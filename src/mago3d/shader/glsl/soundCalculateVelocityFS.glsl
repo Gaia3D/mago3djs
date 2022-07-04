@@ -1091,7 +1091,9 @@ void main()
     float vel_y = currFlux_RFU.y - currFlux_LBD.y + input_flux_LBD.y - input_flux_RFU.y;
     float vel_z = currFlux_RFU.z - currFlux_LBD.z + input_flux_LBD.z - input_flux_RFU.z;
 
-    vec3 velocity = vec3(vel_x, vel_y, vel_z)/2.0;
+    //vec3 velocity = vec3(vel_x, vel_y, vel_z)/2.0;
+    vec3 velocity = vec3(vel_x, vel_y, vel_z);
+
 
 
     //vec2 veloci = vec2(inputflux.w - outputflux.w + outputflux.y - inputflux.y, inputflux.z - outputflux.z + outputflux.x - inputflux.x) / 2.0;

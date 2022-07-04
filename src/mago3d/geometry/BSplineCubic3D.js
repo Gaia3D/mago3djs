@@ -425,6 +425,36 @@ BSplineCubic3D.prototype.isPrepared = function(magoManager)
 	return true;
 };
 
+BSplineCubic3D.prototype.renderThicknessOne = function (magoManager, shader, renderType, bEnableDepth) 
+{
+	if (this.interpolatedPoints3dList !== undefined)
+	{
+		if (shader === undefined)
+		{
+			shader = magoManager.postFxShadersManager.getShader("modelRefSsao");
+			shader.useProgram();
+			shader.disableVertexAttribArrayAll();
+			shader.resetLastBuffersBinded();
+			shader.enableVertexAttribArray(shader.position3_loc);
+			shader.bindUniformGenerals();
+		}
+
+		var gl = magoManager.getGl();
+	
+		gl.uniform1i(shader.bPositionCompressed_loc, false);
+		if (renderType === 1)
+		{
+			gl.uniform1i(shader.bUse1Color_loc, true);
+			
+			if (shader.oneColor4_loc !== undefined && shader.oneColor4_loc !== null)
+			{ gl.uniform4fv(shader.oneColor4_loc, [1.0, 0.0, 0.0, 1.0]); } //.
+		}
+		gl.uniform1f(shader.fixPointSize_loc, 5.0);
+		gl.uniform1i(shader.bUseFixPointSize_loc, true);
+		this.interpolatedPoints3dList.renderLines(magoManager, shader, renderType, this.bLoop, bEnableDepth);
+	}
+};
+
 /**
  * 어떤 일을 하고 있습니까?
  */

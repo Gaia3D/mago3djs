@@ -250,6 +250,9 @@ Voxelizer.prototype.renderToMagoTexture3D = function (soundManager, magoTex3d, g
 	var rendersCount = Math.ceil(finalSlicesCount / 8);
 	for (var i=0; i<rendersCount; i++)
 	{
+		shader = magoManager.postFxShadersManager.getShader("renderOrthogonalToMagoTexture3D"); // (WaterOrthogonalDepthShaderVS, WaterOrthogonalMagoTexture3DFS)
+		magoManager.postFxShadersManager.useProgram(shader);
+
 		// Bind the 8 output textures:
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, magoTex3d.getTexture( i*8 + 0 ), 0);
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, magoTex3d.getTexture( i*8 + 1 ), 0);
@@ -268,9 +271,36 @@ Voxelizer.prototype.renderToMagoTexture3D = function (soundManager, magoTex3d, g
 			var renderable = renderablesArray[j];
 
 			// check if the renderable is geographicCoord class.***
+			var renderType = 0;
 			if (renderable instanceof GeographicCoord)
 			{
 				renderable.renderPoint(magoManager, shader, gl);
+			}
+			else if (renderable instanceof BSplineCubic3D)
+			{
+				// 1rst, force to prepare the bSpline.***
+				var maxCount = 10;
+				var counter = 0;
+				while (!renderable.isPrepared(magoManager))
+				{
+					counter += 1;
+					if (counter > maxCount)
+					{
+						break;
+					}
+				}
+
+				if (!renderable.renderableCurve)
+				{
+					renderable._makeRenderableCurve(magoManager);
+					magoManager.modeler.addObject(renderable.renderableCurve);
+				}
+
+				var glPrimitive;
+				var bIsSelected = false;
+				var bEnableDepth = true;
+				//renderable.renderableCurve.render(magoManager, shader, renderType, glPrimitive, bIsSelected);
+				renderable.renderThicknessOne(magoManager, shader, renderType, bEnableDepth);
 			}
 		}
 	}

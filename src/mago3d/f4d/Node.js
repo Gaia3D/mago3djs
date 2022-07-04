@@ -621,7 +621,7 @@ Node.prototype.renderContent = function (magoManager, shader, renderType, refMat
 		// Tree-data-type has no lods.***
 		//var octreesRenderedCount = this.renderDetailed(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord);
 		var octree = neoBuilding.octree;
-		if (octree.neoReferencesMotherAndIndices) 
+		if (octree && octree.neoReferencesMotherAndIndices) 
 		{
 			// Here must do -> neoBuilding.octree.multiplyKeyTransformMatrix(0, geoLocationData.rotMatrix), bcos
 			// for example, if there are multiple vehicles, as buses, that are moving and rotating, the references with "refMatrixType = 2" is going to multiply by different geoLocations, and

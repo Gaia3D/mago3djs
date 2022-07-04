@@ -1952,7 +1952,8 @@ void main()\n\
             textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
         }\n\
 		\n\
-        if(textureColor.w == 0.0)\n\
+        //if(textureColor.w == 0.0)\n\
+		if(textureColor.w < 0.01)\n\
         {\n\
             discard;\n\
         }\n\
@@ -6445,8 +6446,8 @@ void main()\n\
 \n\
         // Now, calculate the total flux for each axis.***\n\
         //textureColor = vec4(flux_RFU.x - flux_LBD.x, flux_RFU.y - flux_LBD.y, flux_RFU.z - flux_LBD.z, 1.0);\n\
-        textureColor = vec4(flux_RFU, 1.0);\n\
-        //textureColor = vec4(flux_LBD, 1.0);\n\
+        //textureColor = vec4(flux_RFU, 1.0);\n\
+        textureColor = vec4(flux_LBD, 1.0);\n\
 \n\
     }\n\
     else if(uTextureType == 2)\n\
@@ -6480,8 +6481,10 @@ void main()\n\
         // To see velocity.***\n\
         textureColor = texture2D(texture_0, texCoord);\n\
         vec3 vel = decodeVelocity(textureColor.rgb);\n\
+        //float speed = length(vel); // test\n\
         vec3 normalizedVel = normalize(vel);\n\
         textureColor = vec4(normalizedVel.rgb, 1.0);\n\
+        //textureColor = vec4(speed, speed, speed, 1.0); // test\n\
     }\n\
     else if(uTextureType == 6)\n\
     {\n\
@@ -10386,7 +10389,9 @@ void main()\n\
     float vel_y = currFlux_RFU.y - currFlux_LBD.y + input_flux_LBD.y - input_flux_RFU.y;\n\
     float vel_z = currFlux_RFU.z - currFlux_LBD.z + input_flux_LBD.z - input_flux_RFU.z;\n\
 \n\
-    vec3 velocity = vec3(vel_x, vel_y, vel_z)/2.0;\n\
+    //vec3 velocity = vec3(vel_x, vel_y, vel_z)/2.0;\n\
+    vec3 velocity = vec3(vel_x, vel_y, vel_z);\n\
+\n\
 \n\
 \n\
     //vec2 veloci = vec2(inputflux.w - outputflux.w + outputflux.y - inputflux.y, inputflux.z - outputflux.z + outputflux.x - inputflux.x) / 2.0;\n\
@@ -10595,8 +10600,10 @@ uniform mat4 modelViewMatrixRelToEye;\n\
 uniform mat4 modelViewMatrixRelToEyeInv;\n\
 uniform vec3 encodedCameraPositionMCHigh;\n\
 uniform vec3 encodedCameraPositionMCLow;\n\
+\n\
 uniform float u_airMaxPressure;\n\
 uniform float u_airEnvirontmentPressure;\n\
+uniform float u_maxVelocity;\n\
 uniform vec2 u_screenSize;\n\
 uniform vec2 uNearFarArray[4];\n\
 uniform float tangentOfHalfFovy;\n\
@@ -10676,7 +10683,7 @@ vec3 decodeVelocity(in vec3 encodedVel)\n\
 vec3 getVelocity(in vec2 texCoord)\n\
 {\n\
     vec4 encodedVel = texture2D(airVelocityTex, texCoord);\n\
-    return decodeVelocity(encodedVel.xyz);\n\
+    return decodeVelocity(encodedVel.xyz)*u_maxVelocity;\n\
 }\n\
 \n\
 vec4 getNormal_simulationBox(in vec2 texCoord)\n\
@@ -11029,9 +11036,9 @@ void main(){\n\
     vec4 normal4front = getNormal_simulationBox(frontTexCoord);\n\
 	vec3 normal = normal4rear.xyz;\n\
     \n\
-	//if(length(normal) < 0.1)\n\
+	if(length(normal) < 0.1)\n\
     {\n\
-        //discard;\n\
+        discard;\n\
         /*\n\
         vec4 color4discard = vec4(0.0, 0.5, 0.8, 1.0);\n\
         gl_FragData[0] = color4discard;\n\
@@ -11113,7 +11120,8 @@ void main(){\n\
     bool testBool = false;\n\
 \n\
     float totalAirPressure = 0.0;\n\
-    vec3 totalVelocity = vec3(0.0);\n\
+    vec3 totalVelocityLC = vec3(0.0);\n\
+    float totalDotProdInv = 0.0;\n\
     float airPressure = 0.0;\n\
     float smplingCount = 0.0;\n\
     float currMaxPressure = 0.0;\n\
@@ -11128,9 +11136,13 @@ void main(){\n\
         increLength = u_voxelSizeMeters[0];\n\
     }\n\
     vec3 velocity;\n\
+    vec3 velocityLC;\n\
 \n\
-    vec3 camRay = normalize(getViewRay(v_tex_pos, 1.0));\n\
+    //vec3 camRay = normalize(getViewRay(v_tex_pos, 1.0));\n\
+    vec3 camRay = normalize(sceneDepthPosCC);\n\
     float dotProdAccum = 0.0;\n\
+    vec4 color4Aux = vec4(0.0, 0.0, 0.0, 0.0);\n\
+    float dotProdFactor = 6.0;\n\
     \n\
     for(int i=0; i<50; i++)\n\
     {\n\
@@ -11148,27 +11160,26 @@ void main(){\n\
         //sampleTexCoord3d.y = 1.0 - sampleTexCoord3d.y;\n\
         \n\
         //if(get_airPressure_fromTexture3d(frontTexCoord3d + samplingDir * increLength * float(i), airPressure, velocity)) // original.***\n\
-        if(get_airPressure_fromTexture3d(sampleTexCoord3d, airPressure, velocity))\n\
+        if(get_airPressure_fromTexture3d(sampleTexCoord3d, airPressure, velocityLC))\n\
         {\n\
-            // u_airEnvirontmentPressure\n\
-\n\
             // Now, compare the velocity direction with the camRay.***\n\
             // The velocity must be multiplied by mvMatrix.***\n\
-            float speed = length(velocity);\n\
-            vec3 velocityDir = normalize(velocity);\n\
+            float speed = length(velocityLC);\n\
+            vec4 velocityWC = u_simulBoxTMat * vec4(velocityLC, 1.0);\n\
 \n\
             // Now, calculate the velocityCC.***\n\
-            vec4 velocityDirCC = modelViewMatrixRelToEye * vec4(velocityDir, 1.0);\n\
+            vec4 velocityDirCC = modelViewMatrixRelToEye * vec4(velocityWC.xyz, 1.0);\n\
             \n\
-            \n\
-\n\
-            if(airPressure > u_airEnvirontmentPressure)\n\
+            //if(speed > 0.01)\n\
+            if(airPressure > u_airEnvirontmentPressure)// && speed > 1.0)\n\
             {\n\
-                float dotProd = dot(camRay, velocityDirCC.xyz);\n\
+                float dotProd = dot(camRay, normalize(velocityDirCC.xyz));\n\
+                float dotProdInv = 1.0 - abs(dotProd);\n\
                 //if(dotProd < 0.0)\n\
                 {\n\
-                    totalVelocity += velocity;\n\
-                    totalAirPressure += airPressure * (1.0 - abs(dotProd)) * 3.0;\n\
+                    totalVelocityLC += velocityLC;\n\
+                    totalDotProdInv += dotProdInv * dotProdFactor;\n\
+                    totalAirPressure += airPressure * dotProdInv * dotProdFactor;\n\
                     smplingCount += 1.0;\n\
                     //break;\n\
 \n\
@@ -11180,7 +11191,6 @@ void main(){\n\
                     currMaxPressure = airPressure;\n\
                 }\n\
             }\n\
-\n\
             \n\
         }\n\
         else\n\
@@ -11200,10 +11210,12 @@ void main(){\n\
     \n\
     float averageAirPressure = totalAirPressure / smplingCount;\n\
     float unitaryAirPressure = averageAirPressure / u_airMaxPressure;\n\
-    vec3 averageVelocity = totalVelocity / smplingCount;\n\
+    vec3 averageVelocityLC = totalVelocityLC / smplingCount;\n\
     float averageDotProd = dotProdAccum / smplingCount;\n\
+    float averageDotProdInv = totalDotProdInv / smplingCount;\n\
+    averageDotProdInv /= dotProdFactor;\n\
 \n\
-    vec4 color4Aux;\n\
+    \n\
     float f = 10.0;\n\
     float deltaP = averageAirPressure - u_airEnvirontmentPressure;\n\
     float maxPressure_reference = u_airMaxPressure;\n\
@@ -11211,64 +11223,35 @@ void main(){\n\
     //vec3 rainbowCol3 = getRainbowColor_byHeight(sceneAirPressure * f, 0.0, maxPressure_reference);\n\
 \n\
     float alpha;\n\
-    //if(deltaP > 0.0)\n\
+    if(deltaP > 0.0)\n\
+    //if(deltaP > 0.001)\n\
     {\n\
-        alpha = deltaP * 40000.0 / u_airMaxPressure;\n\
-        //alpha = deltaP * 4.0 / u_airMaxPressure;\n\
-        color4Aux = vec4(rainbowCol3, alpha);\n\
-        vec3 velocityDir = normalize(averageVelocity);\n\
-        vec4 velocityDirCC = modelViewMatrixRelToEye * vec4(velocityDir, 1.0);\n\
-        color4Aux = vec4(normalize(velocityDirCC.xyz), alpha);\n\
+        // Test with velocity:\n\
+        vec4 velocityWC = u_simulBoxTMat * vec4(averageVelocityLC, 1.0);\n\
+        vec4 velocityDirCC = modelViewMatrixRelToEye * vec4(velocityWC.xyz, 1.0);\n\
 \n\
-        //color4Aux = vec4(averageDotProd, averageDotProd, averageDotProd, alpha);\n\
-        color4Aux = vec4(smplingCount/50.0, smplingCount/50.0, smplingCount/50.0, alpha);\n\
+        vec3 lightDirLC = normalize(vec3(0.1, 0.1, -0.9));\n\
+\n\
+        vec4 lightDirWC = u_simulBoxTMat * vec4(lightDirLC, 1.0);\n\
+        vec4 lightDirCC = modelViewMatrixRelToEye * vec4(lightDirWC.xyz, 1.0);\n\
+        //float lightDotProd = abs(dot(normalize(lightDirCC.xyz), normalize(velocityDirCC.xyz)));\n\
+        float lightDotProd = abs(dot(normalize(lightDirLC.xyz), normalize(averageVelocityLC.xyz)));\n\
+\n\
+        //float dotProd = abs(dot(camRay, normalize(velocityDirCC.xyz)));\n\
+        //float dotProdInv = 1.0 - abs(dotProd);\n\
+        color4Aux.rgb *= lightDotProd;\n\
+\n\
+        float alphaByP = deltaP * 2.0 / u_airMaxPressure;\n\
+        //alpha = min(averageDotProdInv, alphaByP);\n\
+        alpha = averageDotProdInv;\n\
+        color4Aux = vec4(rainbowCol3, alpha);\n\
+\n\
+        \n\
+        //color4Aux = vec4(normalize(velocityDirCC.xyz), alpha);\n\
+\n\
+        //color4Aux = vec4(dotProdInv, dotProdInv, dotProdInv, alpha);\n\
+        //color4Aux = vec4(dotProd, dotProd, dotProd, alpha);\n\
     }\n\
-    //else\n\
-    //{\n\
-   //     alpha = 0.0;\n\
-   //     color4Aux = vec4(0.25, 0.4, 0.8, alpha);\n\
-    //}\n\
-    \n\
-    /*\n\
-    float fAux = 1e-5;\n\
-    float valueAux = smplingCount;\n\
-    if(valueAux == 1.0)\n\
-    {\n\
-        color4Aux = vec4(1.0, 0.0, 0.0, 1.0);\n\
-    }\n\
-    else if(valueAux >= 1.0 && valueAux < 4.0)\n\
-    {\n\
-        color4Aux = vec4(0.0, 1.0, 0.0, 1.0);\n\
-    }\n\
-    else if(valueAux >= 4.0 && valueAux < 8.0)\n\
-    {\n\
-        color4Aux = vec4(0.0, 0.0, 1.0, 1.0);\n\
-    }\n\
-    else if(valueAux >= 8.0 && valueAux < 15.0)\n\
-    {\n\
-        color4Aux = vec4(1.0, 1.0, 0.0, 1.0);\n\
-    }\n\
-    else if(valueAux >= 15.0 && valueAux < 20.0)\n\
-    {\n\
-        color4Aux = vec4(1.0, 0.0, 1.0, 1.0);\n\
-    }\n\
-    else if(valueAux >= 20.0 && valueAux < 30.0)\n\
-    {\n\
-        color4Aux = vec4(0.0, 1.0, 1.0, 1.0);\n\
-    }\n\
-    else if(valueAux >= 30.0 && valueAux < 40.0)\n\
-    {\n\
-        color4Aux = vec4(1.0, 0.7, 0.4, 1.0);\n\
-    }\n\
-    else if(valueAux >= 40.0)\n\
-    {\n\
-        color4Aux = vec4(0.5, 0.3, 0.99, 1.0);\n\
-    }\n\
-    else\n\
-    {\n\
-        color4Aux = vec4(0.2, 0.2, 0.2, 0.9);\n\
-    }\n\
-    */\n\
 \n\
     gl_FragData[0] = color4Aux;\n\
 \n\

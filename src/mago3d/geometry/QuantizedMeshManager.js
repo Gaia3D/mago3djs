@@ -653,6 +653,53 @@ QuantizedMeshManager.prototype.test__doQuantizedSurfaceExcavation = function (ma
   
 };
 
+QuantizedMeshManager.makeQuantizedMesh_virtually = function (lonSegments, latSegments, altitude, resultQMesh)
+{
+	// This function makes a planar qMesh (used when the terrainProvider has no qMesh of a tile).***
+	//-----------------------------------------------------------------------------------------------
+	if (!resultQMesh)
+	{
+		resultQMesh = {};
+	}
+
+	// Set the altitude of the tile.
+	resultQMesh._minimumHeight = altitude;
+	resultQMesh._maximumHeight = altitude;
+
+	var pointsCount = (lonSegments + 1.0) * (latSegments + 1.0);
+
+	var shortMax = 32767;
+	var uValues = new Uint16Array(pointsCount);
+	var vValues = new Uint16Array(pointsCount);
+	var heightValues = new Uint16Array(pointsCount);
+	var indices = new Uint16Array(pointsCount);
+
+	var increCol = 1.0 / lonSegments;
+	var increRow = 1.0 / latSegments;
+	var idx = 0;
+
+	for (var r = 0; r < latSegments + 1; r++)
+	{
+		for (var c = 0; c < lonSegments + 1; c++)
+		{
+			uValues[idx] = Math.round(c * increCol * shortMax);
+			vValues[idx] = Math.round(r * increRow * shortMax);
+			heightValues[idx] = shortMax;
+			idx += 1;
+		}
+	}
+
+	var options = undefined;
+	var resultObject = GeometryUtils.getIndicesTrianglesRegularNet(lonSegments, latSegments, undefined, undefined, undefined, undefined, undefined, options);
+
+	resultQMesh._uValues = uValues;
+	resultQMesh._vValues = vValues;
+	resultQMesh._heightValues = heightValues;
+	resultQMesh._indices = resultObject.indicesArray;
+
+	return resultQMesh;
+};
+
 
 QuantizedMeshManager.prototype._makeQuantizedMeshVbo__testQSurfaceMesh = function (qMesh)
 {

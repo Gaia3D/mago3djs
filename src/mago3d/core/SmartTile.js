@@ -519,7 +519,7 @@ SmartTile.prototype.deleteNativeObjectByGuid = function(objectGuid, magoManager)
  * @param {MagoRenderable} object objects to put
  * @param {MagoManager} magoManager magoManager
  */
-SmartTile.prototype.putObject = function(targetDepth, object, magoManager) 
+SmartTile.prototype.putObject = function (targetDepth, object, magoManager) 
 {
 	if (this.sphereExtent === undefined)
 	{ this.makeSphereExtent(magoManager); }

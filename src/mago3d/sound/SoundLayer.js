@@ -23,8 +23,9 @@ var SoundLayer = function(soundManager, options)
 
 	this.simulationTimeStep = 0.08; // 
 	this.simulationTimeStep = 0.0005;
-	this.simulationTimeStep = 0.0008; // ok
+	this.simulationTimeStep = 0.0008; // ok for sejong
 	//this.simulationTimeStep = 0.0004; // no
+	this.simulationTimeStep = 0.0002; // for south city
 
 	// The buildings & objects intersected by this waterTile.
 	this.visibleObjectsControler;
@@ -158,18 +159,29 @@ SoundLayer.prototype.prepareTextures = function ()
 			for (var i=0; i<tilesCount; i++)
 			{
 				var tile = this.tilesArray[i];
-				if (!tile.qMesh)
+				if (!tile.fileLoadState)
 				{
-					if (!tile.qMeshPromise)
-					{
-						var X = tile.X;
-						var Y = tile.Y;
-						var L = tile.L;
-						this._loadQuantizedMesh(L, X, Y, tile);
-					}
+					tile.fileLoadState = CODE.fileLoadState.READY;
+				}
 
+				// check the tile status.***
+				if (tile.fileLoadState === CODE.fileLoadState.READY)
+				{
+					var X = tile.X;
+					var Y = tile.Y;
+					var L = tile.L;
+					this._loadQuantizedMesh(L, X, Y, tile);
 					allQuantizedMeshesLoaded = false;
 				}
+				else if (tile.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
+				{
+					allQuantizedMeshesLoaded = false;
+				}
+
+				//if (!tile.qMesh)
+				//{
+				//	allQuantizedMeshesLoaded = false;
+				//}
 			}
 
 			if (allQuantizedMeshesLoaded)
@@ -195,10 +207,17 @@ SoundLayer.prototype.prepareTextures = function ()
 
 SoundLayer.prototype._loadQuantizedMesh = function (L, X, Y, tile)
 {
+	tile.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	tile.qMeshPromise = this.soundManager.terrainProvider.requestTileGeometry(X, Y, L);
 	tile.qMeshPromise.then((value) =>
 	{
+		tile.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 		tile.qMesh = value;
+		tile.geoExtent = SmartTile.getGeographicExtentOfTileLXY(L, X, Y, undefined, CODE.imageryType.CRS84);
+	}, function (status) 
+	{
+		//console.log("xhr status = " + status);
+		tile.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 		tile.geoExtent = SmartTile.getGeographicExtentOfTileLXY(L, X, Y, undefined, CODE.imageryType.CRS84);
 	});
 };
@@ -505,12 +524,14 @@ SoundLayer.prototype.renderWave = function (magoManager)
 
 	// bind uniforms.***
 	shader.bindUniformGenerals();
+
 	gl.uniform1iv(shader.u_texSize_loc, [refTex3D.texture3DXSize, refTex3D.texture3DYSize, refTex3D.texture3DZSize]); // The original texture3D size.***
 	gl.uniform1iv(shader.u_mosaicSize_loc, [refTex3D.mosaicXCount, refTex3D.mosaicYCount, refTex3D.finalSlicesCount]); // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***
 	var modelViewMatrixRelToEyeInv = sceneState.getModelViewRelToEyeMatrixInv();
 	gl.uniformMatrix4fv(shader.modelViewMatrixRelToEyeInv_loc, false, modelViewMatrixRelToEyeInv._floatArrays);
 	gl.uniform1f(shader.u_airMaxPressure_loc, soundManager.airMaxPressure);
 	gl.uniform1f(shader.u_airEnvirontmentPressure_loc, soundManager.airEnvirontmentPressure);
+	gl.uniform1f(shader.u_maxVelocity_loc, soundManager.airMaxVelocity);
 	gl.uniform2fv(shader.u_screenSize_loc, [sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0]]);
 	gl.uniform2fv(shader.uNearFarArray_loc, magoManager.frustumVolumeControl.nearFarArray);
 	gl.uniform3fv(shader.u_voxelSizeMeters_loc, [this.oneVoxelSizeInMeters[0], this.oneVoxelSizeInMeters[1], this.oneVoxelSizeInMeters[2]]); // The one voxel size in meters.***
@@ -707,11 +728,13 @@ SoundLayer.prototype.doSimulationSteps = function (magoManager)
 		this.soundSourceRealTexture3d.createTextures(gl);
 
 		// Now, render a point or a curve into the soundSourceTex3d.***
-		// render a point (127.23761, 36.51072, 50.0).***
+		// render a point (127.23761, 36.51072, 50.0).************************************************************************************************************************
+		/*
 		if (!this._testGeoCoord)
 		{
 			//this._testGeoCoord = new GeographicCoord(127.23761, 36.51072, 50.0);
-			this._testGeoCoord = new GeographicCoord(127.23761, 36.51072, 85.5);
+			//this._testGeoCoord = new GeographicCoord(127.23761, 36.51072, 85.5); // coord for sejong.***
+			this._testGeoCoord = new GeographicCoord(126.89556, 35.15776, 20.0); // coord for sejong.***
 			this._testGeoCoord.makeDefaultGeoLocationData();
 
 			// provisionally render it.***
@@ -721,6 +744,30 @@ SoundLayer.prototype.doSimulationSteps = function (magoManager)
 
 		var modelViewProjMatrix = this.getTileOrthographic_mvpMat();
 		this.voxelizer.renderToMagoTexture3D(this.soundManager, this.soundSourceRealTexture3d, this.geographicExtent, modelViewProjMatrix, [this._testGeoCoord]);
+		*/
+		//-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+		// render a spline as linear sound source (126.89454, 35.15673), (126.89513, 35.15698), (126.89503, 35.15736), (126.89564, 35.15784).*********************************
+		var modeler = magoManager.modeler;
+
+		var alt = 3.0;
+		var geoCoordsList = new GeographicCoordsList();
+		geoCoordsList.newGeoCoord(126.89454, 35.15673, alt);
+		geoCoordsList.newGeoCoord(126.89513, 35.15698, alt);
+		geoCoordsList.newGeoCoord(126.89503, 35.15736, alt);
+		geoCoordsList.newGeoCoord(126.89564, 35.15784, alt);
+
+		var options = {
+			geoCoordsArray         : geoCoordsList.geographicCoordsArray,
+			initialArmsLengthRatio : 0.3,
+			bLoop                  : false
+		};
+
+		var bSpline = new BSplineCubic3D(options);
+		//modeler.bSplineCubic3d = new BSplineCubic3D(options); // to render it.***
+		var modelViewProjMatrix = this.getTileOrthographic_mvpMat();
+		this.voxelizer.renderToMagoTexture3D(this.soundManager, this.soundSourceRealTexture3d, this.geographicExtent, modelViewProjMatrix, [bSpline]);
+		//--------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 		// Now, with the "soundSourceRealTexture3d" make the soundSourceMosaicTexture.***
 	}
@@ -1861,7 +1908,27 @@ SoundLayer.prototype.makeDEMTextureByQuantizedMeshes = function ()
 			var tile = this.tilesArray[i];
 			if (!tile.qMeshVboKeyContainer)
 			{
-				this._makeQuantizedMeshVbo(tile);
+				if (!tile.qMesh)
+				{
+					// The terrainProvider has no qMesh of this tile, so :
+					// make mesh virtually.***
+					var lonSegments = 10;
+					var latSegments = 10;
+					var altitude = 0.0;
+
+					tile.qMesh = QuantizedMeshManager.makeQuantizedMesh_virtually(lonSegments, latSegments, altitude, undefined);
+				}
+
+				if (tile.qMesh)
+				{
+					this._makeQuantizedMeshVbo(tile);
+				}
+				else
+				{
+					// The terrainProvider has no qMesh of this tile, so :
+					// make mesh virtually.***
+					var hola = 0;
+				}
 			}
 		}
 
@@ -2407,17 +2474,6 @@ SoundLayer.prototype.copyTexture = function (originalTexture, dstTexturesArray, 
 	fbo.unbind();
 };
 
-SoundLayer.prototype.makeVoxelizedTextures3dFromDepthTexture = function (magoManager)
-{
-	if (!this.overWriteDEMWithObjectsFinished)
-	{
-		return false;
-	}
-
-	// must calculate the textures slices count.***
-
-};
-
 SoundLayer.prototype._renderVisibleObjects = function (shader, magoManager)
 {
 	// Function used in overWritingDEMDepth texture.***
@@ -2454,8 +2510,23 @@ SoundLayer.prototype._renderVisibleObjects = function (shader, magoManager)
 		var native = this.visibleObjectsControler.currentVisibleNativeObjects.opaquesArray[i];
 		if (native.name !== "contaminationGenerator" && native.name !== "excavationObject" && native.name !== "waterGenerator")
 		{ 
+			// must render in double face.***
+			if (native.attributes === undefined)
+			{
+				native.attributes = {};
+			}
+			// keep the current value.***
+			var currNativeDoubleFace = native.attributes.doubleFace;
+
+			if (native.attributes.doubleFace === undefined || native.attributes.doubleFace === false)
+			{
+				native.attributes.doubleFace = true;
+			}
 			native.render(magoManager, shader, renderType, glPrimitive); 
 			this.buildingsId_OverWritedOnDemMap[native._guid] = native;
+
+			// return the keeped value.***
+			native.attributes.doubleFace = currNativeDoubleFace;
 		}
 	}
 
@@ -2465,8 +2536,23 @@ SoundLayer.prototype._renderVisibleObjects = function (shader, magoManager)
 		var native = this.visibleObjectsControler.currentVisibleNativeObjects.transparentsArray[i];
 		if (native.name !== "contaminationGenerator" && native.name !== "excavationObject" && native.name !== "waterGenerator")
 		{ 
+			// must render in double face.***
+			if (native.attributes === undefined)
+			{
+				native.attributes = {};
+			}
+			// keep the current value.***
+			var currNativeDoubleFace = native.attributes.doubleFace;
+
+			if (native.attributes.doubleFace === undefined || native.attributes.doubleFace === false)
+			{
+				native.attributes.doubleFace = true;
+			}
 			native.render(magoManager, shader, renderType, glPrimitive); 
 			this.buildingsId_OverWritedOnDemMap[native._guid] = native;
+
+			// return the keeped value.***
+			native.attributes.doubleFace = currNativeDoubleFace;
 		}
 	}
 };

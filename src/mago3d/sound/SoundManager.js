@@ -26,7 +26,7 @@ var SoundManager = function(magoManager)
 	this.airMaxPressure = 20.0;
 	this.airEnvirontmentPressure = 1.0; // 1 Atm.***
 	this.maxFlux = 200.0;
-	this.airMaxVelocity = 40.0;
+	this.airMaxVelocity = 200.0;
 
 	// The DEM can be from highMapTextures files, or from quantizedMesh.*******************************
 	this.terrainDemSourceType = "QUANTIZEDMESH"; // from HighMap or from QuantizedMesh.
@@ -120,7 +120,8 @@ SoundManager.prototype.render = function ()
 {
 	if (!this.testStarted)
 	{
-		this._test_sound();
+		//this._test_sound();
+		this._test_sound_withoutQMesh();
 	}
 
 	var magoManager = this.magoManager;
@@ -192,6 +193,53 @@ SoundManager.prototype._test_sound = function ()
 	//var minLon = 127.23049, minLat = 36.50861, minAlt = 0.0, maxLon = 127.24178, maxLat = 36.51691, maxAlt = 400.0; // big
 	//var minLon = 127.23596, minLat = 36.50977, minAlt = 60.0, maxLon = 127.23915, maxLat = 36.51229, maxAlt = 95.0; // small
 	var minLon = 127.23596, minLat = 36.50977, minAlt = 60.0, maxLon = 127.23915, maxLat = 36.51229, maxAlt = 140.0; // small
+	
+	var geographicExtent = new GeographicExtent(minLon, minLat, minAlt, maxLon, maxLat, maxAlt);
+	var options = {
+		geographicExtent: geographicExtent
+	};
+	var soundLayer = this.newSoundLayer(options);
+
+	// provisionally make a native extruded object to render the simulation box.***
+	this.simulationBox = geographicExtent.getRenderableObject(this.magoManager);
+	this.simulationBox.setOneColor(0, 146/255, 203/255, 0.3); // kim seon young 20220523.***
+	this.simulationBox.attributes.isMovable = false;
+	this.simulationBox.attributes.isSelectable = false;
+	this.simulationBox.attributes.name = "soundSimulationSpaceBox";
+	this.simulationBox.attributes.doubleFace = true;
+	this.simulationBox.attributes.selectedColor4 = new Color(1.0, 0.0, 0.0, 0.0); // selectedColor fully transparent.
+	if (this.simulationBox.options === undefined)
+	{ this.simulationBox.options = {}; }
+	
+	// set wireframe parameters.***
+	this.simulationBox.options.renderWireframe = true;
+	if (this.simulationBox.objectsArray && this.simulationBox.objectsArray.length > 0)
+	{
+		var object = this.simulationBox.objectsArray[0];
+		object.thickness = 2.5;
+
+		var surfacesCount = object.getSurfacesCount();
+		object.setColor(0, 146/255, 203/255, 0.3); // sets color for all surfaces.***
+
+		// now, set colors for caps:
+		var surface = object.getSurface(surfacesCount - 2); // top cap surface.***
+		surface.setColor(0, 146/255, 203/255, 0.0);
+
+		var surface = object.getSurface(surfacesCount - 1); // down cap surface.***
+		surface.setColor(0, 146/255, 203/255, 0.0);
+	}
+
+	this.simulationBox.options.renderShaded = true;
+	this.simulationBox.options.depthMask = false;
+	var depth = 4;
+	//this.magoManager.modeler.addObject(this.simulationBox, depth);
+	//----------------------------------------------
+	this.testStarted = true;
+};
+
+SoundManager.prototype._test_sound_withoutQMesh = function ()
+{
+	var minLon = 126.89397, minLat = 35.15650, minAlt = -5.0, maxLon = 126.89673, maxLat = 35.15892, maxAlt = 50.0; 
 	
 	var geographicExtent = new GeographicExtent(minLon, minLat, minAlt, maxLon, maxLat, maxAlt);
 	var options = {
@@ -655,6 +703,7 @@ SoundManager.prototype.createDefaultShaders = function ()
 	shader.u_mosaicSize_loc = gl.getUniformLocation(shader.program, "u_mosaicSize"); // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***
 	shader.u_airMaxPressure_loc = gl.getUniformLocation(shader.program, "u_airMaxPressure");
 	shader.u_airEnvirontmentPressure_loc = gl.getUniformLocation(shader.program, "u_airEnvirontmentPressure");
+	shader.u_maxVelocity_loc = gl.getUniformLocation(shader.program, "u_maxVelocity");
 	shader.u_voxelSizeMeters_loc = gl.getUniformLocation(shader.program, "u_voxelSizeMeters");
 
 	shader.u_simulBoxTMat_loc = gl.getUniformLocation(shader.program, "u_simulBoxTMat");

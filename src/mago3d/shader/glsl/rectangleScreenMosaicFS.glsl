@@ -107,8 +107,8 @@ void main()
 
         // Now, calculate the total flux for each axis.***
         //textureColor = vec4(flux_RFU.x - flux_LBD.x, flux_RFU.y - flux_LBD.y, flux_RFU.z - flux_LBD.z, 1.0);
-        textureColor = vec4(flux_RFU, 1.0);
-        //textureColor = vec4(flux_LBD, 1.0);
+        //textureColor = vec4(flux_RFU, 1.0);
+        textureColor = vec4(flux_LBD, 1.0);
 
     }
     else if(uTextureType == 2)
@@ -142,8 +142,10 @@ void main()
         // To see velocity.***
         textureColor = texture2D(texture_0, texCoord);
         vec3 vel = decodeVelocity(textureColor.rgb);
+        //float speed = length(vel); // test
         vec3 normalizedVel = normalize(vel);
         textureColor = vec4(normalizedVel.rgb, 1.0);
+        //textureColor = vec4(speed, speed, speed, 1.0); // test
     }
     else if(uTextureType == 6)
     {

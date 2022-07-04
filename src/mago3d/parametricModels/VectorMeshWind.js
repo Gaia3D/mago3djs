@@ -89,11 +89,14 @@ VectorMeshWind.prototype.render = function(magoManager, shader, options)
 	var vbo = this.vboKeysContainer.getVboKey(0);
 	var gl = magoManager.getGl();
 	var animationState = 1; // 0= paused, 1= play.
+	var animationSpeed = 1; // 1 = default.***
 
 	if (options)
 	{
 		if (options.animationState !== undefined)
 		{ animationState = options.animationState; }
+		if (options.animationSpeed !== undefined)
+		{ animationSpeed = options.animationSpeed; }
 	}
 	
 	gl.disableVertexAttribArray(shader.color4_loc);
@@ -178,7 +181,7 @@ VectorMeshWind.prototype.render = function(magoManager, shader, options)
 
 	if (this.vertexToDrawCount < 4)
 	{
-		this.phase -= 1;
+		this.phase -= animationSpeed;
 		if (this.phase <= -maxVertexDrawCount + 1)
 		{
 			this.finished = true;
@@ -191,7 +194,8 @@ VectorMeshWind.prototype.render = function(magoManager, shader, options)
 
 	if (animationState === 1)
 	{
-		this.phase -= 1;
+		//this.phase -= 1; // original.***
+		this.phase -= animationSpeed; 
 		if (this.phase <= -maxVertexDrawCount + 1)
 		{
 			this.finished = true;

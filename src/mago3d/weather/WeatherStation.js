@@ -28,10 +28,11 @@ var WeatherStation = function (magoManager, options)
 	this.WIND_MAXPARTICLES_INSCREEN = 1500;
 	this.WIND_STREAMLINES_NUMPOINTS = 250;
 	this.windDisplayMode = "NORMAL"; // "NORMAL", "OVERTERRAIN"
-	this.speedFactor = 1;
+	this.speedFactor = 1; // no use this.***
 
 	// wind params.
 	this.windThickness = 2.5;
+	this.windDefaultAnimationSpeed = 1;
 
 	if (options)
 	{
@@ -78,6 +79,14 @@ WeatherStation.prototype.getWindLayer = function(idx)
 	return this.windLayersArray[idx];
 };
 
+WeatherStation.prototype.getWindVolume = function(idx)
+{
+	if (this.windVolumesArray === undefined)
+	{ return undefined; }
+	
+	return this.windVolumesArray[idx];
+};
+
 WeatherStation.prototype.newWindLayer = function(options)
 {
 	if (this.windLayersArray === undefined)
@@ -93,6 +102,15 @@ WeatherStation.prototype.newWindVolume = function(options)
 {
 	if (this.windVolumesArray === undefined)
 	{ this.windVolumesArray = []; }
+
+	if (options)
+	{
+		if (options.animationSpeed === undefined)
+		{
+			// AnimationSpeed by default is 1. If want to render faster, try to set animationSpeed = 2 or animationSpeed = 3.***
+			options.animationSpeed = this.windDefaultAnimationSpeed;
+		}
+	}
 
 	var windVolume = new WindVolume(options);
 	windVolume.weatherStation = this;

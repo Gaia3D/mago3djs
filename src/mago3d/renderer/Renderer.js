@@ -683,7 +683,7 @@ Renderer.prototype._renderDepthSunPointOfView = function(gl, visibleObjControler
 	var webglController = new WebGlController(gl);
 
 	// Do the depth render.***
-	var shaderName = "orthogonalDepth";
+	var shaderName = "orthogonalDepth"; // (OrthogonalDepthShaderVS, OrthogonalDepthShaderFS)
 	var currentShader = magoManager.postFxShadersManager.getShader(shaderName); 
 	currentShader.resetLastBuffersBinded();
 	//var shaderProgram = currentShader.program;
@@ -2453,7 +2453,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 			{
 				if (soundLayer.fluxRFUMosaicTexture3d_HIGH_A.texturesArray.length > 0)
 				{
-					//texture = soundLayer.fluxRFUMosaicTexture3d_HIGH_A.texturesArray[0];
+					texture = soundLayer.fluxRFUMosaicTexture3d_HIGH_A.texturesArray[0];
 					//gl.uniform1i(shader.uTextureType_loc, 2); // if want to see scene voxelization.***
 				}
 			}
@@ -2847,7 +2847,7 @@ Renderer.prototype.renderScreenRectangleMosaic = function (gl, options)
 	//}
 
 	gl.uniform1i(shader.uTextureType_loc, 0);
-	gl.uniform1i(shader.uSliceIdx_loc, 47);
+	gl.uniform1i(shader.uSliceIdx_loc, 40);
 	//gl.uniform1i(shader.uSliceIdx_loc, 50); 
 	//gl.uniform1i(shader.uSliceIdx_loc, 67); 
 	 
@@ -2938,7 +2938,7 @@ Renderer.prototype.renderScreenRectangleMosaic = function (gl, options)
 				if (soundLayer.fluxRFUMosaicTexture3d_HIGH_A.texturesArray.length > 0)
 				{
 					//tex3d = soundLayer.fluxRFUMosaicTexture3d_LOW_A;
-					//gl.uniform1i(shader.uTextureType_loc, 0); 
+					//gl.uniform1i(shader.uTextureType_loc, 2); 
 				}
 			}
 

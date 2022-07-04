@@ -33,30 +33,37 @@ var WindVolume = function (options)
 	// Animation state controls.
 	this._animationState = 1; // 0= paused. 1= play.
 	this._particesGenerationType = 1; // 0= no generation. 1= inside frustum. 2= particlesGeneratorBox. 3= altitudePlane
+	this._animationSpeed = 1; // default.
 
 	// Particles generator.
 	this._particlesGeneratorBoxesArray;
 
 	if (options)
 	{
-		if (options.geoJsonFile)
+		if (options.geoJsonFile !== undefined)
 		{
 			this.setWindGeoJson(options.geoJsonFile);
 		}
 
-		if (options.geoJsonFilePath)
+		if (options.geoJsonFilePath !== undefined)
 		{
 			this._geoJsonFilePath = options.geoJsonFilePath;
 		}
 
-		if (options.geoJsonFileFolderPath)
+		if (options.geoJsonFileFolderPath !== undefined)
 		{
 			this._geoJsonFileFolderPath = options.geoJsonFileFolderPath;
 		}
 
-		if (options.particesGenerationType)
+		if (options.particesGenerationType !== undefined)
 		{
 			this._particesGenerationType = options.particesGenerationType;
+		}
+
+		if (options.animationSpeed !== undefined)
+		{
+			// AnimationSpeed by default is 1. If want to render faster, try to set animationSpeed = 2 or animationSpeed = 3.***
+			this._animationSpeed = options.animationSpeed;
 		}
 	}
 };
@@ -401,6 +408,11 @@ WindVolume.prototype._createdElemsForDisplayBox = function(magoManager)
 	}
 };
 
+WindVolume.prototype.setWindAnimationSpeed = function (windAnimationSpeed)
+{
+	this._animationSpeed = windAnimationSpeed;
+};
+
 WindVolume.prototype.setWindGeoJson = function (windGeoJson)
 {
 	if (!windGeoJson)
@@ -708,7 +720,7 @@ WindVolume.prototype.newWindStreamLine = function (magoManager)
 			return renderableObject;
 		}
 	}
-	else if (this._particesGenerationType === 2) // 0= no generation. 1= inside frustum. 2= particlesGeneratorBox.
+	else if (this._particesGenerationType === 2) // 0= no generation. 1= inside frustum. 2= particlesGeneratorBox. 3= altitudePlane
 	{
 		// Check if exist particlesGeneratorBoxes.
 		if (this._particlesGeneratorBoxesArray && this._particlesGeneratorBoxesArray.length > 0)
@@ -1168,7 +1180,7 @@ WindVolume.prototype.renderDepthWindVolume = function (magoManager)
 	}
 
 	//this._particesGenerationType = 1; // 0= no generation. 1= inside frustum. 2= particlesGeneratorBox. 3= altitudePlane
-	if (this._particesGenerationType === 1)
+	if (this._particesGenerationType === 1 || this._particesGenerationType === 3)
 	{
 		// The windDisplayBox & plane are objects that in the scene, must dont have depth effect, so usually its has "options.depthMask = false",
 		// but, when need to do depth render, then, must set "options.depthMask = true" to render depth correctly. After depth render, we return to "options.depthMask = false".
@@ -1180,6 +1192,12 @@ WindVolume.prototype.renderDepthWindVolume = function (magoManager)
 			plane.options.depthMask = true;
 		}
 	}
+
+	if (this._particesGenerationType === 3)
+	{
+		this.windDisplayBox.attributes.isVisible = false;
+	}
+	
 	
 
 	// Front Face.***************************************************************************************************************************
@@ -1260,7 +1278,7 @@ WindVolume.prototype.renderDepthWindVolume = function (magoManager)
 	gl.frontFace(gl.CCW);
 
 	//this._particesGenerationType = 1; // 0= no generation. 1= inside frustum. 2= particlesGeneratorBox. 3= altitudePlane
-	if (this._particesGenerationType === 1)
+	if (this._particesGenerationType === 1 || this._particesGenerationType === 3)
 	{
 		// The windDisplayBox & plane are objects that in the scene, must dont have depth effect, so usually its has "options.depthMask = false",
 		// but, when need to do depth render, then, must set "options.depthMask = true" to render depth correctly. After depth render, we return to "options.depthMask = false".
@@ -1271,6 +1289,11 @@ WindVolume.prototype.renderDepthWindVolume = function (magoManager)
 			var plane = this.windDisplayPlanesArray[i];
 			plane.options.depthMask = false;
 		}
+	}
+
+	if (this._particesGenerationType === 3)
+	{
+		this.windDisplayBox.attributes.isVisible = true;
 	}
 
 	magoManager.bindMainFramebuffer();
@@ -1398,7 +1421,7 @@ WindVolume.prototype.renderMode3DThickLines = function (magoManager)
 
 	// Now render the streamLines (thickLines).
 	// change shader. use "thickLines" shader.
-	var thickLineShader = magoManager.postFxShadersManager.getShader("windStreamThickLine"); 
+	var thickLineShader = magoManager.postFxShadersManager.getShader("windStreamThickLine"); // (windStreamThickLineVS, windStreamThickLineFS)
 	thickLineShader.useProgram();
 	thickLineShader.bindUniformGenerals();
 	
@@ -1428,7 +1451,8 @@ WindVolume.prototype.renderMode3DThickLines = function (magoManager)
 	var streamLinesArrayAux = [];
 
 	var options = {
-		animationState: this._animationState
+		animationState : this._animationState,
+		animationSpeed : this._animationSpeed
 	};
 
 	for (var i=0; i<vectorTypeObjectsCount; i++)

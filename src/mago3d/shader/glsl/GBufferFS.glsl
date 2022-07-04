@@ -385,7 +385,8 @@ void main()
             textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));
         }
 		
-        if(textureColor.w == 0.0)
+        //if(textureColor.w == 0.0)
+		if(textureColor.w < 0.01)
         {
             discard;
         }
