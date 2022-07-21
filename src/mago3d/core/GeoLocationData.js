@@ -710,8 +710,11 @@ GeoLocationData.prototype.getTransformedRelativePositionsArray = function(absolu
 };
 
 /**
+ * 유니폼 변수들의 위치정보(GeoLocation)를 셋팅합니다.
+ * @param gl
+ * @param shader
  */
-GeoLocationData.prototype.bindGeoLocationUniforms = function(gl, shader) 
+GeoLocationData.prototype.bindGeoLocationUniforms = function(gl, shader)
 {
 	gl.uniformMatrix4fv(shader.buildingRotMatrix_loc, false, this.rotMatrix._floatArrays);
 	this.bindSplitedPositionUniforms(gl, shader);

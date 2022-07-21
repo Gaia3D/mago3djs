@@ -374,12 +374,19 @@ WindLayer.prototype.prepareWindLayer = function ()
 			//this.windMapFileName = splitted[0];
 		}
 
-		if (!this.windMapFolderPath || this.windMapFolderPath.length === 0) 
+		var windMapTexturePath;
+
+		if (!this.windMapFolderPath || this.windMapFolderPath.length === 0)
 		{
-			this.windMapFolderPath = this.windMapJson.properties.image.serviceUri.split(this.windMapFileName)[0];
+			// 서버에서 serviceUri를 생성할 경우 2022.07.21 정연화 수정
+			windMapTexturePath = this.windMapJson.properties.image.serviceUri;
 		}
-		
-		var windMapTexturePath = this.windMapFolderPath + "/" + this.windMapFileName;// + ".png";
+		else
+		{
+			// 서버에서 serviceUri를 생성하지 않은 경우 (더블 슬러시 문제 해결) 2022.07.21 정연화 수정
+			windMapTexturePath = this.windMapFolderPath + "/" + this.windMapFileName;
+		}
+
 		ReaderWriter.loadImage(this.gl, windMapTexturePath, this.windMapTexture);
 		return false;
 	}

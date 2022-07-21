@@ -225,7 +225,7 @@ PostFxShader.prototype.useProgram = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 유니폼 변수들을 셋팅하고 있습니다.
  * @param shaderName 변수
  * @returns shader
  */
