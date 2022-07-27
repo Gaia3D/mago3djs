@@ -690,7 +690,9 @@ QuantizedMeshManager.makeQuantizedMesh_virtually = function (lonSegments, latSeg
 	}
 
 	var options = undefined;
-	var resultObject = GeometryUtils.getIndicesTrianglesRegularNet(lonSegments, latSegments, undefined, undefined, undefined, undefined, undefined, options);
+	var points_columnsCount = lonSegments + 1;
+	var points_rowsCount = latSegments + 1;
+	var resultObject = GeometryUtils.getIndicesTrianglesRegularNet(points_columnsCount, points_rowsCount, undefined, undefined, undefined, undefined, undefined, options);
 
 	resultQMesh._uValues = uValues;
 	resultQMesh._vValues = vValues;

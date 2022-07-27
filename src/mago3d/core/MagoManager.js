@@ -2442,7 +2442,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 			lightSource: lightAux
 		};
 		
-		//this.renderer.renderScreenRectangle(gl, options); // debug component.
+		this.renderer.renderScreenRectangle(gl, options); // debug component.
 		this.renderer.renderScreenRectangleMosaic(gl, options); // debug component.
 		*/
 		//-----------------------------------------------------------

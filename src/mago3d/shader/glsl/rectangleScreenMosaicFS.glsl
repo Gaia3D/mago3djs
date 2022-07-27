@@ -143,7 +143,7 @@ void main()
         textureColor = texture2D(texture_0, texCoord);
         vec3 vel = decodeVelocity(textureColor.rgb);
         //float speed = length(vel); // test
-        vec3 normalizedVel = normalize(vel);
+        vec3 normalizedVel = normalize(vel.rgb);
         textureColor = vec4(normalizedVel.rgb, 1.0);
         //textureColor = vec4(speed, speed, speed, 1.0); // test
     }

@@ -5,7 +5,7 @@
  * @class MergedObject
  * @param {MagoManager} magoManager
 */
-var MergedObject = function(magoManager) 
+var MergedObject = function (magoManager) 
 {
 	if (!(this instanceof MergedObject)) 
 	{

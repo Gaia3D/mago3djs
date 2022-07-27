@@ -239,7 +239,9 @@ SoundManager.prototype._test_sound = function ()
 
 SoundManager.prototype._test_sound_withoutQMesh = function ()
 {
-	var minLon = 126.89397, minLat = 35.15650, minAlt = -5.0, maxLon = 126.89673, maxLat = 35.15892, maxAlt = 50.0; 
+	//var minLon = 126.89397, minLat = 35.15650, minAlt = -5.0, maxLon = 126.89673, maxLat = 35.15892, maxAlt = 30.0; // (광주) 양동휴먼시아 아파트.***
+	//var minLon = 126.90446, minLat = 35.16761, minAlt = -5.0, maxLon = 126.90804, maxLat = 35.17062, maxAlt = 30.0; // (광주) 모아타운 아파트.***
+	var minLon = 126.88525, minLat = 35.15373, minAlt = -5.0, maxLon = 126.88799, maxLat = 35.15686, maxAlt = 40.0; // (광주) 농성SK뷰센트럴 아파트.***
 	
 	var geographicExtent = new GeographicExtent(minLon, minLat, minAlt, maxLon, maxLat, maxAlt);
 	var options = {
@@ -560,6 +562,7 @@ SoundManager.prototype.createDefaultShaders = function ()
 	shader.u_airMaxPressure_loc = gl.getUniformLocation(shader.program, "u_airMaxPressure");
 	shader.u_airEnvirontmentPressure_loc = gl.getUniformLocation(shader.program, "u_airEnvirontmentPressure");
 	shader.u_processType_loc = gl.getUniformLocation(shader.program, "u_processType");
+	shader.u_airPressureAlternative_loc = gl.getUniformLocation(shader.program, "u_airPressureAlternative"); 
 
 	shader.soundSourceTex_0_loc = gl.getUniformLocation(shader.program, "soundSourceTex_0");
 	shader.soundSourceTex_1_loc = gl.getUniformLocation(shader.program, "soundSourceTex_1");
@@ -656,6 +659,7 @@ SoundManager.prototype.createDefaultShaders = function ()
 	shader.flux_LBD_MosaicTex_HIGH_loc = gl.getUniformLocation(shader.program, "flux_LBD_MosaicTex_HIGH");
 	shader.flux_LBD_MosaicTex_LOW_loc = gl.getUniformLocation(shader.program, "flux_LBD_MosaicTex_LOW");
 	shader.auxMosaicTex_loc = gl.getUniformLocation(shader.program, "auxMosaicTex");
+	shader.maxPressureMosaicTex_loc = gl.getUniformLocation(shader.program, "maxPressureMosaicTex");
 
 	shader.a_pos_loc = gl.getAttribLocation(shader.program, "a_pos");//
 	shader.u_airMaxPressure_loc = gl.getUniformLocation(shader.program, "u_airMaxPressure");//
@@ -674,6 +678,7 @@ SoundManager.prototype.createDefaultShaders = function ()
 	gl.uniform1i(shader.flux_LBD_MosaicTex_HIGH_loc, 3);
 	gl.uniform1i(shader.flux_LBD_MosaicTex_LOW_loc, 4);
 	gl.uniform1i(shader.auxMosaicTex_loc, 5);
+	gl.uniform1i(shader.maxPressureMosaicTex_loc, 6);
 	
 	// 3) calculateVelocity Shader.*********************************************************************************************
 	shaderName = "volumetricWaves";
@@ -690,6 +695,7 @@ SoundManager.prototype.createDefaultShaders = function ()
 	shader.sceneDepthTex_loc = gl.getUniformLocation(shader.program, "sceneDepthTex"); // scene depth tex.***
 	shader.sceneNormalTex_loc = gl.getUniformLocation(shader.program, "sceneNormalTex"); // scene normal tex.***
 	shader.airVelocityTex_loc = gl.getUniformLocation(shader.program, "airVelocityTex");
+	shader.maxPressureMosaicTex_loc = gl.getUniformLocation(shader.program, "maxPressureMosaicTex");
 
 	shader.a_pos_loc = gl.getAttribLocation(shader.program, "a_pos");
 	shader.u_screenSize_loc = gl.getUniformLocation(shader.program, "u_screenSize");
@@ -720,6 +726,7 @@ SoundManager.prototype.createDefaultShaders = function ()
 	gl.uniform1i(shader.sceneDepthTex_loc, 3);
 	gl.uniform1i(shader.sceneNormalTex_loc, 4);
 	gl.uniform1i(shader.airVelocityTex_loc, 5);
+	gl.uniform1i(shader.maxPressureMosaicTex_loc, 6);
 
 	magoManager.postFxShadersManager.useProgram(null);
 };

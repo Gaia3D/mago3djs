@@ -1211,7 +1211,7 @@ GeographicCoordsList.prototype.renderPoints = function(magoManager, shader, rend
 	//for(var i = 0; i<vertexAttribsCount; i++)
 	//	gl.disableVertexAttribArray(i);
 
-	var shaderLocal = magoManager.postFxShadersManager.getShader("pointsCloudSsao"); // provisional. Use the currentShader of argument.
+	var shaderLocal = magoManager.postFxShadersManager.getShader("pointsCloudSsao"); // (PointCloudVS, PointCloudSsaoFS)
 	magoManager.postFxShadersManager.useProgram(shaderLocal);
 	
 	shaderLocal.disableVertexAttribArrayAll();
@@ -1226,12 +1226,13 @@ GeographicCoordsList.prototype.renderPoints = function(magoManager, shader, rend
 	gl.uniform4fv(shaderLocal.oneColor4_loc, [1.0, 0.1, 0.1, 1.0]); //.
 	gl.uniform1f(shaderLocal.fixPointSize_loc, 5.0);
 	gl.uniform1i(shaderLocal.bUseFixPointSize_loc, 1);
+	gl.uniform1f(shaderLocal.externalAlpha_loc, 1.0);
 
 	/////////////////////////////////////////////////////////////
 	var pCloudSettings = magoManager.magoPolicy.getPointsCloudSettings();
-	gl.uniform1i(shaderLocal.bUseColorCodingByHeight_loc, true);
-	gl.uniform1f(shaderLocal.minHeight_rainbow_loc, parseInt(pCloudSettings.minHeightRainbow));
-	gl.uniform1f(shaderLocal.maxHeight_rainbow_loc, parseInt(pCloudSettings.maxHeightRainbow));
+	//gl.uniform1i(shaderLocal.bUseColorCodingByHeight_loc, true);
+	//gl.uniform1f(shaderLocal.minHeight_rainbow_loc, parseInt(pCloudSettings.minHeightRainbow));
+	//gl.uniform1f(shaderLocal.maxHeight_rainbow_loc, parseInt(pCloudSettings.maxHeightRainbow));
 	gl.uniform1f(shaderLocal.maxPointSize_loc, parseInt(pCloudSettings.maxPointSize));
 	gl.uniform1f(shaderLocal.minPointSize_loc, parseInt(pCloudSettings.minPointSize));
 	gl.uniform1f(shaderLocal.pendentPointSize_loc, parseInt(pCloudSettings.pendentPointSize));
@@ -1276,7 +1277,9 @@ GeographicCoordsList.prototype.renderPoints = function(magoManager, shader, rend
 	var canvas = magoManager.getObjectLabel();
 	var ctx = canvas.getContext("2d");
 	ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-	ctx.font = "13px Arial";
+	ctx.font = "bold 13px Arial";
+	ctx.fillStyle = "black";
+	ctx.strokeStyle = "white";
 
 	var gl = magoManager.sceneState.gl;
 	var worldPosition;
@@ -1293,9 +1296,17 @@ GeographicCoordsList.prototype.renderPoints = function(magoManager, shader, rend
 		//var geoCoords = geoLoc.geographicCoord;
 		if (screenCoord.x >= 0 && screenCoord.y >= 0)
 		{
-			var word = "lon: " + geoCoord.longitude.toFixed(5) + ", lat: " + geoCoord.latitude.toFixed(5);
+			var word = "lon: " + geoCoord.longitude.toFixed(6);
 			ctx.strokeText(word, screenCoord.x, screenCoord.y);
 			ctx.fillText(word, screenCoord.x, screenCoord.y);
+
+			word = "lat: " + geoCoord.latitude.toFixed(6);
+			ctx.strokeText(word, screenCoord.x, screenCoord.y + 15.0);
+			ctx.fillText(word, screenCoord.x, screenCoord.y + 15.0);
+
+			word = "alt: " + geoCoord.altitude.toFixed(6);
+			ctx.strokeText(word, screenCoord.x, screenCoord.y + 30.0);
+			ctx.fillText(word, screenCoord.x, screenCoord.y + 30.0);
 		}
 	}
 	

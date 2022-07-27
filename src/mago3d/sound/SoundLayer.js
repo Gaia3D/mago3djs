@@ -24,8 +24,15 @@ var SoundLayer = function(soundManager, options)
 	this.simulationTimeStep = 0.08; // 
 	this.simulationTimeStep = 0.0005;
 	this.simulationTimeStep = 0.0008; // ok for sejong
-	//this.simulationTimeStep = 0.0004; // no
+	///////////////////////////////////////////////////////
 	this.simulationTimeStep = 0.0002; // for south city
+	this.simulationTimeStep = 0.0004; // test delete.!!!
+
+	// wave vars.***
+	this.waveLength = 1.0;
+	this.waveAmplitude = 1.0;
+	this.wavePhase = 0.0;
+	this.timeStepAccum = 0.0;
 
 	// The buildings & objects intersected by this waterTile.
 	this.visibleObjectsControler;
@@ -140,6 +147,12 @@ SoundLayer.prototype.prepareTextures = function ()
 			{
 				this._targetDepth = maxDepthAvailable;
 			}
+
+			
+			//if (this._targetDepth > 17)// test:::
+			//{
+			//	this._targetDepth = 17;// test:::
+			//}
 
 			var depth = this._targetDepth;
 			
@@ -570,6 +583,9 @@ SoundLayer.prototype.renderWave = function (magoManager)
 	gl.activeTexture(gl.TEXTURE5);
 	gl.bindTexture(gl.TEXTURE_2D, this.airVelocity_B.getTexture( 0 )); 
 
+	gl.activeTexture(gl.TEXTURE6);
+	gl.bindTexture(gl.TEXTURE_2D, this.maxPressureMosaicTexture3d_A.getTexture( 0 ));
+
 	// Draw screenQuad:
 	gl.drawArrays(gl.TRIANGLES, 0, 6);
 
@@ -599,7 +615,90 @@ SoundLayer.prototype.renderWave = function (magoManager)
 
 	gl.enable(gl.BLEND);
 	
+	this.drawSimulationVariables();
+};
 
+SoundLayer.prototype.newPointSource = function (longitude, latitude, altitude) 
+{
+	var geoCoord = new GeographicCoord(longitude, latitude, altitude); 
+	geoCoord.makeDefaultGeoLocationData();
+
+	// provisionally render it.***
+	var magoManager = this.soundManager.magoManager;
+	var geoCoordsList = magoManager.modeler.getGeographicCoordsList();
+	geoCoordsList.addGeoCoord(geoCoord);
+
+	var modelViewProjMatrix = this.getTileOrthographic_mvpMat();
+	this.voxelizer.renderToMagoTexture3D(this.soundManager, this.soundSourceRealTexture3d, this.geographicExtent, modelViewProjMatrix, [geoCoord]);
+};
+
+SoundLayer.prototype.newBSplineCubic3DSource = function (geoCoordsArray) 
+{
+	var options = {
+		geoCoordsArray         : geoCoordsArray,
+		initialArmsLengthRatio : 0.3,
+		bLoop                  : false
+	};
+
+	var bSpline = new BSplineCubic3D(options);
+	var modelViewProjMatrix = this.getTileOrthographic_mvpMat();
+	this.voxelizer.renderToMagoTexture3D(this.soundManager, this.soundSourceRealTexture3d, this.geographicExtent, modelViewProjMatrix, [bSpline]);
+};
+
+SoundLayer.prototype.TEST_yangDongHumenSiA_apt = function () 
+{
+	// (광주) 양동휴먼시아 아파트.***
+	// ******************************************************************************************************************************************************************
+	this.newPointSource(126.89556, 35.15776, 5.0);
+	this.newPointSource(126.89535, 35.15715, 5.0);
+	//-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+	// render a spline as linear sound source (126.89454, 35.15673), (126.89513, 35.15698), (126.89503, 35.15736), (126.89564, 35.15784).*********************************
+	var alt = 3.0;
+	var geoCoordsList = new GeographicCoordsList();
+	geoCoordsList.newGeoCoord(126.89454, 35.15673, alt);
+	geoCoordsList.newGeoCoord(126.89513, 35.15698, alt);
+	geoCoordsList.newGeoCoord(126.89503, 35.15736, alt);
+	geoCoordsList.newGeoCoord(126.89564, 35.15784, alt);
+
+	this.newBSplineCubic3DSource(geoCoordsList.geographicCoordsArray);
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+};
+
+SoundLayer.prototype.TEST_MoATown_apt = function () 
+{
+	// (광주) 모아타운 아파트.***
+	// ******************************************************************************************************************************************************************
+	//-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+	// render a spline as linear sound source (126.89454, 35.15673), (126.89513, 35.15698), (126.89503, 35.15736), (126.89564, 35.15784).*********************************
+	var alt = 3.0;
+	var geoCoordsList = new GeographicCoordsList();
+	geoCoordsList.newGeoCoord(126.90506, 35.16952, alt);
+	geoCoordsList.newGeoCoord(126.90718, 35.16899, alt);
+
+	this.newBSplineCubic3DSource(geoCoordsList.geographicCoordsArray);
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+};
+
+SoundLayer.prototype.TEST_NongSeon_SK_viewCentral_apt = function () 
+{
+	// (광주) 농성SK뷰센트럴 아파트.***
+	// ******************************************************************************************************************************************************************
+	//this.newPointSource(126.88602, 35.15512, 5.0);
+	//-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+	// render a spline as linear sound source (126.89454, 35.15673), (126.89513, 35.15698), (126.89503, 35.15736), (126.89564, 35.15784).*********************************
+	var alt = 3.0;
+	var geoCoordsList = new GeographicCoordsList();
+	geoCoordsList.newGeoCoord(126.88568, 35.15520, alt);
+	geoCoordsList.newGeoCoord(126.88620, 35.15494, alt);
+	geoCoordsList.newGeoCoord(126.88648, 35.15528, alt);
+	geoCoordsList.newGeoCoord(126.88724, 35.15534, alt);
+	geoCoordsList.newGeoCoord(126.88780, 35.15602, alt);
+
+	this.newBSplineCubic3DSource(geoCoordsList.geographicCoordsArray);
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------------------
 };
 
 SoundLayer.prototype.doSimulationSteps = function (magoManager) 
@@ -728,48 +827,9 @@ SoundLayer.prototype.doSimulationSteps = function (magoManager)
 		this.soundSourceRealTexture3d.createTextures(gl);
 
 		// Now, render a point or a curve into the soundSourceTex3d.***
-		// render a point (127.23761, 36.51072, 50.0).************************************************************************************************************************
-		/*
-		if (!this._testGeoCoord)
-		{
-			//this._testGeoCoord = new GeographicCoord(127.23761, 36.51072, 50.0);
-			//this._testGeoCoord = new GeographicCoord(127.23761, 36.51072, 85.5); // coord for sejong.***
-			this._testGeoCoord = new GeographicCoord(126.89556, 35.15776, 20.0); // coord for sejong.***
-			this._testGeoCoord.makeDefaultGeoLocationData();
-
-			// provisionally render it.***
-			var geoCoordsList = magoManager.modeler.getGeographicCoordsList();
-			geoCoordsList.addGeoCoord(this._testGeoCoord);
-		}
-
-		var modelViewProjMatrix = this.getTileOrthographic_mvpMat();
-		this.voxelizer.renderToMagoTexture3D(this.soundManager, this.soundSourceRealTexture3d, this.geographicExtent, modelViewProjMatrix, [this._testGeoCoord]);
-		*/
-		//-------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-		// render a spline as linear sound source (126.89454, 35.15673), (126.89513, 35.15698), (126.89503, 35.15736), (126.89564, 35.15784).*********************************
-		var modeler = magoManager.modeler;
-
-		var alt = 3.0;
-		var geoCoordsList = new GeographicCoordsList();
-		geoCoordsList.newGeoCoord(126.89454, 35.15673, alt);
-		geoCoordsList.newGeoCoord(126.89513, 35.15698, alt);
-		geoCoordsList.newGeoCoord(126.89503, 35.15736, alt);
-		geoCoordsList.newGeoCoord(126.89564, 35.15784, alt);
-
-		var options = {
-			geoCoordsArray         : geoCoordsList.geographicCoordsArray,
-			initialArmsLengthRatio : 0.3,
-			bLoop                  : false
-		};
-
-		var bSpline = new BSplineCubic3D(options);
-		//modeler.bSplineCubic3d = new BSplineCubic3D(options); // to render it.***
-		var modelViewProjMatrix = this.getTileOrthographic_mvpMat();
-		this.voxelizer.renderToMagoTexture3D(this.soundManager, this.soundSourceRealTexture3d, this.geographicExtent, modelViewProjMatrix, [bSpline]);
-		//--------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-		// Now, with the "soundSourceRealTexture3d" make the soundSourceMosaicTexture.***
+		//this.TEST_yangDongHumenSiA_apt(); // (광주) 양동휴먼시아 아파트.***
+		//this.TEST_MoATown_apt(); // (광주) 모아타운 아파트.***
+		this.TEST_NongSeon_SK_viewCentral_apt();// (광주) 농성SK뷰센트럴 아파트.***
 	}
 
 	if (!this.soundSourceRealTexture3d)
@@ -802,6 +862,16 @@ SoundLayer.prototype.doSimulationSteps = function (magoManager)
 		this.pressureMosaicTexture3d_B = new MagoTexture3D();
 		this.pressureMosaicTexture3d_B.copyParametersFrom(this.fluxRFUMosaicTexture3d_HIGH_A);
 		this.pressureMosaicTexture3d_B.createTextures(gl);
+
+		// create the max pressure record mosaic texture 3d.***
+		this.maxPressureMosaicTexture3d_A = new MagoTexture3D();
+		this.maxPressureMosaicTexture3d_A.copyParametersFrom(this.fluxRFUMosaicTexture3d_HIGH_A);
+		this.maxPressureMosaicTexture3d_A.createTextures(gl);
+
+		this.maxPressureMosaicTexture3d_B = new MagoTexture3D();
+		this.maxPressureMosaicTexture3d_B.copyParametersFrom(this.fluxRFUMosaicTexture3d_HIGH_A);
+		this.maxPressureMosaicTexture3d_B.createTextures(gl);
+
 
 		// Now, must set the environtment air pressure.***
 		this._setEnvirontmentAirPressure();
@@ -856,25 +926,27 @@ SoundLayer.prototype.doSimulationSteps = function (magoManager)
 	{ 
 		return false; 
 	}
+
+	if (!this.timeStepAccum)
+	{
+		this.timeStepAccum = 0.0;
+	}
 	
 	if (!this.oneSimulationStep) // test debug "if". Delete after debug.!!!
 	{
 		// Start the simulation steps.***
 		if (!this.airPresureFromSource) // test debug "if". Delete after debug.!!!
 		{
-			if (!this.timeStepAccum)
-			{
-				this.timeStepAccum = 0.0;
-			}
+			// this.simulationTimeStep
 
-			if (this.timeStepAccum >= 0.01)
+			if (this.timeStepAccum >= 0.05)
 			{
 				//this.airPresureFromSource = true;
+				//this._calculateAirPressureFromSoundSource();
+				//this.timeStepAccum = 0.0;
 			}
 			this._calculateAirPressureFromSoundSource();
-			//this.airPresureFromSource = true;
-
-			this.timeStepAccum += this.simulationTimeStep;
+			//this.airPresureFromSource = true;	
 		}
 		
 		this._makeAuxMosaicTexture3D_forFluxCalculation();
@@ -886,6 +958,8 @@ SoundLayer.prototype.doSimulationSteps = function (magoManager)
 		
 		//this.oneSimulationStep = true; // test debug var.***
 	}
+
+	this.timeStepAccum += this.simulationTimeStep;
 	
 
 	var hola = 0;
@@ -913,7 +987,7 @@ SoundLayer.prototype._calculateVelocity = function ()
 		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
 		extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1]
 		extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2]
-		extbuffers.NONE, // gl_FragData[3]
+		extbuffers.COLOR_ATTACHMENT3_WEBGL, // gl_FragData[3]
 		extbuffers.NONE, // gl_FragData[3]
 		extbuffers.NONE, // gl_FragData[3]
 		extbuffers.NONE, // gl_FragData[3]
@@ -921,7 +995,7 @@ SoundLayer.prototype._calculateVelocity = function ()
 	]);
 
 	//gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0);
-	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0);
+	//gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0);
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT4_WEBGL, gl.TEXTURE_2D, null, 0);
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT5_WEBGL, gl.TEXTURE_2D, null, 0);
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT6_WEBGL, gl.TEXTURE_2D, null, 0);
@@ -954,7 +1028,8 @@ SoundLayer.prototype._calculateVelocity = function ()
 		// Bind the 8 output textures:
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.pressureMosaicTexture3d_A.getTexture( i ), 0); // airPressure
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.airVelocity_A.getTexture( i ), 0); // airVelocity.
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, this.shaderLogTexture_vel.getTexture( i ), 0); // airVelocity.
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, this.maxPressureMosaicTexture3d_A.getTexture( i ), 0); // airVelocity.
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, this.shaderLogTexture_vel.getTexture( i ), 0); // airVelocity.
 		
 
 		//gl.uniform1i(shader.u_lowestMosaicSliceIndex_loc,  i*8);
@@ -977,6 +1052,9 @@ SoundLayer.prototype._calculateVelocity = function ()
 		gl.activeTexture(gl.TEXTURE5);
 		gl.bindTexture(gl.TEXTURE_2D, this.auxMosaicTexture3d_forFluxCalculation.getTexture( i ));
 
+		gl.activeTexture(gl.TEXTURE6);
+		gl.bindTexture(gl.TEXTURE_2D, this.maxPressureMosaicTexture3d_B.getTexture( i ));
+
 
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		// Draw screenQuad:
@@ -995,6 +1073,7 @@ SoundLayer.prototype._calculateVelocity = function ()
 	// now, swap waterHeightTextures:
 	SoundLayer._swapTextures3D(this.pressureMosaicTexture3d_A, this.pressureMosaicTexture3d_B);
 	SoundLayer._swapTextures3D(this.airVelocity_A, this.airVelocity_B);
+	SoundLayer._swapTextures3D(this.maxPressureMosaicTexture3d_A, this.maxPressureMosaicTexture3d_B);
 };
 
 SoundLayer.prototype._makeAuxMosaicTexture3D_forFluxCalculation = function ()
@@ -1592,7 +1671,7 @@ SoundLayer.prototype._setEnvirontmentAirPressure = function ()
 	var webglController = new WebGlController(gl);
 
 	var screenQuad = soundManager.getQuadBuffer();
-	var shader = magoManager.postFxShadersManager.getShader("soundCalculateAirPressure");
+	var shader = magoManager.postFxShadersManager.getShader("soundCalculateAirPressure"); // (waterQuadVertVS, soundCalculatePressureFS)
 	magoManager.postFxShadersManager.useProgram(shader);
 	//var increTimeSeconds = waterManager.getIncrementTimeSeconds() * 1;
 
@@ -1674,6 +1753,55 @@ SoundLayer.prototype._setEnvirontmentAirPressure = function ()
 	SoundLayer._swapTextures3D(this.pressureMosaicTexture3d_A, this.pressureMosaicTexture3d_B);
 };
 
+SoundLayer.prototype.drawSimulationVariables = function() 
+{
+	var soundManager = this.soundManager;
+	var magoManager = soundManager.magoManager;
+	var canvas = magoManager.getObjectLabel();
+	var ctx = canvas.getContext("2d");
+
+	// lod2.
+	var gl = magoManager.getGl();
+	var worldPosition;
+	var screenCoord = new Point2D(100, 100);
+
+	ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+	// write.*****************************************************
+	var offset = [0.0, 0.0];
+	var increY = 30.0;
+	ctx.fillStyle = "black";
+	ctx.strokeStyle = "white";
+	ctx.font = "bold 18px Arial";
+	var text = "Wave length (m) : " + this.waveLength.toString(10);
+	ctx.strokeText(text, screenCoord.x, screenCoord.y);
+	ctx.fillText(text, screenCoord.x, screenCoord.y);
+
+	offset[1] += increY;
+	text = "Wave amplitude (Pa) : " + this.waveAmplitude.toString(10);
+	ctx.strokeText(text, screenCoord.x + offset[0], screenCoord.y + offset[1]);
+	ctx.fillText(text, screenCoord.x + offset[0], screenCoord.y + offset[1]);//this.simulationTimeStep
+
+	offset[1] += increY;
+	text = "Simulation time step (s) : " + this.simulationTimeStep.toFixed(5).toString(10);
+	ctx.strokeText(text, screenCoord.x + offset[0], screenCoord.y + offset[1]);
+	ctx.fillText(text, screenCoord.x + offset[0], screenCoord.y + offset[1]);
+
+	offset[1] += increY;
+	text = "Wave phase : " + this.wavePhase.toFixed(5).toString(10);
+	ctx.strokeText(text, screenCoord.x + offset[0], screenCoord.y + offset[1]);
+	ctx.fillText(text, screenCoord.x + offset[0], screenCoord.y + offset[1]);
+
+	offset[1] += increY;
+	text = "Time (s) : " + this.timeStepAccum.toFixed(5).toString(10);
+	ctx.strokeText(text, screenCoord.x + offset[0], screenCoord.y + offset[1]);
+	ctx.fillText(text, screenCoord.x + offset[0], screenCoord.y + offset[1]);
+
+	// End writing.-----------------------------------------------------
+	ctx.restore();
+	this.canvasDirty = true;
+};
+
 SoundLayer.prototype._calculateAirPressureFromSoundSource = function ()
 {
 	if (!this.voxelizer)
@@ -1693,16 +1821,31 @@ SoundLayer.prototype._calculateAirPressureFromSoundSource = function ()
 	var webglController = new WebGlController(gl);
 
 	var screenQuad = soundManager.getQuadBuffer();
-	var shader = magoManager.postFxShadersManager.getShader("soundCalculateAirPressure");
+	var shader = magoManager.postFxShadersManager.getShader("soundCalculateAirPressure"); // (waterQuadVertVS, soundCalculatePressureFS)
 	magoManager.postFxShadersManager.useProgram(shader);
 	//var increTimeSeconds = waterManager.getIncrementTimeSeconds() * 1;
 
+	// Simulate a wave airPressure using "this.timeStepAccum" & "this.simulationTimeStep".***
+	this.waveLength = 1.5; // 1m.***
+	var waveSpeed = 320.0;// 320m/s.
+	var freq = waveSpeed / this.waveLength;
+	var angularVelocity = 2 * Math.PI * freq; // w = 2PI/T or w = 2PI*freq.***
+	this.waveAmplitude = 3.0;
+	var environtmentAirPressure = soundManager.airEnvirontmentPressure;
+	var currTimeSec = this.timeStepAccum;
+	this.wavePhase = Math.sin(angularVelocity * currTimeSec);
+	var airPressureAlternative = this.waveAmplitude * this.wavePhase + (this.waveAmplitude);// + environtmentAirPressure); // Pa.***
+
 	gl.uniform1f(shader.u_airMaxPressure_loc, soundManager.airMaxPressure);
 	gl.uniform1f(shader.u_airEnvirontmentPressure_loc, soundManager.airEnvirontmentPressure);
+	gl.uniform1f(shader.u_airPressureAlternative_loc, airPressureAlternative);
 
+	//*****************************************************************
 	// u_processType == 0= pressure from pressure soyrce. 
 	// u_processType == 1= setting air environtment pressure.***
-	gl.uniform1i(shader.u_processType_loc, 0);
+	// u_processType == 2= wave pressure.***
+	gl.uniform1i(shader.u_processType_loc, 2);
+	//-----------------------------------------------------------------
 
 	// bind screenQuad positions.
 	FBO.bindAttribute(gl, screenQuad.posBuffer, shader.a_pos, 2);
@@ -1908,12 +2051,20 @@ SoundLayer.prototype.makeDEMTextureByQuantizedMeshes = function ()
 			var tile = this.tilesArray[i];
 			if (!tile.qMeshVboKeyContainer)
 			{
+				if (tile.qMesh && tile.qMesh._uValues === undefined)
+				{
+					// Note : the code enter here when serverPolicy.terrainType = 'cesium-default';
+					// Note : the cesium default terrain(without DEM) has "qMesh", but has no "qMesh._uValues".***
+					// So, set tile.qMesh as undefined & continue the algorithm.***
+					tile.qMesh = undefined;
+				}
+
 				if (!tile.qMesh)
 				{
 					// The terrainProvider has no qMesh of this tile, so :
 					// make mesh virtually.***
-					var lonSegments = 10;
-					var latSegments = 10;
+					var lonSegments = 2;
+					var latSegments = 2;
 					var altitude = 0.0;
 
 					tile.qMesh = QuantizedMeshManager.makeQuantizedMesh_virtually(lonSegments, latSegments, altitude, undefined);
@@ -1974,7 +2125,7 @@ SoundLayer.prototype.makeDEMTextureByQuantizedMeshes = function ()
 	//gl.clearColor(1.0, 0.0, 0.0, 0.0);
 	gl.clearDepth(1.0);
 
-	shader = magoManager.postFxShadersManager.getShader("depthTexFromQuantizedMesh");
+	shader = magoManager.postFxShadersManager.getShader("depthTexFromQuantizedMesh"); // (waterQuantizedMeshVS, waterDEMTexFromQuantizedMeshFS)
 	magoManager.postFxShadersManager.useProgram(shader);
 	shader.bindUniformGenerals();
 
@@ -1988,8 +2139,13 @@ SoundLayer.prototype.makeDEMTextureByQuantizedMeshes = function ()
 
 	// Now, set the waterSimGeoExtent & the qMeshGeoExtent.
 	var geoExtent = this.geographicExtent;
-	gl.uniform3fv(shader.u_totalMinGeoCoord_loc, [geoExtent.minGeographicCoord.longitude, geoExtent.minGeographicCoord.latitude, geoExtent.minGeographicCoord.altitude]);
-	gl.uniform3fv(shader.u_totalMaxGeoCoord_loc, [geoExtent.maxGeographicCoord.longitude, geoExtent.maxGeographicCoord.latitude, geoExtent.maxGeographicCoord.altitude]);
+	//var totalMinLonFloor = Math.floor(geoExtent.minGeographicCoord.longitude);
+	//var totalMinLatFloor = Math.floor(geoExtent.minGeographicCoord.latitude);
+	gl.uniform3fv(shader.u_totalMinGeoCoord_loc, new Float32Array([geoExtent.minGeographicCoord.longitude, geoExtent.minGeographicCoord.latitude, geoExtent.minGeographicCoord.altitude]));
+	gl.uniform3fv(shader.u_totalMaxGeoCoord_loc, new Float32Array([geoExtent.maxGeographicCoord.longitude, geoExtent.maxGeographicCoord.latitude, geoExtent.maxGeographicCoord.altitude]));
+
+	//var lonRange = geoExtent.maxGeographicCoord.longitude - geoExtent.minGeographicCoord.longitude;
+	//var latRange = geoExtent.maxGeographicCoord.latitude - geoExtent.minGeographicCoord.latitude;
 
 	if (this.demTextureByQMesh_lastTileIdx === undefined)
 	{
@@ -2010,8 +2166,8 @@ SoundLayer.prototype.makeDEMTextureByQuantizedMeshes = function ()
 		}
 		var tile = this.tilesArray[idx];
 		var tileGeoExtent = tile.geoExtent;
-		gl.uniform3fv(shader.u_currentMinGeoCoord_loc, [tileGeoExtent.minGeographicCoord.longitude, tileGeoExtent.minGeographicCoord.latitude, tile.qMesh._minimumHeight]);
-		gl.uniform3fv(shader.u_currentMaxGeoCoord_loc, [tileGeoExtent.maxGeographicCoord.longitude, tileGeoExtent.maxGeographicCoord.latitude, tile.qMesh._maximumHeight]);
+		gl.uniform3fv(shader.u_currentMinGeoCoord_loc, new Float32Array([tileGeoExtent.minGeographicCoord.longitude, tileGeoExtent.minGeographicCoord.latitude, tile.qMesh._minimumHeight]));
+		gl.uniform3fv(shader.u_currentMaxGeoCoord_loc, new Float32Array([tileGeoExtent.maxGeographicCoord.longitude, tileGeoExtent.maxGeographicCoord.latitude, tile.qMesh._maximumHeight]));
 
 		var vbo_vicky = tile.qMeshVboKeyContainer.vboCacheKeysArray[0]; // there are only one.
 		var vertices_count = vbo_vicky.vertexCount;
@@ -2740,7 +2896,7 @@ SoundLayer.prototype._voxelizeInYDirection = function (magoManager)
 	var n = 0.0;
 	var f = 1.0;
 	var iterationsCount = Math.ceil(scene_ySize/8);
-	var nearFarRange = 1.0 / iterationsCount;
+	var nearFarRange = 1.0 / (iterationsCount);
 	//iterationsCount = 2; // test delete!!!!!!!!!!!
 	for (var i=0; i<iterationsCount; i++)
 	{

@@ -2436,7 +2436,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 			{
 				if (soundLayer.pressureMosaicTexture3d_A.texturesArray.length > 0)
 				{
-					//texture = soundLayer.pressureMosaicTexture3d_A.texturesArray[0];
+					texture = soundLayer.pressureMosaicTexture3d_A.texturesArray[0];
 					//gl.uniform1i(shader.uTextureType_loc, 4); // This decodes 4byte color4.***
 				}
 			}
@@ -2453,7 +2453,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 			{
 				if (soundLayer.fluxRFUMosaicTexture3d_HIGH_A.texturesArray.length > 0)
 				{
-					texture = soundLayer.fluxRFUMosaicTexture3d_HIGH_A.texturesArray[0];
+					//texture = soundLayer.fluxRFUMosaicTexture3d_HIGH_A.texturesArray[0];
 					//gl.uniform1i(shader.uTextureType_loc, 2); // if want to see scene voxelization.***
 				}
 			}
@@ -2506,7 +2506,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 			{
 				if (soundLayer.airVelocity_B.texturesArray.length > 0)
 				{
-					texture = soundLayer.airVelocity_B.texturesArray[0];
+					//texture = soundLayer.airVelocity_B.texturesArray[0];
 					//gl.uniform1i(shader.uTextureType_loc, 5); // if want to see velocity.***
 				}
 			}
@@ -2761,16 +2761,18 @@ Renderer.prototype.renderScreenRectangleMosaic = function (gl, options)
 	var screenHeight = sceneState.drawingBufferHeight[0];
 	var aspectRatio = screenWidth / screenHeight;
 
-	if (this.quadBuffer === undefined)
+	if (this.quadBuffer_mosaic === undefined)
 	{
 
 		//var data = new Float32Array([0, 0,   1, 0,   0, 1,   0, 1,   1, 0,   1,  1]); // total screen.
 		//-----------------------------------------------------------------------------------------------------------------
-		var data = new Float32Array([0, 0,   0.5, 0,   0, 0.5,       0, 0.5,   0.5, 0,   0.5, 0.5]); // rightUp screen.
+		//var data = new Float32Array([0, 0,   0.5, 0,   0, 0.5,       0, 0.5,   0.5, 0,   0.5, 0.5]); // rightUp screen.
 		//-----------------------------------------------------------------------------------------------------------------
 		//var data = new Float32Array([0, 0,   0.5, 0,   0, 1,       0, 1,   0.5, 0,   0.5, 1]); // right half screen.
 		//-----------------------------------------------------------------------------------------------------------------
-		this.quadBuffer = FBO.createBuffer(gl, data);
+		var data = new Float32Array([0, 0.5,   0.5, 0.5,   0, 1,       0, 1,   0.5, 0.5,   0.5, 1]); // rightDown screen.
+		//-----------------------------------------------------------------------------------------------------------------
+		this.quadBuffer_mosaic = FBO.createBuffer(gl, data);
 
 		// create texCoords.
 		var texCoords = new Float32Array([0, 0,   1, 0,   0, 1,   0, 1,   1, 0,   1,  1]); // total screen.
@@ -2820,7 +2822,7 @@ Renderer.prototype.renderScreenRectangleMosaic = function (gl, options)
 	var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
 
 	gl.enableVertexAttribArray(shader.position2_loc);
-	FBO.bindAttribute(gl, this.quadBuffer, shader.position2_loc, 2);
+	FBO.bindAttribute(gl, this.quadBuffer_mosaic, shader.position2_loc, 2);
 
 	if (shader.normal3_loc !== -1)
 	{
@@ -2847,8 +2849,8 @@ Renderer.prototype.renderScreenRectangleMosaic = function (gl, options)
 	//}
 
 	gl.uniform1i(shader.uTextureType_loc, 0);
-	gl.uniform1i(shader.uSliceIdx_loc, 40);
-	//gl.uniform1i(shader.uSliceIdx_loc, 50); 
+	//gl.uniform1i(shader.uSliceIdx_loc, 102); // frontier in 102 to 103.***
+	gl.uniform1i(shader.uSliceIdx_loc, 11); 
 	//gl.uniform1i(shader.uSliceIdx_loc, 67); 
 	 
 
@@ -2894,7 +2896,7 @@ Renderer.prototype.renderScreenRectangleMosaic = function (gl, options)
 			{
 				if (soundLayer.pressureMosaicTexture3d_A.texturesArray.length > 0)
 				{
-					//tex3d = soundLayer.pressureMosaicTexture3d_A;
+					tex3d = soundLayer.pressureMosaicTexture3d_A;
 					//gl.uniform1i(shader.uTextureType_loc, 4); 
 				}
 			}
@@ -2908,9 +2910,18 @@ Renderer.prototype.renderScreenRectangleMosaic = function (gl, options)
 				}
 			}
 
+			if (soundLayer.maxPressureMosaicTexture3d_A)
+			{
+				if (soundLayer.maxPressureMosaicTexture3d_A.texturesArray.length > 0)
+				{
+					//tex3d = soundLayer.maxPressureMosaicTexture3d_A;
+					//gl.uniform1i(shader.uTextureType_loc, 4); 
+				}
+			}
+
 			if (soundLayer.fluxRFUMosaicTexture3d_HIGH_A && soundLayer.fluxRFUMosaicTexture3d_LOW_A && soundLayer.fluxLBDMosaicTexture3d_HIGH_A && soundLayer.fluxLBDMosaicTexture3d_LOW_A)
 			{
-				
+				/*
 				if (soundLayer.fluxRFUMosaicTexture3d_HIGH_A.texturesArray.length > 0 && soundLayer.fluxRFUMosaicTexture3d_LOW_A.texturesArray.length > 0 &&
 					soundLayer.fluxLBDMosaicTexture3d_HIGH_A.texturesArray.length > 0 && soundLayer.fluxLBDMosaicTexture3d_LOW_A.texturesArray.length > 0)
 				{
@@ -2930,7 +2941,7 @@ Renderer.prototype.renderScreenRectangleMosaic = function (gl, options)
 					gl.activeTexture(gl.TEXTURE0 + 3); 
 					gl.bindTexture(gl.TEXTURE_2D, texture_LBD_LOW_A);
 				}
-				
+				*/
 			}
 
 			if (soundLayer.fluxRFUMosaicTexture3d_HIGH_A)
@@ -3046,13 +3057,20 @@ Renderer.prototype.renderScreenRectangleMosaic = function (gl, options)
 		}
 	}
 
-	if (tex3d === undefined)
+	if (tex3d === undefined)// && texture === undefined)
 	{
 		return;
 	}
 
 	texture = tex3d.texturesArray[0];
-	gl.uniform1iv(shader.u_mosaicSize_loc, [tex3d.mosaicXCount, tex3d.mosaicYCount, tex3d.finalSlicesCount]); // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***
+	if (tex3d)
+	{
+		gl.uniform1iv(shader.u_mosaicSize_loc, [tex3d.mosaicXCount, tex3d.mosaicYCount, tex3d.finalSlicesCount]); // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***
+	}
+	else 
+	{
+		gl.uniform1iv(shader.u_mosaicSize_loc, [1, 1, 1]);
+	}
 
 	if (texture === undefined)
 	{ return; }

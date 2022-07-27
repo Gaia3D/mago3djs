@@ -157,8 +157,8 @@ void main()
     vec2 subTexCoordYDir = vec2(subTexCoord.x, float(sliceIdx)/float(u_yDirTextureSize[1]));
 
     // Now, calculate the texCoordYDirMosaic.***
-    int col_yDirMosaic = int(colRow_yDirMosaic.x);
-    int row_yDirMosaic = int(colRow_yDirMosaic.y);
+    int col_yDirMosaic = int(floor(colRow_yDirMosaic.x));
+    int row_yDirMosaic = int(floor(colRow_yDirMosaic.y));
 
     vec2 texCoordYDirMosaic = subTexCoord_to_texCoord(subTexCoordYDir, col_yDirMosaic, row_yDirMosaic, u_yDirMosaicSize[0], u_yDirMosaicSize[1]);
 

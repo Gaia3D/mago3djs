@@ -57,7 +57,7 @@ vec2 encodeRG(in float wh)
 
 void main()
 {     
-    vec2 screenPos = vec2(gl_FragCoord.x / u_simulationTextureSize.x, gl_FragCoord.y / u_simulationTextureSize.y);
+    //vec2 screenPos = vec2(gl_FragCoord.x / u_simulationTextureSize.x, gl_FragCoord.y / u_simulationTextureSize.y);
 
     // Check if the current fragment is inside of the u_quantizedVolume_MinMax.***
     vec3 quantizedVolumeMin = u_quantizedVolume_MinMax[0];
@@ -81,13 +81,13 @@ void main()
     // Note : consider that there are 8 output textures.***
     float zDepthRangeTotal = quantizedVolumeMax.z - quantizedVolumeMin.z;
     float zDepthOneSlice = zDepthRangeTotal / 8.0;
-    vec4 zeroColor4 = vec4(0.0);
+    vec4 zeroColor4 = vec4(0.0); // original.***
     vec4 solidColor4 = vec4(1.0, 1.0, 1.0, 1.0);
 
     float qPosZ = quantizedPos.z;
     solidColor4 = vec4(qPosZ, qPosZ, qPosZ, 1.0);
 
-    float factor = 0.6;
+    float factor = 0.6; // original.***
 
     // Now, for each output texture, calculate if intersects the quantizedPos.***
     // gl_FragData[0] - is the nearest slice.***

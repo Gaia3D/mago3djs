@@ -32,6 +32,8 @@ var Voxelizer = function(options)
 			this.voxelZSize = options.voxelZSize;
 		}
 	}
+
+	// voxelization technique proposed by Eisemann and Decoret
 };
 
 Voxelizer.prototype.makeMosaicTexture3DFromRealTexture3D = function (magoManager, realTex3d, resultMosaicTexture3d)

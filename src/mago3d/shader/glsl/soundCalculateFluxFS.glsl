@@ -196,6 +196,14 @@ bool getNextSubTextureColRow(in int col, in int row, inout int next_col, inout i
     {
         next_col = col + 1;
     }
+
+    // Must check : some times, no all textures of the last row is used.***
+    int sliceIdx = next_row * u_mosaicSize[0] + next_col;
+    if(sliceIdx > u_texSize[2]-1)
+    {
+        return false;
+    }
+
     return true;
 }
 
@@ -295,12 +303,13 @@ float getAirPressure(in vec2 texCoord, inout vec3 airPressure_RFU, inout vec3 ai
         float t = row_aux * tRange_aux + subTexCoord.y * tRange_aux;
 
         vec2 texCoord_auxMosaicTex = vec2(s, t);
-        airPressure_RFU.z = getAirPressure_inAuxMosaicTexture(texCoord_auxMosaicTex);
+        //airPressure_RFU.z = getAirPressure_inAuxMosaicTexture(texCoord_auxMosaicTex);
         airPressure_RFU.z = u_airEnvirontmentPressure; // test delete.***
 
         // Now, read flux_RFU_HIGH to calculate the voxelSpaceType.***
-        vec4 color4_RFU_HIGH = texture2D(flux_RFU_MosaicTex_HIGH, texCoord_auxMosaicTex);
-        voxelSpaceType_RFU.z = color4_RFU_HIGH.a;
+        vec4 color4_RFU_HIGH = texture2D(flux_RFU_MosaicTex_HIGH, texCoord_auxMosaicTex); // error! Cannot use "texCoord_auxMosaicTex" in "flux_RFU_MosaicTex_HIGH" texture!!!
+        //voxelSpaceType_RFU.z = color4_RFU_HIGH.a;
+        voxelSpaceType_RFU.z = 0.0;
         
     }
     //--------------------------------------------------------------------------------------------------------------
@@ -383,12 +392,13 @@ float getAirPressure(in vec2 texCoord, inout vec3 airPressure_RFU, inout vec3 ai
         float t = row_aux * tRange_aux + subTexCoord.y * tRange_aux;
 
         vec2 texCoord_auxMosaicTex = vec2(s, t);
-        airPressure_LBD.z = getAirPressure_inAuxMosaicTexture(texCoord_auxMosaicTex);
+        //airPressure_LBD.z = getAirPressure_inAuxMosaicTexture(texCoord_auxMosaicTex);
         airPressure_LBD.z = u_airEnvirontmentPressure; // test delete.***
 
         // Now, read flux_RFU_HIGH to calculate the voxelSpaceType.***
-        vec4 color4_RFU_HIGH = texture2D(flux_RFU_MosaicTex_HIGH, texCoord_auxMosaicTex);
-        voxelSpaceType_LBD.z = color4_RFU_HIGH.a;
+        //vec4 color4_RFU_HIGH = texture2D(flux_RFU_MosaicTex_HIGH, texCoord_auxMosaicTex); // error! Cannot use "texCoord_auxMosaicTex" in "flux_RFU_MosaicTex_HIGH" texture!!!
+        //voxelSpaceType_LBD.z = color4_RFU_HIGH.a;
+        voxelSpaceType_LBD.z = 0.0;
         
     }
     //--------------------------------------------------------------------------------------------------------------
