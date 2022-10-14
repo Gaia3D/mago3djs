@@ -1325,7 +1325,7 @@ Renderer.prototype.renderScreenQuad = function (gl)
 	// ------------------------------------------------------------------------------
 
 	var postFxShadersManager = magoManager.postFxShadersManager;
-	currentShader = postFxShadersManager.getShader("screenQuad"); 
+	currentShader = postFxShadersManager.getShader("screenQuad"); // (ScreenQuadVS, ScreenQuadFS)
 	postFxShadersManager.useProgram(currentShader);
 	currentShader.bindUniformGenerals();
 
@@ -1780,10 +1780,10 @@ Renderer.prototype.renderScreenQuadBlur_ssaoTex = function (gl)
 	var postFxShadersManager = magoManager.postFxShadersManager;
 
 	var bGaussianBlur = true;
-	var shaderName = "screenQuadBlur";
+	var shaderName = "screenQuadBlur"; // (ScreenQuadVS, ScreenQuadBlurFS)
 	if (bGaussianBlur)
 	{
-		shaderName = "gaussianBlur";
+		shaderName = "gaussianBlur"; // (ScreenQuadVS, ScreenQuadGaussianBlurFS)
 	}
 
 	currentShader = postFxShadersManager.getShader(shaderName); 
@@ -1888,7 +1888,7 @@ Renderer.prototype.renderSsaoFromDepth = function (gl)
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	}
 
-	var currentShader = magoManager.postFxShadersManager.getShader("ssaoFromDepth"); 
+	var currentShader = magoManager.postFxShadersManager.getShader("ssaoFromDepth"); // (ScreenQuadVS, ssaoFromDepthFS)
 	currentShader.useProgram();
 	currentShader.bindUniformGenerals();
 

@@ -145,12 +145,12 @@ Texture.createTexture = function(gl, filter, data, width, height, texWrap)
 {
 	// static function.
 	// example of filter: gl.NEAREST
-	if (!texWrap)
+	if (texWrap === undefined)
 	{
 		texWrap = gl.CLAMP_TO_EDGE;
 	}
 
-	if (!filter)
+	if (filter === undefined)
 	{
 		filter = gl.NEAREST;
 	}
@@ -162,6 +162,7 @@ Texture.createTexture = function(gl, filter, data, width, height, texWrap)
 
 	var texture = gl.createTexture();
 	gl.bindTexture(gl.TEXTURE_2D, texture);
+	gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false); // must to be an argument. TODO.***
 	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, texWrap);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, texWrap);

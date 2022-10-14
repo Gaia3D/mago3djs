@@ -29,6 +29,9 @@ var SoundLayer = function(soundManager, options)
 	this.simulationTimeStep = 0.0004; // test delete.!!!
 
 	// wave vars.***
+	/*
+	Para una temperatura de aire de 20ºC donde la velocidad del sonido es 344 m/s, las ondas de sonido audible, tienen longitudes de onda desde 0,0172 m (0,68 pulgadas), a 17,2 metros (56,4 pies).
+	*/
 	this.waveLength = 1.0;
 	this.waveAmplitude = 1.0;
 	this.wavePhase = 0.0;
@@ -1755,6 +1758,28 @@ SoundLayer.prototype._setEnvirontmentAirPressure = function ()
 
 SoundLayer.prototype.drawSimulationVariables = function() 
 {
+	/*
+	// Text inside rectangle sample.*********************************
+	// Text inside rectangle sample.*********************************
+	var canvas = document.getElementById("canvas");
+	var ctx = canvas.getContext("2d");
+
+	var fontsize = 14;
+	var fontface = 'verdana';
+	var lineHeight = fontsize * 1.286;
+	var text = 'Draw a rectangle around me.';
+
+	ctx.font = fontsize + 'px ' + fontface;
+	var textWidth = ctx.measureText(text).width;
+
+	ctx.textAlign = 'left';
+	ctx.textBaseline = 'top';
+
+	ctx.fillText(text, 20, 50);
+	ctx.strokeRect(20, 50, textWidth, lineHeight);
+	//------------------------------------------------------------------
+	*/
+
 	var soundManager = this.soundManager;
 	var magoManager = soundManager.magoManager;
 	var canvas = magoManager.getObjectLabel();
@@ -1773,29 +1798,41 @@ SoundLayer.prototype.drawSimulationVariables = function()
 	ctx.fillStyle = "black";
 	ctx.strokeStyle = "white";
 	ctx.font = "bold 18px Arial";
+	var lineHeight = 18 * 1.286;
+
 	var text = "Wave length (m) : " + this.waveLength.toString(10);
+	var textWidth = ctx.measureText(text).width;
 	ctx.strokeText(text, screenCoord.x, screenCoord.y);
 	ctx.fillText(text, screenCoord.x, screenCoord.y);
+	//ctx.strokeRect(screenCoord.x, screenCoord.y, textWidth, lineHeight);
 
 	offset[1] += increY;
 	text = "Wave amplitude (Pa) : " + this.waveAmplitude.toString(10);
+	textWidth = ctx.measureText(text).width;
 	ctx.strokeText(text, screenCoord.x + offset[0], screenCoord.y + offset[1]);
 	ctx.fillText(text, screenCoord.x + offset[0], screenCoord.y + offset[1]);//this.simulationTimeStep
+	//ctx.strokeRect(screenCoord.x + offset[0], screenCoord.y + offset[1], textWidth, lineHeight);
 
 	offset[1] += increY;
 	text = "Simulation time step (s) : " + this.simulationTimeStep.toFixed(5).toString(10);
+	textWidth = ctx.measureText(text).width;
 	ctx.strokeText(text, screenCoord.x + offset[0], screenCoord.y + offset[1]);
 	ctx.fillText(text, screenCoord.x + offset[0], screenCoord.y + offset[1]);
+	//ctx.strokeRect(screenCoord.x + offset[0], screenCoord.y + offset[1], textWidth, lineHeight);
 
 	offset[1] += increY;
 	text = "Wave phase : " + this.wavePhase.toFixed(5).toString(10);
+	textWidth = ctx.measureText(text).width;
 	ctx.strokeText(text, screenCoord.x + offset[0], screenCoord.y + offset[1]);
 	ctx.fillText(text, screenCoord.x + offset[0], screenCoord.y + offset[1]);
+	//ctx.strokeRect(screenCoord.x + offset[0], screenCoord.y + offset[1], textWidth, lineHeight);
 
 	offset[1] += increY;
 	text = "Time (s) : " + this.timeStepAccum.toFixed(5).toString(10);
+	textWidth = ctx.measureText(text).width;
 	ctx.strokeText(text, screenCoord.x + offset[0], screenCoord.y + offset[1]);
 	ctx.fillText(text, screenCoord.x + offset[0], screenCoord.y + offset[1]);
+	//ctx.strokeRect(screenCoord.x + offset[0], screenCoord.y + offset[1], textWidth, lineHeight);
 
 	// End writing.-----------------------------------------------------
 	ctx.restore();
@@ -1826,11 +1863,16 @@ SoundLayer.prototype._calculateAirPressureFromSoundSource = function ()
 	//var increTimeSeconds = waterManager.getIncrementTimeSeconds() * 1;
 
 	// Simulate a wave airPressure using "this.timeStepAccum" & "this.simulationTimeStep".***
-	this.waveLength = 1.5; // 1m.***
+	/*
+	Para una temperatura de aire de 20ºC donde la velocidad del sonido es 344 m/s, 
+	las ondas de sonido audible, tienen longitudes de onda desde 0,0172 m (0,68 pulgadas), 
+	a 17,2 metros (56,4 pies).
+	*/
+	this.waveLength = 15.0; // 1m.***
 	var waveSpeed = 320.0;// 320m/s.
 	var freq = waveSpeed / this.waveLength;
 	var angularVelocity = 2 * Math.PI * freq; // w = 2PI/T or w = 2PI*freq.***
-	this.waveAmplitude = 3.0;
+	this.waveAmplitude = 6.0;
 	var environtmentAirPressure = soundManager.airEnvirontmentPressure;
 	var currTimeSec = this.timeStepAccum;
 	this.wavePhase = Math.sin(angularVelocity * currTimeSec);

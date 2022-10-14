@@ -98,6 +98,59 @@ GeometryUtils.getPrevIdx = function(currIdx, pointsCount)
 };
 
 /**
+ * This function calculates the centerPosition of the array and makes a local positionsArray.
+ * @param {positionsFloatArray} positionsFloatArray
+ * @Return {object} {centerPos, [localPosition]}
+ */
+GeometryUtils.getCenterPositionAndLocalPositions3DFloat32 = function (positionsFloatArray)
+{
+	var arrayLength = positionsFloatArray.length;
+	// Note : arrayLength must be multiple of 3.***
+	var pointsCount = arrayLength / 3;
+	var bbox = new BoundingBox();
+	for (var i=0; i<pointsCount; i++)
+	{
+		var x = positionsFloatArray[3*i];
+		var y = positionsFloatArray[3*i + 1];
+		var z = positionsFloatArray[3*i + 2];
+
+		if (i === 0)
+		{
+			bbox.initXYZData(x, y, z);
+		}
+		else 
+		{
+			bbox.addXYZData(x, y, z);
+		}
+	}
+
+	var centerPos = bbox.getCenterPoint(undefined);
+	var centerPos_x = new Float32Array([centerPos.x])[0];
+	var centerPos_y = new Float32Array([centerPos.y])[0];
+	var centerPos_z = new Float32Array([centerPos.z])[0];
+
+	// Now, relativize all position to centerPos.***
+	var localPosFloatArray = new Float32Array(arrayLength);
+	for (var i=0; i<pointsCount; i++)
+	{
+		var x = positionsFloatArray[3*i];
+		var y = positionsFloatArray[3*i + 1];
+		var z = positionsFloatArray[3*i + 2];
+		
+		localPosFloatArray[3*i] = x - centerPos_x;
+		localPosFloatArray[3*i + 1] = y - centerPos_y;
+		localPosFloatArray[3*i + 2] = z - centerPos_z;
+	}
+
+	var result = {
+		centerPos          : centerPos,
+		localPosFloatArray : localPosFloatArray
+	};
+
+	return result;
+};
+
+/**
  * This function makes the triangles vertices indices for a regular grid.
  * @param {Number} numCols Grid columns count.
  * @param {Number} numRows Grid rows count.

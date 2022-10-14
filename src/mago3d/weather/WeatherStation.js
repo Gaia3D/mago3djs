@@ -12,6 +12,8 @@ var WeatherStation = function (magoManager, options)
 	this.provisional_geometryDataPath;
 	this.windVolumesArray;
 	this.dustVolumesArray;
+	this.pollutionVolumesArray;
+	this.soundSurfacesVolumesArray;
 
 	this.windLayersArray; // old.***
 	this.tempLayersArray; // old.***
@@ -33,6 +35,7 @@ var WeatherStation = function (magoManager, options)
 	// wind params.
 	this.windThickness = 2.5;
 	this.windDefaultAnimationSpeed = 1;
+	this.pollutionDefaultAnimationSpeed = 1;
 
 	if (options)
 	{
@@ -98,6 +101,8 @@ WeatherStation.prototype.newWindLayer = function(options)
 	return windLayer;
 };
 
+
+
 WeatherStation.prototype.newWindVolume = function(options)
 {
 	if (this.windVolumesArray === undefined)
@@ -116,6 +121,71 @@ WeatherStation.prototype.newWindVolume = function(options)
 	windVolume.weatherStation = this;
 	this.windVolumesArray.push(windVolume);
 	return windVolume;
+};
+
+WeatherStation.prototype.newPollutionVolumeTest = function(options)
+{
+	if (this.pollutionVolumesArray === undefined)
+	{ this.pollutionVolumesArray = []; }
+
+	if (options)
+	{
+		if (options.animationSpeed === undefined)
+		{
+			// AnimationSpeed by default is 1. If want to render faster, try to set animationSpeed = 2 or animationSpeed = 3.***
+			options.animationSpeed = this.pollutionDefaultAnimationSpeed;
+		}
+	}
+
+	var pollutionVolume = new PollutionVolumeTest(options);
+	pollutionVolume.weatherStation = this;
+	this.pollutionVolumesArray.push(pollutionVolume);
+	return pollutionVolume;
+};
+
+WeatherStation.prototype.getSoundSurfaceVolume = function (idx)
+{
+	if (this.soundSurfacesVolumesArray === undefined || this.soundSurfacesVolumesArray.length === 0)
+	{
+		return undefined;
+	}
+
+	if (idx === undefined)
+	{
+		return undefined;
+	}
+
+	if (idx < 0)
+	{
+		idx = 0;
+	}
+
+	if (idx > this.soundSurfacesVolumesArray.length)
+	{
+		idx = this.soundSurfacesVolumesArray.length;
+	}
+
+	return this.soundSurfacesVolumesArray[idx];
+};
+
+WeatherStation.prototype.newSoundSurfaceVolume = function(options)
+{
+	if (this.soundSurfacesVolumesArray === undefined)
+	{ this.soundSurfacesVolumesArray = []; }
+
+	//if (options)
+	//{
+	//	if (options.animationSpeed === undefined)
+	//	{
+	//		// AnimationSpeed by default is 1. If want to render faster, try to set animationSpeed = 2 or animationSpeed = 3.***
+	//		options.animationSpeed = this.pollutionDefaultAnimationSpeed;
+	//	}
+	//}
+
+	var soundSurfaceVolume = new SoundSurfaceVolume(options);
+	soundSurfaceVolume.weatherStation = this;
+	this.soundSurfacesVolumesArray.push(soundSurfaceVolume);
+	return soundSurfaceVolume;
 };
 
 WeatherStation.prototype.deleteDustVolumes = function()
@@ -450,7 +520,39 @@ WeatherStation.prototype.renderWindMultiLayers = function(magoManager)
 	//}
 };
 
-WeatherStation.prototype.renderWeather = function(magoManager)
+WeatherStation.prototype.renderPollutionTest = function (magoManager)
+{
+	// StreamLines wind version.***
+	//if (magoManager.currentFrustumIdx > 2)
+	//{ return; }
+	
+	// DisplayVolumeBox.***
+	if (this.pollutionVolumesArray === undefined || this.pollutionVolumesArray.length === 0)
+	{ return; }
+
+	var pollutionVolumes = this.pollutionVolumesArray.length;
+	for (var i=0; i<pollutionVolumes; i++)
+	{
+		this.pollutionVolumesArray[i].render(magoManager);
+	}
+	return;
+};
+
+WeatherStation.prototype.renderSoundSurfaces = function (magoManager)
+{
+	// DisplayVolumeBox.***
+	if (this.soundSurfacesVolumesArray === undefined || this.soundSurfacesVolumesArray.length === 0)
+	{ return; }
+
+	var soundSurfVolumes = this.soundSurfacesVolumesArray.length;
+	for (var i=0; i<soundSurfVolumes; i++)
+	{
+		this.soundSurfacesVolumesArray[i].render(magoManager);
+	}
+	return;
+};
+
+WeatherStation.prototype.renderWeather = function (magoManager)
 {
 	// Render all active weather type.
 
@@ -472,6 +574,17 @@ WeatherStation.prototype.renderWeather = function(magoManager)
 		this.renderWind3D(magoManager);
 		//this.renderWindLayerDisplayPlanes(magoManager); // old.
 	}
+
+	if (this.pollutionVolumesArray)
+	{
+		this.renderPollutionTest(magoManager);
+	}
+
+	if (this.soundSurfacesVolumesArray)
+	{
+		this.renderSoundSurfaces(magoManager);
+	}
+
 	/*
 	if (this.tempLayersArray)
 	{ 
@@ -667,6 +780,86 @@ WeatherStation.prototype.loadWindGeoJson = function (geoJsonFilePath)
 	{
 		throw new Error(err);
 	}
+};
+
+WeatherStation.prototype.loadPollutionTestGeoJsonIndexFile = function(geoJsonIndexFilePath)
+{
+	// This is the geoJson version. 2021.
+	// Create a windVolume & load the wind-geoJson.
+	if (!geoJsonIndexFilePath)
+	{ return false; }
+
+	// calculate the geoJsonFileFolderPath.***
+	var geoJsonIndexFileFolderPath = "";
+	var pollutionVolume;
+	try 
+	{
+		var urlInstance = new URL(geoJsonIndexFilePath, self.location.href);
+		var splitted = urlInstance.pathname.split('/');
+		var spilttedsCount = splitted.length;
+		for (var i=0; i<spilttedsCount-1; i++)
+		{
+			var word = splitted[i];
+			if (word.length > 0)
+			{
+				geoJsonIndexFileFolderPath += "/";
+				geoJsonIndexFileFolderPath += word;
+
+			}
+		}
+
+		var options = {
+			geoJsonIndexFilePath       : geoJsonIndexFilePath,
+			geoJsonIndexFileFolderPath : geoJsonIndexFileFolderPath
+		};
+		pollutionVolume = this.newPollutionVolumeTest(options);
+	}
+	catch (err) 
+	{
+		throw new Error(err);
+	}
+
+	return pollutionVolume;
+};
+
+WeatherStation.prototype.loadSoundSurfaceGeoJsonIndexFile = function(geoJsonIndexFilePath)
+{
+	// This is the geoJson version. 2021.
+	// Create a soundSurfVolume & load the soundSurf-geoJson.
+	if (!geoJsonIndexFilePath)
+	{ return false; }
+
+	// calculate the geoJsonFileFolderPath.***
+	var geoJsonIndexFileFolderPath = "";
+	var soundSurfaceVolume;
+	try 
+	{
+		var urlInstance = new URL(geoJsonIndexFilePath, self.location.href);
+		var splitted = urlInstance.pathname.split('/');
+		var spilttedsCount = splitted.length;
+		for (var i=0; i<spilttedsCount-1; i++)
+		{
+			var word = splitted[i];
+			if (word.length > 0)
+			{
+				geoJsonIndexFileFolderPath += "/";
+				geoJsonIndexFileFolderPath += word;
+
+			}
+		}
+
+		var options = {
+			geoJsonIndexFilePath       : geoJsonIndexFilePath,
+			geoJsonIndexFileFolderPath : geoJsonIndexFileFolderPath
+		};
+		soundSurfaceVolume = this.newSoundSurfaceVolume(options);
+	}
+	catch (err) 
+	{
+		throw new Error(err);
+	}
+
+	return soundSurfaceVolume;
 };
 
 /**

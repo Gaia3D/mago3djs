@@ -262,12 +262,18 @@ VBOVertexIdxCacheKey.prototype.readPosNorIdx = function(arrayBuffer, vboMemManag
 /**
  * 어떤 일을 하고 있습니까?
  */
-VBOVertexIdxCacheKey.prototype.bindDataCustom = function(shader, vboMemManager, name) 
+VBOVertexIdxCacheKey.prototype.bindDataCustom = function(shader, vboMemManager, name, attribLocation) 
 {
 	if (shader === undefined || this.vboBufferCustomMap === undefined)
 	{ return false; }
 
 	var vboBufferCustom = this.vboBufferCustomMap[name];
+
+	if (attribLocation !== undefined)
+	{
+		vboBufferCustom.attribLocation = attribLocation;
+	}
+
 	return vboBufferCustom.bindData(shader, vboBufferCustom.attribLocation, vboMemManager);
 };
 

@@ -191,6 +191,10 @@ VboBuffer.getGlTypeOfArray = function (dataArray)
 	var glType = -1;
 	if (dataArray.constructor === Float32Array)
 	{ glType = 5126; } // gl.FLOAT.
+	else if (dataArray.constructor === Int32Array)
+	{ glType = 5124; } // gl.INT.
+	else if (dataArray.constructor === Uint32Array)
+	{ glType = 5125; } // gl.UNSIGNED_INT.
 	else if (dataArray.constructor === Int16Array)
 	{ glType = 5122; } // gl.SHORT.
 	else if (dataArray.constructor === Uint16Array)
@@ -219,6 +223,10 @@ VboBuffer.newTypedArray = function(arrayLength, glType)
 	{ typedArray = new Int8Array(arrayLength); }
 	else if (glType === 5121)// gl.UNSIGNED_BYTE.
 	{ typedArray = new Uint8Array(arrayLength); }
+	else if (glType === 5124)
+	{ typedArray = new Int32Array(arrayLength); } // gl.INT.
+	else if (glType === 5125)
+	{ typedArray = new Uint32Array(arrayLength); } // gl.UNSIGNED_INT.
 		
 	return typedArray;
 };

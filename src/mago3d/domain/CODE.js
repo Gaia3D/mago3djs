@@ -81,6 +81,12 @@ CODE.modelerDrawingState = {
 	"STARTED"    : 1
 };
 
+CODE.processState = {
+	"NO_STARTED" : 0,
+	"STARTED"    : 1,
+	"FINISHED"   : 2,
+};
+
 CODE.modelerDrawingElement = {
 	"NOTHING"          : 0,
 	"POINTS"           : 1,

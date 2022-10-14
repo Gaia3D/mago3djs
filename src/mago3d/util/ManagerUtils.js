@@ -672,6 +672,21 @@ ManagerUtils.mod = function(x, y)
 
 ManagerUtils.packDepth = function(depth)
 {
+	/*
+	//vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;
+	//enc = fract(enc);
+	//enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);
+	//return enc;
+
+	var enc = new Float32Array([1.0 * depth, 255.0 * depth, 65025.0 * depth, 16581375.0 * depth]);
+	var enc2 = [enc[0] - Math.floor(enc[0]), enc[1] - Math.floor(enc[1]), enc[2] - Math.floor(enc[2]), enc[3] - Math.floor(enc[3])];
+	var aux = [enc2[1] * 1.0/255.0, enc2[2] * 1.0/255.0, enc2[3] * 1.0/255.0, 0.0];
+	var enc3 = [enc2[0] - aux[0], enc2[1] - aux[1], enc2[2] - aux[2], enc2[3] - aux[3]];
+	return enc3;
+	*/
+
+	//--------------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------------------
 	// Note: Function for debug. Function no used in javaScript.***
 	// Note: Function for debug. Function no used in javaScript.***
 	// Note: Function for debug. Function no used in javaScript.***
@@ -684,6 +699,7 @@ ManagerUtils.packDepth = function(depth)
 	//return res; 
 	
 	// Note: Function for debug. Function no used in javaScript.***
+	
 	var bit_shift = [16777216.0, 65536.0, 256.0, 1.0];
 	var bit_mask = [0.0, 0.00390625, 0.00390625, 0.00390625];
 
@@ -706,7 +722,11 @@ ManagerUtils.packDepth = function(depth)
 		resAux[2] - resBitMasked[2], 
 		resAux[3] - resBitMasked[3]];
 
-	return res;
+	// reverse the result.***
+	var reversedResult = [res[3], res[2], res[1], res[0]];
+
+	return reversedResult;
+	
 };
 
 /**

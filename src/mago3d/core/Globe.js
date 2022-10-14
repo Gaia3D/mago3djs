@@ -486,12 +486,35 @@ Globe.atan2Test = function(y, x)
 
 /**
  * Change absolute coordinate to WGS84 coordinate 
+ * @param {Array[float32Array(3)]} cartesiansArray
+ * @param {Array[Float32Array(3)]} result the cartesian point which will contain the calculated point
+ * @param {Boolean} bStoreAbsolutePosition This decide whether store absolute value at the 'result' point or not as the property
+ * 
+ */
+Globe.Point3DToGeographicWgs84Array = function (point3dArray, bStoreAbsolutePosition) 
+{
+	var geoCoordsArray = [];
+	var point3dCount = point3dArray.length;
+	for (var i=0; i<point3dCount; i++)
+	{
+		var point3d = point3dArray[i];
+		var geoCoord = Globe.CartesianToGeographicWgs84(point3d.x, point3d.y, point3d.z, undefined, bStoreAbsolutePosition);
+		geoCoordsArray.push(geoCoord);
+	}
+	var result = {
+		geoCoordsArray: geoCoordsArray
+	};
+
+	return result;
+};
+
+/**
+ * Change absolute coordinate to WGS84 coordinate 
  * @param {Number} x the x coordi of the point of absolute coordinate
  * @param {Number} y the y coordi of the point of absolute coordinate
  * @param {Number} z the z coordi of the point of absolute coordinate
  * @param {Float32Array} result the cartesian point which will contain the calculated point
  * @param {Boolean} bStoreAbsolutePosition This decide whether store absolute value at the 'result' point or not as the property
- * @param {Float32Array} result
  * 
  */
 Globe.CartesianToGeographicWgs84 = function (x, y, z, result, bStoreAbsolutePosition) 
@@ -818,6 +841,102 @@ Globe.getArcDistanceBetweenGeographicCoords = function(startGeoCoord, endGeoCoor
 	var distMeters = earthRadius * c;
 
 	return distMeters;
+};
+
+/**
+ * Returns a rectangle (4 corner geoCoords) centered at the centerGeoCoord.
+ * @param {GeographicCoord} centerGeoCoord
+ * @param {Number} widthMeters
+ * @param {Number} heightMeters
+ */
+Globe.getRectangleMeshOnEllisoideCenteredAtGeographicCoord = function (centerGeoCoord, widthMeters, heightMeters, numCols, numRows)
+{
+	// Calculate rectangle on sphere, and then project it on to ellipsoide.***
+	// Find intersection between line and ellipsoid : https://math.stackexchange.com/questions/3722553/find-intersection-between-line-and-ellipsoid
+	//---------------------------------------------------------------------------------------------------------------------------------------------
+	// Given a geographicCoord (center of the rectangle) and the rectangle size in meters, this function returns a rectangleMesh on ellipsoid.
+	//---------------------------------------------------------------------------------------------------------------------------------------------
+
+	// Calculate the cartesian of the centerGeoCoord.***
+	var centerCartesian = Globe.geographicToCartesianWgs84(centerGeoCoord.longitude, centerGeoCoord.latitude, centerGeoCoord.altitude, undefined);
+
+	// Find westSouthPoint.***
+	// Now, find the 1rst rotation axis.***
+	var zDir = new Point3D(0, 0, 1);
+	var centerPoint = new Point3D(centerCartesian[0], centerCartesian[1], centerCartesian[2]);
+	var radius = centerPoint.getModul();
+	var normal = new Point3D(centerCartesian[0], centerCartesian[1], centerCartesian[2]); // normal at centerPoint.***
+	normal.unitary();
+
+	var rotAxisPitch = zDir.crossProduct(normal, undefined);
+	rotAxisPitch.unitary();
+
+	var rotAxisRoll = normal.crossProduct(rotAxisPitch, undefined);
+	rotAxisRoll.unitary();
+
+	// Now, calculate rotation matrix.***
+	// perimeter = angRad * radius. -> angRad = perimeter / radius.
+	var angRadPitch = (widthMeters/2.0) / radius;
+	var angRadRoll = (heightMeters/2.0) / radius;
+
+	var increAngRadPitch = -angRadPitch / (numRows - 1); // negative, bcos we start in leftDown corner, so pitch is negative!
+	var increAngRadRoll = angRadRoll / (numCols - 1);
+
+	var rotMatPitch = new Matrix4();
+	rotMatPitch.rotationAxisAngRad(angRadPitch, rotAxisPitch.x, rotAxisPitch.y, rotAxisPitch.z);
+
+	var rotMatRoll = new Matrix4();
+	rotMatRoll.rotationAxisAngRad(angRadRoll, rotAxisRoll.x, rotAxisRoll.y, rotAxisRoll.z);
+
+	var totalMat = rotMatRoll.getMultipliedByMatrix(rotMatPitch, undefined);
+
+	var westSouthPoint = totalMat.rotatePoint3D(centerPoint, undefined);
+	var pointsArray = [];
+	var texCoordsArray = [];
+
+	for (var row = 0; row < numRows; row++)
+	{
+		var currAngRadPitch = increAngRadPitch * row;
+		rotMatPitch.rotationAxisAngRad(currAngRadPitch, rotAxisPitch.x, rotAxisPitch.y, rotAxisPitch.z);
+		var westPoint = rotMatPitch.rotatePoint3D(westSouthPoint, undefined);
+
+		for (var col = 0; col < numCols; col++)
+		{
+			var currAngRadRoll = increAngRadRoll * col;
+			rotMatRoll.rotationAxisAngRad(currAngRadRoll, rotAxisRoll.x, rotAxisRoll.y, rotAxisRoll.z);
+			var currPoint = rotMatRoll.rotatePoint3D(westPoint, undefined);
+
+			pointsArray.push(currPoint);
+
+			// Now, the texCoords.***
+			var texCoord = new Point2D(col/(numCols-1), row/(numRows-1));
+			texCoordsArray.push(texCoord);
+		}
+	}
+
+	var options = {
+		bCalculateBorderIndices : false,
+		indicesByteSize         : 2
+	};
+
+	if (numCols*numRows >= 65535)
+	{
+		options.indicesByteSize = 4;
+	}
+
+	var resultObject = GeometryUtils.getIndicesTrianglesRegularNet(numCols, numRows, undefined, undefined, undefined, undefined, undefined, options);
+	var indices = resultObject.indicesArray;
+	
+	var resultObject = {
+		pointsArray    : pointsArray,
+		texCoordsArray : texCoordsArray,
+		indices        : indices,
+		numCols        : numCols,
+		numRows        : numRows
+	};
+
+	return resultObject;
+
 };
 
 
