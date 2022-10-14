@@ -232,6 +232,7 @@ gulp.task('merge:js', gulp.series( 'clean', 'build', function()
 	var list = paths.source_js.slice(0);
 	list.push('!./src/mago3d/api/APIGateway.js');
 	list.push('!./src/mago3d/worker/*');
+	list.push('!./src/mago3d/worker/src/*');
 	return gulp.src(list)
 		.pipe(babel({
 			presets: ['@babel/preset-env'],
@@ -297,11 +298,11 @@ gulp.task('karma', function (done)
 gulp.task('lint', function() 
 {
     var list = paths.source_js.slice(0);
-	list.push('!./src/mago3d/worker/src/*.js');
-	
+	list.push('!./src/mago3d/worker/src/*');
     list = list.concat(paths.test);
     return gulp.src(list)
-        .pipe(eslint({fix: true, quiet: isError, envs: [{ "es6": true }]}))
+        .pipe(eslint({fix: true, quiet: isError}))
+
         .pipe(eslint.format())
         .pipe(gulpIf(isFixed, gulp.dest(function(file)
         {
