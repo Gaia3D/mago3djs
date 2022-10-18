@@ -585,6 +585,8 @@ WeatherStation.prototype.renderWeather = function (magoManager)
 		this.renderSoundSurfaces(magoManager);
 	}
 
+	this._TEST_addSoundJsonsArray(); // test. Delete this.***
+
 	/*
 	if (this.tempLayersArray)
 	{ 
@@ -820,6 +822,104 @@ WeatherStation.prototype.loadPollutionTestGeoJsonIndexFile = function(geoJsonInd
 	}
 
 	return pollutionVolume;
+};
+
+WeatherStation.prototype._TEST_addSoundJsonsArray = function()
+{
+	// this function loads soundJsons, and then adds its into sound volume.***
+	if (this._test_addingSoundsJsonsProcess === undefined)
+	{
+		this._test_addingSoundsJsonsProcess = CODE.processState.NO_STARTED;
+	}
+
+	if (this._test_addingSoundsJsonsProcess === CODE.processState.NO_STARTED)
+	{
+		this._test_addingSoundsJsonsProcess = CODE.processState.STARTED;
+
+		// load 3 or 4 sound jsons.***
+		this.test_soundJsonsArray = [];
+		var path = "\\f4d\\result_sound_facada_Json\\M.json"; 
+		this.test_soundJsonsArray.push({
+			path          : path,
+			fileLoadState : 0
+		});
+		path = "\\f4d\\result_sound_facada_Json\\M_00000.json";  
+		this.test_soundJsonsArray.push({
+			path          : path,
+			fileLoadState : 0
+		});
+		path = "\\f4d\\result_sound_facada_Json\\M_00001.json"; 
+		this.test_soundJsonsArray.push({
+			path          : path,
+			fileLoadState : 0
+		});
+		path = "\\f4d\\result_sound_facada_Json\\M_00002.json"; 
+		this.test_soundJsonsArray.push({
+			path          : path,
+			fileLoadState : 0
+		});
+		
+		var that = this;
+		loadWithXhr(this.test_soundJsonsArray[0].path, undefined, undefined, 'json', 'GET').done(function(res) 
+		{
+			that.test_soundJsonsArray[0]._geoJsonIndexFileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			that.test_soundJsonsArray[0]._geoJsonIndexFile = res;
+		});
+
+		loadWithXhr(this.test_soundJsonsArray[1].path, undefined, undefined, 'json', 'GET').done(function(res) 
+		{
+			that.test_soundJsonsArray[1]._geoJsonIndexFileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			that.test_soundJsonsArray[1]._geoJsonIndexFile = res;
+		});
+
+		loadWithXhr(this.test_soundJsonsArray[2].path, undefined, undefined, 'json', 'GET').done(function(res) 
+		{
+			that.test_soundJsonsArray[2]._geoJsonIndexFileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			that.test_soundJsonsArray[2]._geoJsonIndexFile = res;
+		});
+
+		loadWithXhr(this.test_soundJsonsArray[3].path, undefined, undefined, 'json', 'GET').done(function(res) 
+		{
+			that.test_soundJsonsArray[3]._geoJsonIndexFileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			that.test_soundJsonsArray[3]._geoJsonIndexFile = res;
+		});
+	}
+
+	if (this._test_addingSoundsJsonsProcess !== CODE.processState.FINISHED)
+	{
+		// check if all json are loaded.***
+		var allJsonLoaded = true;
+		var layersCount = this.test_soundJsonsArray.length;
+		for (var i=0; i<layersCount; i++)
+		{
+			if (this.test_soundJsonsArray[i]._geoJsonIndexFileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
+			{
+				allJsonLoaded = false;
+			}
+		}
+
+		if (allJsonLoaded)
+		{
+			this._test_addingSoundsJsonsProcess = CODE.processState.FINISHED;
+
+			// All json are loaded, so do the test:
+			var options = undefined;
+			var soundVolume = this.newSoundSurfaceVolume(options);
+
+			// make jsonsArray.***
+			var jsonsArray = [];
+			var jsonsCount = this.test_soundJsonsArray.length;
+			for (var i=0; i<jsonsCount; i++)
+			{
+				jsonsArray.push(this.test_soundJsonsArray[i]._geoJsonIndexFile);
+			}
+
+			// finally call API:
+			soundVolume.addJsonsArray(jsonsArray);
+		}
+	}
+
+	
 };
 
 WeatherStation.prototype.loadSoundSurfaceGeoJsonIndexFile = function(geoJsonIndexFilePath)

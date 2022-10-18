@@ -9,7 +9,7 @@
  * 
  * @param {object} option 
 */
-var KoreaBuildingSeed = function(option)
+var KoreaBuildingSeed = function (option)
 {
 	this.status = KoreaBuildingSeed.STATUS.UNLOAD;
 

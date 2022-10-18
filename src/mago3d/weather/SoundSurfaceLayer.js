@@ -310,7 +310,7 @@ SoundSurfaceLayer.prototype.render = function (magoManager)
 
 	// ColorType.***
 	// 0= oneColor, 1= attribColor, 2= texture, 3= colorByHeight, 4= grayByHeight, 5= color-legend.***
-	gl.uniform1i(currentShader.colorType_loc, 5); 
+	gl.uniform1i(currentShader.colorType_loc, this._soundSurfaceVolumeOwner._colorType); 
 
 	// set the soundLevel minmax values.***
 	var timeSlice = this._timeSlicesArray[this._currTimeSliceIdx];
@@ -335,7 +335,6 @@ SoundSurfaceLayer.prototype.render = function (magoManager)
 	gl.uniform4fv(currentShader.uLegendColors_loc, legendColors);
 	gl.uniform1fv(currentShader.uLegendValues_loc, legendValues);
 
-	//gl.frontFace(gl.CCW);
 	gl.enable(gl.BLEND);
 	//gl.disable(gl.CULL_FACE);
 

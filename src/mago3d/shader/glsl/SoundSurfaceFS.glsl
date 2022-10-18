@@ -237,7 +237,7 @@ void main()
 	else if(colorType == 5)
 	{
 		// use an external legend.***
-		vec4 colorAux = vec4(0.0, 0.0, 0.0, 0.0);
+		vec4 colorAux = vec4(0.3, 0.3, 0.3, 0.4);
 
 		// find legendIdx.***
 		for(int i=0; i<15; i++)
@@ -248,6 +248,11 @@ void main()
 				break;
 			}
 		}
+
+        if(colorAux.a == 0.0)
+        {
+            discard;
+        }
 
 		textureColor = colorAux;
     }

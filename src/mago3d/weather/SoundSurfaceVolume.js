@@ -31,10 +31,13 @@ var SoundSurfaceVolume = function(options)
 	this._totalAnimTime;
 	this._increTime;
 
+	// color type.// 0= oneColor, 1= attribColor, 2= texture, 3= colorByHeight, 4= grayByHeight, 5= color-legend.***
+	this._colorType = 5;
+
 	// color legend.***
 	this._legendColors4;
 	this._legendValues;
-	//this._TEST_setLegendsColors(); // test.***
+	this._TEST_setLegendsColors(); // test.***
 
 	// Options.***
 	if (options)
@@ -257,6 +260,50 @@ SoundSurfaceVolume.prototype._prepareSoundSurfacesLayers = function (magoManager
 	this._allLayersArePrepared = allLayersArePrepared;
 
 	return false;
+};
+
+SoundSurfaceVolume.prototype.addJsonsArray = function (jsonsArray)
+{
+	if ( jsonsArray === undefined || jsonsArray.length === 0)
+	{
+		return false;
+	}
+
+	//***************************************************************************************************
+	// In this mode, no use the "JsonIndexFile", so set "geoJsonIndexFileLoadState" as LOADING_FINISHED.***
+	//---------------------------------------------------------------------------------------------------
+	this._geoJsonIndexFileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+
+	// Check if 1 layers exist.***
+	var soundLayersCount = this.getSoundSurfacesLayersCount();
+	if (soundLayersCount === 0)
+	{
+		// create an empty soundSurfaceLayer.***
+		var options = {soundSurfaceVolumeOwner: this};
+		var soundSurfaceLayer = this.newSoundSurfaceLayer(options);
+	}
+
+	var soundSurfaceLayer = this.getSoundLayer(0); // take the 1rst layer.***
+	if (soundSurfaceLayer._timeSlicesArray === undefined)
+	{
+		soundSurfaceLayer._timeSlicesArray = [];
+	}
+
+	var jsonFilesCount = jsonsArray.length;
+	for (var i=0; i<jsonFilesCount; i++)
+	{
+		// now, create the timeSlices into the soundSurfaceLayer.***
+		var options = {soundSurfaceLayerOwner: soundSurfaceLayer};
+		var timeSlice = new SoundSurfaceTimeSlice(options);
+		timeSlice._jsonFile = jsonsArray[i];
+
+		// set "timeSlice._fileileLoadState" as LOADING_FINISHED.***
+		timeSlice._fileileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+
+		soundSurfaceLayer._timeSlicesArray.push(timeSlice);
+	}
+
+	return true;
 };
 
 SoundSurfaceVolume.prototype.prepareVolume = function (magoManager)
