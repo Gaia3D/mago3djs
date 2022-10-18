@@ -585,7 +585,7 @@ WeatherStation.prototype.renderWeather = function (magoManager)
 		this.renderSoundSurfaces(magoManager);
 	}
 
-	this._TEST_addSoundJsonsArray(); // test. Delete this.***
+	//this._TEST_addSoundJsonsArray(); // test. Delete this.***
 
 	/*
 	if (this.tempLayersArray)
