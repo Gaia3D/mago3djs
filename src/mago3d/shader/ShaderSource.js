@@ -18767,6 +18767,7 @@ vec2 decodeVelocity(in vec2 encodedVel)\n\
 }\n\
 \n\
 void main() {\n\
+\n\
 	vec2 pt = gl_PointCoord - vec2(0.5);\n\
 	if(pt.x*pt.x+pt.y*pt.y > 0.25)\n\
 	{\n\
@@ -18810,6 +18811,7 @@ void main() {\n\
 			intensity = 1.0;\n\
 		gl_FragColor = vec4(intensity,intensity,intensity,1.0);\n\
 	}\n\
+	\n\
 }\n\
 ";
 ShaderSource.waterParticlesRenderingFadeFS = "precision mediump float;\n\
@@ -19094,19 +19096,11 @@ uniform float aspectRatio;\n\
 uniform mat4 projectionMatrixInv;\n\
 uniform bool bUseLogarithmicDepth;\n\
 uniform int uWaterType; // 0= nothing, 1= flux, 2= velocity\n\
-uniform int u_RenderParticles; \n\
+uniform float uMinWaterHeightToRender;\n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
 \n\
-uniform int u_TerrainType;\n\
-uniform float u_WaterTransparency;\n\
-uniform float u_SimRes;\n\
-uniform vec2 u_Dimensions;\n\
-uniform vec3 unif_LightPos;\n\
-uniform float u_far;\n\
-uniform float u_near;\n\
 \n\
-uniform float u_contaminantMaxHeigh;\n\
 \n\
 varying vec4 vColorAuxTest;\n\
 varying float vWaterHeight;\n\
@@ -19220,28 +19214,34 @@ vec3 getRainbowColor_byHeight(float height, in float maxi, in float mini)\n\
 \n\
 void main()\n\
 {\n\
-    float minWaterHeightToRender = 0.001; // 1mm.\n\
-    //minWaterHeightToRender = 0.01; // 1cm.\n\
-    minWaterHeightToRender = 0.005; // 0.5cm.\n\
-    //if(vWaterHeight + vContaminantHeight < minWaterHeightToRender)// original = 0.0001\n\
-    //{\n\
-    //    discard;\n\
-    //}\n\
-    float totalH = vWaterHeight + vContaminantHeight;\n\
+    bool isParticle = false;\n\
     float alpha = vColorAuxTest.a;\n\
-    if(totalH < 0.1)\n\
+    vec4 finalCol4 = vec4(vColorAuxTest);\n\
+\n\
+    if(uWaterType == 3)\n\
     {\n\
-        alpha = min(totalH/0.1, alpha); // original.***\n\
-        //alpha = totalH; // test.***\n\
+        // particles case: now, decode velocity:\n\
+        vec4 velocity4 = texture2D(waterTex, vec2(vTexCoord.x, vTexCoord.y));\n\
+        finalCol4 = mix(vColorAuxTest, velocity4, velocity4.a);\n\
+        if(alpha < velocity4.a)\n\
+        {\n\
+            alpha = velocity4.a;\n\
+            isParticle = true;\n\
+        }\n\
     }\n\
 \n\
+    if(!isParticle && vWaterHeight + vContaminantHeight < uMinWaterHeightToRender)// original = 0.0001\n\
+    {\n\
+        discard;\n\
+    }\n\
+    float totalH = vWaterHeight + vContaminantHeight;\n\
     \n\
-    vec4 finalCol4 = vec4(vColorAuxTest);\n\
-    //if(vWaterHeight + vContaminantHeight < minWaterHeightToRender)// + 0.01)\n\
-    //{\n\
-    //   alpha = 0.9;\n\
-    //   finalCol4 = vec4(vColorAuxTest * 0.4);\n\
-    //}\n\
+    if(totalH < 0.5)\n\
+    {\n\
+        alpha = min(totalH/0.1, alpha); // original.***\n\
+        //alpha = min(totalH, alpha); // test.***\n\
+    }\n\
+\n\
 \n\
     // calculate contaminationConcentration;\n\
     float contaminConcentration = vContaminantHeight / (totalH);\n\
@@ -19251,7 +19251,7 @@ void main()\n\
     \n\
     float dotProd = dot(vViewRay, vNormal);\n\
     //finalCol4 = vec4(finalCol4.xyz * dotProd, alpha);\n\
-    bool isParticle = false;\n\
+    \n\
 \n\
     if(uWaterType == 1)\n\
     {\n\
@@ -19445,6 +19445,7 @@ uniform float u_contaminantMaxHeigh;\n\
 uniform vec2 u_tileSize; // tile size in meters.\n\
 uniform vec2 u_simulationTextureSize; // for example 512 x 512.\n\
 uniform vec2 u_terrainTextureSize; // for example 512 x 512.\n\
+uniform float u_waterRenderingHeightOffset; \n\
 \n\
 uniform sampler2D depthTex;\n\
 \n\
@@ -19664,7 +19665,7 @@ void main()\n\
 	float height = terrainHeight + vWaterHeight + vContaminantHeight;\n\
 \n\
 	// Test debug:\n\
-	height += 0.5;\n\
+	height += u_waterRenderingHeightOffset;\n\
 \n\
 	//if(thisIsBorderWater)\n\
 	//{\n\

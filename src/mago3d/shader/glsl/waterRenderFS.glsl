@@ -33,19 +33,11 @@ uniform float aspectRatio;
 uniform mat4 projectionMatrixInv;
 uniform bool bUseLogarithmicDepth;
 uniform int uWaterType; // 0= nothing, 1= flux, 2= velocity
-uniform int u_RenderParticles; 
+uniform float uMinWaterHeightToRender;
 varying float flogz;
 varying float Fcoef_half;
 
-uniform int u_TerrainType;
-uniform float u_WaterTransparency;
-uniform float u_SimRes;
-uniform vec2 u_Dimensions;
-uniform vec3 unif_LightPos;
-uniform float u_far;
-uniform float u_near;
 
-uniform float u_contaminantMaxHeigh;
 
 varying vec4 vColorAuxTest;
 varying float vWaterHeight;
@@ -159,28 +151,34 @@ vec3 getRainbowColor_byHeight(float height, in float maxi, in float mini)
 
 void main()
 {
-    float minWaterHeightToRender = 0.001; // 1mm.
-    //minWaterHeightToRender = 0.01; // 1cm.
-    minWaterHeightToRender = 0.005; // 0.5cm.
-    //if(vWaterHeight + vContaminantHeight < minWaterHeightToRender)// original = 0.0001
-    //{
-    //    discard;
-    //}
-    float totalH = vWaterHeight + vContaminantHeight;
+    bool isParticle = false;
     float alpha = vColorAuxTest.a;
-    if(totalH < 0.1)
+    vec4 finalCol4 = vec4(vColorAuxTest);
+
+    if(uWaterType == 3)
     {
-        alpha = min(totalH/0.1, alpha); // original.***
-        //alpha = totalH; // test.***
+        // particles case: now, decode velocity:
+        vec4 velocity4 = texture2D(waterTex, vec2(vTexCoord.x, vTexCoord.y));
+        finalCol4 = mix(vColorAuxTest, velocity4, velocity4.a);
+        if(alpha < velocity4.a)
+        {
+            alpha = velocity4.a;
+            isParticle = true;
+        }
     }
 
+    if(!isParticle && vWaterHeight + vContaminantHeight < uMinWaterHeightToRender)// original = 0.0001
+    {
+        discard;
+    }
+    float totalH = vWaterHeight + vContaminantHeight;
     
-    vec4 finalCol4 = vec4(vColorAuxTest);
-    //if(vWaterHeight + vContaminantHeight < minWaterHeightToRender)// + 0.01)
-    //{
-    //   alpha = 0.9;
-    //   finalCol4 = vec4(vColorAuxTest * 0.4);
-    //}
+    if(totalH < 0.5)
+    {
+        alpha = min(totalH/0.1, alpha); // original.***
+        //alpha = min(totalH, alpha); // test.***
+    }
+
 
     // calculate contaminationConcentration;
     float contaminConcentration = vContaminantHeight / (totalH);
@@ -190,7 +188,7 @@ void main()
     
     float dotProd = dot(vViewRay, vNormal);
     //finalCol4 = vec4(finalCol4.xyz * dotProd, alpha);
-    bool isParticle = false;
+    
 
     if(uWaterType == 1)
     {

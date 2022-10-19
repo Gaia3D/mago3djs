@@ -38,6 +38,7 @@ uniform float u_contaminantMaxHeigh;
 uniform vec2 u_tileSize; // tile size in meters.
 uniform vec2 u_simulationTextureSize; // for example 512 x 512.
 uniform vec2 u_terrainTextureSize; // for example 512 x 512.
+uniform float u_waterRenderingHeightOffset; 
 
 uniform sampler2D depthTex;
 
@@ -257,7 +258,7 @@ void main()
 	float height = terrainHeight + vWaterHeight + vContaminantHeight;
 
 	// Test debug:
-	height += 0.5;
+	height += u_waterRenderingHeightOffset;
 
 	//if(thisIsBorderWater)
 	//{

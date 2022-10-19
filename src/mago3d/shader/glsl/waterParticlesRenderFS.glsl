@@ -24,6 +24,7 @@ vec2 decodeVelocity(in vec2 encodedVel)
 }
 
 void main() {
+
 	vec2 pt = gl_PointCoord - vec2(0.5);
 	if(pt.x*pt.x+pt.y*pt.y > 0.25)
 	{
@@ -67,4 +68,5 @@ void main() {
 			intensity = 1.0;
 		gl_FragColor = vec4(intensity,intensity,intensity,1.0);
 	}
+	
 }

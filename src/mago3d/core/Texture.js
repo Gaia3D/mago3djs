@@ -141,7 +141,7 @@ Texture.resetTexture = function(texture, gl, filter, texWrap, width, height)
  * @param width the width of the texture image
  * @param height the height of the texture image
  */
-Texture.createTexture = function(gl, filter, data, width, height, texWrap) 
+Texture.createTexture = function(gl, filter, data, width, height, texWrap, bPremultiplyAlphaWebgl) 
 {
 	// static function.
 	// example of filter: gl.NEAREST
@@ -160,9 +160,16 @@ Texture.createTexture = function(gl, filter, data, width, height, texWrap)
 		data = null;
 	}
 
+	if (bPremultiplyAlphaWebgl === undefined)
+	{
+		bPremultiplyAlphaWebgl = false;
+	}
+
+	//var curr_UNPACK_PREMULTIPLY_ALPHA_WEBGL = gl.getParameter(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL);
+
 	var texture = gl.createTexture();
 	gl.bindTexture(gl.TEXTURE_2D, texture);
-	gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false); // must to be an argument. TODO.***
+	gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, bPremultiplyAlphaWebgl); // must to be an argument. TODO.***
 	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, texWrap);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, texWrap);
@@ -179,6 +186,7 @@ Texture.createTexture = function(gl, filter, data, width, height, texWrap)
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, data); 
 	}
 	gl.bindTexture(gl.TEXTURE_2D, null);
+
 	return texture;
 };
 

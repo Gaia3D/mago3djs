@@ -36,7 +36,24 @@ var WaterManager = function (magoManager, options)
 	this.simulationTextureSize = new Float32Array([this.maxSimulationSize, this.maxSimulationSize]);
 	this.bSsimulateWater = false;
 	this.terrainTextureSize = new Float32Array([this.maxSimulationSize, this.maxSimulationSize]);
-	this.terrainHeightEncodingBytes = 1; // default 1byte.***
+	this.terrainHeightEncodingBytes = 4; // default 4byte.***
+
+	// Simulation quantizing parameters.***************************************************************
+	this.waterMaxHeight = 500.0; // ok.
+	//this.waterMaxFlux = 100000.0; // ok. (4000 is no enought).
+	//this.waterMaxFlux = 4000.0; // setting for only rain.***
+	this.waterMaxFlux = 2000.0;// test - setting for only rain.***
+
+	//this.waterMaxVelocity = 40.0;
+	this.waterMaxVelocity = 400.0;
+	//this.contaminantMaxheight = -1.0; // value when there are no exist contaminant.
+	this.contaminantMaxheight = 50.0;
+	this.simulationTimeStep = 0.08; // ok. // The "simulationTimeStep" must be calculated by simulation cell size.***
+	this.simulationTimeStep = 0.06;
+	this.simulationTimeStep = 0.04;
+
+	this.minWaterHeightToRender = 0.02; // 2cm
+	this.waterRenderingHeightOffset = 0.7; // 0.5m
 
 	// Water wind.*************************************************************************************
 	this.bRenderParticles = true;
@@ -108,15 +125,67 @@ var WaterManager = function (magoManager, options)
 			this.terrainHeightEncodingBytes = options.terrainHeightEncodingBytes;
 		}
 
-		if (options.maxSimulationSize !== undefined)
+		if (options.minWaterHeightToRender !== undefined)
 		{
-			this.maxSimulationSize = options.maxSimulationSize;
+			this.minWaterHeightToRender = options.minWaterHeightToRender;
+		}
+
+		if (options.waterRenderingHeightOffset !== undefined)
+		{
+			this.waterRenderingHeightOffset = options.waterRenderingHeightOffset;
+		}
+
+		if (options.rainValue_mmHour !== undefined)
+		{
+			this.rainValue_mmHour = options.rainValue_mmHour;
 		}
 	}
 
 
 	this.createDefaultShaders();
 	this.init();
+};
+
+WaterManager.prototype.setSimulationSettings = function (options)
+{
+	if (options !== undefined)
+	{
+		// Check settings.***
+		if (options.waterMaxHeight !== undefined)
+		{
+			this.waterMaxHeight = options.waterMaxHeight;
+		}
+
+		if (options.waterMaxFlux !== undefined)
+		{
+			this.waterMaxFlux = options.waterMaxFlux;
+		}
+
+		if (options.waterMaxVelocity !== undefined)
+		{
+			this.waterMaxVelocity = options.waterMaxVelocity;
+		}
+
+		if (options.contaminantMaxheight !== undefined)
+		{
+			this.contaminantMaxheight = options.contaminantMaxheight;
+		}
+
+		if (options.simulationTimeStep !== undefined)
+		{
+			this.simulationTimeStep = options.simulationTimeStep;
+		}
+
+		if (options.minWaterHeightToRender !== undefined)
+		{
+			this.minWaterHeightToRender = options.minWaterHeightToRender;
+		}
+
+		if (options.waterRenderingHeightOffset !== undefined)
+		{
+			this.waterRenderingHeightOffset = options.waterRenderingHeightOffset;
+		}
+	}
 };
 
 WaterManager.prototype.setCurrentTimeSeconds = function (currTimeSeconds)
@@ -331,6 +400,8 @@ WaterManager.prototype.createDefaultShaders = function ()
 	shader.u_tileSize_loc = gl.getUniformLocation(shader.program, "u_tileSize");
 	shader.u_simulationTextureSize_loc = gl.getUniformLocation(shader.program, "u_simulationTextureSize");
 	shader.u_terrainTextureSize_loc = gl.getUniformLocation(shader.program, "u_terrainTextureSize");
+	shader.uMinWaterHeightToRender_loc = gl.getUniformLocation(shader.program, "uMinWaterHeightToRender");
+	shader.u_waterRenderingHeightOffset_loc = gl.getUniformLocation(shader.program, "u_waterRenderingHeightOffset");
 
 	magoManager.postFxShadersManager.useProgram(shader);
 	gl.uniform1i(shader.hightmap_loc, 1); // this is water height tex.
@@ -1280,8 +1351,8 @@ WaterManager.prototype.test__createContaminationBox_sejong = function (magoManag
 	lon = 126.90190;
 	lat = 37.35583;
 
-	var lon = 126.87882;
-	var lat = 37.32386;
+	var lon = 127.182017;
+	var lat = 37.616451;
 
 	width = 20.0;
 	length = 20.0;
