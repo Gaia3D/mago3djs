@@ -49,8 +49,7 @@ var WaterManager = function (magoManager, options)
 	//this.contaminantMaxheight = -1.0; // value when there are no exist contaminant.
 	this.contaminantMaxheight = 50.0;
 	this.simulationTimeStep = 0.08; // ok. // The "simulationTimeStep" must be calculated by simulation cell size.***
-	this.simulationTimeStep = 0.06;
-	this.simulationTimeStep = 0.04;
+	this.simulationTimeStep = 0.05;
 
 	this.minWaterHeightToRender = 0.02; // 2cm
 	this.waterRenderingHeightOffset = 0.7; // 0.5m
