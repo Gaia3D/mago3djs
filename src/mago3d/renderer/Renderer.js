@@ -3280,7 +3280,6 @@ Renderer.prototype.renderLightBuffer = function (lightSourcesArray)
 
 	var gl = magoManager.getGl();
 	var sceneState = magoManager.sceneState;
-	var webglController = new WebGlController(gl);
 
 	var lBuffer = magoManager.lBuffer;
 	lBuffer.bind();
@@ -3299,11 +3298,11 @@ Renderer.prototype.renderLightBuffer = function (lightSourcesArray)
 		lBuffer.extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - lightFog
 	]);
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	webglController.viewport(0, 0, sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0]);
-	webglController.clearColor(0, 0, 0, 0);
-	webglController.clearDepth(1);
+	gl.viewport(0, 0, sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0]);
+	gl.clearColor(0, 0, 0, 0);
+	gl.clearDepth(1);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	webglController.clearColor(0, 0, 0, 1);
+	gl.clearColor(0, 0, 0, 1);
 
 	if (lightSourcesCount === 0)
 	{ return; }
@@ -3348,11 +3347,11 @@ Renderer.prototype.renderLightBuffer = function (lightSourcesArray)
 	gl.bindTexture(gl.TEXTURE_2D, magoManager.normalTex);
 
 	// Note : The "frontFace" MUST be "CW", bcos "CCW" no iluminates when camera is inside of the light-volume.
-	webglController.frontFace(gl.CW);
-	webglController.enable_GL_BLEND();
-	webglController.blendFunc(gl.SRC_ALPHA, gl.ONE);
-	webglController.depthMask(false);
-	webglController.disable_GL_DEPTH_TEST();
+	gl.frontFace(gl.CW);
+	gl.enable(gl.BLEND);
+	gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+	gl.depthMask(false);
+	gl.disable(gl.DEPTH_TEST);
 	
 	var light;
 	var renderType = 1;
@@ -3383,14 +3382,14 @@ Renderer.prototype.renderLightBuffer = function (lightSourcesArray)
 
 		// 1rst, do light pass.**************************************************************
 		gl.uniform1i(currentShader.u_processType_loc, 1); // light pass.
-		webglController.frontFace(gl.CW);
-		webglController.blendFunc(gl.SRC_ALPHA, gl.ONE);
+		gl.frontFace(gl.CW);
+		gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 		light.render(magoManager, currentShader, renderType, glPrimitive, bIsSelected);
 
 		// Now, do light-fog pass.***********************************************************
 		gl.uniform1i(currentShader.u_processType_loc, 2); // light-fog pass.
-		webglController.frontFace(gl.CCW);
-		webglController.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+		gl.frontFace(gl.CCW);
+		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 		light.render(magoManager, currentShader, renderType, glPrimitive, bIsSelected);
 	}
 	
@@ -3398,7 +3397,13 @@ Renderer.prototype.renderLightBuffer = function (lightSourcesArray)
 	magoManager.postFxShadersManager.useProgram(null);
 
 	lBuffer.unbind();
-	webglController.restoreAllParameters();
+
+	// restore gl settings.***
+	gl.frontFace(gl.CCW);
+	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+	gl.depthMask(true);
+	gl.enable(gl.DEPTH_TEST);
+	gl.disable(gl.BLEND);
 };
 
 Renderer.prototype.renderGeometryBufferORT = function (gl, renderType, visibleObjControlerNodes, options) 
@@ -3776,11 +3781,9 @@ Renderer.prototype.renderGeometryBuffer = function (gl, renderType, visibleObjCo
 	var sceneState = magoManager.sceneState;
 	var renderingSettings = magoManager._settings.getRenderingSettings();
 
-	var webglController = new WebGlController(gl);
-
-	webglController.enable_GL_DEPTH_TEST();
-	webglController.enable_GL_CULL_FACE();
-	webglController.disable_GL_BLEND(); // No blend in GBuffer.
+	gl.enable(gl.DEPTH_TEST);
+	gl.enable(gl.CULL_FACE);
+	gl.disable(gl.BLEND); // No blend in GBuffer.
 	
 	var currentShader;
 	var renderTexture = false;
@@ -4047,8 +4050,7 @@ Renderer.prototype.renderGeometryBuffer = function (gl, renderType, visibleObjCo
 
 	//gl.depthRange(0.0, 1.0);	
 
-	// return webgl states.
-	webglController.restoreAllParameters();
+
 };
 
 /**
@@ -4059,9 +4061,8 @@ Renderer.prototype.renderGeometryBuffer = function (gl, renderType, visibleObjCo
  */
 Renderer.prototype.renderGeometryBufferTransparents = function (gl, renderType, visibleObjControlerNodes) 
 {
-	var webglController = new WebGlController(gl);
-	webglController.enable_GL_DEPTH_TEST();
-	webglController.enable_GL_BLEND();
+	gl.enable(gl.DEPTH_TEST);
+	gl.enable(gl.BLEND);
 	
 	var currentShader;
 	var magoManager = this.magoManager;
@@ -4071,7 +4072,7 @@ Renderer.prototype.renderGeometryBufferTransparents = function (gl, renderType, 
 	var renderTexture = false;
 	var selectionManager = magoManager.selectionManager;
 
-	webglController.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 	
 	if (renderType === 1 )//&& magoManager.currentFrustumIdx === 1) 
 	{
@@ -4202,7 +4203,7 @@ Renderer.prototype.renderGeometryBufferTransparents = function (gl, renderType, 
 			}
 
 
-			webglController.enable_GL_CULL_FACE();
+			gl.enable(gl.CULL_FACE);
 			var refTMatrixIdxKey = 0;
 			var minSizeToRender = 0.0;
 			var renderType = 1;
@@ -4372,7 +4373,9 @@ Renderer.prototype.renderGeometryBufferTransparents = function (gl, renderType, 
 		}
 		*/
 	}
-	webglController.restoreAllParameters();
+	
+	// restore gl settings.***
+	gl.disable(gl.BLEND);
 };
 
 
