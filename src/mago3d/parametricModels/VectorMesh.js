@@ -157,3 +157,185 @@ VectorMesh.prototype.deleteObjects = function(vboMemManager)
 		this.vboKeysContainer = undefined;
 	}
 };
+
+VectorMesh.getVectorMeshFromPoints3dLCArray = function (points3dLCArray, geoLoc, magoManager, options)
+{	
+	// function used for windVolume.***
+	if (!points3dLCArray || points3dLCArray.length < 2)
+	{
+		return undefined;
+	}
+
+	if (options === undefined)
+	{
+		options = {};
+	}
+
+	if (options.thickness === undefined)
+	{ options.thickness = 2.0; }
+
+	if (options.color === undefined)
+	{ options.color = new Color(0.8, 1.0, 1.0, 1.0); }
+
+	// check the colorRamp.***
+	/*
+	if (this.colorRamp)
+	{
+		// need velocities array.
+		if (options.velocitiesArray === undefined)
+		{ options.velocitiesArray = []; }
+	}
+	*/
+
+	points3dLCArray.reverse();
+
+	var vectorMesh = new VectorMeshWind(options);
+	
+	var optionsThickLine = {
+		colorType: "alphaGradient"
+	};
+
+	// If exist this.colorRamp, then create colorsArray.*****************************************************************************
+	/*
+	if (this.colorRamp)
+	{
+		options.colorsArray = []; // create colors array.***
+
+		var valuesCount = options.velocitiesArray.length;
+		var color; 
+		var vel, speed;
+		var minSpeed = 1000000.0;
+		var maxSpeed = -100.0;
+		for (var i=0; i<valuesCount; i++)
+		{
+			vel = options.velocitiesArray[i];
+			speed = vel.getModul();
+			color = this.colorRamp.getInterpolatedColor(speed);
+
+			options.colorsArray.push(color);
+
+			if (speed > maxSpeed)
+			{
+				maxSpeed = speed;
+			}
+			else if (speed < minSpeed)
+			{
+				minSpeed = speed;
+			}
+		}
+	}
+	*/
+
+	vectorMesh.vboKeysContainer = Point3DList.getVboThickLines(magoManager, points3dLCArray, vectorMesh.vboKeysContainer, options);
+	vectorMesh.geoLocDataManager = new GeoLocationDataManager();
+	vectorMesh.geoLocDataManager.addGeoLocationData(geoLoc);
+	vectorMesh.objectType = MagoRenderable.OBJECT_TYPE.VECTORMESH;
+
+	// Now, create a customVbo.
+	var pointsCount = points3dLCArray.length;
+	var indicesDataArray = new Float32Array(pointsCount*4);
+	for (var i=0; i<pointsCount*4; i++)
+	{
+		indicesDataArray[i] = i.toFixed(0);
+	}
+
+	var vbo = vectorMesh.vboKeysContainer.getVboKey(0);
+	var vboMemManager = magoManager.vboMemoryManager;
+	var dimensions = 1;
+	var name = "indices";
+	var attribLoc = 4;
+	vbo.setDataArrayCustom(indicesDataArray, vboMemManager, dimensions, name, attribLoc);
+
+	return vectorMesh;
+};
+
+VectorMesh.getVectorMeshItineraryFromPoints3dLCArray = function (points3dLCArray, geoLoc, magoManager, options)
+{	
+	// Function used for itineraryManager.***
+	if (!points3dLCArray || points3dLCArray.length < 2)
+	{
+		return undefined;
+	}
+
+	if (options === undefined)
+	{
+		options = {};
+	}
+
+	if (options.thickness === undefined)
+	{ options.thickness = 2.0; }
+
+	if (options.color === undefined)
+	{ options.color = new Color(0.8, 1.0, 1.0, 1.0); }
+
+	// check the colorRamp.***
+	/*
+	if (this.colorRamp)
+	{
+		// need velocities array.
+		if (options.velocitiesArray === undefined)
+		{ options.velocitiesArray = []; }
+	}
+	*/
+
+	points3dLCArray.reverse();
+
+	var vectorMesh = new VectorMesh(options);
+	
+	var optionsThickLine = {
+		colorType: "alphaGradient"
+	};
+
+	// If exist this.colorRamp, then create colorsArray.*****************************************************************************
+	/*
+	if (this.colorRamp)
+	{
+		options.colorsArray = []; // create colors array.***
+
+		var valuesCount = options.velocitiesArray.length;
+		var color; 
+		var vel, speed;
+		var minSpeed = 1000000.0;
+		var maxSpeed = -100.0;
+		for (var i=0; i<valuesCount; i++)
+		{
+			vel = options.velocitiesArray[i];
+			speed = vel.getModul();
+			color = this.colorRamp.getInterpolatedColor(speed);
+
+			options.colorsArray.push(color);
+
+			if (speed > maxSpeed)
+			{
+				maxSpeed = speed;
+			}
+			else if (speed < minSpeed)
+			{
+				minSpeed = speed;
+			}
+		}
+	}
+	*/
+
+	vectorMesh.vboKeysContainer = Point3DList.getVboThickLines(magoManager, points3dLCArray, vectorMesh.vboKeysContainer, options);
+	vectorMesh.geoLocDataManager = new GeoLocationDataManager();
+	vectorMesh.geoLocDataManager.addGeoLocationData(geoLoc);
+	vectorMesh.objectType = MagoRenderable.OBJECT_TYPE.VECTORMESH;
+
+	// Now, create a customVbo.
+	var pointsCount = points3dLCArray.length;
+	var indicesDataArray = new Float32Array(pointsCount*4);
+	for (var i=0; i<pointsCount*4; i++)
+	{
+		indicesDataArray[i] = i.toFixed(0);
+	}
+
+	var vbo = vectorMesh.vboKeysContainer.getVboKey(0);
+	var vboMemManager = magoManager.vboMemoryManager;
+	var dimensions = 1;
+	var name = "indices";
+	var attribLoc = 4;
+	vbo.setDataArrayCustom(indicesDataArray, vboMemManager, dimensions, name, attribLoc);
+
+	return vectorMesh;
+};

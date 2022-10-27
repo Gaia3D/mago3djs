@@ -228,8 +228,10 @@ void main()
 	float pollutionValue = UnpackDepth32(textureColor);
 
 	vec4 albedo4 = finalColor;
-
-	finalColor = vec4(pollutionValue, pollutionValue, pollutionValue, pollutionValue);
+	vec4 intensity4 = vec4(pollutionValue, pollutionValue, pollutionValue, pollutionValue);
+	vec4 pollutionColor = vec4(0.5, 1.0, 0.1, 1.0);
+	finalColor = mix(intensity4, pollutionColor, pollutionValue);
+	//finalColor = vec4(pollutionValue, pollutionValue, pollutionValue, pollutionValue);
     gl_FragData[0] = finalColor; 
 
 	#ifdef USE_MULTI_RENDER_TARGET

@@ -1475,6 +1475,12 @@ ReaderWriter.loadBinaryData = function(fileName, dataContainer, weatherLayer)
  */
 ReaderWriter.loadImage = function (gl, filePath_inServer, texture) 
 {
+	//**************************************************************************************************************************
+	// No use ReaderWriter to load images. Use TexturesManager!.*** No use ReaderWriter to load images. Use TexturesManager!.***
+	// No use ReaderWriter to load images. Use TexturesManager!.*** No use ReaderWriter to load images. Use TexturesManager!.***
+	// No use ReaderWriter to load images. Use TexturesManager!.*** No use ReaderWriter to load images. Use TexturesManager!.***
+	//**************************************************************************************************************************
+
 	// Must know the fileExtension.***
 	//var extension = filePath_inServer.split('.').pop();
 	

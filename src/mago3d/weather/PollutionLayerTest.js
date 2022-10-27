@@ -266,7 +266,7 @@ PollutionLayerTest.prototype.render = function (magoManager)
 	gl.bindTexture(gl.TEXTURE_2D, glTexNext);
 
 	gl.frontFace(gl.CCW);
-	//gl.enable(gl.BLEND);
+	gl.enable(gl.BLEND);
 
 	// Render the rectangleMesh.*********************************************************************
 	// Init uniforms.
@@ -338,7 +338,7 @@ PollutionLayerTest.prototype.render = function (magoManager)
 		gl.drawElements(primitive, vboKey.indicesCount, gl.UNSIGNED_SHORT, 0);
 	}
 	// End render rectangleMesh.---------------------------------------------------------------------
-	//gl.disable(gl.BLEND);
+	gl.disable(gl.BLEND);
 	currentShader.disableVertexAttribArrayAll();
 	magoManager.postFxShadersManager.useProgram(null);
 
@@ -425,8 +425,8 @@ PollutionLayerTest.prototype._prepareLayer = function ()
 		var centerGeoCoord = geoJson.centerGeographicCoord;
 
 		// must find the 4 geoCoords of the rectangle.***
-		var widthMeters = 1500.0;
-		var heightMeters = 1500.0;
+		var widthMeters = this._pollutionVolumeOwner._geoJsonIndexFile.height_km * 1000.0;
+		var heightMeters = this._pollutionVolumeOwner._geoJsonIndexFile.width_km * 1000.0;
 		var resultObject = Globe.getRectangleMeshOnEllisoideCenteredAtGeographicCoord(centerGeoCoord, widthMeters, heightMeters, numCols, numRows);
 
 		vboKey.setDataArrayIdx(resultObject.indices, magoManager.vboMemoryManager);

@@ -242,6 +242,30 @@ Color.fromHexCode = function(hex, resultColor4)
 		
 };
 
+Color.getColorRGBRandom = function(result_color4) 
+{
+	if (result_color4 === undefined)
+	{
+		result_color4 = new Color();
+	}
+
+	result_color4.setRGB(Math.random(), Math.random(), Math.random());
+
+	return result_color4;
+};
+
+Color.getColorPastelRGBRandom = function(result_color4) 
+{
+	if (result_color4 === undefined)
+	{
+		result_color4 = new Color();
+	}
+
+	result_color4.setRGB(Math.random() * 0.5 + 0.5, Math.random() * 0.5 + 0.5, Math.random() * 0.5 + 0.5);
+
+	return result_color4;
+};
+
 /**
  * Match gray scale to RGB scale
  * @param gray the percentage of the gray color. normalize the value from 0.0 to 1.0

@@ -763,6 +763,29 @@ Point3DList.getThickLinesPositionDataArray = function(point3dArray, resultPosVbo
 	return resultPosVboDataArray;
 };
 
+Point3DList.float32ArrayToPoints3DArray = function(float32Array, result_point3dArray)
+{
+	// static.***
+	if (float32Array === undefined || float32Array.length < 3)
+	{
+		return result_point3dArray;
+	}
+
+	if (result_point3dArray === undefined)
+	{
+		result_point3dArray = [];
+	}
+	
+	var pointsCount = float32Array.length / 3;
+	for (var i=0; i<pointsCount; i++)
+	{
+		var point3d = new Point3D(float32Array[3*i], float32Array[3*i+1], float32Array[3*i+2]);
+		result_point3dArray[i] = point3d;
+	}
+
+	return result_point3dArray;
+};
+
 /**
  * Make the vbo of this point3DList
  * @param magoManager

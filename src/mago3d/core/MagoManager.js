@@ -369,6 +369,7 @@ var MagoManager = function (config)
 	this.workersManager = new WorkersManager(this);
 	//this.voxelizer = new Voxelizer(this, undefined);
 
+
 	//https://rustwasm.github.io/book/game-of-life/hello-world.html
 	//https://rustwasm.github.io/wasm-bindgen/examples/wasm2js.html
 };
@@ -2003,6 +2004,34 @@ MagoManager.prototype.doRenderORT = function (frustumVolumenObject)
 	*/
 };
 
+MagoManager.prototype._renderManagers_transparentPass = function () 
+{
+	if (this.waterManager) // TransparentPass.***
+	{
+		// 1rst, do objects intersection culling.
+		var visiblesArray = this.visibleObjControlerNodes.getAllVisibles();
+		var nativeVisiblesArray = this.visibleObjControlerNodes.getAllNatives();
+		this.waterManager.doIntersectedObjectsCulling(visiblesArray, nativeVisiblesArray);
+		this.waterManager.render();
+	}
+
+	if (this.soundManager) // TransparentPass.***
+	{
+		// do sound simulation.
+		// Note : This is different to water simulation. Here, do not IntersectedObjectsCulling if the simulation was started. TODO.***
+		var visiblesArray = this.visibleObjControlerNodes.getAllVisibles();
+		var nativeVisiblesArray = this.visibleObjControlerNodes.getAllNatives();
+		this.soundManager.doIntersectedObjectsCulling(visiblesArray, nativeVisiblesArray);
+		this.soundManager.render();
+	};
+
+	if (this.itineraryManager !== undefined)
+	{
+		// render itinerary layers.***
+		this.itineraryManager.render();
+	}
+};
+
 /**
  * Main rendering function.
  * @private
@@ -2248,7 +2277,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 	this.renderType = 1;
 	this.renderer.renderGeometryBufferTransparents(gl, renderType, this.visibleObjControlerNodes);
 
-	
+	this._renderManagers_transparentPass(); // TransparentPass.***
 
 	//if (this.weatherStation)
 	//{
@@ -2256,24 +2285,10 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 	//	this.weatherStation.renderWeatherTransparents(this);
 	//}
 
-	if (this.waterManager) // TransparentPass.***
-	{
-		// 1rst, do objects intersection culling.
-		var visiblesArray = this.visibleObjControlerNodes.getAllVisibles();
-		var nativeVisiblesArray = this.visibleObjControlerNodes.getAllNatives();
-		this.waterManager.doIntersectedObjectsCulling(visiblesArray, nativeVisiblesArray);
-		this.waterManager.render();
-	}
 
-	if (this.soundManager) // TransparentPass.***
-	{
-		// do sound simulation.
-		// Note : This is different to water simulation. Here, do not IntersectedObjectsCulling if the simulation was started. TODO.***
-		var visiblesArray = this.visibleObjControlerNodes.getAllVisibles();
-		var nativeVisiblesArray = this.visibleObjControlerNodes.getAllNatives();
-		this.soundManager.doIntersectedObjectsCulling(visiblesArray, nativeVisiblesArray);
-		this.soundManager.render();
-	};
+	
+
+	
 
 	// check if must render boundingBoxes.
 	if (this.magoPolicy.getShowBoundingBox())

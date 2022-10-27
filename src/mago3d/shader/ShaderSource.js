@@ -1,5 +1,248 @@
 'use strict';
 var ShaderSource = {};
+ShaderSource.AnimatedIconFS = "precision highp float;\n\
+\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+varying vec2 v_texcoord;\n\
+uniform bool textureFlipYAxis;\n\
+uniform sampler2D u_texture;\n\
+uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
+uniform vec4 oneColor4;\n\
+\n\
+\n\
+varying vec2 imageSizeInPixels;\n\
+\n\
+vec3 encodeNormal(in vec3 normal)\n\
+{\n\
+	return normal*0.5 + 0.5;\n\
+}\n\
+\n\
+vec3 decodeNormal(in vec3 normal)\n\
+{\n\
+	return normal * 2.0 - 1.0;\n\
+}\n\
+\n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+  return enc;\n\
+}\n\
+\n\
+void main()\n\
+{\n\
+    vec4 textureColor;\n\
+\n\
+	// 1rst, check if the texture.w != 0.\n\
+	if(textureFlipYAxis)\n\
+	{\n\
+		textureColor = texture2D(u_texture, vec2(v_texcoord.s, 1.0 - v_texcoord.t));\n\
+	}\n\
+	else\n\
+	{\n\
+		textureColor = texture2D(u_texture, v_texcoord);\n\
+	}\n\
+	\n\
+	if(textureColor.w < 0.5)\n\
+	{\n\
+		discard;\n\
+	}\n\
+\n\
+\n\
+	if(colorType == 2)\n\
+	{\n\
+		// do nothing.\n\
+	}\n\
+	else if( colorType == 0)\n\
+	{\n\
+		textureColor = oneColor4;\n\
+	}\n\
+\n\
+    //gl_FragColor = textureColor;\n\
+	gl_FragData[0] = textureColor;\n\
+\n\
+	#ifdef USE_MULTI_RENDER_TARGET\n\
+		//gl_FragData[1] = packDepth(vDepth);\n\
+		gl_FragData[1] = packDepth(0.0);\n\
+		\n\
+		// Note: points cloud data has frustumIdx 20 .. 23.********\n\
+		float frustumIdx = 0.1; // realFrustumIdx = 0.1 * 100 = 10. \n\
+		\n\
+		//if(uFrustumIdx == 0)\n\
+		//frustumIdx = 0.005; // frustumIdx = 20.***\n\
+		//else if(uFrustumIdx == 1)\n\
+		//frustumIdx = 0.015; // frustumIdx = 21.***\n\
+		//else if(uFrustumIdx == 2)\n\
+		//frustumIdx = 0.025; // frustumIdx = 22.***\n\
+		//else if(uFrustumIdx == 3)\n\
+		//frustumIdx = 0.035; // frustumIdx = 23.***\n\
+\n\
+		vec3 normal = encodeNormal(vec3(0.0, 0.0, 1.0));\n\
+		gl_FragData[2] = vec4(normal, frustumIdx); // save normal.***\n\
+\n\
+		// now, albedo.\n\
+		gl_FragData[3] = textureColor; \n\
+	#endif\n\
+\n\
+	#ifdef USE_LOGARITHMIC_DEPTH\n\
+	//if(bUseLogarithmicDepth)\n\
+	//{\n\
+	//	gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
+	//}\n\
+	#endif\n\
+}";
+ShaderSource.AnimatedIconVS = "attribute vec4 position;\n\
+attribute vec2 texCoord;\n\
+uniform mat4 buildingRotMatrix;\n\
+uniform mat4 modelViewMatrixRelToEye;  \n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;  \n\
+uniform mat4 projectionMatrix;\n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+uniform vec2 scale2d;\n\
+uniform vec2 size2d;\n\
+uniform vec3 aditionalOffset;\n\
+uniform vec2 imageSize;\n\
+uniform float screenWidth;    \n\
+uniform float screenHeight;\n\
+uniform bool bUseOriginalImageSize;\n\
+varying vec2 v_texcoord;\n\
+varying vec2 imageSizeInPixels;\n\
+\n\
+void main()\n\
+{\n\
+    vec4 position2 = vec4(position.xyz, 1.0);\n\
+    vec4 rotatedPos = buildingRotMatrix * vec4(position2.xyz, 1.0);\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+	\n\
+	//imageSizeInPixels = vec2(imageSize.x, imageSize.y);\n\
+	\n\
+	float order_w = position.w;\n\
+	float sense = 1.0;\n\
+	int orderInt = 0;\n\
+	if(order_w > 0.0)\n\
+	{\n\
+		sense = -1.0;\n\
+		if(order_w < 1.5)\n\
+		{\n\
+			orderInt = 1;\n\
+		}\n\
+		else{\n\
+			orderInt = 2;\n\
+		}\n\
+	}\n\
+	else\n\
+	{\n\
+		sense = 1.0;\n\
+		if(order_w > -1.5)\n\
+		{\n\
+			orderInt = -1;\n\
+		}\n\
+		else{\n\
+			orderInt = -2;\n\
+		}\n\
+	}\n\
+	\n\
+    v_texcoord = texCoord;\n\
+	vec4 projected = ModelViewProjectionMatrixRelToEye * pos4;\n\
+	//vec4 projected2 = modelViewMatrixRelToEye * pos4;\n\
+\n\
+	// Now, calculate the pixelSize in the plane of the projected point.\n\
+	float pixelWidthRatio = 2. / ((screenWidth));// * projectionMatrix[0][0]);\n\
+	// alternative : float pixelWidthRatio = 2. / (screenHeight * projectionMatrix[1][1]);\n\
+	float pixelWidth = projected.w * pixelWidthRatio;\n\
+\n\
+	//float pixelHeightRatio = pixelWidthRatio * (screenHeight/screenWidth); // no works correctly.\n\
+	float pixelHeightRatio = 2. / ((screenHeight));\n\
+	float pixelHeight = projected.w * pixelHeightRatio;\n\
+	\n\
+	if(projected.w < 5.0)\n\
+		pixelWidth = 5.0 * pixelWidthRatio;\n\
+\n\
+	//pixelHeight = pixelWidth;\n\
+	\n\
+	vec4 offset;\n\
+	float offsetX;\n\
+	float offsetY;\n\
+	if(bUseOriginalImageSize)\n\
+	{\n\
+		offsetX = pixelWidth*imageSize.x/2.0;\n\
+		offsetY = pixelHeight*imageSize.y/2.0;\n\
+	}\n\
+	else{\n\
+		offsetX = pixelWidth*size2d.x/2.0;\n\
+		offsetY = pixelHeight*size2d.y/2.0;\n\
+	}\n\
+	\n\
+	// Offset our position along the normal\n\
+	if(orderInt == 1)\n\
+	{\n\
+		offset = vec4(-offsetX*scale2d.x, 0.0, 0.0, 1.0);\n\
+	}\n\
+	else if(orderInt == -1)\n\
+	{\n\
+		offset = vec4(offsetX*scale2d.x, 0.0, 0.0, 1.0);\n\
+	}\n\
+	else if(orderInt == 2)\n\
+	{\n\
+		offset = vec4(-offsetX*scale2d.x, offsetY*2.0*scale2d.y, 0.0, 1.0);\n\
+	}\n\
+	else if(orderInt == -2)\n\
+	{\n\
+		offset = vec4(offsetX*scale2d.x, offsetY*2.0*scale2d.y, 0.0, 1.0);\n\
+	}\n\
+\n\
+	gl_Position = projected + offset + vec4(aditionalOffset.x*pixelWidth, aditionalOffset.y*pixelWidth, aditionalOffset.z*pixelWidth, 0.0); \n\
+}\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+";
 ShaderSource.atmosphereFS = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
@@ -6333,8 +6576,10 @@ void main()\n\
 	float pollutionValue = UnpackDepth32(textureColor);\n\
 \n\
 	vec4 albedo4 = finalColor;\n\
-\n\
-	finalColor = vec4(pollutionValue, pollutionValue, pollutionValue, pollutionValue);\n\
+	vec4 intensity4 = vec4(pollutionValue, pollutionValue, pollutionValue, pollutionValue);\n\
+	vec4 pollutionColor = vec4(0.5, 1.0, 0.1, 1.0);\n\
+	finalColor = mix(intensity4, pollutionColor, pollutionValue);\n\
+	//finalColor = vec4(pollutionValue, pollutionValue, pollutionValue, pollutionValue);\n\
     gl_FragData[0] = finalColor; \n\
 \n\
 	#ifdef USE_MULTI_RENDER_TARGET\n\

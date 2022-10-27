@@ -265,7 +265,6 @@ MagoRenderable.prototype.render = function (magoManager, shader, renderType, glP
 		gl.uniform1f(shader.externalAlpha_loc, this.attributes.opacity);
 	}
 
-	var webglController = new WebGlController(gl);
 
 	// Set geoLocation uniforms.***
 	
@@ -277,11 +276,11 @@ MagoRenderable.prototype.render = function (magoManager, shader, renderType, glP
 
 	if (this.attributes.doubleFace)
 	{
-		webglController.disable_GL_CULL_FACE();
+		gl.disable(gl.CULL_FACE);
 	}
 	else 
 	{
-		webglController.enable_GL_CULL_FACE();
+		gl.enable(gl.CULL_FACE);
 	}
 
 	var executedEffects = false;
@@ -391,7 +390,7 @@ MagoRenderable.prototype.render = function (magoManager, shader, renderType, glP
 			gl.uniform1i(shaderThickLine.uFrustumIdx_loc, magoManager.currentFrustumIdx);
 			gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
 			gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-			webglController.disable_GL_CULL_FACE();
+			gl.disable(gl.CULL_FACE);
 			
 			gl.enableVertexAttribArray(shaderThickLine.prev_loc);
 			gl.enableVertexAttribArray(shaderThickLine.current_loc);
@@ -411,14 +410,14 @@ MagoRenderable.prototype.render = function (magoManager, shader, renderType, glP
 			
 			var bWireframe = true;
 			this.renderAsChild(magoManager, shaderThickLine, renderType, glPrimitive, bIsSelected, this.options, bWireframe);
-			webglController.enable_GL_CULL_FACE();
+			gl.enable(gl.CULL_FACE);
 			
 			// Return to the currentShader.
 			magoManager.postFxShadersManager.useProgram(shader);
 		}
 	}
 
-	webglController.restoreAllParameters();
+	gl.enable(gl.CULL_FACE);
 };
 
 MagoRenderable.prototype.renderAsChild = function (magoManager, shader, renderType, glPrimitive, bIsSelected, options, bWireframe) 
@@ -431,8 +430,6 @@ MagoRenderable.prototype.renderAsChild = function (magoManager, shader, renderTy
 
 	// Set geoLocation uniforms.***
 	var gl = magoManager.getGl();
-
-	var webglController = new WebGlController(gl);
 	
 	if (renderType === 0)
 	{
@@ -546,7 +543,7 @@ MagoRenderable.prototype.renderAsChild = function (magoManager, shader, renderTy
 
 			gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
 			gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-			webglController.disable_GL_CULL_FACE();
+			gl.disable(gl.CULL_FACE);
 			
 			gl.enableVertexAttribArray(shaderThickLine.prev_loc);
 			gl.enableVertexAttribArray(shaderThickLine.current_loc);
@@ -596,10 +593,10 @@ MagoRenderable.prototype.renderAsChild = function (magoManager, shader, renderTy
 			gl.uniform1i(shaderLocal.bUseFixPointSize_loc, 1);
 			gl.uniform1i(shaderLocal.uStrokeSize_loc, this.style.strokeSize);
 			gl.uniform1i(shaderLocal.uFrustumIdx_loc, magoManager.currentFrustumIdx);
-			webglController.depthRange(0, 0);
+			gl.depthRange(0, 0);
 			object.renderAsChild(magoManager, shaderLocal, renderType, glPrimitive, bIsSelected, options, bWireframe);
 			// Return to the currentShader.
-			webglController.depthRange(0, 1);
+			gl.depthRange(0, 1);
 			magoManager.postFxShadersManager.useProgram(shader);
 		}
 		else
@@ -608,7 +605,8 @@ MagoRenderable.prototype.renderAsChild = function (magoManager, shader, renderTy
 		}
 	}
 
-	webglController.restoreAllParameters();
+	gl.depthRange(0, 1);
+	gl.enable(gl.CULL_FACE);
 	this.dispatchEvent('RENDER_END', magoManager);
 };
 

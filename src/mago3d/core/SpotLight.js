@@ -539,7 +539,7 @@ SpotLight.prototype.getModelViewMatrixRelToEye = function(faceIdx)
 	return this.mvMatRelToEyeArray[faceIdx];
 };
 
-SpotLight.prototype.bindCubeMapFrameBuffer = function(faceIdx, magoManager, webglController) 
+SpotLight.prototype.bindCubeMapFrameBuffer = function(faceIdx, magoManager) 
 {
 	var gl = magoManager.getGl();
 
@@ -556,13 +556,6 @@ SpotLight.prototype.bindCubeMapFrameBuffer = function(faceIdx, magoManager, webg
 	gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, cubeMapFbo.depthBuffer);
 	
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_CUBE_MAP_POSITIVE_X + faceIdx, cubeMapFbo.colorBuffer, 0);
-	
-	webglController.viewport(0, 0, cubeMapFbo.width[0], cubeMapFbo.width[0]);
-	webglController.clearColor(1, 1, 1, 1);
-	webglController.clearDepth(1.0);
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	webglController.clearColor(0, 0, 0, 1);
-
 };
 
 SpotLight.prototype.getDepthCubeMapTexture = function(magoManager) 
