@@ -16,6 +16,8 @@ var ItineraryManager = function(options)
 	 this._walkingManMosaicTexPath; // if walkingMan is used.***
 	 this._walkingManMosaicTexIsPrepared = false;
 
+	 this._animatedIcon;
+
 	 if (options !== undefined)
 	 {
 		// Check options.***
@@ -168,6 +170,7 @@ ItineraryManager.prototype.render = function ()
 	gl.enable(gl.CULL_FACE);
 	gl.disable(gl.BLEND);
 
+	// WALKING MAN.**********************************************************************************************
 	// Now, render the itinerary walkingMan & points.************************************************************
 	// Check if the walkingManMosaicTex is prepared.***
 	if (!this._prepareWalkingManTexture())
@@ -175,6 +178,54 @@ ItineraryManager.prototype.render = function ()
 		return false;
 	}
 
+	// get the "animatedIcon" shader & set uniforms.***
+	var shader = magoManager.postFxShadersManager.getShader("animatedIcon"); 
+	shader.resetLastBuffersBinded();
+	
+	var shaderProgram = shader.program;
+	
+	gl.useProgram(shaderProgram);
+	shader.bindUniformGenerals();
+	magoManager.effectsManager.setCurrentShader(shader);
+	gl.uniformMatrix4fv(shader.modelViewProjectionMatrix4RelToEye_loc, false, magoManager.sceneState.modelViewProjRelToEyeMatrix._floatArrays);
+	gl.uniform3fv(shader.cameraPosHIGH_loc, magoManager.sceneState.encodedCamPosHigh);
+	gl.uniform3fv(shader.cameraPosLOW_loc, magoManager.sceneState.encodedCamPosLow);
+	gl.uniformMatrix4fv(shader.buildingRotMatrix_loc, false, magoManager.sceneState.modelViewRelToEyeMatrixInv._floatArrays);
+	gl.uniform1f(shader.screenWidth_loc, parseFloat(magoManager.sceneState.drawingBufferWidth[0]));
+	gl.uniform1f(shader.screenHeight_loc, parseFloat(magoManager.sceneState.drawingBufferHeight[0]));
+	gl.uniform1i(shader.textureFlipYAxis_loc, magoManager.sceneState.textureFlipYAxis); 
+	// Tell the shader to get the texture from texture unit 0
+	gl.uniform1i(shader.texture_loc, 0);
+	gl.enableVertexAttribArray(shader.texCoord2_loc);
+	gl.enableVertexAttribArray(shader.position4_loc);
+	gl.activeTexture(gl.TEXTURE0);
+	
+	//gl.depthRange(0, 0.05);
+	//var context = document.getElementById('canvas2').getContext("2d");
+	//var canvas = document.getElementById("magoContainer");
+
+	if (this._animatedIcon === undefined)
+	{
+		var options = {};
+		this._animatedIcon = new AnimatedIcon(options);
+	}
+
+	var iconPosBuffer = this._animatedIcon.getPositionBuffer(gl);
+	
+	gl.bindBuffer(gl.ARRAY_BUFFER, iconPosBuffer);
+	gl.vertexAttribPointer(shader.position4_loc, 4, gl.FLOAT, false, 0, 0);
+	gl.bindBuffer(gl.ARRAY_BUFFER, this._animatedIcon.texcoordBuffer);
+	gl.vertexAttribPointer(shader.texCoord2_loc, 2, gl.FLOAT, false, 0, 0);
+	
+	gl.activeTexture(gl.TEXTURE0);
+	
+	gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
+	gl.uniform4fv(shader.oneColor4_loc, [0.2, 0.7, 0.9, 1.0]);
+	gl.uniform2fv(shader.scale2d_loc, [1.0, 1.0]);
+	gl.uniform2fv(shader.size2d_loc, [25.0, 25.0]);
+	gl.uniform1i(shader.bUseOriginalImageSize_loc, true);
+	gl.uniform3fv(shader.aditionalOffset_loc, [0.0, 0.0, 0.0]);
+		
 
 	for (var i=0; i<itisCount; i++)
 	{

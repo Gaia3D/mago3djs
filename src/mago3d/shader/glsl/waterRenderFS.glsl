@@ -171,14 +171,25 @@ void main()
     {
         discard;
     }
+
     float totalH = vWaterHeight + vContaminantHeight;
     
-    if(totalH < 0.5)
+    float whiteWaterMaxHeight = uMinWaterHeightToRender * 1.5;
+    float whiteFactor = 0.0;
+    if(totalH < whiteWaterMaxHeight)
     {
         alpha = min(totalH/0.1, alpha); // original.***
         //alpha = min(totalH, alpha); // test.***
-    }
 
+        // do water more white.***
+        
+        whiteFactor = (totalH - uMinWaterHeightToRender) / (whiteWaterMaxHeight - uMinWaterHeightToRender);
+        vec4 white = vec4(1.0, 1.0, 1.0, 1.0);
+        finalCol4 = mix(white, finalCol4, whiteFactor);
+
+        alpha = finalCol4.a;
+    }
+    
 
     // calculate contaminationConcentration;
     float contaminConcentration = vContaminantHeight / (totalH);
@@ -217,7 +228,7 @@ void main()
     {
         // particles case: now, decode velocity:
         vec4 velocity4 = texture2D(waterTex, vec2(vTexCoord.x, vTexCoord.y));
-        finalCol4 = mix(vColorAuxTest, velocity4, velocity4.a);
+        finalCol4 = mix(finalCol4, velocity4, velocity4.a);
         if(alpha < velocity4.a)
         {
             alpha = velocity4.a;
@@ -277,8 +288,9 @@ void main()
 		}
 
 	//}
-    vec3 specCol = finalCol4.xyz * 3.0;
-    specCol = vec3(0.5, 1.0, 1.0);
+    //vec3 specCol = finalCol4.xyz * 3.0;
+    vec3 specCol = vec3(0.5, 1.0, 1.0);
+
     //finalCol4 = vec4((finalCol4.xyz * lambertian + specCol * specular), alpha);
     //*************************************************************************************************************
     vec3 lightdir = normalize(lightPos - vOrthoPos);
@@ -286,7 +298,11 @@ void main()
     float spec = pow(max(dot(vNormal, halfway), 0.0), 333.0);
     finalCol4 = vec4((finalCol4.xyz * lambertian + specCol * spec), alpha);
 
-    //finalCol4 = vec4(0.0, 0.0, 0.0, 1.0); // test debug.
+    if(!isParticle)
+    {
+        finalCol4 = vec4(finalCol4.xyz* (1.0 + whiteFactor), alpha);
+    }
+    
 
     //-------------------------------------------------------------------------------------------------------------
     gl_FragData[0] = finalCol4;  // anything.

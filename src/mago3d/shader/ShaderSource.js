@@ -19479,14 +19479,25 @@ void main()\n\
     {\n\
         discard;\n\
     }\n\
+\n\
     float totalH = vWaterHeight + vContaminantHeight;\n\
     \n\
-    if(totalH < 0.5)\n\
+    float whiteWaterMaxHeight = uMinWaterHeightToRender * 1.5;\n\
+    float whiteFactor = 0.0;\n\
+    if(totalH < whiteWaterMaxHeight)\n\
     {\n\
         alpha = min(totalH/0.1, alpha); // original.***\n\
         //alpha = min(totalH, alpha); // test.***\n\
-    }\n\
 \n\
+        // do water more white.***\n\
+        \n\
+        whiteFactor = (totalH - uMinWaterHeightToRender) / (whiteWaterMaxHeight - uMinWaterHeightToRender);\n\
+        vec4 white = vec4(1.0, 1.0, 1.0, 1.0);\n\
+        finalCol4 = mix(white, finalCol4, whiteFactor);\n\
+\n\
+        alpha = finalCol4.a;\n\
+    }\n\
+    \n\
 \n\
     // calculate contaminationConcentration;\n\
     float contaminConcentration = vContaminantHeight / (totalH);\n\
@@ -19525,7 +19536,7 @@ void main()\n\
     {\n\
         // particles case: now, decode velocity:\n\
         vec4 velocity4 = texture2D(waterTex, vec2(vTexCoord.x, vTexCoord.y));\n\
-        finalCol4 = mix(vColorAuxTest, velocity4, velocity4.a);\n\
+        finalCol4 = mix(finalCol4, velocity4, velocity4.a);\n\
         if(alpha < velocity4.a)\n\
         {\n\
             alpha = velocity4.a;\n\
@@ -19585,8 +19596,9 @@ void main()\n\
 		}\n\
 \n\
 	//}\n\
-    vec3 specCol = finalCol4.xyz * 3.0;\n\
-    specCol = vec3(0.5, 1.0, 1.0);\n\
+    //vec3 specCol = finalCol4.xyz * 3.0;\n\
+    vec3 specCol = vec3(0.5, 1.0, 1.0);\n\
+\n\
     //finalCol4 = vec4((finalCol4.xyz * lambertian + specCol * specular), alpha);\n\
     //*************************************************************************************************************\n\
     vec3 lightdir = normalize(lightPos - vOrthoPos);\n\
@@ -19594,7 +19606,11 @@ void main()\n\
     float spec = pow(max(dot(vNormal, halfway), 0.0), 333.0);\n\
     finalCol4 = vec4((finalCol4.xyz * lambertian + specCol * spec), alpha);\n\
 \n\
-    //finalCol4 = vec4(0.0, 0.0, 0.0, 1.0); // test debug.\n\
+    if(!isParticle)\n\
+    {\n\
+        finalCol4 = vec4(finalCol4.xyz* (1.0 + whiteFactor), alpha);\n\
+    }\n\
+    \n\
 \n\
     //-------------------------------------------------------------------------------------------------------------\n\
     gl_FragData[0] = finalCol4;  // anything.\n\

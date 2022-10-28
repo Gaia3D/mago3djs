@@ -2411,7 +2411,7 @@ Water.prototype.doIntersectedObjectsCulling = function (visiblesArray, nativeVis
 	//	var hola = 0;
 	//}
 
-	// nativeVisiblesObjects.
+	// nativeVisiblesObjects. There are opaques & transparents in the same array.***
 	var native;
 	for (var i=0; i<nativeVisiblesCount; i++)
 	{
@@ -2423,7 +2423,7 @@ Water.prototype.doIntersectedObjectsCulling = function (visiblesArray, nativeVis
 
 		if (this._isObjectIdDemOverWrited(native._guid)) 
 		{
-			//continue;
+			continue;
 		}
 
 		bSphereWC = native.getBoundingSphereWC(bSphereWC);
@@ -2811,6 +2811,11 @@ Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
 	if (!this.prepareTextures()) // textures that must be loaded.
 	{ return false; }
 
+	if (!this.buildingsId_OverWritedOnDemMap)
+	{
+		this.buildingsId_OverWritedOnDemMap = {};
+	}
+
 	var visibleNodesCount = this.visibleObjectsControler.currentVisibles0.length;
 	var visibleNativesOpaquesCount = this.visibleObjectsControler.currentVisibleNativeObjects.opaquesArray.length;
 	var visibleNativesTransparentsCount = this.visibleObjectsControler.currentVisibleNativeObjects.transparentsArray.length;
@@ -2829,7 +2834,11 @@ Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
 	var shader;
 
 	// 1rst, copy the terrain depth into "this.demWithBuildingsTex".************************************************************************************
-	if (magoManager.isFarestFrustum())
+	if (this.demTexCopied_toDemWithBuildingsTex === undefined)
+	{
+		this.demTexCopied_toDemWithBuildingsTex = false;
+	}
+	if (!this.demTexCopied_toDemWithBuildingsTex && magoManager.isFarestFrustum())
 	{ 
 		// We must copy "dem_texture" into "demWithBuildingsTex" to preserve the "dem_texture".
 		// There are the original tile DEM texture named : "dem_texture".
@@ -2837,6 +2846,7 @@ Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
 		// Note : "dem_texture" can have excavations.
 		var bFlipTexcoordY = false;
 		this.copyTexture(this.dem_texture_A, [this.demWithBuildingsTex], bFlipTexcoordY);
+		this.demTexCopied_toDemWithBuildingsTex = true;
 	}
 
 	// 2n, make building depth over terrain depth.******************************************************************************************************
@@ -2878,22 +2888,38 @@ Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
 	gl.uniform1i(shader.u_processType_loc, 0); // 0 = overWriteDEM, 1 = excavation.
 	
 	gl.disable(gl.CULL_FACE);
-	gl.clear(gl.DEPTH_BUFFER_BIT);
+
+	// we clear depth buffer only once.***
+	var count = 0;
+	for (var prop in this.buildingsId_OverWritedOnDemMap) 
+	{
+		if (this.buildingsId_OverWritedOnDemMap.hasOwnProperty(prop))
+		{ 
+			++count;
+			break;
+		}
+	}
+
+	if (count === 0)
+	{
+		gl.clear(gl.DEPTH_BUFFER_BIT);
+	}
+	
 
 	var renderType = 0;
 	var refMatrixIdxKey = 0;
 	var glPrimitive = undefined; // 
 
-	if (!this.buildingsId_OverWritedOnDemMap)
-	{
-		this.buildingsId_OverWritedOnDemMap = {};
-	}
+	
 	
 	for (var i=0; i<visibleNodesCount; i++)
 	{
 		var node = this.visibleObjectsControler.currentVisibles0[i];
-		node.renderContent(magoManager, shader, renderType, refMatrixIdxKey);
-		this.buildingsId_OverWritedOnDemMap[node._guid] = node;
+		var lodRendered = node.renderContent(magoManager, shader, renderType, refMatrixIdxKey);
+		if (lodRendered >= 0 && lodRendered < 6)
+		{
+			this.buildingsId_OverWritedOnDemMap[node._guid] = node;
+		}
 	}
 
 	var visibleNativesOpaquesCount = this.visibleObjectsControler.currentVisibleNativeObjects.opaquesArray.length;
@@ -2902,8 +2928,10 @@ Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
 		var native = this.visibleObjectsControler.currentVisibleNativeObjects.opaquesArray[i];
 		if (native.name !== "contaminationGenerator" && native.name !== "excavationObject" && native.name !== "waterGenerator")
 		{ 
-			native.render(magoManager, shader, renderType, glPrimitive); 
-			this.buildingsId_OverWritedOnDemMap[native._guid] = native;
+			if (native.render(magoManager, shader, renderType, glPrimitive))
+			{
+				this.buildingsId_OverWritedOnDemMap[native._guid] = native;
+			}
 		}
 	}
 
@@ -2913,8 +2941,11 @@ Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
 		var native = this.visibleObjectsControler.currentVisibleNativeObjects.transparentsArray[i];
 		if (native.name !== "contaminationGenerator" && native.name !== "excavationObject" && native.name !== "waterGenerator")
 		{ 
-			native.render(magoManager, shader, renderType, glPrimitive); 
-			this.buildingsId_OverWritedOnDemMap[native._guid] = native;
+			if (native.render(magoManager, shader, renderType, glPrimitive))
+			{
+				this.buildingsId_OverWritedOnDemMap[native._guid] = native;
+			}
+			
 		}
 	}
 	

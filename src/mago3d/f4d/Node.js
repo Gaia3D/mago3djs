@@ -455,7 +455,7 @@ Node.prototype.renderContent = function (magoManager, shader, renderType, refMat
 	var data = this.data;
 	if (data === undefined) 
 	{ 
-		return; 
+		return undefined; 
 	}
 
 	if (this.renderCondition && typeof this.renderCondition === 'function') 
@@ -469,14 +469,14 @@ Node.prototype.renderContent = function (magoManager, shader, renderType, refMat
 	{
 		if (attributes.isVisible !== undefined && attributes.isVisible === false)  
 		{
-			return;
+			return undefined;
 		}
 		
 		if (magoManager.currentProcess === CODE.magoCurrentProcess.DepthShadowRendering) 
 		{
 			if (attributes.castShadow !== undefined && attributes.castShadow === false) 
 			{
-				return;
+				return undefined;
 			}
 		}
 	}
@@ -501,7 +501,7 @@ Node.prototype.renderContent = function (magoManager, shader, renderType, refMat
 	var neoBuilding = data.neoBuilding;
 	if (neoBuilding === undefined) 
 	{ 
-		return; 
+		return undefined; 
 	}
 
 	// Update visibleOctreesControler of the neoBuilding & the relativeCurrentCamera.
@@ -524,7 +524,7 @@ Node.prototype.renderContent = function (magoManager, shader, renderType, refMat
 
 	if (geoLocDataManager === undefined)
 	{
-		return;
+		return undefined;
 	}
 
 	// 1rst, determine the shader.

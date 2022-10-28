@@ -184,7 +184,7 @@ ExtrusionBuilding.prototype.render = function (magoManager, shader, renderType, 
 	{
 		if (this.attributes.isVisible !== undefined && this.attributes.isVisible === false)
 		{
-			return;
+			return true;
 		}
 	}
 	
@@ -278,6 +278,8 @@ ExtrusionBuilding.prototype.render = function (magoManager, shader, renderType, 
 	gl.uniform1i(shader.bApplySpecularLighting_loc, false);
 	// return clippingType to 0 (0= no clipping).***
 	gl.uniform1i(shader.clippingType_loc, 0);
+
+	return true;
 };
 
 /**

@@ -425,7 +425,7 @@ MagoRenderable.prototype.renderAsChild = function (magoManager, shader, renderTy
 	if (this.dirty) 
 	{ 
 		this.makeMesh(magoManager); 
-		return;
+		return false;
 	}
 
 	// Set geoLocation uniforms.***
@@ -512,6 +512,8 @@ MagoRenderable.prototype.renderAsChild = function (magoManager, shader, renderTy
 	{
 		gl.uniformMatrix4fv(shader.buildingRotMatrix_loc, false, this.tMat._floatArrays);
 	}
+
+	var rendered = true;
 	
 	var objectsCount = this.objectsArray.length;
 	for (var i=0; i<objectsCount; i++)
@@ -561,7 +563,11 @@ MagoRenderable.prototype.renderAsChild = function (magoManager, shader, renderTy
 			{ gl.uniform4fv(shaderThickLine.oneColor4_loc, [0.2, 0.4, 0.9, 1.0]); }
 			gl.uniform2fv(shaderThickLine.viewport_loc, [drawingBufferWidth[0], drawingBufferHeight[0]]);
 
-			object.renderAsChild(magoManager, shaderThickLine, renderType, glPrimitive, bIsSelected, options, bWireframe);
+			if (!object.renderAsChild(magoManager, shaderThickLine, renderType, glPrimitive, bIsSelected, options, bWireframe))
+			{
+				rendered = false;
+			}
+
 
 			// Return to the currentShader.
 			magoManager.postFxShadersManager.useProgram(shader);
@@ -594,20 +600,27 @@ MagoRenderable.prototype.renderAsChild = function (magoManager, shader, renderTy
 			gl.uniform1i(shaderLocal.uStrokeSize_loc, this.style.strokeSize);
 			gl.uniform1i(shaderLocal.uFrustumIdx_loc, magoManager.currentFrustumIdx);
 			gl.depthRange(0, 0);
-			object.renderAsChild(magoManager, shaderLocal, renderType, glPrimitive, bIsSelected, options, bWireframe);
+			if (!object.renderAsChild(magoManager, shaderLocal, renderType, glPrimitive, bIsSelected, options, bWireframe))
+			{
+				rendered = false;
+			}
 			// Return to the currentShader.
 			gl.depthRange(0, 1);
 			magoManager.postFxShadersManager.useProgram(shader);
 		}
 		else
 		{
-			object.renderAsChild(magoManager, shader, renderType, glPrimitive, bIsSelected, options, bWireframe);
+			if (!object.renderAsChild(magoManager, shader, renderType, glPrimitive, bIsSelected, options, bWireframe))
+			{
+				rendered = false;
+			}
 		}
 	}
 
 	gl.depthRange(0, 1);
 	gl.enable(gl.CULL_FACE);
 	this.dispatchEvent('RENDER_END', magoManager);
+	return rendered;
 };
 
 MagoRenderable.prototype.makeMesh = function(magoManager) 

@@ -851,6 +851,8 @@ Mesh.prototype.renderAsChild = function (magoManager, shader, renderType, glPrim
 	
 	var gl = magoManager.getGl();
 
+	var rendered = false;
+
 	if (bWireframe)
 	{
 		if ( renderType !== 1)
@@ -867,7 +869,7 @@ Mesh.prototype.renderAsChild = function (magoManager, shader, renderType, glPrim
 	
 		if (renderWireframe)
 		{
-			this.renderWireframe(magoManager, shader, renderType, glPrimitive, isSelected);
+			rendered = this.renderWireframe(magoManager, shader, renderType, glPrimitive, isSelected);
 		}
 	}
 	else
@@ -884,11 +886,12 @@ Mesh.prototype.renderAsChild = function (magoManager, shader, renderType, glPrim
 		if (renderShaded)
 		{
 			gl.depthMask(depthMask);
-			this.render(magoManager, shader, renderType, glPrimitive, isSelected);
+			rendered = this.render(magoManager, shader, renderType, glPrimitive, isSelected);
 			gl.depthMask(true);
 		}
 	}
 
+	return rendered;
 };
 
 /**
@@ -952,7 +955,7 @@ Mesh.prototype.render = function (magoManager, shader, renderType, glPrimitive, 
 							var url = diffuseTexture.url;
 							var flipYTexCoord = false;
 							TexturesManager.loadTexture(url, diffuseTexture, magoManager, flipYTexCoord);
-							return;
+							return false;
 						}
 					}
 				}
@@ -1056,6 +1059,8 @@ Mesh.prototype.render = function (magoManager, shader, renderType, glPrimitive, 
 		
 		gl.drawElements(primitive, vboKey.indicesCount, gl.UNSIGNED_SHORT, 0);
 	}
+
+	return true;
 };
 
 /**
@@ -1108,7 +1113,7 @@ Mesh.prototype.renderWireframe = function(magoManager, shader, renderType, glPri
 	if (this.edgesVboKeysContainer === undefined)
 	{
 		this.edgesVboKeysContainer = this.getVboEdgesThickLines(this.edgesVboKeysContainer, magoManager);
-		return;
+		return false;
 	}
 	
 	var gl = magoManager.sceneState.gl;
@@ -1180,7 +1185,7 @@ Mesh.prototype.renderWireframe = function(magoManager, shader, renderType, glPri
 	var dim = vboPos.dataDimensions; // in this case dimensions = 4.
 	if (!vboPos.isReady(gl, magoManager.vboMemoryManager))
 	{
-		return;
+		return false;
 	}
 	gl.bindBuffer(gl.ARRAY_BUFFER, vboPos.key);
 	gl.vertexAttribPointer(shader.prev_loc, dim, gl.FLOAT, false, 16, 0);
@@ -1189,7 +1194,7 @@ Mesh.prototype.renderWireframe = function(magoManager, shader, renderType, glPri
 	//gl.vertexAttribPointer(shader.next_loc, dim, gl.FLOAT, false, 16, 128-32); // original.***
 	//gl.drawArrays(gl.TRIANGLE_STRIP, 0, vbo.vertexCount-(4)); // original.***
 	gl.drawArrays(gl.TRIANGLE_STRIP, 0, vbo.vertexCount-(6));
-
+	return true;
 };
 
 /**
