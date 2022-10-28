@@ -2391,7 +2391,7 @@ Water.prototype.doIntersectedObjectsCulling = function (visiblesArray, nativeVis
 		node = visiblesArray[i];
 		if (this._isObjectIdDemOverWrited(node._guid)) 
 		{
-			//continue;
+			continue;
 		}
 		bSphereWC = node.getBoundingSphereWC(bSphereWC);
 
