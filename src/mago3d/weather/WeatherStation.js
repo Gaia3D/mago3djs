@@ -824,6 +824,12 @@ WeatherStation.prototype.loadPollutionTestGeoJsonIndexFile = function(geoJsonInd
 	return pollutionVolume;
 };
 
+WeatherStation.prototype._TEST_addPollutionJsonsArray = function()
+{
+	// load the jsond and push it into pollutionLayers.***
+	
+};
+
 WeatherStation.prototype._TEST_addSoundJsonsArray = function()
 {
 	// this function loads soundJsons, and then adds its into sound volume.***

@@ -15,6 +15,10 @@ uniform vec2 imageSize;
 uniform float screenWidth;    
 uniform float screenHeight;
 uniform bool bUseOriginalImageSize;
+
+uniform int uMosaicSize[2];
+uniform int uSubImageIdx; // mosaicTex = numCols * numRows = subImagesArray.***
+
 varying vec2 v_texcoord;
 varying vec2 imageSizeInPixels;
 
@@ -56,7 +60,6 @@ void main()
 		}
 	}
 	
-    v_texcoord = texCoord;
 	vec4 projected = ModelViewProjectionMatrixRelToEye * pos4;
 	//vec4 projected2 = modelViewMatrixRelToEye * pos4;
 
@@ -106,6 +109,23 @@ void main()
 	}
 
 	gl_Position = projected + offset + vec4(aditionalOffset.x*pixelWidth, aditionalOffset.y*pixelWidth, aditionalOffset.z*pixelWidth, 0.0); 
+
+	// Now, calculate the texCoords.***
+	// uMosaicSize = colsCount, rowsCount.***
+	float colsCount = float(uMosaicSize[0]);
+	float rowsCount = float(uMosaicSize[1]);
+
+	// var idx = col + row * numCols;
+	// row = floor(idx / numCols).
+	// col = idx - row * numCols.
+
+	float row = floor((float(uSubImageIdx) + 0.1 )/ colsCount);
+	float col = float(uSubImageIdx) - row * colsCount;
+
+	vec2 subTexCoordSize = vec2(1.0 / colsCount, 1.0 / rowsCount);
+
+	v_texcoord = vec2(subTexCoordSize.x * col + texCoord.x * subTexCoordSize.x, 
+						subTexCoordSize.y * row + texCoord.y * subTexCoordSize.y);
 }
 
 

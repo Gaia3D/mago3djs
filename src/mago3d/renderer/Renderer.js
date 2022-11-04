@@ -2874,7 +2874,7 @@ Renderer.prototype.renderScreenRectangleMosaic = function (gl, options)
 			var soundLayer = magoManager.soundManager.soundLayersArray[0];
 			if (soundLayer.demWithBuildingsTex && soundLayer.demWithBuildingsTex.texId)
 			{
-				//texture = soundLayer.demWithBuildingsTex.texId;
+				texture = soundLayer.demWithBuildingsTex.texId;
 			}
 
 			if (soundLayer.soundSourceRealTexture3d)
@@ -2903,7 +2903,7 @@ Renderer.prototype.renderScreenRectangleMosaic = function (gl, options)
 			{
 				if (soundLayer.pressureMosaicTexture3d_A.texturesArray.length > 0)
 				{
-					tex3d = soundLayer.pressureMosaicTexture3d_A;
+					//tex3d = soundLayer.pressureMosaicTexture3d_A;
 					//gl.uniform1i(shader.uTextureType_loc, 4); 
 				}
 			}
@@ -3066,10 +3066,10 @@ Renderer.prototype.renderScreenRectangleMosaic = function (gl, options)
 
 	if (tex3d === undefined)// && texture === undefined)
 	{
-		return;
+		//return;
 	}
 
-	texture = tex3d.texturesArray[0];
+	//texture = tex3d.texturesArray[0];
 	if (tex3d)
 	{
 		gl.uniform1iv(shader.u_mosaicSize_loc, [tex3d.mosaicXCount, tex3d.mosaicYCount, tex3d.finalSlicesCount]); // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***

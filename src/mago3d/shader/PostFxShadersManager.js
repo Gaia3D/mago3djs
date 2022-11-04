@@ -397,6 +397,9 @@ PostFxShadersManager.prototype._createShader_pollution = function ()
 	shader.uModelOpacity_loc = gl.getUniformLocation(shader.program, "uModelOpacity");
 	shader.uSelColor4_loc = gl.getUniformLocation(shader.program, "uSelColor4");//
 	shader.uInterpolationFactor_loc = gl.getUniformLocation(shader.program, "uInterpolationFactor");
+	shader.uMinMaxQuantizedValues_tex0_loc = gl.getUniformLocation(shader.program, "uMinMaxQuantizedValues_tex0");
+	shader.uMinMaxQuantizedValues_tex1_loc = gl.getUniformLocation(shader.program, "uMinMaxQuantizedValues_tex1");
+	shader.uMinMaxValues_loc = gl.getUniformLocation(shader.program, "uMinMaxValues");
 
 	// textures.***
 	shader.texture_0_loc = gl.getUniformLocation(shader.program, "texture_0");

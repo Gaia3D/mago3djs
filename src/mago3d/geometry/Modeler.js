@@ -1272,7 +1272,11 @@ Modeler.prototype.render = function (magoManager, shader, renderType, glPrimitiv
 			
 			shader.useProgram();
 		}
-		this.geoCoordsList.renderPoints(magoManager, shader, renderType);
+		var options = {
+			writeGeographicCoords: true
+		};
+		var bEnableDepth = false;
+		this.geoCoordsList.renderPoints(magoManager, shader, renderType, bEnableDepth, options);
 	}
 	
 	if (this.excavation !== undefined)

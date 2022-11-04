@@ -22,7 +22,7 @@ var MagoRenderable = function (options)
 	
 	this.dirty = true;
 	this.color4 =  new Color(1, 1, 1, 1);
-	this.orgColor4 =  new Color(1, 1, 1, 1);
+	this.orgColor4 =  new Color(1, 1, 1, 1); // originalColor (needed when restore color).***
 	this.wireframeColor4;
 	this.selectedColor4;
 	this.objectType = MagoRenderable.OBJECT_TYPE.MESH; // Init as mesh type.
@@ -1006,4 +1006,90 @@ MagoRenderable.prototype.setToDate = function(toDate)
 MagoRenderable.prototype.getToDate = function() 
 {
 	return this.toDate;
+};
+
+//------------------------------------------------------------------------------------------------------------------------------
+
+// Static functions.*** Static functions.*** Static functions.*** Static functions.*** Static functions.*** Static functions.***
+MagoRenderable.newCylinder = function (options)
+{
+	/*
+	options = { 
+		radius,
+		height,
+		geographicCoord = {
+			longitude,
+			latitude,
+			altitude
+		},
+		heading (optional, default 0.0),
+		pitch (optional, default 0.0),
+		roll (optional, default 0.0),
+		color4 = {
+			r, g, b, a
+		}
+	}
+	*/
+	if (options === undefined)
+	{
+		return undefined;
+	}
+
+	var radius = 50.0;
+	var height = 120.0;
+
+	if (options.radius !== undefined)
+	{
+		radius = options.radius;
+	}
+
+	if (options.height !== undefined)
+	{
+		height = options.height;
+	}
+
+	var longitude = options.geographicCoord.longitude;
+	var latitude = options.geographicCoord.latitude;
+	var altitude = options.geographicCoord.altitude;
+
+	var heading = 0.0;
+	var pitch = 0.0;
+	var roll = 0.0;
+
+	if (options.heading !== undefined)
+	{
+		heading = options.heading;
+	}
+
+	if (options.pitch !== undefined)
+	{
+		pitch = options.pitch;
+	}
+
+	if (options.roll !== undefined)
+	{
+		roll = options.roll;
+	}
+
+	
+	
+	var optionsCylinder = {};
+	var cylinder = new Mago3D.Cylinder(radius, height, optionsCylinder);
+
+	cylinder.geoLocDataManager = new GeoLocationDataManager();
+	var geoLocData = cylinder.geoLocDataManager.newGeoLocationData();
+	ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, heading, pitch, roll, geoLocData);
+
+	cylinder.boundingSphereWC = new BoundingSphere();
+	var positionWC = geoLocData.position;
+	var radiusAprox = height;
+	cylinder.boundingSphereWC.setCenterPoint(positionWC.x, positionWC.y, positionWC.z);
+	cylinder.boundingSphereWC.setRadius(radiusAprox);
+
+	if (options.color4)
+	{
+		cylinder.setOneColor(options.color4.r, options.color4.g, options.color4.b, options.color4.a);
+	}
+
+	return cylinder;
 };

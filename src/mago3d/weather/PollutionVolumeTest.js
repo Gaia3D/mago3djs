@@ -25,7 +25,14 @@ var PollutionVolumeTest = function(options)
 	this._allLayersArePrepared = false;
 
 	// Animation state controls.
-	this._animationState = 0; // 0= paused. 1= play.
+	/*
+	CODE.processState = {
+	"NO_STARTED" : 0,
+	"STARTED"    : 1,
+	"FINISHED"   : 2,
+};
+*/
+	this._animationState = CODE.processState.NO_STARTED; 
 	this._animationStartTime = 0;
 	this._totalAnimTime;
 	this._increTime;
@@ -52,8 +59,18 @@ var PollutionVolumeTest = function(options)
 
 PollutionVolumeTest.prototype.render = function (magoManager)
 {
+	if (this._animationState === CODE.processState.FINISHED)
+	{
+		return true;
+	}
+
 	if (!this.prepareVolume(magoManager))
 	{ return false; }
+
+	if (this._animationState === CODE.processState.NO_STARTED)
+	{
+		this._animationState = CODE.processState.STARTED;
+	}
 
 	if (this._animationStartTime === 0) 
 	{
@@ -62,7 +79,7 @@ PollutionVolumeTest.prototype.render = function (magoManager)
 
 	if (this._totalAnimTime === undefined) 
 	{
-		this._totalAnimTime = 20000; // 10 seconds.***
+		this._totalAnimTime = 30000; // 10 seconds.***
 	}
 
 	var totalAnimTime = this._totalAnimTime;
@@ -71,10 +88,12 @@ PollutionVolumeTest.prototype.render = function (magoManager)
 
 	if (this._increTime >= totalAnimTime)
 	{
+		this._animationState = CODE.processState.FINISHED;
+		return true;
 		// Modify the animationStartTime.***
-		var num = Math.floor(this._increTime / totalAnimTime);
-		this._animationStartTime += num * totalAnimTime;
-		this._increTime = currTime - this._animationStartTime;
+		//var num = Math.floor(this._increTime / totalAnimTime);
+		//this._animationStartTime += num * totalAnimTime;
+		//this._increTime = currTime - this._animationStartTime;
 	}
 
 	// Render layers.***

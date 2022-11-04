@@ -20,10 +20,19 @@ var ItineraryLayer = function(options)
 	 this.vectorMesh;
 	 this._walkingManCurrentPosition;
 	 this._animationStartTime = 0;
+	 this._totalItineraryTimeSec;
 
 	 this._animatedIcon;
 	 this._walkingManMosaicTexture;
 	 this._walkingManMosaicTexturePath;
+
+	 this._WM_vboKeysContainer;
+
+	 // sampling data. position, color, etc.***
+	 this._samplingDataObj;
+	 this._samplingData_vboKeysContainer;
+	 
+	 this._timeScale = 2000.0; // to simulate fast.***
 
 	 if (options !== undefined)
 	 {
@@ -91,6 +100,7 @@ ItineraryLayer.prototype._prepare = function ()
 		var options = {};
 
 		this.vectorMesh = VectorMesh.getVectorMeshItineraryFromPoints3dLCArray(points3dArray, geoLocData, magoManager, options);
+		this.vectorMesh.thickness = 3.5;
 		
 		// Provisionally set a random color.***
 		Color.getColorPastelRGBRandom(this.vectorMesh.color4);
@@ -98,6 +108,7 @@ ItineraryLayer.prototype._prepare = function ()
 		// Now, calculate the velocity for all segments of the itinerary.***
 		this._segmentsInfoArray = [];
 		var nodesCount = this._jsonFile.nodes.length;
+		this._totalItineraryTimeSec = 0.0;
 		for (var i=0; i<nodesCount - 1; i++)
 		{
 			var nodeCurr = this._jsonFile.nodes[i];
@@ -136,6 +147,8 @@ ItineraryLayer.prototype._prepare = function ()
 				startPosLC         : posCurr,
 				endPosLC           : posNext
 			};
+
+			this._totalItineraryTimeSec += diffTimeSeconds;
 
 			var hola = 0;
 		}
@@ -194,6 +207,11 @@ ItineraryLayer.prototype.render = function (thickLineShader)
 ItineraryLayer.prototype._getWalkingManPositionLC_forIncreTimeSec = function (diffTimeSec, result_walkingManPosLC)
 {
 	// given a diffTime in seconds, this function returns the position of the walkingMan.***
+	if (this._segmentsInfoArray === undefined || this._segmentsInfoArray.length === 0)
+	{
+		return undefined;
+	}
+
 	var segmentsCount = this._segmentsInfoArray.length;
 	var segmentFound = false;
 	var i=0;
@@ -210,16 +228,13 @@ ItineraryLayer.prototype._getWalkingManPositionLC_forIncreTimeSec = function (di
 		var segmentLength = segmentInfo.dist;
 		var segmentVel = segmentInfo.velocity_metersSec;
 		var segmentDiffTimeSec = segmentInfo.diffTimeSec;
-
-		// Now, check, with the velocity & diffTimeSec, if the walkingMan moved all segment dist.***
 		var currDist = segmentVel * currDiffTimeSec;
 
-		if (currDist > segmentLength)
+		if (segmentDiffTimeSec < currDiffTimeSec)
 		{
 			// the walkingMan has moved through all currentSegment.***
 			// re-set the diffTimeSec for the next segment.***
 			currDiffTimeSec -= segmentDiffTimeSec;
-
 		}
 		else
 		{
@@ -230,15 +245,29 @@ ItineraryLayer.prototype._getWalkingManPositionLC_forIncreTimeSec = function (di
 			var segStartPosLC = segmentInfo.startPosLC;
 			var segEndPosLC = segmentInfo.endPosLC;
 
-			var dir = segStartPosLC.getVectorToPoint(segEndPosLC, undefined);
-			dir.unitary();
-
-			if (result_walkingManPosLC === undefined)
+			if (currDist < 1e-12)
 			{
-				result_walkingManPosLC = new Point3D();
-			}
+				// the walkingMan is stopped.***
+				if (result_walkingManPosLC === undefined)
+				{
+					result_walkingManPosLC = new Point3D();
+				}
 
-			result_walkingManPosLC.set(segStartPosLC.x + dir.x * currDist, segStartPosLC.y + dir.y * currDist, segStartPosLC.z + dir.z * currDist);
+				result_walkingManPosLC.set(segStartPosLC.x, segStartPosLC.y, segStartPosLC.z);
+			}
+			else
+			{
+				var dir = segStartPosLC.getVectorToPoint(segEndPosLC, undefined);
+				dir.unitary();
+
+				if (result_walkingManPosLC === undefined)
+				{
+					result_walkingManPosLC = new Point3D();
+				}
+
+				result_walkingManPosLC.set(segStartPosLC.x + dir.x * currDist, segStartPosLC.y + dir.y * currDist, segStartPosLC.z + dir.z * currDist);
+			}
+			
 		}
 		
 		i++;
@@ -255,6 +284,152 @@ ItineraryLayer.prototype._getWalkingManPositionLC_forIncreTimeSec = function (di
 	return result_walkingManPosLC;
 };
 
+
+ItineraryLayer.prototype._getWalkingManPositionWC_forIncreTimeSec = function (diffTimeSec, result_walkingManPosWC)
+{
+	// given a diffTime in seconds, this function returns the position of the walkingMan.***
+	// 1rst, find the posLC. Then calculate posWC.***
+	var walkingManPosLC = this._getWalkingManPositionLC_forIncreTimeSec(diffTimeSec, undefined);
+
+	if (walkingManPosLC === undefined)
+	{
+		return undefined;
+	}
+
+	if (this.vectorMesh === undefined)
+	{
+		return undefined;
+	}
+
+	if (result_walkingManPosWC === undefined)
+	{
+		result_walkingManPosWC = new Point3D();
+	}
+
+	// 2nd, calculate posWC.***
+	var geoLocData = this.vectorMesh.geoLocDataManager.getCurrentGeoLocationData();
+	result_walkingManPosWC = geoLocData.localCoordToWorldCoord(walkingManPosLC, result_walkingManPosWC);
+
+	return result_walkingManPosWC;
+};
+
+ItineraryLayer.prototype._getDiffTimeSec = function (currTime)
+{
+	// This function returns the time difference between animationStartTime & current time.***
+	var diffTime = currTime - this._animationStartTime;
+	var diffTimeSec = diffTime / 1000.0;
+	diffTimeSec *= this._timeScale; // test value. TEST. TEST. TEST. TEST.***
+	return diffTimeSec;
+};
+
+ItineraryLayer.prototype.getTotalItineraryTime = function ()
+{
+	if (this._totalItineraryTimeSec === undefined)
+	{
+		// calculate it.***
+		//this._segmentsInfoArray[i] = {
+		//	dist               : dist,
+		//	diffTimeSec        : diffTimeSeconds,
+		//	velocity_metersSec : vel_metersSec,
+		//	startPosLC         : posCurr,
+		//	endPosLC           : posNext
+		//};
+		this._totalItineraryTimeSec = 0;
+		var segmentsCount = this._segmentsInfoArray.length;
+		for (var i=0; i<segmentsCount; i++)
+		{
+			this._totalItineraryTimeSec += this._segmentsInfoArray[i].diffTimeSec;
+		}
+	}
+
+	return this._totalItineraryTimeSec;
+};
+
+ItineraryLayer.prototype.sampleWeatherPollution = function (currTime, pollutionLayer)
+{
+	if (this.vectorMesh === undefined)
+	{
+		return false;
+	}
+
+	// 1rst, need currentPosition of the walkingMan.***
+	var diffTimeSec = this._getDiffTimeSec(currTime);
+	var totalItineraryTimeSec = this.getTotalItineraryTime();
+	if (diffTimeSec > totalItineraryTimeSec)
+	{
+		return false;
+	}
+
+	var currPosWC = this._getWalkingManPositionWC_forIncreTimeSec(diffTimeSec, undefined);
+
+	if (currPosWC === undefined)
+	{
+		return false;
+	}
+	
+	var pollutionValue = pollutionLayer.getPollutionValue(currPosWC, currTime);
+
+	if (pollutionValue === undefined)
+	{
+		return false;
+	}
+
+	var pollutionMinMaxValue = pollutionLayer._getMinMaxQuantizedValues();
+
+	if (pollutionMinMaxValue === undefined)
+	{
+		return false;
+	}
+
+	// now, store the sampled data.***
+	// this._samplingDataObj;
+	// this._samplingData_vboKeysContainer;
+	if (this._samplingDataObj === undefined)
+	{
+		this._samplingDataObj = {};
+	}
+
+	// calculate the local position respect to "geoLocData = this.vectorMesh.geoLocDataManager.getCurrentGeoLocationData()"
+	var geoLocData = this.vectorMesh.geoLocDataManager.getCurrentGeoLocationData();
+	var posLC = geoLocData.worldCoordToLocalCoord(currPosWC, undefined);
+
+	if (this._samplingDataObj.posLC_floatArray === undefined)
+	{
+		this._samplingDataObj.posLC_floatArray = [];
+	}
+
+	this._samplingDataObj.posLC_floatArray.push(posLC.x, posLC.y, posLC.z);
+
+	// now, convert pollutionValue to color by legend.***
+	var polutionQuantized = (pollutionValue - pollutionMinMaxValue[0]) / (pollutionMinMaxValue[1] - pollutionMinMaxValue[0]);
+
+	if (this._samplingDataObj.color4_uIntArray === undefined)
+	{
+		this._samplingDataObj.color4_uIntArray = [];
+	}
+
+	var hotToCold = false;
+	var color4RGBA = Color.getRainbowColor_byHeight(polutionQuantized,  0.0, 0.08, hotToCold);
+
+	this._samplingDataObj.color4_uIntArray.push(Math.floor(color4RGBA.r*255), Math.floor(color4RGBA.g*255), Math.floor(color4RGBA.b*255), Math.floor(color4RGBA.a*255));
+
+	// Now make vbo. 1rst delete existing vbo bcos another sample point was added.***
+	if (this._samplingData_vboKeysContainer === undefined)
+	{
+		this._samplingData_vboKeysContainer = new VBOVertexIdxCacheKeysContainer();
+		var vbo = this._samplingData_vboKeysContainer.newVBOVertexIdxCacheKey();
+	}
+	var magoManager = this._itineraryManager.magoManager;
+	var samplingVbo = this._samplingData_vboKeysContainer.getVboKey(0);
+	var posVboDataArray = new Float32Array(this._samplingDataObj.posLC_floatArray); 
+	var colorVboDataArray = new Uint8Array(this._samplingDataObj.color4_uIntArray);
+	samplingVbo.deleteGlObjects(magoManager.vboMemoryManager);
+	samplingVbo.setDataArrayPos(posVboDataArray, magoManager.vboMemoryManager);
+	samplingVbo.setDataArrayCol(colorVboDataArray, magoManager.vboMemoryManager);
+
+	return true;
+};
+
 ItineraryLayer.prototype.renderWalkingMan = function ()
 {
 	// render a point & the walkingMan.***
@@ -269,9 +444,6 @@ ItineraryLayer.prototype.renderWalkingMan = function ()
 		return false;
 	}
 
-	
-
-
 	var magoManager = this._itineraryManager.magoManager;
 	if (this._animationStartTime === undefined || this._animationStartTime === 0) 
 	{
@@ -283,8 +455,7 @@ ItineraryLayer.prototype.renderWalkingMan = function ()
 
 	// calculate the current position into the itinerary using the currentTime.***
 	var currTime = magoManager.getCurrentTime();
-	var diffTime = currTime - this._animationStartTime;
-	var diffTimeSec = diffTime / 1000.0 * 1000.0; // test value.***
+	var diffTimeSec = this._getDiffTimeSec(currTime);
 
 	var currWalkingManPosLC = this._getWalkingManPositionLC_forIncreTimeSec(diffTimeSec);
 
@@ -306,8 +477,8 @@ ItineraryLayer.prototype.renderWalkingMan = function ()
 	
 	gl.uniform1i(shaderLocal.bPositionCompressed_loc, false);
 	gl.uniform1i(shaderLocal.bUse1Color_loc, true);
-	gl.uniform4fv(shaderLocal.oneColor4_loc, [1.0, 0.1, 0.1, 1.0]); //.
-	gl.uniform1f(shaderLocal.fixPointSize_loc, 5.0);
+	gl.uniform4fv(shaderLocal.oneColor4_loc, [0.1, 1.0, 0.1, 1.0]); //.
+	gl.uniform1f(shaderLocal.fixPointSize_loc, 10.0);
 	gl.uniform1i(shaderLocal.bUseFixPointSize_loc, 1);
 	gl.uniform1f(shaderLocal.externalAlpha_loc, 1.0);
 
@@ -350,85 +521,53 @@ ItineraryLayer.prototype.renderWalkingMan = function ()
 	if (!vbo.bindDataPosition(shaderLocal, magoManager.vboMemoryManager))
 	{ return false; }
 
+	gl.depthRange(0.0, 0.1);
+
 	gl.drawArrays(gl.POINTS, 0, vbo.vertexCount);
 
-	// Now, render the walkingMan.***
-
-
-	/*
-	// Render pClouds.
-	var geoCoord;
-	var geoCoordsCount = this.geographicCoordsArray.length;
-	for (var i=0; i<geoCoordsCount; i++)
+	// Now, render the pollution sampling data.***
+	// this._samplingDataObj.posLC_floatArray
+	// this._samplingDataObj.color4_uIntArray
+	var renderSmpledData = true;
+	if (this._samplingDataObj === undefined)
 	{
-		geoCoord = this.geographicCoordsArray[i];
-		////geoCoord.renderPoint(magoManager, shaderLocal, gl, renderType);
-		
-		//var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
-		//buildingGeoLocation.bindGeoLocationUniforms(gl, shader);
-		
-		//var vbo_vicky = this.vboKeysContainer.vboCacheKeysArray[0]; // there are only one.
-		//if (!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
-		//{ return false; }
-
-		//gl.drawArrays(gl.POINTS, 0, vbo_vicky.vertexCount);
-
+		renderSmpledData = false;
 	}
-	*/
 
-	/*
-	// Check if exist selectedGeoCoord.
-	var currSelected = magoManager.selectionManager.getSelectedGeneral();
-	if (currSelected !== undefined && currSelected.constructor.name === "GeographicCoord")
+	if (this._samplingData_vboKeysContainer === undefined)
 	{
-		gl.uniform4fv(shaderLocal.oneColor4_loc, [1.0, 0.1, 0.1, 1.0]); //.
-		gl.uniform1f(shaderLocal.fixPointSize_loc, 10.0);
-		currSelected.renderPoint(magoManager, shaderLocal, gl, renderType);
+		renderSmpledData = false;
 	}
-	
-	shaderLocal.disableVertexAttribArrayAll();
-	gl.enable(gl.DEPTH_TEST);
-	
-	// Write coords.
-	
-	var canvas = magoManager.getObjectLabel();
-	var ctx = canvas.getContext("2d");
-	ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-	ctx.font = "bold 13px Arial";
-	ctx.fillStyle = "black";
-	ctx.strokeStyle = "white";
 
-	var gl = magoManager.sceneState.gl;
-	var worldPosition;
-	var screenCoord;
-	for (var i=0; i<geoCoordsCount; i++)
+	if (renderSmpledData)
 	{
-		geoCoord = this.geographicCoordsArray[i];
-		var geoLocDataManager = geoCoord.getGeoLocationDataManager();
-		var geoLoc = geoLocDataManager.getCurrentGeoLocationData();
-		worldPosition = geoLoc.position;
-		screenCoord = ManagerUtils.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord, magoManager);
-		screenCoord.x += 15;
-		screenCoord.y -= 15;
-		//var geoCoords = geoLoc.geographicCoord;
-		if (screenCoord.x >= 0 && screenCoord.y >= 0)
-		{
-			var word = "lon: " + geoCoord.longitude.toFixed(6);
-			ctx.strokeText(word, screenCoord.x, screenCoord.y);
-			ctx.fillText(word, screenCoord.x, screenCoord.y);
+		var samplingVbo = this._samplingData_vboKeysContainer.getVboKey(0);
 
-			word = "lat: " + geoCoord.latitude.toFixed(6);
-			ctx.strokeText(word, screenCoord.x, screenCoord.y + 15.0);
-			ctx.fillText(word, screenCoord.x, screenCoord.y + 15.0);
-
-			word = "alt: " + geoCoord.altitude.toFixed(6);
-			ctx.strokeText(word, screenCoord.x, screenCoord.y + 30.0);
-			ctx.fillText(word, screenCoord.x, screenCoord.y + 30.0);
+		if (!samplingVbo.bindDataPosition(shaderLocal, magoManager.vboMemoryManager))
+		{ 
+			gl.depthRange(0.0, 1.0);
+			return false; 
 		}
+
+		if (!samplingVbo.bindDataColor(shaderLocal, magoManager.vboMemoryManager))
+		{ 
+			shaderLocal.disableVertexAttribArray(shaderLocal.color4_loc);
+			gl.uniform1i(shaderLocal.bUse1Color_loc, true);
+			
+		}
+		else 
+		{
+			shaderLocal.enableVertexAttribArray(shaderLocal.color4_loc);
+			gl.uniform1i(shaderLocal.bUse1Color_loc, false);
+		}
+
+		gl.depthRange(0.0, 0.1);
+
+		gl.drawArrays(gl.POINTS, 0, samplingVbo.vertexCount);
 	}
-	
-	ctx.restore();
-	*/
+
+	// return gl settings.***
+	gl.depthRange(0.0, 1.0);
 	
 	// return the current shader.
 	//magoManager.postFxShadersManager.useProgram(shader);

@@ -110,6 +110,28 @@ ItineraryManager.prototype._prepareWalkingManTexture = function ()
 	return this._walkingManMosaicTexIsPrepared;
 };
 
+ItineraryManager.prototype.sampleWeatherPollution = function (currTime, pollutionLayer)
+{
+	if (this._itineraryLayersArray === undefined)
+	{
+		return false;
+	}
+
+	var itisCount = this.getItineraryLayersCount();
+	if (itisCount === 0)
+	{
+		return false;
+	}
+
+	for (var i=0; i<itisCount; i++)
+	{
+		var itiLayer = this.getItineraryLayer(i);
+		itiLayer.sampleWeatherPollution(currTime, pollutionLayer);
+	}
+
+	return true;
+};
+
 ItineraryManager.prototype.render = function ()
 {
 	if (this._itineraryLayersArray === undefined)
@@ -193,7 +215,7 @@ ItineraryManager.prototype.render = function ()
 	gl.uniformMatrix4fv(shader.buildingRotMatrix_loc, false, magoManager.sceneState.modelViewRelToEyeMatrixInv._floatArrays);
 	gl.uniform1f(shader.screenWidth_loc, parseFloat(magoManager.sceneState.drawingBufferWidth[0]));
 	gl.uniform1f(shader.screenHeight_loc, parseFloat(magoManager.sceneState.drawingBufferHeight[0]));
-	gl.uniform1i(shader.textureFlipYAxis_loc, magoManager.sceneState.textureFlipYAxis); 
+	gl.uniform1i(shader.textureFlipYAxis_loc, true); 
 	// Tell the shader to get the texture from texture unit 0
 	gl.uniform1i(shader.texture_loc, 0);
 	gl.enableVertexAttribArray(shader.texCoord2_loc);
@@ -222,10 +244,115 @@ ItineraryManager.prototype.render = function ()
 	gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
 	gl.uniform4fv(shader.oneColor4_loc, [0.2, 0.7, 0.9, 1.0]);
 	gl.uniform2fv(shader.scale2d_loc, [1.0, 1.0]);
-	gl.uniform2fv(shader.size2d_loc, [25.0, 25.0]);
-	gl.uniform1i(shader.bUseOriginalImageSize_loc, true);
+	gl.uniform2fv(shader.size2d_loc, [60.0, 60.0]);
+	gl.uniform1i(shader.bUseOriginalImageSize_loc, false);
 	gl.uniform3fv(shader.aditionalOffset_loc, [0.0, 0.0, 0.0]);
+
+	gl.uniform1iv(shader.uMosaicSize_loc, new Int32Array([5, 2])); // 5 cols & 2 rows.***
 		
+	var selectionManager = magoManager.selectionManager;
+	var lastTexId = undefined;
+
+	if (this.subImageIdx === undefined)
+	{
+		this.subImageIdx = 0;
+	}
+
+	if (this.lastTimeSubImageChanged === undefined)
+	{
+		this.lastTimeSubImageChanged = magoManager.getCurrentTime();
+	}
+
+	gl.enable(gl.BLEND);
+	var executedEffects = false;
+	for (var i=0; i<itisCount; i++)
+	{
+		var itiLayer = this.getItineraryLayer(i);
+		//var objMarker = magoManager.objMarkerManager.objectMarkerArray[i];
+		//var currentTexture = this.pin.getTexture(objMarker.imageFilePath);
+		var currentTexture = this._walkingManMosaicTex;
+
+		gl.uniform2fv(shader.scale2d_loc, new Float32Array([1.0, 1.0]));
+		/*
+		if (selectionManager.isObjectSelected(objMarker))
+		{
+			gl.uniform2fv(shader.scale2d_loc, new Float32Array([1.5, 1.5]));
+			if (objMarker.imageFilePathSelected)
+			{
+				var selectedTexture = this.pin.getTexture(objMarker.imageFilePathSelected);
+				if (selectedTexture)
+				{ currentTexture = selectedTexture; }
+				else 
+				{
+					this.pin.loadImage(objMarker.imageFilePathSelected, magoManager);
+					continue;
+				}
+			}
+		}
+		*/
+
+		//gl.uniform1i(shader.bUseOriginalImageSize_loc, objMarker.bUseOriginalImageSize);
+		//if (!objMarker.bUseOriginalImageSize)
+		//{ gl.uniform2fv(shader.size2d_loc, objMarker.size2d); }
+	
+		// Check if there are effects.
+		//if (renderType !== 2 && magoManager.currentProcess !== CODE.magoCurrentProcess.StencilSilhouetteRendering)
+		//{ executedEffects = magoManager.effectsManager.executeEffects(objMarker.id, magoManager); }
+	
+		gl.uniform2fv(shader.imageSize_loc, [currentTexture.texId.imageWidth, currentTexture.texId.imageHeight]);
+		gl.uniform1i(shader.uSubImageIdx_loc, this.subImageIdx);
+		
+		//var objMarkerGeoLocation = objMarker.geoLocationData; // original.
+
+		var geoLocData = itiLayer.vectorMesh.geoLocDataManager.getCurrentGeoLocationData();
+		geoLocData.bindGeoLocationUniforms(gl, shader);
+
+		if (geoLocData === undefined)
+		{ continue; }
+		
+		if (currentTexture.texId !== lastTexId)
+		{
+			gl.bindTexture(gl.TEXTURE_2D, currentTexture.texId);
+			lastTexId = currentTexture.texId;
+		}
+
+		var currTime = magoManager.getCurrentTime();
+		var diffTimeSec = itiLayer._getDiffTimeSec(currTime);
+
+		var posWC = itiLayer._getWalkingManPositionWC_forIncreTimeSec(diffTimeSec, undefined);
+
+		// now bind the posHIGH & posLOW.***
+		var positionHIGH = new Float32Array([0.0, 0.0, 0.0]); 
+		var positionLOW = new Float32Array([0.0, 0.0, 0.0]); 
+		ManagerUtils.calculateSplited3fv([posWC.x, posWC.y, posWC.z], positionHIGH, positionLOW);
+		
+		gl.uniform3fv(shader.buildingPosHIGH_loc, positionHIGH);
+		gl.uniform3fv(shader.buildingPosLOW_loc, positionLOW);
+		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+		if (currTime - this.lastTimeSubImageChanged > 150.0)
+		{
+			this.subImageIdx += 1;
+			this.lastTimeSubImageChanged = currTime;
+		}
+		
+		if (this.subImageIdx >= 10)
+		{
+			this.subImageIdx = 0;
+		}
+	}
+	
+	if (executedEffects)
+	{
+		// must return all uniforms changed for effects.
+		gl.uniform3fv(shader.aditionalOffset_loc, [0.0, 0.0, 0.0]); // init referencesMatrix.
+	}
+	
+	
+	gl.disable(gl.BLEND);
+	gl.depthRange(0, 1);
+	gl.depthMask(true);
+	gl.useProgram(null);
 
 	for (var i=0; i<itisCount; i++)
 	{
@@ -291,6 +418,8 @@ ItineraryManager.prototype.createDefaultShaders = function ()
 	shader.aditionalOffset_loc = gl.getUniformLocation(shader.program, "aditionalOffset");
 	shader.screenWidth_loc = gl.getUniformLocation(shader.program, "screenWidth");
 	shader.screenHeight_loc = gl.getUniformLocation(shader.program, "screenHeight");
+	shader.uMosaicSize_loc = gl.getUniformLocation(shader.program, "uMosaicSize");
+	shader.uSubImageIdx_loc = gl.getUniformLocation(shader.program, "uSubImageIdx");
 
 	var hola = 0;
 };

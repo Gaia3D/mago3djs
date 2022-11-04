@@ -1199,7 +1199,7 @@ GeographicCoordsList.prototype.renderLines = function(magoManager, shader, rende
  * @param bEnableDepth
  * 
  */
-GeographicCoordsList.prototype.renderPoints = function(magoManager, shader, renderType, bEnableDepth) 
+GeographicCoordsList.prototype.renderPoints = function(magoManager, shader, renderType, bEnableDepth, options) 
 {
 	if (this.geographicCoordsArray === undefined)
 	{ return false; }
@@ -1272,45 +1272,58 @@ GeographicCoordsList.prototype.renderPoints = function(magoManager, shader, rend
 	shaderLocal.disableVertexAttribArrayAll();
 	gl.enable(gl.DEPTH_TEST);
 	
-	// Write coords.
-	
-	var canvas = magoManager.getObjectLabel();
-	var ctx = canvas.getContext("2d");
-	ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-	ctx.font = "bold 13px Arial";
-	ctx.fillStyle = "black";
-	ctx.strokeStyle = "white";
-
-	var gl = magoManager.sceneState.gl;
-	var worldPosition;
-	var screenCoord;
-	for (var i=0; i<geoCoordsCount; i++)
+	// check options.***
+	var writeGeoCoords = false;
+	if (options !== undefined)
 	{
-		geoCoord = this.geographicCoordsArray[i];
-		var geoLocDataManager = geoCoord.getGeoLocationDataManager();
-		var geoLoc = geoLocDataManager.getCurrentGeoLocationData();
-		worldPosition = geoLoc.position;
-		screenCoord = ManagerUtils.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord, magoManager);
-		screenCoord.x += 15;
-		screenCoord.y -= 15;
-		//var geoCoords = geoLoc.geographicCoord;
-		if (screenCoord.x >= 0 && screenCoord.y >= 0)
+		if (options.writeGeographicCoords !== undefined)
 		{
-			var word = "lon: " + geoCoord.longitude.toFixed(6);
-			ctx.strokeText(word, screenCoord.x, screenCoord.y);
-			ctx.fillText(word, screenCoord.x, screenCoord.y);
-
-			word = "lat: " + geoCoord.latitude.toFixed(6);
-			ctx.strokeText(word, screenCoord.x, screenCoord.y + 15.0);
-			ctx.fillText(word, screenCoord.x, screenCoord.y + 15.0);
-
-			word = "alt: " + geoCoord.altitude.toFixed(6);
-			ctx.strokeText(word, screenCoord.x, screenCoord.y + 30.0);
-			ctx.fillText(word, screenCoord.x, screenCoord.y + 30.0);
+			writeGeoCoords = options.writeGeographicCoords;
 		}
 	}
+
+	if (writeGeoCoords)
+	{
+		// Write coords.
+		var canvas = magoManager.getObjectLabel();
+		var ctx = canvas.getContext("2d");
+		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+		ctx.font = "bold 13px Arial";
+		ctx.fillStyle = "black";
+		ctx.strokeStyle = "white";
+
+		var gl = magoManager.sceneState.gl;
+		var worldPosition;
+		var screenCoord;
+		for (var i=0; i<geoCoordsCount; i++)
+		{
+			geoCoord = this.geographicCoordsArray[i];
+			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+			var geoLoc = geoLocDataManager.getCurrentGeoLocationData();
+			worldPosition = geoLoc.position;
+			screenCoord = ManagerUtils.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord, magoManager);
+			screenCoord.x += 15;
+			screenCoord.y -= 15;
+			//var geoCoords = geoLoc.geographicCoord;
+			if (screenCoord.x >= 0 && screenCoord.y >= 0)
+			{
+				var word = "lon: " + geoCoord.longitude.toFixed(6);
+				ctx.strokeText(word, screenCoord.x, screenCoord.y);
+				ctx.fillText(word, screenCoord.x, screenCoord.y);
+
+				word = "lat: " + geoCoord.latitude.toFixed(6);
+				ctx.strokeText(word, screenCoord.x, screenCoord.y + 15.0);
+				ctx.fillText(word, screenCoord.x, screenCoord.y + 15.0);
+
+				word = "alt: " + geoCoord.altitude.toFixed(6);
+				ctx.strokeText(word, screenCoord.x, screenCoord.y + 30.0);
+				ctx.fillText(word, screenCoord.x, screenCoord.y + 30.0);
+			}
+		}
+		
+		ctx.restore();
+	}
 	
-	ctx.restore();
 	
 	// return the current shader.
 	magoManager.postFxShadersManager.useProgram(shader);

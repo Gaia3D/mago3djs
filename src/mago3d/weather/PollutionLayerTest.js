@@ -53,6 +53,17 @@ PollutionTimeSlice.prototype._prepare = function ()
 	return this._isPrepared;
 };
 
+PollutionTimeSlice.prototype.getQuantizedMinMaxValues = function ()
+{
+	if (this._jsonFile === undefined)
+	{
+		return undefined;
+	}
+
+	var minMaxValues = [this._jsonFile.minValue, this._jsonFile.maxValue];
+	return minMaxValues;
+};
+
 PollutionTimeSlice.prototype.getGlTexture = function (gl)
 {
 	if (this._glTexture === undefined || this._glTexture === null)
@@ -159,6 +170,169 @@ var PollutionLayerTest = function (options)
 	}
 };
 
+PollutionLayerTest.prototype._getMinMaxQuantizedValues = function ()
+{
+	if (this.minMaxValues === undefined)
+	{
+		if (this._timeSlicesArray === undefined || this._timeSlicesArray.length === 0)
+		{
+			return undefined;
+		}
+
+		var minMaxValues = [];
+		var minVal;
+		var maxVal;
+
+		var timeSlicesCount = this._timeSlicesArray.length;
+		for (var i=0; i<timeSlicesCount; i++)
+		{
+			var timeSlice = this._timeSlicesArray[i];
+			if (timeSlice._jsonFile === undefined)
+			{
+				return undefined;
+			}
+			minVal = timeSlice._jsonFile.minValue;
+			maxVal = timeSlice._jsonFile.maxValue;
+
+			if (i === 0)
+			{
+				minMaxValues[0] = minVal;
+				minMaxValues[1] = maxVal;
+			}
+			else
+			{
+				if (minVal < minMaxValues[0])
+				{
+					minMaxValues[0] = minVal;
+				}
+
+				if (maxVal > minMaxValues[1])
+				{
+					minMaxValues[1] = maxVal;
+				}
+			}
+		}
+
+		if (timeSlicesCount > 0)
+		{
+			this.minMaxValues = new Float32Array(minMaxValues);
+		}
+	}
+
+	return this.minMaxValues;
+};
+
+PollutionLayerTest.prototype.getPollutionValue = function (posWC, currTime)
+{
+	if (!this._prepareLayer())
+	{
+		return false;
+	}
+
+	// given a geoCoord and a currTime, this function returns the pollution value at the geoCoord in the currTime.***
+	var pollutionValue;
+
+	// now posWC to posLC.***
+	var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
+
+	var geoJsonIndexFile = this._pollutionVolumeOwner._geoJsonIndexFile;
+
+	if (geoJsonIndexFile === undefined)
+	{
+		return undefined;
+	}
+
+	if (this._pollutionVolumeOwner === undefined || this._pollutionVolumeOwner._totalAnimTime === undefined)
+	{
+		return undefined;
+	}
+
+	var posLC = geoLocData.worldCoordToLocalCoord(posWC, undefined);
+
+	// Now, with posLC must find the quantizedPos = texCoord.***
+	var widthMeters = geoJsonIndexFile.height_km * 1000.0;
+	var heightMeters = geoJsonIndexFile.width_km * 1000.0;
+
+	var posLC_quantized2d = new Point2D((posLC.x + 0.5 * widthMeters) / widthMeters, (posLC.y + 0.5 * heightMeters) / heightMeters);
+	
+	// now, with currTime find the 2 timeSlices to interpolate.***
+	// Provisionally take only one texture.***
+	var totalAnimTime = this._pollutionVolumeOwner._totalAnimTime;
+	var increTime = currTime - this._pollutionVolumeOwner._animationStartTime;
+	var timeSlicesCount = this._timeSlicesArray.length;
+
+	var timeFactor = increTime / totalAnimTime;
+	var f = timeFactor * timeSlicesCount;
+	var ffract = f - Math.floor(f); // this is the interpolation factor between currTex & nexTex.***
+	var texIdxCurr = Math.floor(f);
+
+	if (texIdxCurr >= timeSlicesCount)
+	{
+		texIdxCurr = timeSlicesCount - 1;
+	}
+
+	var texIdxNext = texIdxCurr + 1;
+	if (texIdxNext >= timeSlicesCount)
+	{
+		texIdxNext = texIdxCurr;
+	}
+	
+	//this._currTexIdx = 151;
+	var timeSliceCurr = this._timeSlicesArray[texIdxCurr];
+	var timeSliceNext = this._timeSlicesArray[texIdxNext];
+
+	if (timeSliceCurr === undefined)
+	{
+		return undefined;
+	}
+
+	var width = timeSliceCurr._jsonFile.columnsCount;
+	var height = timeSliceCurr._jsonFile.rowsCount;
+
+	var glTexCurr = timeSliceCurr.getGlTexture(gl);
+	var glTexNext = timeSliceNext.getGlTexture(gl);
+
+	// Now, bind framebuffer.***
+	var magoManager = this._pollutionVolumeOwner.weatherStation.magoManager;
+	var gl = magoManager.getGl();
+
+	if (!this.fboValuesTex) 
+	{
+		var bUseMultiRenderTarget = false;
+		this.fboValuesTex = new FBO(gl, width, height, {matchCanvasSize: false, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 1}); 
+	}
+
+	// Now, bind valuesTex in to the framebuffer and read pixel in posLC_quantized position.***
+	var pixelPos_x = Math.floor(posLC_quantized2d.x * width);
+	var pixelPos_y = Math.floor(posLC_quantized2d.y * height);
+
+	var pixel = new Uint8Array(4);
+	this.fboValuesTex.bind();
+
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glTexCurr, 0);
+	gl.readPixels(pixelPos_x, pixelPos_y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
+	this.fboValuesTex.unbind();
+
+	if (pixel[0] !== 0 || pixel[1] !== 0 || pixel[2] !== 0 || pixel[3] !== 0)
+	{
+		var hola = 0;
+	}
+
+	var currMinValue = timeSliceCurr._jsonFile.minValue;
+	var currMaxValue = timeSliceCurr._jsonFile.maxValue;
+
+	var nextMinValue = timeSliceNext._jsonFile.minValue;
+	var nextMaxValue = timeSliceNext._jsonFile.maxValue;
+
+	var pixelFloats = [pixel[0] / 255.0, pixel[1] / 255.0, pixel[2] / 255.0, pixel[3] / 255.0];
+	var decodedCurr = ManagerUtils.unpackDepth(pixelFloats);
+	var pollutionValue_curr = (decodedCurr * (currMaxValue - currMinValue) + currMinValue);
+
+	pollutionValue = pollutionValue_curr;
+
+	return pollutionValue;
+};
+
 PollutionLayerTest.prototype.render = function (magoManager)
 {
 	if (this._timeSlicesArray === undefined || this._timeSlicesArray.length === 0)
@@ -228,6 +402,9 @@ PollutionLayerTest.prototype.render = function (magoManager)
 	gl.uniform4fv(currentShader.colorMultiplier_loc, [1.0, 1.0, 1.0, 1.0]);
 	gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.
 	gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
+
+	var minMaxValues = this._getMinMaxQuantizedValues();
+	gl.uniform2fv(currentShader.uMinMaxValues_loc, minMaxValues);
 	
 	
 	// Textures.*****************************************************************************************************
@@ -267,6 +444,11 @@ PollutionLayerTest.prototype.render = function (magoManager)
 
 	gl.frontFace(gl.CCW);
 	gl.enable(gl.BLEND);
+
+	var minMaxQuantizedValues_tex0 = timeSliceCurr.getQuantizedMinMaxValues();
+	var minMaxQuantizedValues_tex1 = timeSliceNext.getQuantizedMinMaxValues();
+	gl.uniform2fv(currentShader.uMinMaxQuantizedValues_tex0_loc, minMaxQuantizedValues_tex0);
+	gl.uniform2fv(currentShader.uMinMaxQuantizedValues_tex1_loc, minMaxQuantizedValues_tex1);
 
 	// Render the rectangleMesh.*********************************************************************
 	// Init uniforms.
@@ -421,12 +603,12 @@ PollutionLayerTest.prototype._prepareLayer = function ()
 		var timeSlice = this._timeSlicesArray[0];
 		var numCols = timeSlice._jsonFile.columnsCount;
 		var numRows = timeSlice._jsonFile.rowsCount;
-		var geoJson = this._pollutionVolumeOwner._geoJsonIndexFile;
-		var centerGeoCoord = geoJson.centerGeographicCoord;
+		var geoJsonIndexFile = this._pollutionVolumeOwner._geoJsonIndexFile;
+		var centerGeoCoord = geoJsonIndexFile.centerGeographicCoord;
 
 		// must find the 4 geoCoords of the rectangle.***
-		var widthMeters = this._pollutionVolumeOwner._geoJsonIndexFile.height_km * 1000.0;
-		var heightMeters = this._pollutionVolumeOwner._geoJsonIndexFile.width_km * 1000.0;
+		var widthMeters = geoJsonIndexFile.height_km * 1000.0;
+		var heightMeters = geoJsonIndexFile.width_km * 1000.0;
 		var resultObject = Globe.getRectangleMeshOnEllisoideCenteredAtGeographicCoord(centerGeoCoord, widthMeters, heightMeters, numCols, numRows);
 
 		vboKey.setDataArrayIdx(resultObject.indices, magoManager.vboMemoryManager);
@@ -545,17 +727,6 @@ PollutionLayerTest.prototype._prepareLayer = function ()
 		// The process finished.***
 		this._makingRectangleMeshProcess = CODE.processState.FINISHED;
 		return false;
-	}
-
-	// Now, make the timeSlices values textures.***
-	var timeSlicesCount = this._timeSlicesArray.length;
-	for (var i=0; i<timeSlicesCount; i++)
-	{
-		var timeSlice = this._timeSlicesArray[i];
-
-		
-
-		var hola = 0;
 	}
 
 	// If all process are finished, then set isPrepared as true.***

@@ -17,6 +17,7 @@ uniform sampler2D u_texture;
 uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.
 uniform vec4 oneColor4;
 
+uniform vec2 imageSize;
 
 varying vec2 imageSizeInPixels;
 
@@ -37,24 +38,52 @@ vec4 packDepth( float v ) {
   return enc;
 }
 
+void make_kernel(inout vec4 n[9], vec2 coord)
+{
+	float w = 1.0 / imageSize.x;
+	float h = 1.0 / imageSize.y;
+
+	n[0] = texture2D(u_texture, coord + vec2( -w, -h));
+	n[1] = texture2D(u_texture, coord + vec2(0.0, -h));
+	n[2] = texture2D(u_texture, coord + vec2(  w, -h));
+	n[3] = texture2D(u_texture, coord + vec2( -w, 0.0));
+	n[4] = texture2D(u_texture, coord);
+	n[5] = texture2D(u_texture, coord + vec2(  w, 0.0));
+	n[6] = texture2D(u_texture, coord + vec2( -w, h));
+	n[7] = texture2D(u_texture, coord + vec2(0.0, h));
+	n[8] = texture2D(u_texture, coord + vec2(  w, h));
+}
+
 void main()
 {
     vec4 textureColor;
+	vec2 finalTexCoord = v_texcoord;
 
 	// 1rst, check if the texture.w != 0.
 	if(textureFlipYAxis)
 	{
-		textureColor = texture2D(u_texture, vec2(v_texcoord.s, 1.0 - v_texcoord.t));
-	}
-	else
-	{
-		textureColor = texture2D(u_texture, v_texcoord);
+		finalTexCoord = vec2(v_texcoord.s, 1.0 - v_texcoord.t);
 	}
 	
-	if(textureColor.w < 0.5)
-	{
-		discard;
-	}
+	textureColor = texture2D(u_texture, finalTexCoord);
+
+	// now, check neibourgh pixels to determine a silhouette.***
+	//if(textureColor.a == 0.0)
+	//{
+	//	vec4 n[9];
+	//	make_kernel(n, finalTexCoord);
+	//
+	//	for(int i=0; i<9; i++)
+	//	{
+	//		// check if exist one or more neibourgh pixel with alpha != 0.0.***
+	//		if(n[i].a > 0.0)
+	//		{
+	//			textureColor = vec4(1.0, 1.0, 1.0, 0.5);
+	//			break;
+	//		}
+	//	}
+	//}
+	
 
 
 	if(colorType == 2)
@@ -74,7 +103,7 @@ void main()
 		gl_FragData[1] = packDepth(0.0);
 		
 		// Note: points cloud data has frustumIdx 20 .. 23.********
-		float frustumIdx = 0.1; // realFrustumIdx = 0.1 * 100 = 10. 
+		float frustumIdx = 0.005; // frustum zero.
 		
 		//if(uFrustumIdx == 0)
 		//frustumIdx = 0.005; // frustumIdx = 20.***

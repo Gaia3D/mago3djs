@@ -498,7 +498,6 @@ SoundLayer.prototype.renderWave = function (magoManager)
 
 	fbo.bind();
 	gl.viewport(0, 0, fbo.width[0], fbo.height[0]);
-	var webglController = new WebGlController(gl);
 
 	var screenQuad = soundManager.getQuadBuffer();
 	var shader = magoManager.postFxShadersManager.getShader("volumetricWaves"); // (waterQuadVertVS, soundVolumetricFS)

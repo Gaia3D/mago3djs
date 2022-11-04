@@ -879,8 +879,8 @@ Globe.getRectangleMeshOnEllisoideCenteredAtGeographicCoord = function (centerGeo
 	var angRadPitch = (widthMeters/2.0) / radius;
 	var angRadRoll = (heightMeters/2.0) / radius;
 
-	var increAngRadPitch = -angRadPitch / (numRows - 1); // negative, bcos we start in leftDown corner, so pitch is negative!
-	var increAngRadRoll = angRadRoll / (numCols - 1);
+	var increAngRadPitch = -(angRadPitch * 2.0) / (numRows - 1); // negative, bcos we start in leftDown corner, so pitch is negative!
+	var increAngRadRoll = (angRadRoll * 2.0) / (numCols - 1);
 
 	var rotMatPitch = new Matrix4();
 	rotMatPitch.rotationAxisAngRad(angRadPitch, rotAxisPitch.x, rotAxisPitch.y, rotAxisPitch.z);

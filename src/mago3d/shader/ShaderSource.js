@@ -19,6 +19,7 @@ uniform sampler2D u_texture;\n\
 uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
 uniform vec4 oneColor4;\n\
 \n\
+uniform vec2 imageSize;\n\
 \n\
 varying vec2 imageSizeInPixels;\n\
 \n\
@@ -39,24 +40,52 @@ vec4 packDepth( float v ) {\n\
   return enc;\n\
 }\n\
 \n\
+void make_kernel(inout vec4 n[9], vec2 coord)\n\
+{\n\
+	float w = 1.0 / imageSize.x;\n\
+	float h = 1.0 / imageSize.y;\n\
+\n\
+	n[0] = texture2D(u_texture, coord + vec2( -w, -h));\n\
+	n[1] = texture2D(u_texture, coord + vec2(0.0, -h));\n\
+	n[2] = texture2D(u_texture, coord + vec2(  w, -h));\n\
+	n[3] = texture2D(u_texture, coord + vec2( -w, 0.0));\n\
+	n[4] = texture2D(u_texture, coord);\n\
+	n[5] = texture2D(u_texture, coord + vec2(  w, 0.0));\n\
+	n[6] = texture2D(u_texture, coord + vec2( -w, h));\n\
+	n[7] = texture2D(u_texture, coord + vec2(0.0, h));\n\
+	n[8] = texture2D(u_texture, coord + vec2(  w, h));\n\
+}\n\
+\n\
 void main()\n\
 {\n\
     vec4 textureColor;\n\
+	vec2 finalTexCoord = v_texcoord;\n\
 \n\
 	// 1rst, check if the texture.w != 0.\n\
 	if(textureFlipYAxis)\n\
 	{\n\
-		textureColor = texture2D(u_texture, vec2(v_texcoord.s, 1.0 - v_texcoord.t));\n\
-	}\n\
-	else\n\
-	{\n\
-		textureColor = texture2D(u_texture, v_texcoord);\n\
+		finalTexCoord = vec2(v_texcoord.s, 1.0 - v_texcoord.t);\n\
 	}\n\
 	\n\
-	if(textureColor.w < 0.5)\n\
-	{\n\
-		discard;\n\
-	}\n\
+	textureColor = texture2D(u_texture, finalTexCoord);\n\
+\n\
+	// now, check neibourgh pixels to determine a silhouette.***\n\
+	//if(textureColor.a == 0.0)\n\
+	//{\n\
+	//	vec4 n[9];\n\
+	//	make_kernel(n, finalTexCoord);\n\
+	//\n\
+	//	for(int i=0; i<9; i++)\n\
+	//	{\n\
+	//		// check if exist one or more neibourgh pixel with alpha != 0.0.***\n\
+	//		if(n[i].a > 0.0)\n\
+	//		{\n\
+	//			textureColor = vec4(1.0, 1.0, 1.0, 0.5);\n\
+	//			break;\n\
+	//		}\n\
+	//	}\n\
+	//}\n\
+	\n\
 \n\
 \n\
 	if(colorType == 2)\n\
@@ -76,7 +105,7 @@ void main()\n\
 		gl_FragData[1] = packDepth(0.0);\n\
 		\n\
 		// Note: points cloud data has frustumIdx 20 .. 23.********\n\
-		float frustumIdx = 0.1; // realFrustumIdx = 0.1 * 100 = 10. \n\
+		float frustumIdx = 0.005; // frustum zero.\n\
 		\n\
 		//if(uFrustumIdx == 0)\n\
 		//frustumIdx = 0.005; // frustumIdx = 20.***\n\
@@ -118,6 +147,10 @@ uniform vec2 imageSize;\n\
 uniform float screenWidth;    \n\
 uniform float screenHeight;\n\
 uniform bool bUseOriginalImageSize;\n\
+\n\
+uniform int uMosaicSize[2];\n\
+uniform int uSubImageIdx; // mosaicTex = numCols * numRows = subImagesArray.***\n\
+\n\
 varying vec2 v_texcoord;\n\
 varying vec2 imageSizeInPixels;\n\
 \n\
@@ -159,7 +192,6 @@ void main()\n\
 		}\n\
 	}\n\
 	\n\
-    v_texcoord = texCoord;\n\
 	vec4 projected = ModelViewProjectionMatrixRelToEye * pos4;\n\
 	//vec4 projected2 = modelViewMatrixRelToEye * pos4;\n\
 \n\
@@ -209,6 +241,23 @@ void main()\n\
 	}\n\
 \n\
 	gl_Position = projected + offset + vec4(aditionalOffset.x*pixelWidth, aditionalOffset.y*pixelWidth, aditionalOffset.z*pixelWidth, 0.0); \n\
+\n\
+	// Now, calculate the texCoords.***\n\
+	// uMosaicSize = colsCount, rowsCount.***\n\
+	float colsCount = float(uMosaicSize[0]);\n\
+	float rowsCount = float(uMosaicSize[1]);\n\
+\n\
+	// var idx = col + row * numCols;\n\
+	// row = floor(idx / numCols).\n\
+	// col = idx - row * numCols.\n\
+\n\
+	float row = floor((float(uSubImageIdx) + 0.1 )/ colsCount);\n\
+	float col = float(uSubImageIdx) - row * colsCount;\n\
+\n\
+	vec2 subTexCoordSize = vec2(1.0 / colsCount, 1.0 / rowsCount);\n\
+\n\
+	v_texcoord = vec2(subTexCoordSize.x * col + texCoord.x * subTexCoordSize.x, \n\
+						subTexCoordSize.y * row + texCoord.y * subTexCoordSize.y);\n\
 }\n\
 \n\
 \n\
@@ -5626,7 +5675,7 @@ void main()\n\
 	\n\
 	if(textureColor.w < 0.5)\n\
 	{\n\
-		discard;\n\
+		//discard;\n\
 	}\n\
 \n\
 \n\
@@ -5647,7 +5696,7 @@ void main()\n\
 		gl_FragData[1] = packDepth(0.0);\n\
 		\n\
 		// Note: points cloud data has frustumIdx 20 .. 23.********\n\
-		float frustumIdx = 0.1; // realFrustumIdx = 0.1 * 100 = 10. \n\
+		float frustumIdx = 0.005; // realFrustumIdx = 0.1 * 100 = 10. \n\
 		\n\
 		//if(uFrustumIdx == 0)\n\
 		//frustumIdx = 0.005; // frustumIdx = 20.***\n\
@@ -6384,6 +6433,9 @@ uniform int uFrustumIdx;\n\
 uniform vec4 uSelColor4;\n\
 \n\
 uniform float uInterpolationFactor;\n\
+uniform vec2 uMinMaxQuantizedValues_tex0;\n\
+uniform vec2 uMinMaxQuantizedValues_tex1;\n\
+uniform vec2 uMinMaxValues;\n\
 \n\
 varying vec3 vNormal;\n\
 varying vec4 vColor4; // color from attributes\n\
@@ -6533,6 +6585,94 @@ bool isEdge()\n\
 }\n\
 */\n\
 \n\
+float unQuantize(float quantizedValue, float minVal, float maxVal)\n\
+{\n\
+	float unquantizedValue = quantizedValue * (maxVal - minVal) + minVal;\n\
+	return unquantizedValue;\n\
+}\n\
+\n\
+vec4 getRainbowColor_byHeight(in float height, in float minHeight_rainbow, in float maxHeight_rainbow, bool hotToCold)\n\
+{\n\
+    \n\
+    float gray = (height - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);\n\
+	if (gray > 1.0){ gray = 1.0; }\n\
+	else if (gray<0.0){ gray = 0.0; }\n\
+\n\
+    float value = gray * 4.0;\n\
+    float h = floor(value);\n\
+    float f = fract(value);\n\
+\n\
+    vec4 resultColor = vec4(0.0, 0.0, 0.0, gray);\n\
+\n\
+    if(hotToCold)\n\
+    {\n\
+        // HOT to COLD.***\n\
+        resultColor.rgb = vec3(1.0, 0.0, 0.0); // init\n\
+        if(h >= 0.0 && h < 1.0)\n\
+        {\n\
+            // mix red & yellow.***\n\
+            vec3 red = vec3(1.0, 0.0, 0.0);\n\
+            vec3 yellow = vec3(1.0, 1.0, 0.0);\n\
+            resultColor.rgb = mix(red, yellow, f);\n\
+        }\n\
+        else if(h >= 1.0 && h < 2.0)\n\
+        {\n\
+            // mix yellow & green.***\n\
+            vec3 green = vec3(0.0, 1.0, 0.0);\n\
+            vec3 yellow = vec3(1.0, 1.0, 0.0);\n\
+            resultColor.rgb = mix(yellow, green, f);\n\
+        }\n\
+        else if(h >= 2.0 && h < 3.0)\n\
+        {\n\
+            // mix green & cyan.***\n\
+            vec3 green = vec3(0.0, 1.0, 0.0);\n\
+            vec3 cyan = vec3(0.0, 1.0, 1.0);\n\
+            resultColor.rgb = mix(green, cyan, f);\n\
+        }\n\
+        else if(h >= 3.0)\n\
+        {\n\
+            // mix cyan & blue.***\n\
+            vec3 blue = vec3(0.0, 0.0, 1.0);\n\
+            vec3 cyan = vec3(0.0, 1.0, 1.0);\n\
+            resultColor.rgb = mix(cyan, blue, f);\n\
+        }\n\
+    }\n\
+    else\n\
+    {\n\
+        // COLD to HOT.***\n\
+        resultColor.rgb = vec3(0.0, 0.0, 1.0); // init\n\
+        if(h >= 0.0 && h < 1.0)\n\
+        {\n\
+            // mix blue & cyan.***\n\
+            vec3 blue = vec3(0.0, 0.0, 1.0);\n\
+            vec3 cyan = vec3(0.0, 1.0, 1.0);\n\
+            resultColor.rgb = mix(blue, cyan, f);\n\
+        }\n\
+        else if(h >= 1.0 && h < 2.0)\n\
+        {\n\
+            // mix cyan & green.***\n\
+            vec3 green = vec3(0.0, 1.0, 0.0);\n\
+            vec3 cyan = vec3(0.0, 1.0, 1.0);\n\
+            resultColor.rgb = mix(cyan, green, f);  \n\
+        }\n\
+        else if(h >= 2.0 && h < 3.0)\n\
+        {\n\
+            // mix green & yellow.***\n\
+            vec3 green = vec3(0.0, 1.0, 0.0);\n\
+            vec3 yellow = vec3(1.0, 1.0, 0.0);\n\
+            resultColor.rgb = mix(green, yellow, f);\n\
+        }\n\
+        else if(h >= 3.0)\n\
+        {\n\
+            // mix yellow & red.***\n\
+            vec3 red = vec3(1.0, 0.0, 0.0);\n\
+            vec3 yellow = vec3(1.0, 1.0, 0.0);\n\
+            resultColor.rgb = mix(yellow, red, f);\n\
+        }\n\
+    }\n\
+\n\
+    return resultColor;\n\
+}\n\
 \n\
 void main()\n\
 {\n\
@@ -6549,19 +6689,27 @@ void main()\n\
 	vec4 textureColor_0;\n\
 	vec4 textureColor_1;\n\
 \n\
+	float realPollutionVal_0 = 0.0;\n\
+	float realPollutionVal_1 = 0.0;\n\
+\n\
+	vec2 finalTexCoord = vTexCoord;\n\
+	if(textureFlipYAxis)\n\
+	{\n\
+		finalTexCoord = vec2(vTexCoord.s, 1.0 - vTexCoord.t);\n\
+	}\n\
+\n\
     if(colorType == 2)\n\
     {\n\
-        if(textureFlipYAxis)\n\
-        {\n\
-            textureColor_0 = texture2D(texture_0, vec2(vTexCoord.s, 1.0 - vTexCoord.t));\n\
-			textureColor_1 = texture2D(texture_1, vec2(vTexCoord.s, 1.0 - vTexCoord.t));\n\
-        }\n\
-        else{\n\
-            textureColor_0 = texture2D(texture_0, vec2(vTexCoord.s, vTexCoord.t));\n\
-			textureColor_1 = texture2D(texture_1, vec2(vTexCoord.s, vTexCoord.t));\n\
-        }\n\
+        textureColor_0 = texture2D(texture_0, finalTexCoord);\n\
+		textureColor_1 = texture2D(texture_1, finalTexCoord);\n\
 \n\
-		textureColor = mix(textureColor_0, textureColor_1, uInterpolationFactor);\n\
+		float quantized_0 = UnpackDepth32(textureColor_0);\n\
+		float quantized_1 = UnpackDepth32(textureColor_1);\n\
+\n\
+		realPollutionVal_0 = unQuantize(quantized_0, uMinMaxQuantizedValues_tex0.x, uMinMaxQuantizedValues_tex0.y);\n\
+		realPollutionVal_1 = unQuantize(quantized_1, uMinMaxQuantizedValues_tex1.x, uMinMaxQuantizedValues_tex1.y);\n\
+\n\
+		//textureColor = mix(textureColor_0, textureColor_1, uInterpolationFactor); // no.***\n\
     }\n\
     else if(colorType == 0)\n\
 	{\n\
@@ -6573,14 +6721,22 @@ void main()\n\
     }\n\
 	\n\
     vec4 finalColor;\n\
-	float pollutionValue = UnpackDepth32(textureColor);\n\
+	float realPollutionValue = mix(realPollutionVal_0, realPollutionVal_1, uInterpolationFactor);\n\
+	float realPollutionQuantized = (realPollutionValue - uMinMaxValues.x) / (uMinMaxValues.y - uMinMaxValues.x);\n\
+	float pollutionValue = realPollutionQuantized;\n\
+\n\
+	bool hotToCold = false;\n\
+	vec4 rainbowColor4 = getRainbowColor_byHeight(realPollutionQuantized, 0.0, 1.0, hotToCold);\n\
+	\n\
+	//vec4 intensity4 = vec4(1.0 - pollutionValue, 1.0 - pollutionValue, 1.0 - pollutionValue, pollutionValue * 10.0);\n\
+	vec4 intensity4 = vec4(pollutionValue, 1.0 - pollutionValue, pollutionValue, pollutionValue * 10.0);\n\
+	//vec4 pollutionColor = vec4(0.5, 1.0, 0.1, 1.0); // original green.***\n\
+	vec4 pollutionColor = vec4(rainbowColor4.rgb, 1.0);\n\
+	finalColor = mix(intensity4, pollutionColor, pollutionValue);\n\
+\n\
+    gl_FragData[0] = finalColor; \n\
 \n\
 	vec4 albedo4 = finalColor;\n\
-	vec4 intensity4 = vec4(pollutionValue, pollutionValue, pollutionValue, pollutionValue);\n\
-	vec4 pollutionColor = vec4(0.5, 1.0, 0.1, 1.0);\n\
-	finalColor = mix(intensity4, pollutionColor, pollutionValue);\n\
-	//finalColor = vec4(pollutionValue, pollutionValue, pollutionValue, pollutionValue);\n\
-    gl_FragData[0] = finalColor; \n\
 \n\
 	#ifdef USE_MULTI_RENDER_TARGET\n\
 	{\n\

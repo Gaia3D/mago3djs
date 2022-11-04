@@ -300,6 +300,82 @@ Color.grayToRGB_MagoStyle = function(gray, resultColor)
 	return resultColor;
 };
 
+Color.getRainbowColor_byHeight = function(height,  minHeight_rainbow, maxHeight_rainbow, hotToCold)
+{
+	var gray = (height - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);
+	if (gray > 1.0){ gray = 0.999999; }
+	else if (gray<0.0){ gray = 0.0; }
+
+	var value = gray * 4.0;
+	var h = Math.floor(value);
+	//var f = Math.fract(value);
+	var f = value % 1;
+
+	var resultColor = new Color(0.0, 0.0, 0.0, gray);
+	var red = new Point3D(1.0, 0.0, 0.0);
+	var yellow = new Point3D(1.0, 1.0, 0.0);
+	var green = new Point3D(0.0, 1.0, 0.0);
+	var cyan = new Point3D(0.0, 1.0, 1.0);
+	var blue = new Point3D(0.0, 0.0, 1.0);
+
+	resultColor.setRGB(1.0, 0.0, 0.0);// init
+
+	var mixedColorRGB = new Point3D();
+
+	if (hotToCold)
+	{
+		// HOT to COLD.***
+		if (h >= 0.0 && h < 1.0)
+		{
+			// mix red & yellow.***
+			mixedColorRGB = Point3D.mix(red, yellow, f, mixedColorRGB);
+		}
+		else if (h >= 1.0 && h < 2.0)
+		{
+			// mix yellow & green.***
+			mixedColorRGB = Point3D.mix(yellow, green, f, mixedColorRGB);
+		}
+		else if (h >= 2.0 && h < 3.0)
+		{
+			// mix green & cyan.***
+			mixedColorRGB = Point3D.mix(green, cyan, f, mixedColorRGB);
+		}
+		else if (h >= 3.0)
+		{
+			// mix cyan & blue.***
+			mixedColorRGB = Point3D.mix(cyan, blue, f, mixedColorRGB);
+		}
+	}
+	else
+	{
+		// COLD to HOT.***
+		if (h >= 0.0 && h < 1.0)
+		{
+			// mix blue & cyan.***
+			mixedColorRGB = Point3D.mix(blue, cyan, f, mixedColorRGB);
+		}
+		else if (h >= 1.0 && h < 2.0)
+		{
+			// mix cyan & green.***
+			mixedColorRGB = Point3D.mix(cyan, green, f, mixedColorRGB);
+		}
+		else if (h >= 2.0 && h < 3.0)
+		{
+			// mix green & yellow.***
+			mixedColorRGB = Point3D.mix(green, yellow, f, mixedColorRGB);
+		}
+		else if (h >= 3.0)
+		{
+			// mix yellow & red.***
+			mixedColorRGB = Point3D.mix(yellow, red, f, mixedColorRGB);
+		}
+	}
+
+	resultColor.setRGB(mixedColorRGB.x, mixedColorRGB.y, mixedColorRGB.z);
+
+	return resultColor;
+};
+
 Color.grayToRGBYCM_MagoStyle = function(gray, resultColor)
 {
 	if (resultColor === undefined)

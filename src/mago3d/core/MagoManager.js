@@ -2021,6 +2021,11 @@ MagoManager.prototype._renderManagers_transparentPass = function ()
 		// Note : This is different to water simulation. Here, do not IntersectedObjectsCulling if the simulation was started. TODO.***
 		var visiblesArray = this.visibleObjControlerNodes.getAllVisibles();
 		var nativeVisiblesArray = this.visibleObjControlerNodes.getAllNatives();
+
+		if (visiblesArray.length > 0 || nativeVisiblesArray.length > 0)
+		{
+			var hola = 0;
+		}
 		this.soundManager.doIntersectedObjectsCulling(visiblesArray, nativeVisiblesArray);
 		this.soundManager.render();
 	};
@@ -2029,6 +2034,31 @@ MagoManager.prototype._renderManagers_transparentPass = function ()
 	{
 		// render itinerary layers.***
 		this.itineraryManager.render();
+
+		// If exist weatherStation, then sample weather for the current 
+		// position of the walkingMan of itineraries.***
+		// sample weather = sample pollution, or sample temperature, or sample wind, etc.
+		if (this.isFarestFrustum())
+		{
+			if (this.weatherStation !== undefined)
+			{
+				// provisional.***
+				// sample weather condition for the itinearies at the current time.***
+				var currTime = this.getCurrentTime();
+				var weatherStation = this.weatherStation;
+				if (weatherStation.pollutionVolumesArray !== undefined && weatherStation.pollutionVolumesArray.length > 0)
+				{
+					var pollutionVolume = weatherStation.pollutionVolumesArray[0]; // provisional.***
+					var pollutionLayersCount = pollutionVolume.getPollutionLayersCount();
+					if (pollutionLayersCount > 0)
+					{
+						var pollutionLayer = pollutionVolume._pollutionLayersArray[0]; // provisional.***
+						this.itineraryManager.sampleWeatherPollution(currTime, pollutionLayer);
+					}
+				}
+				
+			}
+		}
 	}
 };
 
@@ -2458,7 +2488,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		};
 		
 		this.renderer.renderScreenRectangle(gl, options); // debug component.
-		//this.renderer.renderScreenRectangleMosaic(gl, options); // debug component.
+		this.renderer.renderScreenRectangleMosaic(gl, options); // debug component.
 		*/
 		//-----------------------------------------------------------
 

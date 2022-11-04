@@ -53,7 +53,7 @@ void main()
 	
 	if(textureColor.w < 0.5)
 	{
-		discard;
+		//discard;
 	}
 
 
@@ -74,7 +74,7 @@ void main()
 		gl_FragData[1] = packDepth(0.0);
 		
 		// Note: points cloud data has frustumIdx 20 .. 23.********
-		float frustumIdx = 0.1; // realFrustumIdx = 0.1 * 100 = 10. 
+		float frustumIdx = 0.005; // realFrustumIdx = 0.1 * 100 = 10. 
 		
 		//if(uFrustumIdx == 0)
 		//frustumIdx = 0.005; // frustumIdx = 20.***

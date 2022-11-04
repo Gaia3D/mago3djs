@@ -36,6 +36,9 @@ uniform int uFrustumIdx;
 uniform vec4 uSelColor4;
 
 uniform float uInterpolationFactor;
+uniform vec2 uMinMaxQuantizedValues_tex0;
+uniform vec2 uMinMaxQuantizedValues_tex1;
+uniform vec2 uMinMaxValues;
 
 varying vec3 vNormal;
 varying vec4 vColor4; // color from attributes
@@ -185,6 +188,94 @@ bool isEdge()
 }
 */
 
+float unQuantize(float quantizedValue, float minVal, float maxVal)
+{
+	float unquantizedValue = quantizedValue * (maxVal - minVal) + minVal;
+	return unquantizedValue;
+}
+
+vec4 getRainbowColor_byHeight(in float height, in float minHeight_rainbow, in float maxHeight_rainbow, bool hotToCold)
+{
+    
+    float gray = (height - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);
+	if (gray > 1.0){ gray = 1.0; }
+	else if (gray<0.0){ gray = 0.0; }
+
+    float value = gray * 4.0;
+    float h = floor(value);
+    float f = fract(value);
+
+    vec4 resultColor = vec4(0.0, 0.0, 0.0, gray);
+
+    if(hotToCold)
+    {
+        // HOT to COLD.***
+        resultColor.rgb = vec3(1.0, 0.0, 0.0); // init
+        if(h >= 0.0 && h < 1.0)
+        {
+            // mix red & yellow.***
+            vec3 red = vec3(1.0, 0.0, 0.0);
+            vec3 yellow = vec3(1.0, 1.0, 0.0);
+            resultColor.rgb = mix(red, yellow, f);
+        }
+        else if(h >= 1.0 && h < 2.0)
+        {
+            // mix yellow & green.***
+            vec3 green = vec3(0.0, 1.0, 0.0);
+            vec3 yellow = vec3(1.0, 1.0, 0.0);
+            resultColor.rgb = mix(yellow, green, f);
+        }
+        else if(h >= 2.0 && h < 3.0)
+        {
+            // mix green & cyan.***
+            vec3 green = vec3(0.0, 1.0, 0.0);
+            vec3 cyan = vec3(0.0, 1.0, 1.0);
+            resultColor.rgb = mix(green, cyan, f);
+        }
+        else if(h >= 3.0)
+        {
+            // mix cyan & blue.***
+            vec3 blue = vec3(0.0, 0.0, 1.0);
+            vec3 cyan = vec3(0.0, 1.0, 1.0);
+            resultColor.rgb = mix(cyan, blue, f);
+        }
+    }
+    else
+    {
+        // COLD to HOT.***
+        resultColor.rgb = vec3(0.0, 0.0, 1.0); // init
+        if(h >= 0.0 && h < 1.0)
+        {
+            // mix blue & cyan.***
+            vec3 blue = vec3(0.0, 0.0, 1.0);
+            vec3 cyan = vec3(0.0, 1.0, 1.0);
+            resultColor.rgb = mix(blue, cyan, f);
+        }
+        else if(h >= 1.0 && h < 2.0)
+        {
+            // mix cyan & green.***
+            vec3 green = vec3(0.0, 1.0, 0.0);
+            vec3 cyan = vec3(0.0, 1.0, 1.0);
+            resultColor.rgb = mix(cyan, green, f);  
+        }
+        else if(h >= 2.0 && h < 3.0)
+        {
+            // mix green & yellow.***
+            vec3 green = vec3(0.0, 1.0, 0.0);
+            vec3 yellow = vec3(1.0, 1.0, 0.0);
+            resultColor.rgb = mix(green, yellow, f);
+        }
+        else if(h >= 3.0)
+        {
+            // mix yellow & red.***
+            vec3 red = vec3(1.0, 0.0, 0.0);
+            vec3 yellow = vec3(1.0, 1.0, 0.0);
+            resultColor.rgb = mix(yellow, red, f);
+        }
+    }
+
+    return resultColor;
+}
 
 void main()
 {
@@ -201,19 +292,27 @@ void main()
 	vec4 textureColor_0;
 	vec4 textureColor_1;
 
+	float realPollutionVal_0 = 0.0;
+	float realPollutionVal_1 = 0.0;
+
+	vec2 finalTexCoord = vTexCoord;
+	if(textureFlipYAxis)
+	{
+		finalTexCoord = vec2(vTexCoord.s, 1.0 - vTexCoord.t);
+	}
+
     if(colorType == 2)
     {
-        if(textureFlipYAxis)
-        {
-            textureColor_0 = texture2D(texture_0, vec2(vTexCoord.s, 1.0 - vTexCoord.t));
-			textureColor_1 = texture2D(texture_1, vec2(vTexCoord.s, 1.0 - vTexCoord.t));
-        }
-        else{
-            textureColor_0 = texture2D(texture_0, vec2(vTexCoord.s, vTexCoord.t));
-			textureColor_1 = texture2D(texture_1, vec2(vTexCoord.s, vTexCoord.t));
-        }
+        textureColor_0 = texture2D(texture_0, finalTexCoord);
+		textureColor_1 = texture2D(texture_1, finalTexCoord);
 
-		textureColor = mix(textureColor_0, textureColor_1, uInterpolationFactor);
+		float quantized_0 = UnpackDepth32(textureColor_0);
+		float quantized_1 = UnpackDepth32(textureColor_1);
+
+		realPollutionVal_0 = unQuantize(quantized_0, uMinMaxQuantizedValues_tex0.x, uMinMaxQuantizedValues_tex0.y);
+		realPollutionVal_1 = unQuantize(quantized_1, uMinMaxQuantizedValues_tex1.x, uMinMaxQuantizedValues_tex1.y);
+
+		//textureColor = mix(textureColor_0, textureColor_1, uInterpolationFactor); // no.***
     }
     else if(colorType == 0)
 	{
@@ -225,14 +324,22 @@ void main()
     }
 	
     vec4 finalColor;
-	float pollutionValue = UnpackDepth32(textureColor);
+	float realPollutionValue = mix(realPollutionVal_0, realPollutionVal_1, uInterpolationFactor);
+	float realPollutionQuantized = (realPollutionValue - uMinMaxValues.x) / (uMinMaxValues.y - uMinMaxValues.x);
+	float pollutionValue = realPollutionQuantized;
+
+	bool hotToCold = false;
+	vec4 rainbowColor4 = getRainbowColor_byHeight(realPollutionQuantized, 0.0, 1.0, hotToCold);
+	
+	//vec4 intensity4 = vec4(1.0 - pollutionValue, 1.0 - pollutionValue, 1.0 - pollutionValue, pollutionValue * 10.0);
+	vec4 intensity4 = vec4(pollutionValue, 1.0 - pollutionValue, pollutionValue, pollutionValue * 10.0);
+	//vec4 pollutionColor = vec4(0.5, 1.0, 0.1, 1.0); // original green.***
+	vec4 pollutionColor = vec4(rainbowColor4.rgb, 1.0);
+	finalColor = mix(intensity4, pollutionColor, pollutionValue);
+
+    gl_FragData[0] = finalColor; 
 
 	vec4 albedo4 = finalColor;
-	vec4 intensity4 = vec4(pollutionValue, pollutionValue, pollutionValue, pollutionValue);
-	vec4 pollutionColor = vec4(0.5, 1.0, 0.1, 1.0);
-	finalColor = mix(intensity4, pollutionColor, pollutionValue);
-	//finalColor = vec4(pollutionValue, pollutionValue, pollutionValue, pollutionValue);
-    gl_FragData[0] = finalColor; 
 
 	#ifdef USE_MULTI_RENDER_TARGET
 	{
