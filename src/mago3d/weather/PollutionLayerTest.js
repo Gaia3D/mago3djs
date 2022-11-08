@@ -259,6 +259,12 @@ PollutionLayerTest.prototype.getPollutionValue = function (posWC, currTime)
 	// Provisionally take only one texture.***
 	var totalAnimTime = this._pollutionVolumeOwner._totalAnimTime;
 	var increTime = currTime - this._pollutionVolumeOwner._animationStartTime;
+
+	if (increTime > totalAnimTime)
+	{
+		//return undefined;
+	}
+
 	var timeSlicesCount = this._timeSlicesArray.length;
 
 	var timeFactor = increTime / totalAnimTime;
@@ -331,6 +337,14 @@ PollutionLayerTest.prototype.getPollutionValue = function (posWC, currTime)
 	pollutionValue = pollutionValue_curr;
 
 	return pollutionValue;
+};
+
+PollutionLayerTest.prototype.getTotalAnimationTimeMinutes = function ()
+{
+	var timeInterval_min = this.timeInterval_min;
+	var timeSlicesCount = this._timeSlicesArray.length;
+	var totalAnimTimeMinutes = timeInterval_min * timeSlicesCount;
+	return totalAnimTimeMinutes;
 };
 
 PollutionLayerTest.prototype.render = function (magoManager)

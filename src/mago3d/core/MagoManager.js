@@ -2021,42 +2021,44 @@ MagoManager.prototype._renderManagers_transparentPass = function ()
 		// Note : This is different to water simulation. Here, do not IntersectedObjectsCulling if the simulation was started. TODO.***
 		var visiblesArray = this.visibleObjControlerNodes.getAllVisibles();
 		var nativeVisiblesArray = this.visibleObjControlerNodes.getAllNatives();
-
-		if (visiblesArray.length > 0 || nativeVisiblesArray.length > 0)
-		{
-			var hola = 0;
-		}
 		this.soundManager.doIntersectedObjectsCulling(visiblesArray, nativeVisiblesArray);
 		this.soundManager.render();
 	};
 
 	if (this.itineraryManager !== undefined)
 	{
-		// render itinerary layers.***
-		this.itineraryManager.render();
-
-		// If exist weatherStation, then sample weather for the current 
-		// position of the walkingMan of itineraries.***
-		// sample weather = sample pollution, or sample temperature, or sample wind, etc.
-		if (this.isFarestFrustum())
+		if (this.animationTimeController === undefined)
 		{
-			if (this.weatherStation !== undefined)
+			this.animationTimeController = new AnimationTimeController();
+		}
+
+		if (this.animationTimeController.getAnimationState() === CODE.processState.STARTED)
+		{
+			// render itinerary layers.***
+			this.itineraryManager.render();
+
+			// If exist weatherStation, then sample weather for the current 
+			// position of the walkingMan of itineraries.***
+			// sample weather = sample pollution, or sample temperature, or sample wind, etc.
+			if (this.isFarestFrustum())
 			{
-				// provisional.***
-				// sample weather condition for the itinearies at the current time.***
-				var currTime = this.getCurrentTime();
-				var weatherStation = this.weatherStation;
-				if (weatherStation.pollutionVolumesArray !== undefined && weatherStation.pollutionVolumesArray.length > 0)
+				if (this.weatherStation !== undefined)
 				{
-					var pollutionVolume = weatherStation.pollutionVolumesArray[0]; // provisional.***
-					var pollutionLayersCount = pollutionVolume.getPollutionLayersCount();
-					if (pollutionLayersCount > 0)
+					// provisional.***
+					// sample weather condition for the itinearies at the current time.***
+					var currTime = this.getCurrentTime();
+					var weatherStation = this.weatherStation;
+					if (weatherStation.pollutionVolumesArray !== undefined && weatherStation.pollutionVolumesArray.length > 0)
 					{
-						var pollutionLayer = pollutionVolume._pollutionLayersArray[0]; // provisional.***
-						this.itineraryManager.sampleWeatherPollution(currTime, pollutionLayer);
+						var pollutionVolume = weatherStation.pollutionVolumesArray[0]; // provisional.***
+						var pollutionLayersCount = pollutionVolume.getPollutionLayersCount();
+						if (pollutionLayersCount > 0)
+						{
+							var pollutionLayer = pollutionVolume._pollutionLayersArray[0]; // provisional.***
+							this.itineraryManager.sampleWeatherPollution(currTime, pollutionLayer);
+						}
 					}
 				}
-				
 			}
 		}
 	}
@@ -2950,6 +2952,11 @@ MagoManager.prototype.startRender = function (isLastFrustum, frustumIdx, numFrus
 		this.dateSC = new Date();
 		this.prevTime = this.currTime;
 		this.currTime = this.dateSC.getTime();
+
+		if (this.animationTimeController)
+		{
+			this.animationTimeController.incrementCurrentTime();
+		}
 		
 		this.initCounters();
 		
