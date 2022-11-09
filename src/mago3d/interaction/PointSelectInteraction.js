@@ -149,7 +149,7 @@ PointSelectInteraction.prototype.getSelected = function ()
  * get TargetHighlight
  * @return {boolean}
  */
-PointSelectInteraction.prototype.getTargetHighlight = function()
+PointSelectInteraction.prototype.getTargetHighlight = function ()
 {
 	return this.targetHighlight;
 };
@@ -157,7 +157,7 @@ PointSelectInteraction.prototype.getTargetHighlight = function()
  * handle event
  * @param {BrowserEvent} browserEvent
  */
-PointSelectInteraction.prototype.handleDownEvent = function(browserEvent)
+PointSelectInteraction.prototype.handleDownEvent = function (browserEvent)
 {
 	return;
 };
@@ -165,7 +165,7 @@ PointSelectInteraction.prototype.handleDownEvent = function(browserEvent)
  * handle event
  * @param {BrowserEvent} browserEvent
  */
-PointSelectInteraction.prototype.handleUpEvent = function(browserEvent)
+PointSelectInteraction.prototype.handleUpEvent = function (browserEvent)
 {
 	var selectionManager = this.manager.selectionManager;
 	selectionManager.clearCurrents();
@@ -217,7 +217,7 @@ PointSelectInteraction.prototype.emitEvent = function (selectedObj, selected, sc
 		this.manager.emit(type, eventObj);
 	}
 };
-PointSelectInteraction.getEventType = function(target, selected, selectedObj)
+PointSelectInteraction.getEventType = function (target, selected, selectedObj)
 {
 	var eventType;
 	switch (target)
@@ -246,7 +246,7 @@ PointSelectInteraction.getEventType = function(target, selected, selectedObj)
  * handle event
  * @param {BrowserEvent} browserEvent
  */
-PointSelectInteraction.prototype.handleMoveEvent = function(browserEvent)
+PointSelectInteraction.prototype.handleMoveEvent = function (browserEvent)
 {
 	if (this.targetHighlight && !this.selected)
 	{
@@ -285,7 +285,7 @@ PointSelectInteraction.prototype.select = function (screenCoordinate)
  * clear 
  * @param {boolean} silence 
  */
-PointSelectInteraction.prototype.clear = function(silence)
+PointSelectInteraction.prototype.clear = function (silence)
 {
 	if (!silence) 
 	{

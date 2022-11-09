@@ -5388,7 +5388,7 @@ MagoManager.prototype.manageMouseDragging = function(mouseX, mouseY)
  * 
  * @private
  */
-MagoManager.prototype.moveSelectedObjectGeneral = function(gl, object) 
+MagoManager.prototype.moveSelectedObjectGeneral = function (gl, object) 
 {
 	if (object === undefined)
 	{ return; }

@@ -108,7 +108,7 @@ SelectionManager.prototype.setCandidateGeneral = function(idxKey, candidateObjec
  * @alias SelectionManager
  * @class SelectionManager
  */
-SelectionManager.prototype.getCandidateGeneral = function(idxKey)
+SelectionManager.prototype.getCandidateGeneral = function (idxKey)
 {
 	return this.selCandidatesMap[idxKey];
 };
@@ -119,7 +119,7 @@ SelectionManager.prototype.getCandidateGeneral = function(idxKey)
  * @alias SelectionManager
  * @class SelectionManager
  */
-SelectionManager.prototype.getSelectedGeneral = function()
+SelectionManager.prototype.getSelectedGeneral = function ()
 {
 	return this.currentGeneralObjectSelected;
 };
@@ -130,7 +130,7 @@ SelectionManager.prototype.getSelectedGeneral = function()
  * @alias SelectionManager
  * @class SelectionManager
  */
-SelectionManager.prototype.getSelectedGeneralArray = function()
+SelectionManager.prototype.getSelectedGeneralArray = function ()
 {
 	return this.currentGeneralObjectSelectedArray;
 };
@@ -152,7 +152,7 @@ SelectionManager.prototype.setSelectedGeneral = function (selectedObject)
  * @alias SelectionManager
  * @class SelectionManager
  */
-SelectionManager.prototype.getSelectedF4dBuilding = function()
+SelectionManager.prototype.getSelectedF4dBuilding = function ()
 {
 	if (this.currentNodeSelected)
 	{
@@ -167,7 +167,7 @@ SelectionManager.prototype.getSelectedF4dBuilding = function()
  * @alias SelectionManager
  * @class SelectionManager
  */
-SelectionManager.prototype.getSelectedF4dBuildingArray = function()
+SelectionManager.prototype.getSelectedF4dBuildingArray = function ()
 {
 	var buildingArray = [];
 	var nodeArray = this.getSelectedF4dNodeArray();

@@ -26,6 +26,7 @@ varying vec4 vColor;
 varying float flogz;
 varying float Fcoef_half;
 varying float vDepth;
+varying float vOrder;
 
 const float error = 0.001;
 
@@ -86,6 +87,18 @@ void main(){
 			orderInt = -2;
 		}
 	}
+
+	// test vOrder.*******************************************
+	//vOrder = abs(current.w) - 1.0; // test, to render outLine.***
+	if(orderInt == 1 || orderInt == 2)
+	{
+		vOrder = 0.0;
+	}
+	else if(orderInt == -1 || orderInt == -2)
+	{
+		vOrder = 1.0;
+	}
+	//--------------------------------------------------------
 	
 	float aspect = viewport.x / viewport.y;
 	vec2 aspectVec = vec2(aspect, 1.0);
