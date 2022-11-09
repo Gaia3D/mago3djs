@@ -337,9 +337,16 @@ void main()
 	vec4 pollutionColor = vec4(rainbowColor4.rgb, 1.0);
 	finalColor = mix(intensity4, pollutionColor, pollutionValue);
 
+    if(finalTexCoord.x < 0.005 || finalTexCoord.x > 0.995 || finalTexCoord.y < 0.005 || finalTexCoord.y > 0.995) 
+    {
+        finalColor = vec4(0.25, 0.5, 0.99, 0.6);
+    }
+
     gl_FragData[0] = finalColor; 
 
 	vec4 albedo4 = finalColor;
+
+    
 
 	#ifdef USE_MULTI_RENDER_TARGET
 	{

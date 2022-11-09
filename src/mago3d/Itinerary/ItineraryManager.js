@@ -17,6 +17,7 @@ var ItineraryManager = function(options)
 	 this._walkingManMosaicTexIsPrepared = false;
 
 	 this._animatedIcon;
+	 this._walkingManMosaicSize = new Int32Array([5, 2]);
 
 	 if (options !== undefined)
 	 {
@@ -29,6 +30,16 @@ var ItineraryManager = function(options)
 		if (options.walkingManMosaicTexPath !== undefined)
 		{
 			this._walkingManMosaicTexPath = options.walkingManMosaicTexPath;
+		}
+
+		if (options.walkingManMosaicColumnsCount !== undefined)
+		{
+			this._walkingManMosaicSize[0] = options.walkingManMosaicColumnsCount;
+		}
+
+		if (options.walkingManMosaicRowsCount !== undefined)
+		{
+			this._walkingManMosaicSize[1] = options.walkingManMosaicRowsCount;
 		}
 	 }
 
@@ -192,6 +203,24 @@ ItineraryManager.prototype.render = function ()
 	gl.enable(gl.CULL_FACE);
 	gl.disable(gl.BLEND);
 
+	// render sampling data.**********************************************************************************************************
+	// Deactive depth & normal framebuffer, to render without ssao.***
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, magoManager.albedoTex, 0);
+
+	extbuffers.drawBuffersWEBGL([
+		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
+		extbuffers.NONE, // gl_FragData[1] - depthTex
+		extbuffers.NONE, // gl_FragData[2] - normalTex
+		extbuffers.COLOR_ATTACHMENT3_WEBGL // gl_FragData[3] - albedoTex
+	]);
+	for (var i=0; i<itisCount; i++)
+	{
+		var itiLayer = this.getItineraryLayer(i);
+		itiLayer.renderWalkingMan(); // here renders sampling points data.***
+	}
+
 	// WALKING MAN.**********************************************************************************************
 	// Now, render the itinerary walkingMan & points.************************************************************
 	// Check if the walkingManMosaicTex is prepared.***
@@ -215,6 +244,8 @@ ItineraryManager.prototype.render = function ()
 	gl.uniformMatrix4fv(shader.buildingRotMatrix_loc, false, magoManager.sceneState.modelViewRelToEyeMatrixInv._floatArrays);
 	gl.uniform1f(shader.screenWidth_loc, parseFloat(magoManager.sceneState.drawingBufferWidth[0]));
 	gl.uniform1f(shader.screenHeight_loc, parseFloat(magoManager.sceneState.drawingBufferHeight[0]));
+	gl.uniform1i(shader.uFrustumIdx_loc, magoManager.currentFrustumIdx);
+	gl.uniform2fv(shader.uNearFarArray_loc, magoManager.frustumVolumeControl.nearFarArray);
 	gl.uniform1i(shader.textureFlipYAxis_loc, true); 
 	// Tell the shader to get the texture from texture unit 0
 	gl.uniform1i(shader.texture_loc, 0);
@@ -248,7 +279,7 @@ ItineraryManager.prototype.render = function ()
 	gl.uniform1i(shader.bUseOriginalImageSize_loc, false);
 	gl.uniform3fv(shader.aditionalOffset_loc, [0.0, 0.0, 0.0]);
 
-	gl.uniform1iv(shader.uMosaicSize_loc, new Int32Array([5, 2])); // 5 cols & 2 rows.***
+	gl.uniform1iv(shader.uMosaicSize_loc, this._walkingManMosaicSize); // 5 cols & 2 rows.***
 		
 	var selectionManager = magoManager.selectionManager;
 	var lastTexId = undefined;
@@ -264,6 +295,7 @@ ItineraryManager.prototype.render = function ()
 	}
 
 	gl.enable(gl.BLEND);
+	gl.depthRange(0.0, 0.1);
 	var executedEffects = false;
 	for (var i=0; i<itisCount; i++)
 	{
@@ -336,7 +368,7 @@ ItineraryManager.prototype.render = function ()
 			this.lastTimeSubImageChanged = currTime;
 		}
 		
-		if (this.subImageIdx >= 10)
+		if (this.subImageIdx >= this._walkingManMosaicSize[0] * this._walkingManMosaicSize[1])
 		{
 			this.subImageIdx = 0;
 		}
@@ -354,11 +386,7 @@ ItineraryManager.prototype.render = function ()
 	gl.depthMask(true);
 	gl.useProgram(null);
 
-	for (var i=0; i<itisCount; i++)
-	{
-		var itiLayer = this.getItineraryLayer(i);
-		itiLayer.renderWalkingMan();
-	}
+	
 };
 
 ItineraryManager.prototype.createDefaultShaders = function ()
@@ -420,6 +448,8 @@ ItineraryManager.prototype.createDefaultShaders = function ()
 	shader.screenHeight_loc = gl.getUniformLocation(shader.program, "screenHeight");
 	shader.uMosaicSize_loc = gl.getUniformLocation(shader.program, "uMosaicSize");
 	shader.uSubImageIdx_loc = gl.getUniformLocation(shader.program, "uSubImageIdx");
+	shader.uFrustumIdx_loc = gl.getUniformLocation(shader.program, "uFrustumIdx");
+	shader.uNearFarArray_loc = gl.getUniformLocation(shader.program, "uNearFarArray");
 
 	var hola = 0;
 };

@@ -390,7 +390,7 @@ PollutionLayerTest.prototype.render = function (magoManager)
 	// Now, bind the rectangleMesh vbo.***
 	var vboKey = this.vboKeysContainer.getVboKey(0);
 	var shaderManager = magoManager.postFxShadersManager;
-	var currentShader = shaderManager.getShader("pollution");
+	var currentShader = shaderManager.getShader("pollution"); // (PollutionVS, PollutionFS).***
 
 	magoManager.postFxShadersManager.useProgram(currentShader);
 	//magoManager.effectsManager.setCurrentShader(currentShader);
