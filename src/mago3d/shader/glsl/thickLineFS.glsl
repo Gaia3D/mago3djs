@@ -38,11 +38,25 @@ vec4 packDepth( float v ) {
 
 void main() {
 	vec4 finalCol4 = vColor;
-
+	
 	if(vOrder <= 0.3 || vOrder >= 0.7)
 	{
-		finalCol4 = vec4(0.0, 0.0, 0.0, 1.0);
+		float factor = 1.0;
+		if(vOrder <= 0.3)
+		{
+			factor = (0.3 - vOrder) / (0.3);
+			//factor = 1.0 - vOrder;
+		}
+		else if(vOrder >= 0.7)
+		{
+			factor = (vOrder - 0.7) / (0.3);
+			//factor = vOrder;
+		}
+		vec4 outLineCol = vec4(0.0, 0.0, 0.0, 1.0);
+		finalCol4 = mix(vColor, outLineCol, factor);
+		//finalCol4 = vec4(0.0, 0.0, 0.0, 1.0);
 	}
+	
 
 	gl_FragData[0] = finalCol4;
 

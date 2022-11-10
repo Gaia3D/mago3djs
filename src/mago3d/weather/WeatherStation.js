@@ -587,6 +587,7 @@ WeatherStation.prototype.renderWeather = function (magoManager)
 
 	//this._TEST_addSoundJsonsArray(); // test. Delete this.***
 	//this._TEST_addPollutionJsonsArray(); // test. Delete this.***
+	//this._TEST_itineraryJsonsArray(); // test. Delete this.***
 
 	/*
 	if (this.tempLayersArray)
@@ -823,6 +824,98 @@ WeatherStation.prototype.loadPollutionTestGeoJsonIndexFile = function(geoJsonInd
 	}
 
 	return pollutionVolume;
+};
+
+WeatherStation.prototype._TEST_itineraryJsonsArray = function()
+{
+	// this function loads soundJsons, and then adds its into sound volume.***
+	if (this._test_addingItineraryJsonsProcess === undefined)
+	{
+		this._test_addingItineraryJsonsProcess = CODE.processState.NO_STARTED;
+	}
+
+	if (this._test_addingItineraryJsonsProcess === CODE.processState.NO_STARTED)
+	{
+		this._test_addingItineraryJsonsProcess = CODE.processState.STARTED;
+
+		// load 3 or 4 sound jsons.***
+		this.test_itinearyJsonsArray = [];
+
+		var path = "\\f4d\\result_personItinerary\\A_gps_20220915.json";
+		this.test_itinearyJsonsArray.push({
+			path          : path,
+			fileLoadState : 0
+		});
+		path = "\\f4d\\result_personItinerary\\B_gps_20220915.json";
+		this.test_itinearyJsonsArray.push({
+			path          : path,
+			fileLoadState : 0
+		});
+
+		
+		var that = this;
+		loadWithXhr(this.test_itinearyJsonsArray[0].path, undefined, undefined, 'json', 'GET').done(function(res) 
+		{
+			that.test_itinearyJsonsArray[0]._geoJsonIndexFileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			that.test_itinearyJsonsArray[0]._geoJsonIndexFile = res;
+		});
+
+		loadWithXhr(this.test_itinearyJsonsArray[1].path, undefined, undefined, 'json', 'GET').done(function(res) 
+		{
+			that.test_itinearyJsonsArray[1]._geoJsonIndexFileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			that.test_itinearyJsonsArray[1]._geoJsonIndexFile = res;
+		});
+
+	}
+
+	if (this._test_addingItineraryJsonsProcess !== CODE.processState.FINISHED)
+	{
+		// check if all json are loaded.***
+		var allJsonLoaded = true;
+		var layersCount = this.test_itinearyJsonsArray.length;
+		for (var i=0; i<layersCount; i++)
+		{
+			if (this.test_itinearyJsonsArray[i]._geoJsonIndexFileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
+			{
+				allJsonLoaded = false;
+			}
+		}
+
+		if (allJsonLoaded)
+		{
+			this._test_addingItineraryJsonsProcess = CODE.processState.FINISHED;
+
+			// All json are loaded, so do the test:
+			var magoManager = this.magoManager;
+
+			var walkingManMosaicTexPath = "\\f4d\\result_personItinerary\\walk-right.png";
+			var options = {
+				magoManager                  : magoManager,
+				walkingManMosaicTexPath      : walkingManMosaicTexPath,
+				walkingManMosaicColumnsCount : 6,
+				walkingManMosaicRowsCount    : 1
+			};
+			magoManager.itineraryManager = new ItineraryManager(options);
+
+			// make jsonsArray.***
+			var jsonsCount = this.test_itinearyJsonsArray.length;
+			for (var i=0; i<jsonsCount; i++)
+			{
+				var jsonFile = this.test_itinearyJsonsArray[i]._geoJsonIndexFile;
+				var layerOptions = {
+					jsonFile      : jsonFile,
+					lineThickness : 4.0
+				};
+				var itiLayer = magoManager.itineraryManager.newItineraryLayer(layerOptions);
+
+			}
+			var options = {
+				incrementalAddingTimeMilisec: 50000
+			};
+			magoManager.animationTimeController = new AnimationTimeController(options);
+			magoManager.animationTimeController.startAnimation();
+		}
+	}
 };
 
 WeatherStation.prototype._TEST_addPollutionJsonsArray = function()

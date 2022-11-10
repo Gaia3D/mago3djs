@@ -215,11 +215,13 @@ ItineraryManager.prototype.render = function ()
 		extbuffers.NONE, // gl_FragData[2] - normalTex
 		extbuffers.COLOR_ATTACHMENT3_WEBGL // gl_FragData[3] - albedoTex
 	]);
+	
 	for (var i=0; i<itisCount; i++)
 	{
 		var itiLayer = this.getItineraryLayer(i);
 		itiLayer.renderWalkingMan(); // here renders sampling points data.***
 	}
+	
 
 	// WALKING MAN.**********************************************************************************************
 	// Now, render the itinerary walkingMan & points.************************************************************
