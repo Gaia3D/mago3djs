@@ -62,7 +62,6 @@ void main(){
 	vec4 vNext = getPointRelToEye(vec4(next.xyz, 1.0));
 	
 	float order_w = current.w;
-	//float order_w = float(order);
 	float sense = 1.0;
 	int orderInt = 0;
 	if(order_w > 0.0)
@@ -88,8 +87,8 @@ void main(){
 		}
 	}
 
-	// test vOrder.*******************************************
-	//vOrder = abs(current.w) - 1.0; // test, to render outLine.***
+	// To render outline : vOrder.*******************************************
+	// In the outLine zone, the vOrder is near to zero or near to 1.***
 	if(orderInt == 1 || orderInt == 2)
 	{
 		vOrder = 0.0;
@@ -117,19 +116,20 @@ void main(){
 	vec2 nextScreen = nextProjected.xy / nextProjected.w * aspectVec;
 					
 	// This helps us handle 90 degree turns correctly
-	vec2 tangentNext = normalize(nextScreen - currentScreen);
-	vec2 tangentPrev = normalize(currentScreen - previousScreen);
 	vec2 normal; 
 	if(orderInt == 1 || orderInt == -1)
 	{
+		vec2 tangentPrev = normalize(currentScreen - previousScreen);
 		normal = vec2(-tangentPrev.y, tangentPrev.x);
 	}
-	else{
+	else
+	{
+		vec2 tangentNext = normalize(nextScreen - currentScreen);
 		normal = vec2(-tangentNext.y, tangentNext.x);
 	}
 	normal *= thickness/2.0;
 	normal.x /= aspect;
-	float direction = (thickness*sense*projectedDepth)/1000.0;
+	float direction = (thickness * sense * projectedDepth) / 1000.0;
 
 	// Offset our position along the normal
 	vec4 offset = vec4(normal * direction, 0.0, 0.0);
@@ -152,6 +152,26 @@ void main(){
 		vColor = color4; //vec4(color4.r+0.8, color4.g+0.8, color4.b+0.8, color4.a+0.8);
 	else
 		vColor = oneColor4;
+
+	// test debug::::
+	/*
+	if(orderInt == 1)
+	{
+		vColor = vec4(1.0, 0.0, 0.0, 1.0);
+	}
+	else if(orderInt == -1)
+	{
+		vColor = vec4(0.0, 1.0, 0.0, 1.0);
+	}
+	else if(orderInt == 2)
+	{
+		vColor = vec4(0.0, 0.0, 1.0, 1.0);
+	}
+	else if(orderInt == -2)
+	{
+		vColor = vec4(1.0, 1.0, 0.0, 1.0);
+	}
+	*/
 }
 
 

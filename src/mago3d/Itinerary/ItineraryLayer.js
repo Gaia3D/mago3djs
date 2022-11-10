@@ -34,12 +34,26 @@ var ItineraryLayer = function(options)
 	 
 	 this._timeScale = 2000.0; // to simulate fast.***
 	 this._lineThickness = 4.0;
+	 this._lineThickness = 10.0; // test.***
 
 	 if (options !== undefined)
 	 {
 		if (options.filePath)
 		{
 			this._filePath = options.filePath;
+		}
+
+		if (options.lineThickness)
+		{
+			this._lineThickness = options.lineThickness;
+		}
+
+		if (options.jsonFile)
+		{
+			this._jsonFile = options.jsonFile;
+
+			// in this case set this._fileLoadState as CODE.fileLoadState.LOADING_FINISHED;
+			this._fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 		}
 	 }
 };
@@ -92,7 +106,7 @@ ItineraryLayer.prototype._prepare = function ()
 		var pitch = 0.0;
 		var roll = 0.0;
 		var centerGeoCoord = this._jsonFile.centerGeographicCoord;
-		centerGeoCoord.altitude = 100.0; // test.!!!!!!!!!!
+		////centerGeoCoord.altitude = 150.0; // test.!!!!!!!!!!
 		geoLocData = ManagerUtils.calculateGeoLocationData(centerGeoCoord.longitude, centerGeoCoord.latitude, centerGeoCoord.altitude, heading, pitch, roll, geoLocData);
 
 		var pointsFloat32Array = new Float32Array(this._jsonFile.localPositions);

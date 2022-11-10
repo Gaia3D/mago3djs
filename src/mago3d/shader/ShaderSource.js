@@ -14909,11 +14909,25 @@ vec4 packDepth( float v ) {\n\
 \n\
 void main() {\n\
 	vec4 finalCol4 = vColor;\n\
-\n\
+	\n\
 	if(vOrder <= 0.3 || vOrder >= 0.7)\n\
 	{\n\
-		finalCol4 = vec4(0.0, 0.0, 0.0, 1.0);\n\
+		float factor = 1.0;\n\
+		if(vOrder <= 0.3)\n\
+		{\n\
+			factor = (0.3 - vOrder) / (0.3);\n\
+			//factor = 1.0 - vOrder;\n\
+		}\n\
+		else if(vOrder >= 0.7)\n\
+		{\n\
+			factor = (vOrder - 0.7) / (0.3);\n\
+			//factor = vOrder;\n\
+		}\n\
+		vec4 outLineCol = vec4(0.0, 0.0, 0.0, 1.0);\n\
+		finalCol4 = mix(vColor, outLineCol, factor);\n\
+		//finalCol4 = vec4(0.0, 0.0, 0.0, 1.0);\n\
 	}\n\
+	\n\
 \n\
 	gl_FragData[0] = finalCol4;\n\
 \n\
@@ -15015,7 +15029,6 @@ void main(){\n\
 	vec4 vNext = getPointRelToEye(vec4(next.xyz, 1.0));\n\
 	\n\
 	float order_w = current.w;\n\
-	//float order_w = float(order);\n\
 	float sense = 1.0;\n\
 	int orderInt = 0;\n\
 	if(order_w > 0.0)\n\
@@ -15041,8 +15054,8 @@ void main(){\n\
 		}\n\
 	}\n\
 \n\
-	// test vOrder.*******************************************\n\
-	//vOrder = abs(current.w) - 1.0; // test, to render outLine.***\n\
+	// To render outline : vOrder.*******************************************\n\
+	// In the outLine zone, the vOrder is near to zero or near to 1.***\n\
 	if(orderInt == 1 || orderInt == 2)\n\
 	{\n\
 		vOrder = 0.0;\n\
@@ -15070,19 +15083,20 @@ void main(){\n\
 	vec2 nextScreen = nextProjected.xy / nextProjected.w * aspectVec;\n\
 					\n\
 	// This helps us handle 90 degree turns correctly\n\
-	vec2 tangentNext = normalize(nextScreen - currentScreen);\n\
-	vec2 tangentPrev = normalize(currentScreen - previousScreen);\n\
 	vec2 normal; \n\
 	if(orderInt == 1 || orderInt == -1)\n\
 	{\n\
+		vec2 tangentPrev = normalize(currentScreen - previousScreen);\n\
 		normal = vec2(-tangentPrev.y, tangentPrev.x);\n\
 	}\n\
-	else{\n\
+	else\n\
+	{\n\
+		vec2 tangentNext = normalize(nextScreen - currentScreen);\n\
 		normal = vec2(-tangentNext.y, tangentNext.x);\n\
 	}\n\
 	normal *= thickness/2.0;\n\
 	normal.x /= aspect;\n\
-	float direction = (thickness*sense*projectedDepth)/1000.0;\n\
+	float direction = (thickness * sense * projectedDepth) / 1000.0;\n\
 \n\
 	// Offset our position along the normal\n\
 	vec4 offset = vec4(normal * direction, 0.0, 0.0);\n\
@@ -15105,6 +15119,26 @@ void main(){\n\
 		vColor = color4; //vec4(color4.r+0.8, color4.g+0.8, color4.b+0.8, color4.a+0.8);\n\
 	else\n\
 		vColor = oneColor4;\n\
+\n\
+	// test debug::::\n\
+	/*\n\
+	if(orderInt == 1)\n\
+	{\n\
+		vColor = vec4(1.0, 0.0, 0.0, 1.0);\n\
+	}\n\
+	else if(orderInt == -1)\n\
+	{\n\
+		vColor = vec4(0.0, 1.0, 0.0, 1.0);\n\
+	}\n\
+	else if(orderInt == 2)\n\
+	{\n\
+		vColor = vec4(0.0, 0.0, 1.0, 1.0);\n\
+	}\n\
+	else if(orderInt == -2)\n\
+	{\n\
+		vColor = vec4(1.0, 1.0, 0.0, 1.0);\n\
+	}\n\
+	*/\n\
 }\n\
 \n\
 \n\
