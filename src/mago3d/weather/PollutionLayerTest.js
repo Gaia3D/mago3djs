@@ -458,6 +458,7 @@ PollutionLayerTest.prototype.render = function (magoManager)
 
 	gl.frontFace(gl.CCW);
 	gl.enable(gl.BLEND);
+	gl.depthMask(false);
 
 	var minMaxQuantizedValues_tex0 = timeSliceCurr.getQuantizedMinMaxValues();
 	var minMaxQuantizedValues_tex1 = timeSliceNext.getQuantizedMinMaxValues();
@@ -535,6 +536,7 @@ PollutionLayerTest.prototype.render = function (magoManager)
 	}
 	// End render rectangleMesh.---------------------------------------------------------------------
 	gl.disable(gl.BLEND);
+	gl.depthMask(true);
 	currentShader.disableVertexAttribArrayAll();
 	magoManager.postFxShadersManager.useProgram(null);
 
