@@ -55,6 +55,7 @@ var ExtrusionBuilding = function (geographicCoordList, height, options)
 	this.attributes.isSelectable = defaultValue(options.isSelectable, true);
 	this.attributes.selectedColor4 = defaultValue(options.selectedColor, new Color(1, 1, 0, 1));
 	this.attributes.heightReference = defaultValue(options.heightReference, HeightReference.NONE);
+	this.attributes.drawFloorText = defaultValue(options.drawFloorText, false);
 	this.divideLevel = defaultValue(options.divideLevel, false);
 
 	if (!this.options)

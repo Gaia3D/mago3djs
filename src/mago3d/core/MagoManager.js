@@ -3582,11 +3582,15 @@ MagoManager.prototype.drawSelectedExtruionBuildingLabel = function()
 
 		if (isNaN(screenCoord.x) || isNaN(screenCoord.y)) { continue; }
 		
-		ctx.font = "normal normal bolder 18px Helvetica";
-		var text = nativeModel.getLevel();
-		ctx.strokeText(text, screenCoord.x, screenCoord.y);
-		ctx.fillText(text, screenCoord.x, screenCoord.y);
-
+		if (nativeModel.attributes.drawFloorText) 
+		{
+			ctx.fillStyle = "#FFFFFF";
+			ctx.strokeStyle = "#333333";
+			ctx.font = "normal normal bolder 17px Helvetica";
+			var text = nativeModel.getLevel();
+			ctx.strokeText(text, screenCoord.x, screenCoord.y);
+			ctx.fillText(text, screenCoord.x, screenCoord.y);
+		}
 	}
 	ctx.restore();
 	this.canvasDirty = true;
