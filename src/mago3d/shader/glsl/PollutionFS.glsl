@@ -198,7 +198,7 @@ vec4 getRainbowColor_byHeight(in float height, in float minHeight_rainbow, in fl
 {
     
     float gray = (height - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);
-	if (gray > 1.0){ gray = 1.0; }
+	if (gray > 1.0){ gray = 0.9999; }
 	else if (gray<0.0){ gray = 0.0; }
 
     float value = gray * 4.0;
@@ -337,9 +337,19 @@ void main()
 	vec4 pollutionColor = vec4(rainbowColor4.rgb, 1.0);
 	finalColor = mix(intensity4, pollutionColor, pollutionValue);
 
+    // test.***
+    finalColor = vec4(rainbowColor4.rgb, rainbowColor4.a * 15.0);
+
+    if(finalTexCoord.x < 0.005 || finalTexCoord.x > 0.995 || finalTexCoord.y < 0.005 || finalTexCoord.y > 0.995) 
+    {
+        finalColor = vec4(0.25, 0.5, 0.99, 0.6);
+    }
+
     gl_FragData[0] = finalColor; 
 
 	vec4 albedo4 = finalColor;
+
+    
 
 	#ifdef USE_MULTI_RENDER_TARGET
 	{

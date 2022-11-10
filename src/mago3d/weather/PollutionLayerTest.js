@@ -259,6 +259,12 @@ PollutionLayerTest.prototype.getPollutionValue = function (posWC, currTime)
 	// Provisionally take only one texture.***
 	var totalAnimTime = this._pollutionVolumeOwner._totalAnimTime;
 	var increTime = currTime - this._pollutionVolumeOwner._animationStartTime;
+
+	if (increTime > totalAnimTime)
+	{
+		//return undefined;
+	}
+
 	var timeSlicesCount = this._timeSlicesArray.length;
 
 	var timeFactor = increTime / totalAnimTime;
@@ -333,6 +339,14 @@ PollutionLayerTest.prototype.getPollutionValue = function (posWC, currTime)
 	return pollutionValue;
 };
 
+PollutionLayerTest.prototype.getTotalAnimationTimeMinutes = function ()
+{
+	var timeInterval_min = this.timeInterval_min;
+	var timeSlicesCount = this._timeSlicesArray.length;
+	var totalAnimTimeMinutes = timeInterval_min * timeSlicesCount;
+	return totalAnimTimeMinutes;
+};
+
 PollutionLayerTest.prototype.render = function (magoManager)
 {
 	if (this._timeSlicesArray === undefined || this._timeSlicesArray.length === 0)
@@ -376,7 +390,7 @@ PollutionLayerTest.prototype.render = function (magoManager)
 	// Now, bind the rectangleMesh vbo.***
 	var vboKey = this.vboKeysContainer.getVboKey(0);
 	var shaderManager = magoManager.postFxShadersManager;
-	var currentShader = shaderManager.getShader("pollution");
+	var currentShader = shaderManager.getShader("pollution"); // (PollutionVS, PollutionFS).***
 
 	magoManager.postFxShadersManager.useProgram(currentShader);
 	//magoManager.effectsManager.setCurrentShader(currentShader);

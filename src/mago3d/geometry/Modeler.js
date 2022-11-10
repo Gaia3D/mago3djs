@@ -1602,6 +1602,8 @@ Modeler.prototype.__TEST__bSpline = function()
 
 	modeler.bSplineCubic3d = new BSplineCubic3D(options);
 
+	// now delete geographiCoords bcos disturbs.***
+	modeler.geoCoordsList.geographicCoordsArray = [];
 };
 
 Modeler.prototype.createPlaneGrid = function(width, height, numCols, numRows) 

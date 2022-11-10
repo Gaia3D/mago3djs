@@ -586,6 +586,7 @@ WeatherStation.prototype.renderWeather = function (magoManager)
 	}
 
 	//this._TEST_addSoundJsonsArray(); // test. Delete this.***
+	//this._TEST_addPollutionJsonsArray(); // test. Delete this.***
 
 	/*
 	if (this.tempLayersArray)
@@ -827,7 +828,69 @@ WeatherStation.prototype.loadPollutionTestGeoJsonIndexFile = function(geoJsonInd
 WeatherStation.prototype._TEST_addPollutionJsonsArray = function()
 {
 	// load the jsond and push it into pollutionLayers.***
-	
+	if (this._test_addingPollutionJsonsProcess === undefined)
+	{
+		this._test_addingPollutionJsonsProcess = CODE.processState.NO_STARTED;
+	}
+
+	if (this._test_addingPollutionJsonsProcess === CODE.processState.NO_STARTED)
+	{
+		this._test_addingPollutionJsonsProcess = CODE.processState.STARTED;
+
+		if (this.test_pollutionJsonsArray === undefined)
+		{
+			this.test_pollutionJsonsArray = [];
+		}
+
+		var that = this;
+		// must load the geoJsonIndexFile.***
+		var path = "\\f4d\\result_air_1minInterval\\JsonIndex.json"; 
+		this.test_pollutionJsonsArray.push({
+			path          : path,
+			fileLoadState : 0
+		});
+		
+		loadWithXhr(this.test_pollutionJsonsArray[0].path, undefined, undefined, 'json', 'GET').done(function(res) 
+		{
+			that.test_pollutionJsonsArray[0]._geoJsonIndexFileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			that.test_pollutionJsonsArray[0]._geoJsonIndexFile = res;
+		});
+	}
+
+	if (this._test_addingPollutionJsonsProcess !== CODE.processState.FINISHED)
+	{
+		// check if all json are loaded.***
+		var allJsonLoaded = true;
+		var layersCount = this.test_pollutionJsonsArray.length;
+		for (var i=0; i<layersCount; i++)
+		{
+			if (this.test_pollutionJsonsArray[i]._geoJsonIndexFileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
+			{
+				allJsonLoaded = false;
+			}
+		}
+
+		if (allJsonLoaded)
+		{
+			this._test_addingPollutionJsonsProcess = CODE.processState.FINISHED;
+
+			// All json are loaded, so do the test:
+			var options = undefined;
+			//var soundVolume = this.newSoundSurfaceVolume(options);
+			var pollutionVolume = this.newPollutionVolumeTest(options);
+
+			// make jsonsArray.***
+			var jsonsArray = [];
+			var jsonsCount = this.test_pollutionJsonsArray.length;
+			for (var i=0; i<jsonsCount; i++)
+			{
+				jsonsArray.push(this.test_pollutionJsonsArray[i]._geoJsonIndexFile);
+			}
+
+			// finally call API:
+			pollutionVolume.setGeoJsonIndexFile(jsonsArray[0]);
+		}
+	}
 };
 
 WeatherStation.prototype._TEST_addSoundJsonsArray = function()

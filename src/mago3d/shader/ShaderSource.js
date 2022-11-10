@@ -20,8 +20,11 @@ uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
 uniform vec4 oneColor4;\n\
 \n\
 uniform vec2 imageSize;\n\
+uniform int uFrustumIdx;\n\
+\n\
 \n\
 varying vec2 imageSizeInPixels;\n\
+varying float vDepth;\n\
 \n\
 vec3 encodeNormal(in vec3 normal)\n\
 {\n\
@@ -69,6 +72,11 @@ void main()\n\
 	\n\
 	textureColor = texture2D(u_texture, finalTexCoord);\n\
 \n\
+	if(textureColor.w == 0.0)\n\
+	{\n\
+		discard;\n\
+	}\n\
+\n\
 	// now, check neibourgh pixels to determine a silhouette.***\n\
 	//if(textureColor.a == 0.0)\n\
 	//{\n\
@@ -101,20 +109,20 @@ void main()\n\
 	gl_FragData[0] = textureColor;\n\
 \n\
 	#ifdef USE_MULTI_RENDER_TARGET\n\
-		//gl_FragData[1] = packDepth(vDepth);\n\
 		gl_FragData[1] = packDepth(0.0);\n\
+		//gl_FragData[1] = packDepth(vDepth);\n\
 		\n\
 		// Note: points cloud data has frustumIdx 20 .. 23.********\n\
 		float frustumIdx = 0.005; // frustum zero.\n\
 		\n\
-		//if(uFrustumIdx == 0)\n\
-		//frustumIdx = 0.005; // frustumIdx = 20.***\n\
-		//else if(uFrustumIdx == 1)\n\
-		//frustumIdx = 0.015; // frustumIdx = 21.***\n\
-		//else if(uFrustumIdx == 2)\n\
-		//frustumIdx = 0.025; // frustumIdx = 22.***\n\
-		//else if(uFrustumIdx == 3)\n\
-		//frustumIdx = 0.035; // frustumIdx = 23.***\n\
+		if(uFrustumIdx == 0)\n\
+		frustumIdx = 0.005; // frustumIdx = 20.***\n\
+		else if(uFrustumIdx == 1)\n\
+		frustumIdx = 0.015; // frustumIdx = 21.***\n\
+		else if(uFrustumIdx == 2)\n\
+		frustumIdx = 0.025; // frustumIdx = 22.***\n\
+		else if(uFrustumIdx == 3)\n\
+		frustumIdx = 0.035; // frustumIdx = 23.***\n\
 \n\
 		vec3 normal = encodeNormal(vec3(0.0, 0.0, 1.0));\n\
 		gl_FragData[2] = vec4(normal, frustumIdx); // save normal.***\n\
@@ -6595,7 +6603,7 @@ vec4 getRainbowColor_byHeight(in float height, in float minHeight_rainbow, in fl
 {\n\
     \n\
     float gray = (height - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);\n\
-	if (gray > 1.0){ gray = 1.0; }\n\
+	if (gray > 1.0){ gray = 0.9999; }\n\
 	else if (gray<0.0){ gray = 0.0; }\n\
 \n\
     float value = gray * 4.0;\n\
@@ -6734,9 +6742,19 @@ void main()\n\
 	vec4 pollutionColor = vec4(rainbowColor4.rgb, 1.0);\n\
 	finalColor = mix(intensity4, pollutionColor, pollutionValue);\n\
 \n\
+    // test.***\n\
+    finalColor = vec4(rainbowColor4.rgb, rainbowColor4.a * 15.0);\n\
+\n\
+    if(finalTexCoord.x < 0.005 || finalTexCoord.x > 0.995 || finalTexCoord.y < 0.005 || finalTexCoord.y > 0.995) \n\
+    {\n\
+        finalColor = vec4(0.25, 0.5, 0.99, 0.6);\n\
+    }\n\
+\n\
     gl_FragData[0] = finalColor; \n\
 \n\
 	vec4 albedo4 = finalColor;\n\
+\n\
+    \n\
 \n\
 	#ifdef USE_MULTI_RENDER_TARGET\n\
 	{\n\
@@ -14870,6 +14888,7 @@ varying vec4 vColor;\n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
 varying float vDepth;\n\
+varying float vOrder;\n\
 \n\
 vec3 encodeNormal(in vec3 normal)\n\
 {\n\
@@ -14889,7 +14908,14 @@ vec4 packDepth( float v ) {\n\
 }\n\
 \n\
 void main() {\n\
-	gl_FragData[0] = vColor;\n\
+	vec4 finalCol4 = vColor;\n\
+\n\
+	if(vOrder <= 0.3 || vOrder >= 0.7)\n\
+	{\n\
+		finalCol4 = vec4(0.0, 0.0, 0.0, 1.0);\n\
+	}\n\
+\n\
+	gl_FragData[0] = finalCol4;\n\
 \n\
 	#ifdef USE_MULTI_RENDER_TARGET\n\
 	if(bUseMultiRenderTarget)\n\
@@ -14899,6 +14925,7 @@ void main() {\n\
 		// Note: points cloud data has frustumIdx 20 .. 23.********\n\
 		float frustumIdx = 0.1; // realFrustumIdx = 0.1 * 100 = 10. \n\
 		\n\
+		// original.***\n\
 		if(uFrustumIdx == 0)\n\
 		frustumIdx = 0.005; // frustumIdx = 20.***\n\
 		else if(uFrustumIdx == 1)\n\
@@ -14912,7 +14939,7 @@ void main() {\n\
 		gl_FragData[2] = vec4(normal, frustumIdx); // save normal.***\n\
 \n\
 		// now, albedo.\n\
-		gl_FragData[3] = vColor; \n\
+		gl_FragData[3] = finalCol4; \n\
 		\n\
 	}\n\
 	#endif\n\
@@ -14952,6 +14979,7 @@ varying vec4 vColor;\n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
 varying float vDepth;\n\
+varying float vOrder;\n\
 \n\
 const float error = 0.001;\n\
 \n\
@@ -15012,6 +15040,18 @@ void main(){\n\
 			orderInt = -2;\n\
 		}\n\
 	}\n\
+\n\
+	// test vOrder.*******************************************\n\
+	//vOrder = abs(current.w) - 1.0; // test, to render outLine.***\n\
+	if(orderInt == 1 || orderInt == 2)\n\
+	{\n\
+		vOrder = 0.0;\n\
+	}\n\
+	else if(orderInt == -1 || orderInt == -2)\n\
+	{\n\
+		vOrder = 1.0;\n\
+	}\n\
+	//--------------------------------------------------------\n\
 	\n\
 	float aspect = viewport.x / viewport.y;\n\
 	vec2 aspectVec = vec2(aspect, 1.0);\n\

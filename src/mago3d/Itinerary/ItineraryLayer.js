@@ -33,6 +33,7 @@ var ItineraryLayer = function(options)
 	 this._samplingData_vboKeysContainer;
 	 
 	 this._timeScale = 2000.0; // to simulate fast.***
+	 this._lineThickness = 4.0;
 
 	 if (options !== undefined)
 	 {
@@ -100,7 +101,7 @@ ItineraryLayer.prototype._prepare = function ()
 		var options = {};
 
 		this.vectorMesh = VectorMesh.getVectorMeshItineraryFromPoints3dLCArray(points3dArray, geoLocData, magoManager, options);
-		this.vectorMesh.thickness = 3.5;
+		this.vectorMesh.thickness = this._lineThickness;
 		
 		// Provisionally set a random color.***
 		Color.getColorPastelRGBRandom(this.vectorMesh.color4);

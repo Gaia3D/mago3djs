@@ -18,8 +18,11 @@ uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.
 uniform vec4 oneColor4;
 
 uniform vec2 imageSize;
+uniform int uFrustumIdx;
+
 
 varying vec2 imageSizeInPixels;
+varying float vDepth;
 
 vec3 encodeNormal(in vec3 normal)
 {
@@ -67,6 +70,11 @@ void main()
 	
 	textureColor = texture2D(u_texture, finalTexCoord);
 
+	if(textureColor.w == 0.0)
+	{
+		discard;
+	}
+
 	// now, check neibourgh pixels to determine a silhouette.***
 	//if(textureColor.a == 0.0)
 	//{
@@ -99,20 +107,20 @@ void main()
 	gl_FragData[0] = textureColor;
 
 	#ifdef USE_MULTI_RENDER_TARGET
-		//gl_FragData[1] = packDepth(vDepth);
 		gl_FragData[1] = packDepth(0.0);
+		//gl_FragData[1] = packDepth(vDepth);
 		
 		// Note: points cloud data has frustumIdx 20 .. 23.********
 		float frustumIdx = 0.005; // frustum zero.
 		
-		//if(uFrustumIdx == 0)
-		//frustumIdx = 0.005; // frustumIdx = 20.***
-		//else if(uFrustumIdx == 1)
-		//frustumIdx = 0.015; // frustumIdx = 21.***
-		//else if(uFrustumIdx == 2)
-		//frustumIdx = 0.025; // frustumIdx = 22.***
-		//else if(uFrustumIdx == 3)
-		//frustumIdx = 0.035; // frustumIdx = 23.***
+		if(uFrustumIdx == 0)
+		frustumIdx = 0.005; // frustumIdx = 20.***
+		else if(uFrustumIdx == 1)
+		frustumIdx = 0.015; // frustumIdx = 21.***
+		else if(uFrustumIdx == 2)
+		frustumIdx = 0.025; // frustumIdx = 22.***
+		else if(uFrustumIdx == 3)
+		frustumIdx = 0.035; // frustumIdx = 23.***
 
 		vec3 normal = encodeNormal(vec3(0.0, 0.0, 1.0));
 		gl_FragData[2] = vec4(normal, frustumIdx); // save normal.***

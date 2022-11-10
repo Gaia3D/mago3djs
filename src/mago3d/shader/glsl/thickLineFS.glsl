@@ -17,6 +17,7 @@ varying vec4 vColor;
 varying float flogz;
 varying float Fcoef_half;
 varying float vDepth;
+varying float vOrder;
 
 vec3 encodeNormal(in vec3 normal)
 {
@@ -36,7 +37,14 @@ vec4 packDepth( float v ) {
 }
 
 void main() {
-	gl_FragData[0] = vColor;
+	vec4 finalCol4 = vColor;
+
+	if(vOrder <= 0.3 || vOrder >= 0.7)
+	{
+		finalCol4 = vec4(0.0, 0.0, 0.0, 1.0);
+	}
+
+	gl_FragData[0] = finalCol4;
 
 	#ifdef USE_MULTI_RENDER_TARGET
 	if(bUseMultiRenderTarget)
@@ -46,6 +54,7 @@ void main() {
 		// Note: points cloud data has frustumIdx 20 .. 23.********
 		float frustumIdx = 0.1; // realFrustumIdx = 0.1 * 100 = 10. 
 		
+		// original.***
 		if(uFrustumIdx == 0)
 		frustumIdx = 0.005; // frustumIdx = 20.***
 		else if(uFrustumIdx == 1)
@@ -59,7 +68,7 @@ void main() {
 		gl_FragData[2] = vec4(normal, frustumIdx); // save normal.***
 
 		// now, albedo.
-		gl_FragData[3] = vColor; 
+		gl_FragData[3] = finalCol4; 
 		
 	}
 	#endif

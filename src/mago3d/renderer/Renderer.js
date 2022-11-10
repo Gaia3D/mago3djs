@@ -3829,7 +3829,7 @@ Renderer.prototype.renderGeometryBuffer = function (gl, renderType, visibleObjCo
 		if (visibleObjectControllerHasRenderables || magoManager.modeler !== undefined)
 		{
 			var shaderManager = magoManager.postFxShadersManager;
-			currentShader = shaderManager.getShader("gBuffer");
+			currentShader = shaderManager.getShader("gBuffer"); // (GBufferVS, GBufferFS).***
 			// --------------------------------------------------------------------------------
 
 			shaderManager.useProgram(currentShader);

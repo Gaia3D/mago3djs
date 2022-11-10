@@ -79,12 +79,21 @@ PollutionVolumeTest.prototype.render = function (magoManager)
 
 	if (this._totalAnimTime === undefined) 
 	{
-		this._totalAnimTime = 30000; // 10 seconds.***
+		var pollLayer = this._pollutionLayersArray[0];
+		//this._totalAnimTime = pollLayer.getTotalAnimationTimeMinutes() * 60 * 1000.0; // miliseconds.***
+		this._totalAnimTime = 30000; // test delete.!! 30 seconds.***
 	}
+
+	if (this._timeScale === undefined) 
+	{
+		this._timeScale = 1.0;
+	}
+
+	//this._timeScale = 1000.0; // test.***
 
 	var totalAnimTime = this._totalAnimTime;
 	var currTime = magoManager.getCurrentTime();
-	this._increTime = currTime - this._animationStartTime;
+	this._increTime = (currTime - this._animationStartTime) * this._timeScale;
 
 	if (this._increTime >= totalAnimTime)
 	{
@@ -103,6 +112,14 @@ PollutionVolumeTest.prototype.render = function (magoManager)
 		var pollLayer = this._pollutionLayersArray[i];
 		pollLayer.render(magoManager);
 	}
+};
+
+PollutionVolumeTest.prototype.setGeoJsonIndexFile = function (geoJsonIndexFile)
+{
+	this._geoJsonIndexFileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+	this._geoJsonIndexFile = geoJsonIndexFile;
+
+	return true;
 };
 
 PollutionVolumeTest.prototype._loadGeoJsonIndexFile = function ()
@@ -184,6 +201,28 @@ PollutionVolumeTest.prototype._preparePollutionLayers = function (magoManager)
 				timeSliceFileFolderPath : timeSliceFileFolderPath
 			};
 			var pollutionLayer = this.newPollutionLayer(options);
+
+			// Now, check if the geoJsonIndexFile has timeSlices data embeded.***
+			var embededTimeSlicesArray = this._geoJsonIndexFile.layers[i].timeSliceFiles; // embeded timeSlicesFiles.***
+			if (embededTimeSlicesArray !== undefined)
+			{
+				if (pollutionLayer._timeSlicesArray === undefined)
+				{
+					pollutionLayer._timeSlicesArray = [];
+				}
+
+				var timeSliceFileNamesCount = embededTimeSlicesArray.length;
+				for (var j=0; j<timeSliceFileNamesCount; j++)
+				{
+					var options = {
+					};
+					var timeSlice = new PollutionTimeSlice(options);
+					timeSlice._jsonFile = embededTimeSlicesArray[j];
+					timeSlice._fileileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+					timeSlice._isPrepared = true;
+					pollutionLayer._timeSlicesArray.push(timeSlice);
+				}
+			}
 		}
 	}
 
