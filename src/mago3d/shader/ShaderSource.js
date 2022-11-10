@@ -15054,8 +15054,9 @@ void main(){\n\
 		}\n\
 	}\n\
 \n\
-	// To render outline : vOrder.*******************************************\n\
-	// In the outLine zone, the vOrder is near to zero or near to 1.***\n\
+	// To render outline : vOrder.********************************************************\n\
+	// In the outLine zone, the vOrder is near to zero or near to 1, so in fragment shader\n\
+	// use this information to render outline.***\n\
 	if(orderInt == 1 || orderInt == 2)\n\
 	{\n\
 		vOrder = 0.0;\n\
@@ -15064,7 +15065,7 @@ void main(){\n\
 	{\n\
 		vOrder = 1.0;\n\
 	}\n\
-	//--------------------------------------------------------\n\
+	//--------------------------------------------------------------------------------------\n\
 	\n\
 	float aspect = viewport.x / viewport.y;\n\
 	vec2 aspectVec = vec2(aspect, 1.0);\n\
@@ -15078,6 +15079,7 @@ void main(){\n\
 	\n\
 	float projectedDepth = currentProjected.w;                \n\
 	// Get 2D screen space with W divide and aspect correction\n\
+\n\
 	vec2 currentScreen = currentProjected.xy / currentProjected.w * aspectVec;\n\
 	vec2 previousScreen = previousProjected.xy / previousProjected.w * aspectVec;\n\
 	vec2 nextScreen = nextProjected.xy / nextProjected.w * aspectVec;\n\
@@ -15087,12 +15089,24 @@ void main(){\n\
 	if(orderInt == 1 || orderInt == -1)\n\
 	{\n\
 		vec2 tangentPrev = normalize(currentScreen - previousScreen);\n\
-		normal = vec2(-tangentPrev.y, tangentPrev.x);\n\
+		if(previousProjected.w > 0.0)\n\
+		{\n\
+			normal = vec2(-tangentPrev.y, tangentPrev.x); // left perpendicular.***\n\
+		}\n\
+		else{\n\
+			normal = vec2(tangentPrev.y, -tangentPrev.x); // right perpendicular.***\n\
+		}\n\
 	}\n\
 	else\n\
 	{\n\
 		vec2 tangentNext = normalize(nextScreen - currentScreen);\n\
-		normal = vec2(-tangentNext.y, tangentNext.x);\n\
+		if(nextProjected.w > 0.0)\n\
+		{\n\
+			normal = vec2(-tangentNext.y, tangentNext.x); // left perpendicular.***\n\
+		}\n\
+		else{\n\
+			normal = vec2(tangentNext.y, -tangentNext.x); // right perpendicular.***\n\
+		}\n\
 	}\n\
 	normal *= thickness/2.0;\n\
 	normal.x /= aspect;\n\

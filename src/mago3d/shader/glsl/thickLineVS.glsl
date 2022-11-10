@@ -87,8 +87,9 @@ void main(){
 		}
 	}
 
-	// To render outline : vOrder.*******************************************
-	// In the outLine zone, the vOrder is near to zero or near to 1.***
+	// To render outline : vOrder.********************************************************
+	// In the outLine zone, the vOrder is near to zero or near to 1, so in fragment shader
+	// use this information to render outline.***
 	if(orderInt == 1 || orderInt == 2)
 	{
 		vOrder = 0.0;
@@ -97,7 +98,7 @@ void main(){
 	{
 		vOrder = 1.0;
 	}
-	//--------------------------------------------------------
+	//--------------------------------------------------------------------------------------
 	
 	float aspect = viewport.x / viewport.y;
 	vec2 aspectVec = vec2(aspect, 1.0);
@@ -111,6 +112,7 @@ void main(){
 	
 	float projectedDepth = currentProjected.w;                
 	// Get 2D screen space with W divide and aspect correction
+
 	vec2 currentScreen = currentProjected.xy / currentProjected.w * aspectVec;
 	vec2 previousScreen = previousProjected.xy / previousProjected.w * aspectVec;
 	vec2 nextScreen = nextProjected.xy / nextProjected.w * aspectVec;
@@ -120,12 +122,24 @@ void main(){
 	if(orderInt == 1 || orderInt == -1)
 	{
 		vec2 tangentPrev = normalize(currentScreen - previousScreen);
-		normal = vec2(-tangentPrev.y, tangentPrev.x);
+		if(previousProjected.w > 0.0)
+		{
+			normal = vec2(-tangentPrev.y, tangentPrev.x); // left perpendicular.***
+		}
+		else{
+			normal = vec2(tangentPrev.y, -tangentPrev.x); // right perpendicular.***
+		}
 	}
 	else
 	{
 		vec2 tangentNext = normalize(nextScreen - currentScreen);
-		normal = vec2(-tangentNext.y, tangentNext.x);
+		if(nextProjected.w > 0.0)
+		{
+			normal = vec2(-tangentNext.y, tangentNext.x); // left perpendicular.***
+		}
+		else{
+			normal = vec2(tangentNext.y, -tangentNext.x); // right perpendicular.***
+		}
 	}
 	normal *= thickness/2.0;
 	normal.x /= aspect;

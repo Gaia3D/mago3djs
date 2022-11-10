@@ -89,11 +89,7 @@ VectorMesh.prototype.render = function (magoManager, shader, renderType, glPrimi
 	
 	var vbo = this.vboKeysContainer.getVboKey(0);
 	var gl = magoManager.getGl();
-
-	//gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
-	//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-	//gl.disable(gl.CULL_FACE);
-
+	
 	gl.enableVertexAttribArray(shader.prev_loc);
 	gl.enableVertexAttribArray(shader.current_loc);
 	gl.enableVertexAttribArray(shader.next_loc);

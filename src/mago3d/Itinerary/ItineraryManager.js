@@ -187,9 +187,7 @@ ItineraryManager.prototype.render = function ()
 
 	gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
 	gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-	//gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
-	//gl.blendFunc( gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
-	gl.disable(gl.CULL_FACE);
+
 	gl.enable(gl.BLEND);
 
 	for (var i=0; i<itisCount; i++)
@@ -200,7 +198,6 @@ ItineraryManager.prototype.render = function ()
 
 	// return to the current shader.
 	gl.useProgram(null);
-	gl.enable(gl.CULL_FACE);
 	gl.disable(gl.BLEND);
 
 	// render sampling data.**********************************************************************************************************

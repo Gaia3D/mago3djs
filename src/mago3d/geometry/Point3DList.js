@@ -808,6 +808,7 @@ Point3DList.getVboThickLines = function(magoManager, point3dArray, resultVboKeys
 	
 	var point3d;
 
+
 	for (var i=0; i<pointsCount; i++)
 	{
 		point3d = point3dArray[i];
@@ -815,25 +816,28 @@ Point3DList.getVboThickLines = function(magoManager, point3dArray, resultVboKeys
 		var y = point3d.y;
 		var z = point3d.z;
 
+		// Note : order 1, -1, 2, -2 produces CW triangles.***
+		// Note : order -1, 1, -2, 2 produces CCW triangles.***
+
 		posVboDataArray[i*16] = x;
 		posVboDataArray[i*16+1] = y;
 		posVboDataArray[i*16+2] = z;
-		posVboDataArray[i*16+3] = 1; // order.
+		posVboDataArray[i*16+3] = -1; // order.
 		
 		posVboDataArray[i*16+4] = x;
 		posVboDataArray[i*16+5] = y;
 		posVboDataArray[i*16+6] = z;
-		posVboDataArray[i*16+7] = -1; // order.
+		posVboDataArray[i*16+7] = 1; // order.
 		
 		posVboDataArray[i*16+8] = x;
 		posVboDataArray[i*16+9] = y;
 		posVboDataArray[i*16+10] = z;
-		posVboDataArray[i*16+11] = 2; // order.
+		posVboDataArray[i*16+11] = -2; // order.
 		
 		posVboDataArray[i*16+12] = x;
 		posVboDataArray[i*16+13] = y;
 		posVboDataArray[i*16+14] = z;
-		posVboDataArray[i*16+15] = -2; // order.
+		posVboDataArray[i*16+15] = 2; // order.
 	}
 
 	// Check if exist colorsArray.***

@@ -421,6 +421,26 @@ ItineraryLayer.prototype.sampleWeatherPollution = function (currTime, pollutionL
 		this._samplingDataObj.color4_uIntArray = [];
 	}
 
+	if (this._samplingDataObj.valuesArray === undefined)
+	{
+		this._samplingDataObj.valuesArray = [];
+	}
+
+	if (this._samplingDataObj.timesArray === undefined)
+	{
+		this._samplingDataObj.timesArray = [];
+	}
+
+	if (this._samplingDataObj.positionWCArray === undefined)
+	{
+		this._samplingDataObj.positionWCArray = [];
+	}
+
+	this._samplingDataObj.timesArray.push(diffTimeSec);
+
+	this._samplingDataObj.valuesArray.push(pollutionValue);
+	this._samplingDataObj.positionWCArray.push(currPosWC);
+
 	var hotToCold = false;
 	var color4RGBA = Color.getRainbowColor_byHeight(polutionQuantized,  0.0, 0.08, hotToCold);
 
@@ -441,6 +461,11 @@ ItineraryLayer.prototype.sampleWeatherPollution = function (currTime, pollutionL
 	samplingVbo.setDataArrayCol(colorVboDataArray, magoManager.vboMemoryManager);
 
 	return true;
+};
+
+ItineraryLayer.prototype.getSampledData = function ()
+{
+	return this._samplingDataObj;
 };
 
 ItineraryLayer.prototype.renderWalkingMan = function ()
