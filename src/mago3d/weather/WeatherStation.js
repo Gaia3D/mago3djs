@@ -971,7 +971,6 @@ WeatherStation.prototype._TEST_addPollutionJsonsArray = function()
 			var options = {
 				samplingDataIncrementTimeMilisec: 100
 			};
-			//var soundVolume = this.newSoundSurfaceVolume(options);
 			var pollutionVolume = this.newPollutionVolumeTest(options);
 
 			// make jsonsArray.***

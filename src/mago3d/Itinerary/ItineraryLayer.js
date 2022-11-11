@@ -34,6 +34,7 @@ var ItineraryLayer = function(options)
 	 
 	 this._timeScale = 2000.0; // to simulate fast.***
 	 this._lineThickness = 4.0;
+	 this._thickLineColor;
 
 	 if (options !== undefined)
 	 {
@@ -53,6 +54,11 @@ var ItineraryLayer = function(options)
 
 			// in this case set this._fileLoadState as CODE.fileLoadState.LOADING_FINISHED;
 			this._fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+		}
+
+		if (options.thickLineColor)
+		{
+			this._thickLineColor = new Color(options.thickLineColor.r, options.thickLineColor.g, options.thickLineColor.b, options.thickLineColor.a);
 		}
 	 }
 };
@@ -116,7 +122,17 @@ ItineraryLayer.prototype._prepare = function ()
 		this.vectorMesh.thickness = this._lineThickness;
 		
 		// Provisionally set a random color.***
-		Color.getColorPastelRGBRandom(this.vectorMesh.color4);
+		if (this._thickLineColor === undefined)
+		{
+			this._thickLineColor = new Color();
+			Color.getColorPastelRGBRandom(this._thickLineColor);
+		}
+		//Color.getColorPastelRGBRandom(this.vectorMesh.color4);
+		if (this.vectorMesh.color4 === undefined)
+		{
+			this.vectorMesh.color4 = new Color();
+		}
+		this.vectorMesh.color4.setRGB(this._thickLineColor.r, this._thickLineColor.g, this._thickLineColor.b);
 
 		// Now, calculate the velocity for all segments of the itinerary.***
 		this._segmentsInfoArray = [];

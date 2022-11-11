@@ -19,7 +19,7 @@ var ItineraryManager = function(options)
 	 this._animatedIcon;
 	 this._walkingManMosaicSize = new Int32Array([5, 2]);
 
-	 this._samplingDataIncrementTimeMilisec = 300;
+	 this._samplingDataIncrementTimeMilisec = 200;
 
 	 if (options !== undefined)
 	 {
