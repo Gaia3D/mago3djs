@@ -968,7 +968,9 @@ WeatherStation.prototype._TEST_addPollutionJsonsArray = function()
 			this._test_addingPollutionJsonsProcess = CODE.processState.FINISHED;
 
 			// All json are loaded, so do the test:
-			var options = undefined;
+			var options = {
+				samplingDataIncrementTimeMilisec: 100
+			};
 			//var soundVolume = this.newSoundSurfaceVolume(options);
 			var pollutionVolume = this.newPollutionVolumeTest(options);
 

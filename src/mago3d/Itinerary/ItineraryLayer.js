@@ -389,6 +389,20 @@ ItineraryLayer.prototype.sampleWeatherPollution = function (currTime, pollutionL
 		return false;
 	}
 
+	if (this._lastSamplingTime === undefined)
+	{
+		this._lastSamplingTime = 0;
+	}
+
+	if (diffTimeSec - this._lastSamplingTime < this._itineraryManager._samplingDataIncrementTimeMilisec)
+	{
+		return false;
+	}
+	else
+	{
+		this._lastSamplingTime = diffTimeSec;
+	}
+
 	// now, store the sampled data.***
 	// this._samplingDataObj;
 	// this._samplingData_vboKeysContainer;

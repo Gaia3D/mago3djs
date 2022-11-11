@@ -19,6 +19,8 @@ var ItineraryManager = function(options)
 	 this._animatedIcon;
 	 this._walkingManMosaicSize = new Int32Array([5, 2]);
 
+	 this._samplingDataIncrementTimeMilisec = 300;
+
 	 if (options !== undefined)
 	 {
 		// Check options.***
@@ -40,6 +42,11 @@ var ItineraryManager = function(options)
 		if (options.walkingManMosaicRowsCount !== undefined)
 		{
 			this._walkingManMosaicSize[1] = options.walkingManMosaicRowsCount;
+		}
+
+		if (options.samplingDataIncrementTimeMilisec !== undefined)
+		{
+			this._samplingDataIncrementTimeMilisec = options.samplingDataIncrementTimeMilisec;
 		}
 	 }
 

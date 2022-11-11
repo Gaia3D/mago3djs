@@ -2054,7 +2054,6 @@ MagoManager.prototype._renderManagers_transparentPass = function ()
 						var pollutionLayersCount = pollutionVolume.getPollutionLayersCount();
 						if (pollutionLayersCount > 0)
 						{
-							//var currTime = this.getCurrentTime();
 							var currTime = this.animationTimeController.getCurrentTimeMilisec();
 							var pollutionLayer = pollutionVolume._pollutionLayersArray[0]; // provisional.***
 							this.itineraryManager.sampleWeatherPollution(currTime, pollutionLayer);
