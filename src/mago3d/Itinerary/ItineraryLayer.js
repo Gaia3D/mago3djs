@@ -196,11 +196,6 @@ ItineraryLayer.prototype.render = function (thickLineShader)
 	}
 	var magoManager = this._itineraryManager.magoManager;
 
-	if (this._animationStartTime === 0) 
-	{
-		this._animationStartTime = magoManager.getCurrentTime();
-	}
-
 	var gl = magoManager.getGl();
 	var streamLine = this.vectorMesh;
 
@@ -483,16 +478,17 @@ ItineraryLayer.prototype.renderWalkingMan = function ()
 	}
 
 	var magoManager = this._itineraryManager.magoManager;
-	if (this._animationStartTime === undefined || this._animationStartTime === 0) 
+	if (this._animationStartTime === undefined) 
 	{
-		this._animationStartTime = magoManager.getCurrentTime();
+		this._animationStartTime = 0;
 	}
 
 	
 	var gl = magoManager.getGl();
 
 	// calculate the current position into the itinerary using the currentTime.***
-	var currTime = magoManager.getCurrentTime();
+	//var currTime = magoManager.getCurrentTime();
+	var currTime = magoManager.animationTimeController.getCurrentTimeMilisec();
 	var diffTimeSec = this._getDiffTimeSec(currTime);
 
 	var currWalkingManPosLC = this._getWalkingManPositionLC_forIncreTimeSec(diffTimeSec);

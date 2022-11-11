@@ -2046,7 +2046,7 @@ MagoManager.prototype._renderManagers_transparentPass = function ()
 				{
 					// provisional.***
 					// sample weather condition for the itinearies at the current time.***
-					var currTime = this.getCurrentTime();
+					
 					var weatherStation = this.weatherStation;
 					if (weatherStation.pollutionVolumesArray !== undefined && weatherStation.pollutionVolumesArray.length > 0)
 					{
@@ -2054,6 +2054,8 @@ MagoManager.prototype._renderManagers_transparentPass = function ()
 						var pollutionLayersCount = pollutionVolume.getPollutionLayersCount();
 						if (pollutionLayersCount > 0)
 						{
+							//var currTime = this.getCurrentTime();
+							var currTime = this.animationTimeController.getCurrentTimeMilisec();
 							var pollutionLayer = pollutionVolume._pollutionLayersArray[0]; // provisional.***
 							this.itineraryManager.sampleWeatherPollution(currTime, pollutionLayer);
 						}

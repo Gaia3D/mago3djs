@@ -290,7 +290,7 @@ ItineraryManager.prototype.render = function ()
 
 	if (this.lastTimeSubImageChanged === undefined)
 	{
-		this.lastTimeSubImageChanged = magoManager.getCurrentTime();
+		this.lastTimeSubImageChanged = 0;
 	}
 
 	gl.enable(gl.BLEND);
@@ -347,7 +347,7 @@ ItineraryManager.prototype.render = function ()
 			lastTexId = currentTexture.texId;
 		}
 
-		var currTime = magoManager.getCurrentTime();
+		var currTime = magoManager.animationTimeController.getCurrentTimeMilisec();
 		var diffTimeSec = itiLayer._getDiffTimeSec(currTime);
 
 		var posWC = itiLayer._getWalkingManPositionWC_forIncreTimeSec(diffTimeSec, undefined);
@@ -361,7 +361,7 @@ ItineraryManager.prototype.render = function ()
 		gl.uniform3fv(shader.buildingPosLOW_loc, positionLOW);
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
-		if (currTime - this.lastTimeSubImageChanged > 150.0)
+		if (currTime - this.lastTimeSubImageChanged > 300.0)
 		{
 			this.subImageIdx += 1;
 			this.lastTimeSubImageChanged = currTime;

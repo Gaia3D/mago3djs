@@ -72,10 +72,10 @@ PollutionVolumeTest.prototype.render = function (magoManager)
 		this._animationState = CODE.processState.STARTED;
 	}
 
-	if (this._animationStartTime === 0) 
-	{
-		this._animationStartTime = magoManager.getCurrentTime();
-	}
+	//if (this._animationStartTime === 0) 
+	//{
+	//this._animationStartTime = magoManager.getCurrentTime();
+	//}
 
 	if (this._totalAnimTime === undefined) 
 	{
@@ -92,7 +92,7 @@ PollutionVolumeTest.prototype.render = function (magoManager)
 	//this._timeScale = 1000.0; // test.***
 
 	var totalAnimTime = this._totalAnimTime;
-	var currTime = magoManager.getCurrentTime();
+	var currTime = magoManager.animationTimeController.getCurrentTimeMilisec();
 	this._increTime = (currTime - this._animationStartTime) * this._timeScale;
 
 	if (this._increTime >= totalAnimTime)

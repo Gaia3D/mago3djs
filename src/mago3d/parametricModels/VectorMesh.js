@@ -139,6 +139,7 @@ VectorMesh.prototype.render = function (magoManager, shader, renderType, glPrimi
 	gl.vertexAttribPointer(shader.next_loc, dim, gl.FLOAT, false, 0, 64);
 
 	gl.drawArrays(gl.TRIANGLE_STRIP, 0, vbo.vertexCount-4);
+
 };
 
 /**

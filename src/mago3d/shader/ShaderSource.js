@@ -14916,18 +14916,15 @@ void main() {\n\
 		if(vOrder <= 0.3)\n\
 		{\n\
 			factor = (0.3 - vOrder) / (0.3);\n\
-			//factor = 1.0 - vOrder;\n\
 		}\n\
 		else if(vOrder >= 0.7)\n\
 		{\n\
 			factor = (vOrder - 0.7) / (0.3);\n\
-			//factor = vOrder;\n\
 		}\n\
 		vec4 outLineCol = vec4(0.0, 0.0, 0.0, 1.0);\n\
 		finalCol4 = mix(vColor, outLineCol, factor);\n\
-		//finalCol4 = vec4(0.0, 0.0, 0.0, 1.0);\n\
+		\n\
 	}\n\
-	\n\
 \n\
 	gl_FragData[0] = finalCol4;\n\
 \n\
@@ -15033,6 +15030,7 @@ void main(){\n\
 	int orderInt = 0;\n\
 	if(order_w > 0.0)\n\
 	{\n\
+		// Positive order.***\n\
 		sense = -1.0;\n\
 		if(order_w < 1.5)\n\
 		{\n\
@@ -15044,6 +15042,7 @@ void main(){\n\
 	}\n\
 	else\n\
 	{\n\
+		// Negative order.***\n\
 		sense = 1.0;\n\
 		if(order_w > -1.5)\n\
 		{\n\
@@ -15086,14 +15085,15 @@ void main(){\n\
 					\n\
 	// This helps us handle 90 degree turns correctly\n\
 	vec2 normal; \n\
-	if(orderInt == 1 || orderInt == -1)\n\
+	if(orderInt == 1 || orderInt == -1) // original.***\n\
 	{\n\
 		vec2 tangentPrev = normalize(currentScreen - previousScreen);\n\
 		if(previousProjected.w > 0.0)\n\
 		{\n\
 			normal = vec2(-tangentPrev.y, tangentPrev.x); // left perpendicular.***\n\
 		}\n\
-		else{\n\
+		else\n\
+		{\n\
 			normal = vec2(tangentPrev.y, -tangentPrev.x); // right perpendicular.***\n\
 		}\n\
 	}\n\
@@ -15104,7 +15104,8 @@ void main(){\n\
 		{\n\
 			normal = vec2(-tangentNext.y, tangentNext.x); // left perpendicular.***\n\
 		}\n\
-		else{\n\
+		else\n\
+		{\n\
 			normal = vec2(tangentNext.y, -tangentNext.x); // right perpendicular.***\n\
 		}\n\
 	}\n\
@@ -15130,29 +15131,30 @@ void main(){\n\
 	if(colorType == 0)\n\
 		vColor = oneColor4;\n\
 	else if(colorType == 1)\n\
-		vColor = color4; //vec4(color4.r+0.8, color4.g+0.8, color4.b+0.8, color4.a+0.8);\n\
+		vColor = color4; \n\
 	else\n\
+	{\n\
+		// use this else to test.***\n\
 		vColor = oneColor4;\n\
 \n\
-	// test debug::::\n\
-	/*\n\
-	if(orderInt == 1)\n\
-	{\n\
-		vColor = vec4(1.0, 0.0, 0.0, 1.0);\n\
+		// test debug::::\n\
+		if(orderInt == 1)\n\
+		{\n\
+			vColor = vec4(1.0, 0.0, 0.0, 1.0);\n\
+		}\n\
+		else if(orderInt == -1)\n\
+		{\n\
+			vColor = vec4(0.0, 1.0, 0.0, 1.0);\n\
+		}\n\
+		else if(orderInt == 2)\n\
+		{\n\
+			vColor = vec4(0.0, 0.0, 1.0, 1.0);\n\
+		}\n\
+		else if(orderInt == -2)\n\
+		{\n\
+			vColor = vec4(1.0, 1.0, 0.0, 1.0);\n\
+		}\n\
 	}\n\
-	else if(orderInt == -1)\n\
-	{\n\
-		vColor = vec4(0.0, 1.0, 0.0, 1.0);\n\
-	}\n\
-	else if(orderInt == 2)\n\
-	{\n\
-		vColor = vec4(0.0, 0.0, 1.0, 1.0);\n\
-	}\n\
-	else if(orderInt == -2)\n\
-	{\n\
-		vColor = vec4(1.0, 1.0, 0.0, 1.0);\n\
-	}\n\
-	*/\n\
 }\n\
 \n\
 \n\

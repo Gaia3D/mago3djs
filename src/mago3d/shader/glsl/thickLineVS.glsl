@@ -66,6 +66,7 @@ void main(){
 	int orderInt = 0;
 	if(order_w > 0.0)
 	{
+		// Positive order.***
 		sense = -1.0;
 		if(order_w < 1.5)
 		{
@@ -77,6 +78,7 @@ void main(){
 	}
 	else
 	{
+		// Negative order.***
 		sense = 1.0;
 		if(order_w > -1.5)
 		{
@@ -119,14 +121,15 @@ void main(){
 					
 	// This helps us handle 90 degree turns correctly
 	vec2 normal; 
-	if(orderInt == 1 || orderInt == -1)
+	if(orderInt == 1 || orderInt == -1) // original.***
 	{
 		vec2 tangentPrev = normalize(currentScreen - previousScreen);
 		if(previousProjected.w > 0.0)
 		{
 			normal = vec2(-tangentPrev.y, tangentPrev.x); // left perpendicular.***
 		}
-		else{
+		else
+		{
 			normal = vec2(tangentPrev.y, -tangentPrev.x); // right perpendicular.***
 		}
 	}
@@ -137,7 +140,8 @@ void main(){
 		{
 			normal = vec2(-tangentNext.y, tangentNext.x); // left perpendicular.***
 		}
-		else{
+		else
+		{
 			normal = vec2(tangentNext.y, -tangentNext.x); // right perpendicular.***
 		}
 	}
@@ -163,29 +167,30 @@ void main(){
 	if(colorType == 0)
 		vColor = oneColor4;
 	else if(colorType == 1)
-		vColor = color4; //vec4(color4.r+0.8, color4.g+0.8, color4.b+0.8, color4.a+0.8);
+		vColor = color4; 
 	else
+	{
+		// use this else to test.***
 		vColor = oneColor4;
 
-	// test debug::::
-	/*
-	if(orderInt == 1)
-	{
-		vColor = vec4(1.0, 0.0, 0.0, 1.0);
+		// test debug::::
+		if(orderInt == 1)
+		{
+			vColor = vec4(1.0, 0.0, 0.0, 1.0);
+		}
+		else if(orderInt == -1)
+		{
+			vColor = vec4(0.0, 1.0, 0.0, 1.0);
+		}
+		else if(orderInt == 2)
+		{
+			vColor = vec4(0.0, 0.0, 1.0, 1.0);
+		}
+		else if(orderInt == -2)
+		{
+			vColor = vec4(1.0, 1.0, 0.0, 1.0);
+		}
 	}
-	else if(orderInt == -1)
-	{
-		vColor = vec4(0.0, 1.0, 0.0, 1.0);
-	}
-	else if(orderInt == 2)
-	{
-		vColor = vec4(0.0, 0.0, 1.0, 1.0);
-	}
-	else if(orderInt == -2)
-	{
-		vColor = vec4(1.0, 1.0, 0.0, 1.0);
-	}
-	*/
 }
 
 
