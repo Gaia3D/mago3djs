@@ -29,7 +29,7 @@
     "jasmine-core": "^3.4.0",
     "jshint": "^2.10.2",
     "jshint-stylish": "^2.2.1",
-    "karma": "^5.0.0",
+    "karma": "^5.2.3",
     "karma-browserify": "^7.0.0",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^3.0.0",
