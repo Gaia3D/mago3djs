@@ -24,14 +24,6 @@ var PollutionVolumeTest = function(options)
 	this._geoJsonIndexFileFolderPath;
 	this._allLayersArePrepared = false;
 
-	// Animation state controls.
-	/*
-	CODE.processState = {
-	"NO_STARTED" : 0,
-	"STARTED"    : 1,
-	"FINISHED"   : 2,
-};
-*/
 	this._animationState = CODE.processState.NO_STARTED; 
 	this._animationStartTime = 0;
 	this._totalAnimTime;
@@ -172,6 +164,51 @@ PollutionVolumeTest.prototype.newPollutionLayer = function (options)
 	var layer = new PollutionLayerTest(options);
 	this._pollutionLayersArray.push(layer);
 	return layer;
+};
+
+PollutionVolumeTest.prototype.deleteObjects = function (vboMemManager)
+{
+	if (this._pollutionLayersArray && this._pollutionLayersArray.length > 0)
+	{
+		if (vboMemManager === undefined)
+		{
+			vboMemManager = this.weatherStation.magoManager.vboMemoryManager;
+		}
+		
+		var pollutionLayersCount = this._pollutionLayersArray.length;
+		for (var i=0; i<pollutionLayersCount; i++)
+		{
+			var pollLayer = this._pollutionLayersArray[i];
+			pollLayer.deleteObjects(vboMemManager);
+		}
+
+		this._pollutionLayersArray.length = 0;
+	}
+
+	this._pollutionLayersArray = undefined;
+	this.weatherStation = undefined;
+	
+	// data.
+	this._geoJsonIndexFileLoadState = undefined;
+
+	// delete json object.***
+	for (var variableKey in this._geoJsonIndexFile)
+	{
+		if (this._geoJsonIndexFile.hasOwnProperty(variableKey))
+		{
+			delete this._geoJsonIndexFile[variableKey];
+		}
+	}
+	this._geoJsonIndexFile = undefined;
+
+	this._geoJsonIndexFilePath = undefined;
+	this._geoJsonIndexFileFolderPath = undefined;
+	this._allLayersArePrepared = undefined;
+
+	this._animationState = undefined; 
+	this._animationStartTime = undefined;
+	this._totalAnimTime = undefined;
+	this._increTime = undefined;
 };
 
 PollutionVolumeTest.prototype._preparePollutionLayers = function (magoManager)

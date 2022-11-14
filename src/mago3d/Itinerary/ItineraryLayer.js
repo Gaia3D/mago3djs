@@ -23,8 +23,6 @@ var ItineraryLayer = function(options)
 	 this._totalItineraryTimeSec;
 
 	 this._animatedIcon;
-	 this._walkingManMosaicTexture;
-	 this._walkingManMosaicTexturePath;
 
 	 this._WM_vboKeysContainer;
 
@@ -61,6 +59,66 @@ var ItineraryLayer = function(options)
 			this._thickLineColor = new Color(options.thickLineColor.r, options.thickLineColor.g, options.thickLineColor.b, options.thickLineColor.a);
 		}
 	 }
+};
+
+ItineraryLayer.prototype.deleteObjects = function (vboMemManager)
+{
+	this._itineraryManager = undefined;
+	this._fileLoadState = undefined;
+	this._filePath = undefined;
+
+	// delete json object.***
+	for (var variableKey in this._jsonFile)
+	{
+		if (this._jsonFile.hasOwnProperty(variableKey))
+		{
+			delete this._jsonFile[variableKey];
+		}
+	}
+	this._jsonFile = undefined;
+
+	this._isPrepared = undefined;
+
+	if (this.vectorMesh)
+	{
+		this.vectorMesh.deleteObjects(vboMemManager);
+		this.vectorMesh = undefined;
+	}
+
+	this._walkingManCurrentPosition = undefined;
+	this._animationStartTime = undefined;
+	this._totalItineraryTimeSec = undefined;
+
+	if (this._animatedIcon)
+	{
+		this._animatedIcon.deleteObjects(vboMemManager);
+		this._animatedIcon = undefined;
+	}
+	
+	if (this._WM_vboKeysContainer)
+	{
+		this._WM_vboKeysContainer.deleteGlObjects(vboMemManager.gl, vboMemManager);
+		this._WM_vboKeysContainer = undefined;
+	}
+
+	// sampling data. position, color, etc.***
+	this._samplingDataObj = undefined; // delete objects of _samplingDataObj. : todo:
+
+	if (this._samplingData_vboKeysContainer)
+	{
+		this._samplingData_vboKeysContainer.deleteGlObjects(vboMemManager.gl, vboMemManager);
+		this._samplingData_vboKeysContainer = undefined;
+	}
+	
+	this._timeScale = undefined; // to simulate fast.***
+	this._lineThickness = undefined;
+
+	if (this._thickLineColor)
+	{
+		this._thickLineColor.deleteObjects();
+		this._thickLineColor = undefined;
+	}
+	
 };
 
 ItineraryLayer.prototype._prepare = function ()
@@ -190,6 +248,7 @@ ItineraryLayer.prototype._prepare = function ()
 
 	if (this._animatedIcon === undefined)
 	{
+		// no used yet, but in the future must to be used sure.***
 		var options = {
 
 		};

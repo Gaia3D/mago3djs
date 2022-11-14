@@ -28,6 +28,26 @@ var AnimationTimeController = function(options)
 	}
 };
 
+AnimationTimeController.prototype.reset = function (options)
+{
+	this._animationState === CODE.processState.NO_STARTED;
+	this._animationStartTimeMilisec = 0;
+	this._currentTimeMilisec = 0;
+	this._timeScale = 1.0;
+	this._date; // a referencial date.***
+
+	// intern parameters.***
+	this._incrementalAddingTimeMilisec = 0;
+
+	if (options !== undefined)
+	{
+		if (options.incrementalAddingTimeMilisec !== undefined)
+		{
+			this._incrementalAddingTimeMilisec = options.incrementalAddingTimeMilisec;
+		}
+	}
+};
+
 AnimationTimeController.prototype.getCurrentTimeMilisec = function ()
 {
 	return this._currentTimeMilisec;

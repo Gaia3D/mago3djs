@@ -64,6 +64,32 @@ PollutionTimeSlice.prototype.getQuantizedMinMaxValues = function ()
 	return minMaxValues;
 };
 
+PollutionTimeSlice.prototype.deleteObjects = function (vboMemManager)
+{
+	// Delete gl objects. In this case there are a glTexture only.***
+	if (this._glTexture)
+	{
+		var gl = vboMemManager.gl;
+		gl.deleteTexture(this._glTexture);
+	}
+
+	// now delete the variables.***
+	this._fileileLoadState = undefined;
+	this._filePath = undefined;
+
+	// delete json object.***
+	for (var variableKey in this._jsonFile)
+	{
+		if (this._jsonFile.hasOwnProperty(variableKey))
+		{
+			delete this._jsonFile[variableKey];
+		}
+	}
+	this._jsonFile = undefined;
+
+	this._isPrepared = undefined;
+};
+
 PollutionTimeSlice.prototype.getGlTexture = function (gl)
 {
 	if (this._glTexture === undefined || this._glTexture === null)
@@ -541,6 +567,52 @@ PollutionLayerTest.prototype.render = function (magoManager)
 	magoManager.postFxShadersManager.useProgram(null);
 
 	var hola = 0;
+};
+
+PollutionLayerTest.prototype.deleteObjects = function (vboMemManager)
+{
+	// Delete time slices.***
+	if (this._timeSlicesArray && this._timeSlicesArray.length > 0)
+	{
+		var timeSlicesCount = this._timeSlicesArray.length;
+		for (var i=0; i<timeSlicesCount; i++)
+		{
+			var timeSlice = this._timeSlicesArray[i];
+			timeSlice.deleteObjects(vboMemManager);
+		}
+
+		this._timeSlicesArray.length = 0;
+	}
+
+	this._timeSlicesArray = undefined;
+
+	// delete vboBuffers.***
+	if (this.vboKeysContainer)
+	{
+		var gl = vboMemManager.gl;
+		this.vboKeysContainer.deleteGlObjects(gl, vboMemManager);
+		this.vboKeysContainer = undefined;
+	}
+
+	// delete another vars.***
+	this._pollutionVolumeOwner = undefined;
+
+	if (this.geoLocationDataManager)
+	{
+		this.geoLocationDataManager.deleteObjects(); // no need arguments.***
+		this.geoLocationDataManager = undefined;
+	}
+	
+	this.gl = undefined;
+
+	this.altitude = undefined;
+	this.timeInterval_min = undefined;
+	this.timeSlicesCount = undefined;
+	this.timeSliceFileNames = undefined;
+	this.timeSliceFileFolderPath = undefined;
+
+	this._isPrepared = undefined;
+	this._terrainSamplingState = undefined;
 };
 
 PollutionLayerTest.prototype._prepareLayer = function ()

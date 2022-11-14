@@ -12,12 +12,11 @@ var AnimatedIcon = function(options)
 
 	// https://imgbin.com/png/FWMR7jaC/animation-walk-cycle-png
 
-	this._itineraryManager;
+	this._owner;
 	this._fileLoadState = CODE.fileLoadState.READY;
 	this._filePath;
 	this._mosaicTexture;
-	this._mosaicTexColumnsCount;
-	this._mosaicTexRowsCount;
+	this._mosaicSize = new Int32Array([1, 1]);; // columns count & rows count. Uint32Array([c, r]);
 	this._isPrepared = false;
 
 	this.positionBuffer;
@@ -30,6 +29,39 @@ var AnimatedIcon = function(options)
 		{
 			this._filePath = options.filePath;
 		}
+
+		if (options.owner)
+		{
+			this._owner = options.owner;
+		}
+	}
+};
+
+AnimatedIcon.prototype.deleteObjects = function(vboMemManager)
+{
+	this._owner = undefined;
+	this._fileLoadState = undefined;
+	this._filePath = undefined;
+
+	if (this._mosaicTexture)
+	{
+		this._mosaicTexture.deleteObjects(vboMemManager.gl);
+		this._mosaicTexture = undefined;
+	}
+
+	this._mosaicSize = undefined; // columns count & rows count. Uint32Array([c, r]);
+	this._isPrepared = undefined;
+
+	if (this.positionBuffer)
+	{
+		vboMemManager.gl.deleteBuffer(this.positionBuffer);
+		this.positionBuffer = undefined;
+	}
+
+	if (this.texcoordBuffer)
+	{
+		vboMemManager.gl.deleteBuffer(this.texcoordBuffer);
+		this.texcoordBuffer = undefined;
 	}
 };
 

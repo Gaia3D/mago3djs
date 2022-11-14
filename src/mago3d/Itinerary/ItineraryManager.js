@@ -12,12 +12,8 @@ var ItineraryManager = function(options)
 
 	 this.magoManager;
 	 this._itineraryLayersArray;
-	 this._walkingManMosaicTex; // a generic walkingMan.***
-	 this._walkingManMosaicTexPath; // if walkingMan is used.***
+	 this._walkingManAnimatedIcon;
 	 this._walkingManMosaicTexIsPrepared = false;
-
-	 this._animatedIcon;
-	 this._walkingManMosaicSize = new Int32Array([5, 2]);
 
 	 this._samplingDataIncrementTimeMilisec = 200;
 
@@ -31,17 +27,22 @@ var ItineraryManager = function(options)
 
 		if (options.walkingManMosaicTexPath !== undefined)
 		{
-			this._walkingManMosaicTexPath = options.walkingManMosaicTexPath;
+			if (this._walkingManAnimatedIcon === undefined)
+			{
+				this._walkingManAnimatedIcon = new AnimatedIcon();
+				this._walkingManAnimatedIcon._mosaicTexture = new Texture();
+				this._walkingManAnimatedIcon._filePath = options.walkingManMosaicTexPath;
+			}
 		}
 
 		if (options.walkingManMosaicColumnsCount !== undefined)
 		{
-			this._walkingManMosaicSize[0] = options.walkingManMosaicColumnsCount;
+			this._walkingManAnimatedIcon._mosaicSize[0] = options.walkingManMosaicColumnsCount;
 		}
 
 		if (options.walkingManMosaicRowsCount !== undefined)
 		{
-			this._walkingManMosaicSize[1] = options.walkingManMosaicRowsCount;
+			this._walkingManAnimatedIcon._mosaicSize[1] = options.walkingManMosaicRowsCount;
 		}
 
 		if (options.samplingDataIncrementTimeMilisec !== undefined)
@@ -106,26 +107,53 @@ ItineraryManager.prototype._prepareWalkingManTexture = function ()
 	}
 
 	// 1rst, check if the texture is loaded.***
-	if (this._walkingManMosaicTex === undefined)
+	if (this._walkingManAnimatedIcon === undefined)
 	{
-		this._walkingManMosaicTex = new Texture();
+		this._walkingManAnimatedIcon = new AnimatedIcon();
+		this._walkingManAnimatedIcon._mosaicTexture = new Texture();
 	}
 
-	if (this._walkingManMosaicTex.fileLoadState === CODE.fileLoadState.READY)
+	if (this._walkingManAnimatedIcon._mosaicTexture.fileLoadState === CODE.fileLoadState.READY)
 	{
 		var flip_y_texCoord = false;
-		TexturesManager.loadTexture(this._walkingManMosaicTexPath, this._walkingManMosaicTex, this.magoManager, flip_y_texCoord);
+		TexturesManager.loadTexture(this._walkingManAnimatedIcon._filePath, this._walkingManAnimatedIcon._mosaicTexture, this.magoManager, flip_y_texCoord);
 
 		return false;
 	}
 
-	if (this._walkingManMosaicTex.fileLoadState === CODE.fileLoadState.BINDING_FINISHED)
+	if (this._walkingManAnimatedIcon._mosaicTexture.fileLoadState === CODE.fileLoadState.BINDING_FINISHED)
 	{
 		// the mosaic texture is prepared.***
 		this._walkingManMosaicTexIsPrepared = true;
 	}
 
 	return this._walkingManMosaicTexIsPrepared;
+};
+
+ItineraryManager.prototype.deleteObjects = function (vboMemManager)
+{
+	this.magoManager = undefined;
+
+	if (this._itineraryLayersArray && this._itineraryLayersArray.length > 0)
+	{
+		var itiLayersCount = this._itineraryLayersArray.length;
+		for (var i=0; i<itiLayersCount; i++)
+		{
+			this._itineraryLayersArray[i].deleteObjects(vboMemManager);
+			this._itineraryLayersArray[i] = undefined;
+		}
+
+		this._itineraryLayersArray.length = 0;
+	}
+	this._itineraryLayersArray = undefined;
+
+	if (this._walkingManAnimatedIcon)
+	{
+		this._walkingManAnimatedIcon.deleteObjects(vboMemManager);
+	}
+	
+	this._walkingManMosaicTexIsPrepared = undefined;
+	this._samplingDataIncrementTimeMilisec = undefined;
 };
 
 ItineraryManager.prototype.sampleWeatherPollution = function (currTime, pollutionLayer)
@@ -259,21 +287,12 @@ ItineraryManager.prototype.render = function ()
 	gl.enableVertexAttribArray(shader.position4_loc);
 	gl.activeTexture(gl.TEXTURE0);
 	
-	//gl.depthRange(0, 0.05);
-	//var context = document.getElementById('canvas2').getContext("2d");
-	//var canvas = document.getElementById("magoContainer");
 
-	if (this._animatedIcon === undefined)
-	{
-		var options = {};
-		this._animatedIcon = new AnimatedIcon(options);
-	}
-
-	var iconPosBuffer = this._animatedIcon.getPositionBuffer(gl);
+	var iconPosBuffer = this._walkingManAnimatedIcon.getPositionBuffer(gl);
 	
 	gl.bindBuffer(gl.ARRAY_BUFFER, iconPosBuffer);
 	gl.vertexAttribPointer(shader.position4_loc, 4, gl.FLOAT, false, 0, 0);
-	gl.bindBuffer(gl.ARRAY_BUFFER, this._animatedIcon.texcoordBuffer);
+	gl.bindBuffer(gl.ARRAY_BUFFER, this._walkingManAnimatedIcon.texcoordBuffer);
 	gl.vertexAttribPointer(shader.texCoord2_loc, 2, gl.FLOAT, false, 0, 0);
 	
 	gl.activeTexture(gl.TEXTURE0);
@@ -285,7 +304,7 @@ ItineraryManager.prototype.render = function ()
 	gl.uniform1i(shader.bUseOriginalImageSize_loc, false);
 	gl.uniform3fv(shader.aditionalOffset_loc, [0.0, 0.0, 0.0]);
 
-	gl.uniform1iv(shader.uMosaicSize_loc, this._walkingManMosaicSize); // 5 cols & 2 rows.***
+	gl.uniform1iv(shader.uMosaicSize_loc, this._walkingManAnimatedIcon._mosaicSize); // 5 cols & 2 rows.***
 		
 	var selectionManager = magoManager.selectionManager;
 	var lastTexId = undefined;
@@ -306,9 +325,7 @@ ItineraryManager.prototype.render = function ()
 	for (var i=0; i<itisCount; i++)
 	{
 		var itiLayer = this.getItineraryLayer(i);
-		//var objMarker = magoManager.objMarkerManager.objectMarkerArray[i];
-		//var currentTexture = this.pin.getTexture(objMarker.imageFilePath);
-		var currentTexture = this._walkingManMosaicTex;
+		var currentTexture = this._walkingManAnimatedIcon._mosaicTexture;
 
 		gl.uniform2fv(shader.scale2d_loc, new Float32Array([1.0, 1.0]));
 		/*
@@ -374,7 +391,7 @@ ItineraryManager.prototype.render = function ()
 			this.lastTimeSubImageChanged = currTime;
 		}
 		
-		if (this.subImageIdx >= this._walkingManMosaicSize[0] * this._walkingManMosaicSize[1])
+		if (this.subImageIdx >= this._walkingManAnimatedIcon._mosaicSize[0] * this._walkingManAnimatedIcon._mosaicSize[1])
 		{
 			this.subImageIdx = 0;
 		}

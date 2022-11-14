@@ -421,7 +421,7 @@ SmartTileManager.prototype.putNode = function(targetDepth, node, magoManager)
 /**
  * 어떤 일을 하고 있습니까?
  */
-SmartTileManager.prototype.putObject = function(targetDepth, object, magoManager) 
+SmartTileManager.prototype.putObject = function (targetDepth, object, magoManager) 
 {
 	targetDepth = defaultValue(targetDepth, this.maxDepth);
 	if (this.tilesArray !== undefined)
