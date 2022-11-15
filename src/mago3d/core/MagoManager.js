@@ -6816,6 +6816,15 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function (intersectedLo
 
 				var data = node.data;
 				if (!data) { continue; }
+
+				// If a node isVisible false, then continue. KimJinHo 20221115.***
+				if (data.attributes)
+				{
+					if (data.attributes.isVisible !== undefined && data.attributes.isVisible === false)
+					{
+						continue;
+					}
+				}
 				
 				neoBuilding = node.data.neoBuilding;
 				if (neoBuilding === undefined) // attributes.isReference === true

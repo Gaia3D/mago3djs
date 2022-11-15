@@ -34,7 +34,7 @@ F4dController.prototype.constructor = F4dController;
  * @param {number} dataGroupId data group id
  * @param {boolean} show 
  */
-F4dController.prototype.showSmartTileGroup = function(dataGroupId, show)
+F4dController.prototype.showSmartTileGroup = function (dataGroupId, show)
 {
 	if (dataGroupId === undefined || dataGroupId === null) { return; }
 
