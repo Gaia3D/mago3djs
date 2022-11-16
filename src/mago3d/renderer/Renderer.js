@@ -2011,6 +2011,8 @@ Renderer.prototype.copyTexture = function (webGlTextureOriginal, webGlTextureDes
 	var screenQuad = this.getScreenQuad();
 	screenQuad.render(magoManager, currentShader);
 
+	magoManager.texturesManager.texturesMergerFbo.unbind();
+
 	// restore gl settings.***
 	gl.depthMask(true);
 	gl.enable(gl.DEPTH_TEST);
@@ -2165,8 +2167,17 @@ Renderer.prototype.renderTerrainCopy = function ()
 		}
 	}
 
+	magoManager.texturesManager.texturesMergerFbo.unbind();
+
 	// restore gl settings.***
 	gl.clearColor(0.0, 0.0, 0.0, 1.0);
+
+	for (var i=0; i<8; i++)
+	{
+		gl.activeTexture(gl.TEXTURE0 + i);
+		gl.bindTexture(gl.TEXTURE_2D, null); 
+	}
+	
 };
 
 Renderer.prototype.renderScreenRectangle = function (gl, options) 

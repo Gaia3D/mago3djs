@@ -557,7 +557,7 @@ PollutionLayerTest.prototype.render = function (magoManager)
 		
 		var primitive = gl.TRIANGLES;
 		//primitive = gl.LINE_LOOP;
-		
+	
 		gl.drawElements(primitive, vboKey.indicesCount, gl.UNSIGNED_SHORT, 0);
 	}
 	// End render rectangleMesh.---------------------------------------------------------------------

@@ -2085,6 +2085,10 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		this.doRenderORT(frustumVolumenObject);
 		return;
 	}
+
+	// Keep some cesium gl settings.***************************************
+	var keepClearColor = this.scene._context._clearColor;
+	//---------------------------------------------------------------------
 	
 	// 1) The depth render.**********************************************************************************************************************
 	var renderType = 0; // 0= depth. 1= color.***
@@ -2208,6 +2212,8 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		if (!this.extbuffers)
 		{ this.extbuffers = gl.getExtension("WEBGL_draw_buffers"); }
 
+		
+
 		// Take cesium colorBuffer.**********************
 		scene._context._currentFramebuffer._bind();
 		this.cesiumColorBuffer = gl.getFramebufferAttachmentParameter(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.FRAMEBUFFER_ATTACHMENT_OBJECT_NAME);
@@ -2257,6 +2263,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 			
 			// End mrt.---------------------------------------------------------------------------------------------------------------
 		}
+		
 	}
 
 	
@@ -2285,7 +2292,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 	//{
 	//	this.quantizedMeshManager.test__doQuantizedSurfaceExcavation(this);
 	//}
-
+	
 	
 	// Render transparents.****************************************************************************************************************
 	if (this.isCesiumGlobe())
@@ -2305,11 +2312,11 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 			this.extbuffers.NONE // [5]debugTex (if exist).***
 		]);
 	}
-
+	
 	renderType = 1;
 	this.renderType = 1;
 	this.renderer.renderGeometryBufferTransparents(gl, renderType, this.visibleObjControlerNodes);
-
+	
 	this._renderManagers_transparentPass(); // TransparentPass.***
 
 	//if (this.weatherStation)
@@ -2317,11 +2324,6 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 	// Note : the transparent foe weatherStation is not prepared yet.***
 	//	this.weatherStation.renderWeatherTransparents(this);
 	//}
-
-
-	
-
-	
 
 	// check if must render boundingBoxes.
 	if (this.magoPolicy.getShowBoundingBox())
@@ -2345,7 +2347,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		this.isCameraMoved = false;
 	}
 	//------------------------------------------------------------------------------------------------
-
+	
 	// Finally do screenSpaceObjects render.
 	this.renderer.renderScreenSpaceObjects(gl);
 
@@ -2421,7 +2423,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		var bTexFlipYAxis = true;
 		var bTexFlipXAxis = true;
 		this.renderer.copyTexture(this.cesiumColorBuffer, this.albedoTex, bTexFlipXAxis, bTexFlipYAxis);
-		// this.renderer.copyTexture(this.scene._context._us.globeDepthTexture._texture, this.debugTex, bTexFlipXAxis, bTexFlipYAxis);
+		//// this.renderer.copyTexture(this.scene._context._us.globeDepthTexture._texture, this.debugTex, bTexFlipXAxis, bTexFlipYAxis);
 
 		// Render the lightBuffer.*****************************************
 		if (sceneState.applyLightsShadows)
@@ -2509,7 +2511,9 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 	}
 	*/
 
-	
+	// Restore cesium gl settings.**************************************************************************
+	gl.clearColor(keepClearColor.red, keepClearColor.green, keepClearColor.blue, keepClearColor.alpha);
+	//------------------------------------------------------------------------------------------------------
 };
 
 /**
@@ -3065,6 +3069,7 @@ MagoManager.prototype.startRender = function (isLastFrustum, frustumIdx, numFrus
 	{
 		this.quantizedMeshManager.excavate();
 	}
+	
 };
 
 /**
