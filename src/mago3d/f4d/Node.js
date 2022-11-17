@@ -1223,6 +1223,7 @@ Node.prototype.changeLocationAndRotationAnimated = function (latitude, longitude
 	animData.path = animationOption.path;
 	animData.linearVelocityInMetersSecond = animationOption.linearVelocityInMetersSecond;
 	animData.autoChangeRotation = animationOption.autoChangeRotation;
+	animData.durationInSeconds = animationOption.durationInSeconds;
 	// End animation by path.***
 	
 	var geoLocDataManager = this.getNodeGeoLocDataManager();
@@ -1299,6 +1300,11 @@ Node.prototype.changeLocationAndRotationAnimated = function (latitude, longitude
 	//Duration For compatibility with lower versions, lower version parameter is just duration(number).
 	var isAnimOption = typeof animationOption === 'object' && isNaN(animationOption);
 	var durationInSeconds = 3.0;
+	if (animData.durationInSeconds !== undefined)
+	{
+		durationInSeconds = animData.durationInSeconds;
+	}
+	
 	if (isAnimOption)
 	{
 		if (animationOption.duration)

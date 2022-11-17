@@ -5,7 +5,7 @@
  * @constructor
  * 
  */
-var Vehicle = function(width, length, height, options) 
+var Vehicle = function (width, length, height, options) 
 {
 	MagoRenderable.call(this);
 
@@ -56,11 +56,11 @@ var Vehicle = function(width, length, height, options)
 
 	//this.changingFrontArrow = false;
 	this.changingFrontArrowType = 0;
-	this.changingFrontArrowSpeed = 0.1;
+	this.changingFrontArrowSpeed = 0.4;
 
 	//this.changingRearArrow = false;
 	this.changingRearArrowType = 0;
-	this.changingRearArrowSpeed = 0.1;
+	this.changingRearArrowSpeed = 0.4;
 
 	//move
 	/**
@@ -69,11 +69,11 @@ var Vehicle = function(width, length, height, options)
 	 */
 	this.maxSpeed = 12;
 	this.frontCurrentSpeed = 0;
-	this.frontAcceleration = 1;
+	this.frontAcceleration = 4;
 	this.frontDeacceleration = 3.8;
 
 	this.rearCurrentSpeed = 0;
-	this.rearAcceleration = 1;
+	this.rearAcceleration = 4;
 	this.rearDeacceleration = 3.8;
 
 	this.pivotPointLC;
@@ -90,7 +90,7 @@ var Vehicle = function(width, length, height, options)
 	this.carriedObjectsArray = [];
 
 	this.shimmyMatDimension = new Point2D(this.width * 0.7, this.wheelbase);
-	this.shimmyMat = new Point2D(2, 12);
+	this.shimmyMat = new Point2D(2, 2);
 
 	var maxPointCount = 50;
 
@@ -262,38 +262,37 @@ Vehicle.prototype.makeMesh = function()
 	this.frame = frame;
 
 	var totalLength = 2;
-	var bodyWidth = totalLength * 0.1;
-	var headWidth = totalLength * 0.2;
-	var tailLength = totalLength * 0.2;
-	var extrude = totalLength * 0.05;
-    
-	var frontArrow = new Arrow(10, 50, 0.5, {
-		totalLength : 12,
-		bodyWidth   : 2,
-		headWidth   : 4,
-		tailLength  : 1,
-		extrude     : 2
-	});
+	//var bodyWidth = totalLength * 0.1;
+	//var headWidth = totalLength * 0.2;
+	//var tailLength = totalLength * 0.2;
+	//var extrude = totalLength * 0.05;
+	// var Arrow = function(width, length, height, option) 
+	var arrowWidth = frameWidth * 0.4;
+	var arrowLength = frameLength * 0.4;
+	var arrowOptions = {
+		totalLength : arrowLength,
+		bodyWidth   : arrowWidth * 0.5,
+		headWidth   : arrowWidth,
+		tailLength  : arrowLength * 0.6,
+		extrude     : frameHeight * 0.1
+	};
 
-	var rearArrow = new Arrow(10, 50, 0.5, {
-		totalLength : 12,
-		bodyWidth   : 2,
-		headWidth   : 4,
-		tailLength  : 1,
-		extrude     : 2
-	});
+	var frontArrow = new Arrow(arrowWidth, arrowLength, 0.5, arrowOptions);
+	var rearArrow = new Arrow(arrowWidth, arrowLength, 0.5, arrowOptions);
 
 	this.objectsArray.push(frontArrow);
 	this.frontArrow = frontArrow;
 	this.frontArrow.setOneColor(0.9, 0.1, 0.1, 1);
-	this.frontArrowPos = new Point3D(0.0, this.wheelbase * 1.5, this.height);
+	//this.frontArrowPos = new Point3D(0.0, this.wheelbase * 1.5, this.height); // original.***
+	this.frontArrowPos = new Point3D(0.0, this.wheelbase * 0.5, this.height);
 	frontArrow.tMatOriginal = new Matrix4();
 	frontArrow.tMatOriginal.setTranslation(this.frontArrowPos.x, this.frontArrowPos.y, this.frontArrowPos.z);
 	
 	this.objectsArray.push(rearArrow);
 	this.rearArrow = rearArrow;
     
-	this.rearArrowPos = new Point3D(0.0, -this.wheelbase * 1.5, this.height);
+	//this.rearArrowPos = new Point3D(0.0, -this.wheelbase * 1.5, this.height); // original.***
+	this.rearArrowPos = new Point3D(0.0, -this.wheelbase * 0.5, this.height);
 	rearArrow.tMatOriginal = new Matrix4();
 	rearArrow.tMatOriginal.setTranslation(this.rearArrowPos.x, this.rearArrowPos.y, this.rearArrowPos.z);
     
@@ -315,7 +314,6 @@ Vehicle.prototype.makeMesh = function()
 	var numCols = this.shimmyMat.x;
 	var numRows = this.shimmyMat.y;
 
-	var refRow = numRows/2;
 	var colDist = this.shimmyMatDimension.x / (numCols-1);
 	var rowDist = this.shimmyMatDimension.y / (numRows-1);
 

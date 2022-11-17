@@ -744,7 +744,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function (sceneState)
 		// * if this is in Cesium:
 		var scene = this.scene;
 		var uniformState = scene._context.uniformState;
-		
+		//scene.camera.frustum.fov = 140.0 * Math.PI / 180.0;
 		//if(!Matrix4.areEqualArrays(sceneState.modelViewMatrixLast, uniformState.modelView) || !Matrix4.areEqualArrays(sceneState.projectionMatrixLast, uniformState._projection))
 		//{
 		//	// calculate matrices.
@@ -2212,8 +2212,6 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		if (!this.extbuffers)
 		{ this.extbuffers = gl.getExtension("WEBGL_draw_buffers"); }
 
-		
-
 		// Take cesium colorBuffer.**********************
 		scene._context._currentFramebuffer._bind();
 		this.cesiumColorBuffer = gl.getFramebufferAttachmentParameter(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.FRAMEBUFFER_ATTACHMENT_OBJECT_NAME);
@@ -2265,8 +2263,6 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		}
 		
 	}
-
-	
 	
 	// 2) gBuffer render.*****************************************************************************************************************
 	renderType = 1;
@@ -2350,8 +2346,6 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 	
 	// Finally do screenSpaceObjects render.
 	this.renderer.renderScreenSpaceObjects(gl);
-
-	
 
 	if (this.isCesiumGlobe())
 	{
@@ -4467,7 +4461,7 @@ MagoManager.prototype.setBPicking = function(mouseX, mouseY)
  * 
  * @private
  */
-MagoManager.prototype.keyDown = function(key) 
+MagoManager.prototype.keyDown = function (key) 
 {
 	if (!this.magoPolicy.getMagoEnable()) { return; }
 	if (this.modeler === undefined)
@@ -7250,7 +7244,7 @@ MagoManager.prototype.selectedObjectNotice = function (neoBuilding)
  * 변환 행렬
  * @private
  */
-MagoManager.prototype.changeLocationAndRotation = function(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll, animationOption) 
+MagoManager.prototype.changeLocationAndRotation = function (projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll, animationOption) 
 {
 	var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
 	if (node === undefined)
@@ -7262,7 +7256,7 @@ MagoManager.prototype.changeLocationAndRotation = function(projectId, dataKey, l
  * 변환 행렬
  * @private
  */
-MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, longitude, elevation, heading, pitch, roll, animationOption) 
+MagoManager.prototype.changeLocationAndRotationNode = function (node, latitude, longitude, elevation, heading, pitch, roll, animationOption) 
 {
 	if (node === undefined)
 	{ return; }

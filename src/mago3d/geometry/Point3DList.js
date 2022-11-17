@@ -1070,6 +1070,8 @@ Point3DList.prototype.renderAsChild = function(magoManager, shader, renderType, 
 	var gl = magoManager.getGl();
 	shader.enableVertexAttribArray(shader.position3_loc);
 	shader.disableVertexAttribArray(shader.normal3_loc);
+	shader.disableVertexAttribArray(shader.color4_loc);
+	shader.disableVertexAttribArray(shader.texCoord2_loc);
 	var bEnableDepth;
 	if (bEnableDepth === undefined)
 	{ bEnableDepth = true; }

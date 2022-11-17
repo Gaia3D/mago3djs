@@ -35,6 +35,7 @@ var Modeler = function(magoManager)
 	this.sphere; // class : Sphere.
 	this.clippingBox;
 	this.magoRectangle;
+	this.vehicle;
 	
 	this.testObjectsArray;
 	
@@ -1239,7 +1240,7 @@ Modeler.prototype.render = function (magoManager, shader, renderType, glPrimitiv
 		for (var i=0; i<testObjectsCount; i++)
 		{
 			var testObject = this.testObjectsArray[i];
-			testObject.render(magoManager);
+			testObject.render(magoManager, shader, renderType);
 		}
 	}
 	
@@ -1595,7 +1596,7 @@ Modeler.prototype.__TEST__bSpline = function()
 
 	var options = {
 		geoCoordsArray         : modeler.geoCoordsList.geographicCoordsArray,
-		initialArmsLengthRatio : 0.3,
+		initialArmsLengthRatio : 0.2,
 		bLoop                  : false
 	};
 
