@@ -16,7 +16,7 @@
     "del": "^5.0.0",
     "eslint": "^6.0.0",
     "eslint-plugin-react": "^7.12.4",
-    "express": "^4.16.4",
+    "express": "^4.17.3",
     "globby": "^10.0.0",
     "glsl-strip-comments": "^1.0.0",
     "gulp": "^4.0.1",
