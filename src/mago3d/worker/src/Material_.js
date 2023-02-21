@@ -1,5 +1,5 @@
 'use strict';
-
+importScripts('./src/Texture_.js');
 /**
  * This is a material
  * @class Material
