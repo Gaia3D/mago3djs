@@ -1039,7 +1039,7 @@ Mesh.prototype.render = function (magoManager, shader, renderType, glPrimitive, 
 			{
 				if (!vboKey.bindDataColor(shader, vboMemManager))
 				{ return false; }
-				gl.uniform1i(shader.colorType_loc, 1); // attributeColor.
+				gl.uniform1i(shader.colorType_loc, vboKey.vboBufferTCoord ? 2:1); // attributeColor.
 			}
 			else 
 			{
