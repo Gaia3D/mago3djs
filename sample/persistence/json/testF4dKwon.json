@@ -1,0 +1,30 @@
+{
+"attributes": {
+"isPhysical": false
+},
+"children": [
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": false
+    },
+    "children": [],
+    "data_key": "7D6_401",
+    "data_name": "7D6_401",
+    "mapping_type":"origin",
+    "longitude": 127.289649,
+    "latitude": 37.378538,
+    "height": 163.920273,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+],
+	"parent": 0,
+	"depth": 1,
+	"view_order": 2,
+	"data_key": "testF4dKwon",
+	"data_name": "testF4dKwon",
+    "mapping_type": "origin"
+}

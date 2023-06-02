@@ -7,6 +7,91 @@
 },
 "children": [
 {
+	"attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": false
+    },
+    "children": [],
+    "data_key": "all_files_common1rstplant",
+    "data_name": "all_files_common1rstplant",
+    "mapping_type":"origin",
+    "longitude": 126.6130,
+    "latitude": 37.57845,
+    "altitude": 200.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+},
+{
+	"attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": false
+    },
+    "children": [],
+    "data_key": "all_files_101",
+    "data_name": "all_files_101",
+    "mapping_type":"origin",
+    "longitude": 126.6130,
+    "latitude": 37.57845,
+    "altitude": 200.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+},
+{
+	"attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": false
+    },
+    "children": [],
+    "data_key": "all_files_102",
+    "data_name": "all_files_102",
+    "mapping_type":"origin",
+    "longitude": 126.6130,
+    "latitude": 37.57845,
+    "altitude": 200.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+},
+{
+	"attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": false
+    },
+    "children": [],
+    "data_key": "all_files_103",
+    "data_name": "all_files_103",
+    "mapping_type":"origin",
+    "longitude": 126.6130,
+    "latitude": 37.57845,
+    "altitude": 200.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+},
+{
+	"attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": false
+    },
+    "children": [],
+    "data_key": "all_files_subterrain",
+    "data_name": "all_files_subterrain",
+    "mapping_type":"origin",
+    "longitude": 126.6130,
+    "latitude": 37.57845,
+    "altitude": 200.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+},
+{
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
@@ -296,9 +381,9 @@
     "data_key": "masterplan_0",
     "data_name": "masterplan_0",
     "mapping_type":"origin",
-    "longitude": 126.6082,
-    "latitude": 37.5820,
-    "altitude": 2050.000000,
+    "longitude": 126.78723,
+    "latitude": 37.36281,
+    "altitude": 2080.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -314,9 +399,9 @@
     "data_key": "masterplan_1",
     "data_name": "masterplan_1",
     "mapping_type":"origin",
-    "longitude": 126.6082,
-    "latitude": 37.5820,
-    "altitude": 2050.000000,
+    "longitude": 126.78735,
+    "latitude": 37.36268,
+    "altitude": 2080.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3404,15 +3489,16 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": false
+        "flipYTexCoords": false,
+		"heightReference" : "relativeToGround"
     },
     "children": [],
     "data_key": "masterplan_3",
     "data_name": "masterplan_3",
     "mapping_type":"origin",
-    "longitude": 126.6082,
-    "latitude": 37.5820,
-    "altitude": 2050.000000,
+    "longitude": 127.2168603111981,
+    "latitude": 35.61620379015061,
+    "height": 160.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000

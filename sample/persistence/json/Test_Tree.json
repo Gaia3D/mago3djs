@@ -1,0 +1,30 @@
+{
+"attributes": {
+"isPhysical": false
+},
+"children": [
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": false
+    },
+    "children": [],
+    "data_key": "Gledista_Triacanthos",
+    "data_name": "Gledista_Triacanthos",
+    "mapping_type":"origin",
+    "longitude": 126.6130,
+    "latitude": 37.57845,
+    "altitude": 51.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+],
+	"parent": 0,
+	"depth": 1,
+	"view_order": 2,
+	"data_key": "Test_Tree",
+	"data_name": "Test_Tree",
+    "mapping_type": "origin"
+}

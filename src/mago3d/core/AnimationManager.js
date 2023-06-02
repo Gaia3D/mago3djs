@@ -193,6 +193,11 @@ AnimationManager.prototype._TEST_SAMPLECODE_nodeAnimation = function (magoManage
 	var selectedNode = magoManager.selectionManager.getSelectedF4dNode();
 	var node = selectedNode;
 
+	if (node === undefined)
+	{
+		return;
+	}
+
 	var projectId = node.data.projectId;
 	var dataKey = node.data.nodeId; 
 	
@@ -214,8 +219,8 @@ AnimationManager.prototype._TEST_SAMPLECODE_nodeAnimation = function (magoManage
 	// Test 2: moving by a path.***
 	var bSplineCubic3d = magoManager.modeler.bSplineCubic3d;
 	var geographicCoordsArray = bSplineCubic3d.geoCoordsList.geographicCoordsArray;
-	//var path3d = new Path3D(geographicCoordsArray);
-	var path3d = bSplineCubic3d;
+	var path3d = new Path3D(geographicCoordsArray);
+	//var path3d = bSplineCubic3d;
 
 	if (bSplineCubic3d !== undefined) 
 	{

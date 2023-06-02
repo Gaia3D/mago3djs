@@ -9,6 +9,9 @@
 	<script type="text/javascript" src="../../externlib/jquery/jquery.js"></script>
 	<script type="text/javascript" src="../src/engine/cesium/Cesium.js"></script>
 	<script type="text/javascript" src="../build/mago3d/mago3d.js"></script>
+	<style>
+		body{ background-color:black; }
+	</style>
 </head>
 
 <body>
@@ -18,6 +21,30 @@
 	</li>
 	<li onclick="doTest();">
 		test
+	</li>
+	<li onclick="doTest2();">
+		dark
+	</li>
+	<li onclick="doTest3();">
+		light
+	</li>
+	<li onclick="doTest4();">
+		test4
+	</li>
+	<li onclick="testWeather();">
+		test weather
+	</li>
+	<li onclick="playPause();">
+		Play-Pause
+	</li>
+	<li onclick="particlesGeneratorSwitch();">
+		particlesGenSwitch
+	</li>
+	<li onclick="deleteDustVolume();">
+		deleteDustVolume
+	</li>
+	<li onclick="bSplineTest();">
+		bSplineTest
 	</li>
 </ul>
 
@@ -38,7 +65,7 @@
     // mago3d start, policy loading
 	function magoStart(renderDivId) {
 		$.ajax({
-			url: dataInformationUrl + "geopolicy.json",
+			url: dataInformationUrl + "geopolicyMW.json",
 			type: "GET",
 			dataType: "json",
 			success: function(serverPolicy){
@@ -108,18 +135,19 @@
 					layers : [
 						baseMap,
 						tt,
-						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'sk_emd', tiled: true}}),
-						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'basemap', tiled: true}}),
-						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'echodelta_25m', tiled: true}}),
-						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'gangseogu_4326', tiled: true}}),
-						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'land_block', tiled: true}}),
-						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'sk_sdo', tiled: true}}),
-						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'sk_sgg', tiled: true}}),
-						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'utmk_lsmd_cont_ldreg', tiled: true}}),
-						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'dem', tiled: true}})
+						//new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'sk_emd', tiled: true}}),
+						//new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'basemap', tiled: true}}),
+						//new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'echodelta_25m', tiled: true}}),
+						//new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'gangseogu_4326', tiled: true}}),
+						//new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'land_block', tiled: true}}),
+						//new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'sk_sdo', tiled: true}}),
+						//new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'sk_sgg', tiled: true}}),
+						//new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'utmk_lsmd_cont_ldreg', tiled: true}}),
+						//new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'dem', tiled: true}})
 					]
 				});
 				*/
+				
 				
 				
 				
@@ -136,6 +164,86 @@
 				var f4dController = managerFactory.getF4dController();
 
 				//magoManager.addLayer(tt);
+				////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+								magoManager.on(Mago3D.MagoManager.EVENT_TYPE.CLICK, function(e){
+								console.info(e);
+								
+								
+								// Do a test. Create a geoCoord and render it.*******************************************************************
+								var screenX = e.clickCoordinate.screenCoordinate.x;
+								var screenY = e.clickCoordinate.screenCoordinate.y;
+								var options = {
+									highPrecision : false
+								};
+								
+								var posWC = Mago3D.ManagerUtils.screenCoordToWorldCoordUseDepthCheck(screenX, screenY, magoManager, options);
+								var geoCoord = Mago3D.ManagerUtils.pointToGeographicCoord(posWC, undefined);
+
+								geoCoord.altitude += 4.0; //
+
+								geoCoord.makeDefaultGeoLocationData();
+								
+								var geoCoordsList = magoManager.modeler.getGeographicCoordsList();
+								geoCoordsList.addGeoCoord(geoCoord);
+								//var hola = 0;
+								// End test.----------------------------------------------------------------------------------------------------
+								
+
+								/*
+								// Do a code creating test.
+								var falloffDeg = 75.0;
+								var falloffDistance = 60;
+								var angRad = falloffDeg * Math.PI/180;
+								var radius = falloffDistance * Math.sin(angRad);
+								var height = falloffDistance * Math.cos(angRad);
+								var color = new Mago3D.Color(0.95, 0.95, 0.95, 0.4);
+								var options = {
+										baseType : 2, // 0= NONE. 1= PLANE. 2= SPHERICAL.
+										color : color,
+										originType : 1 // 0= ATBASE, 1= ATVERTEX
+								};
+								var cone = new Mago3D.Cone(radius, height, options);
+								cone.setGeographicPosition(geoCoord, undefined, undefined, undefined);
+								magoManager.modeler.addObject(cone);
+								*/
+								// End cone test.------------------------------
+
+								// Do a spotLightTest.****************************
+								
+								// Small opening.***
+								var options = {
+									hotspotDeg : 35.0,
+									falloffDeg : 50.0,
+									hotDistance : 50.0,
+									falloffDistance : 60.0
+								};
+
+								// Medium opening.***
+								var options = {
+									hotspotDeg : 55.0,
+									falloffDeg : 75.0,
+									hotDistance : 50.0,
+									falloffDistance : 60.0
+								};
+								/*
+								// Big opening.***
+								var options = {
+									hotspotDeg : 75.0,
+									falloffDeg : 90.0,
+									hotDistance : 50.0,
+									falloffDistance : 60.0
+								};
+								*/
+
+								var spotLight = new Mago3D.SpotLight(options);
+								spotLight.setGeographicPosition(geoCoord, undefined, undefined, undefined);
+								magoManager.modeler.addObject(spotLight);
+								
+								// End spotlightTest.-----------------------------
+								
+							});
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							
 			},
 			error: function(e){
 				alert(e.responseText);
@@ -143,28 +251,46 @@
 		});
 	}
 	// 3ds, pointsCloud, sihung_campus, sihung_las, IncheonGyeyang_2
+
+	
+	
 	function doTest(){
 		var f4dController = managerFactory.getF4dController();
-		
+
 		f4dController.addSmartTileGroup({
             dataGroupId : 10000,
-            dataGroupKey : 'IncheonGayang',
-            dataGroupName : '계양시 건물들',
-            dataGroupPath : 'IncheonGayang/',
-            smartTileIndexPath: "SmartTiles_IncheonGayang"
+            dataGroupKey : 'gs_F4Ds',
+            dataGroupName : '테스트 건물들',
+            dataGroupPath : 'gs_F4Ds/',
+            smartTileIndexPath: "smartTiles_gs"
 		});
-		
-		
+
 		f4dController.addSmartTileGroup({
             dataGroupId : 10000,
-            dataGroupKey : 'Incheon_Mirae',
-            dataGroupName : '계양시 건물들',
-            dataGroupPath : 'Incheon_Mirae/',
-            smartTileIndexPath: "_TILE_Incheon_Mirae"
+            dataGroupKey : '3ds',
+            dataGroupName : '테스트 건물들',
+            dataGroupPath : '3ds/',
+            smartTileIndexPath: "smartTiles_3ds"
 		});
+
+		// hyemi smartTiles
+		f4dController.addSmartTileGroup({
+            dataGroupId : 10000,
+            dataGroupKey : 'GA',
+            dataGroupName : 'sihung_campus',
+            dataGroupPath : 'smartTile_Gwanak_f4ds/GA/'
+        });
+		f4dController.addSmartTileGroup({
+            dataGroupId : 10001,
+            dataGroupKey : 'EP',
+            dataGroupName : 'sihung_campus',
+            dataGroupPath : 'smartTile_Gwanak_f4ds/EP/',
+            smartTileIndexPath: "smstOutput3_Gwanak"
+		});
+		
 		/*
 		$.ajax({
-			url: dataInformationUrl + "IncheonGyeyang_2.json",
+			url: dataInformationUrl + "3ds.json",
 			type: "GET",
 			dataType: "json",
 			success: function(f4dObject){
@@ -177,50 +303,44 @@
 		});
 		*/
 
-		// Test weather wind.*********************************
-		/*
-		var magomanager = managerFactory.getMagoManager();
-		if (magomanager.windTest === undefined)
-		{
-			if (magomanager.weatherStation === undefined)
-			{ magomanager.weatherStation = new Mago3D.WeatherStation(); }
+		var magoManager = managerFactory.getMagoManager();
+		magoManager.modeler.__TEST__extrusionBuildings();
+	}
+
+	function doTest2(){
+		var f4dController = managerFactory.getF4dController();
+		var magoManager = managerFactory.getMagoManager();
 		
-			var geometryDataPath = magomanager.readerWriter.geometryDataPath;
-			var windDataFilesNamesArray = ["OBS-QWM_2016062000.grib2_wind_000", "OBS-QWM_2016062001.grib2_wind_000", "OBS-QWM_2016062002.grib2_wind_000", "OBS-QWM_2016062003.grib2_wind_000",
-				"OBS-QWM_2016062004.grib2_wind_000", "OBS-QWM_2016062005.grib2_wind_000", "OBS-QWM_2016062006.grib2_wind_000", "OBS-QWM_2016062007.grib2_wind_000",
-				"OBS-QWM_2016062008.grib2_wind_000", "OBS-QWM_2016062009.grib2_wind_000", "OBS-QWM_2016062010.grib2_wind_000", "OBS-QWM_2016062011.grib2_wind_000",
-				"OBS-QWM_2016062012.grib2_wind_000", "OBS-QWM_2016062013.grib2_wind_000", "OBS-QWM_2016062014.grib2_wind_000", "OBS-QWM_2016062015.grib2_wind_000",
-				"OBS-QWM_2016062016.grib2_wind_000", "OBS-QWM_2016062017.grib2_wind_000", "OBS-QWM_2016062018.grib2_wind_000", "OBS-QWM_2016062019.grib2_wind_000",
-				"OBS-QWM_2016062020.grib2_wind_000", "OBS-QWM_2016062021.grib2_wind_000", "OBS-QWM_2016062022.grib2_wind_000", "OBS-QWM_2016062023.grib2_wind_000"];
-				
-			var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_Airport";
-			//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_GolfPark_NineBridge1";
-			
-			magomanager.weatherStation.test_loadWindData3d(magomanager, windDataFilesNamesArray, windMapFilesFolderPath);
-			magomanager.weatherStation.test_loadDustData3d(magomanager, windDataFilesNamesArray, windMapFilesFolderPath);
-			//magomanager.TEST__golfPark();
-			magomanager.windTest = true;
-		}
-		*/
+		// test camera laser.
+		//magoManager.TEST__cameraLaser();
+		var sunSystem = magoManager.sceneState.sunSystem;
+		var currHours = sunSystem.date.getHours();
+		var date = new Date();
+		date.setMonth(5);
+		date.setHours(currHours+1);
+		date.setMinutes(0);
+
+		sunSystem.setDate(date);
+		
+	}
+
+	function doTest3(){
+		var f4dController = managerFactory.getF4dController();
+		var magoManager = managerFactory.getMagoManager();
+		
+		// test camera laser.
+		//magoManager.TEST__cameraLaser();
+		var sunSystem = magoManager.sceneState.sunSystem;
+		var currHours = sunSystem.date.getHours();
+		var date = new Date();
+		date.setMonth(5);
+		date.setHours(currHours-1);
+		date.setMinutes(0);
+
+		sunSystem.setDate(date);
+		
 	}
 	
-	/*
-	function doTest(){
-		var f4dController = managerFactory.getF4dController();
-		$.ajax({
-			url: dataInformationUrl + "workshop-data.json",
-			type: "GET",
-			dataType: "json",
-			success: function(f4dObject){
-				console.info(f4dObject);
-				f4dController.addF4dGroup(f4dObject);
-			},
-			error: function(e){
-				alert(e.responseText);
-			}
-		});
-	}
-	*/
 
 </script>
 </body>

@@ -68,17 +68,12 @@
 	<li onclick="OsmToggle();">
 		osm toggle
 	</li>
-	<li onclick="Chemical_Accident_Test();">
-		Chemical Accident Test
-	</li>
-
 </ul>
 <div id="magoContainer" class="mapWrap"></div>
 
 
 <script type="text/javascript" src="../src/engine/cesium/Cesium.js"></script>
 <script type="text/javascript" src="../build/mago3d/mago3d.js"></script>
-<!--<script type="text/javascript" src="../test/extrusion.js"></script> <!--  상암에 extrusion buildings 불러오기-->-->
 <script>
 	var message = new Mago3D.Message(i18next);
 	
@@ -153,9 +148,8 @@
 
 
 				//serverPolicy.terrainType = 'cesium-customer';
-				serverPolicy.terrainValue = 'https://terrain.cdn.ntruss.com/tilesets/ws2/';
-				//serverPolicy.terrainValue = 'http://211.106.171.246:49998/tilesets/terrain_sj/'; // from Kim Jin Ho 20220420 (to test terrain excavation bugs).***
-				//serverPolicy.terrainValue = 'http://175.197.92.213:10207/tilesets/terrain_ws2_sangam/';
+				//serverPolicy.terrainValue = 'https://terrain.cdn.ntruss.com/tilesets/ws2/';
+				serverPolicy.terrainValue = 'http://211.106.171.246:49998/tilesets/terrain_sj/'; // from Kim Jin Ho 20220420 (to test terrain excavation bugs).***
 
 				//cesiumViewerOption.terrainProvider = new Cesium.EditableCesiumTerrainProvider({
 				//										url: 'http://211.106.171.246:49998/tilesets/terrain_sj/'
@@ -167,13 +161,6 @@
 				serverPolicy.initLongitude = 126.60657;
 				serverPolicy.initAltitude = 3000;
 				MAGO3D_INSTANCE = new Mago3D.Mago3d(renderDivId, serverPolicy, {loadend : loadend}, cesiumViewerOption);
-
-				MAGO3D_INSTANCE.getViewer().extend(Cesium.viewerCesium3DTilesInspectorMixin);
-        		const inspectorViewModel = MAGO3D_INSTANCE.getViewer().cesium3DTilesInspector.viewModel;
-				
-				
-				//MAGO3D_INSTANCE.getViewer().scene.globe.translucency.enabled = true;
-				//MAGO3D_INSTANCE.getViewer().scene.globe.translucency.frontFaceAlphaByDistance = new Cesium.NearFarScalar(300.0, 0.0, 3000.0, 1.0);
 
 			},
 			error: function(e){
@@ -228,12 +215,6 @@
 			color : new self.Mago3D.Color(r, g, b ,1)
 		});
 
-		//magoManager.gjMaster = magoManager.addKoreaBuildingMaster('https://dtdata.cdn.ntruss.com/buildingmaster/seoul/15/', 'geojson', {
-		//	show : true,
-		//	/* color : new self.Mago3D.Color(241/255, 231/255, 200/255 ,1) */
-		//	color : new self.Mago3D.Color(r, g, b ,1)
-		//});
-
 		//===================================================================================
 		//===================================================================================
 		
@@ -253,36 +234,15 @@
 			
 			var posWC = Mago3D.ManagerUtils.screenCoordToWorldCoordUseDepthCheck(screenX, screenY, magoManager, options);
 			var geoCoord = Mago3D.ManagerUtils.pointToGeographicCoord(posWC, undefined);
-			geoCoord.altitude += 4.0; //
-			geoCoord.makeDefaultGeoLocationData();
 
-			// check if mago is or not in selection & move mode.***
+			geoCoord.altitude += 4.0; //
+
+			geoCoord.makeDefaultGeoLocationData();
 			var geoCoordsList = magoManager.modeler.getGeographicCoordsList();
 			geoCoordsList.addGeoCoord(geoCoord);
-			
 			var hola = 0;
-
-			// test create a cylinder.*********************************************
-			/*
-			options = {
-				radius : 10.0,
-				height : 100.0,
-				geographicCoord : {
-					longitude : geoCoord.longitude,
-					latitude : geoCoord.latitude,
-					altitude : geoCoord.altitude
-				},
-				color4 : {
-					r : 0.5, g : 0.25, b : 1.0, a : 1.0
-				}
-			};
-			var cylinder = Mago3D.MagoRenderable.newCylinder(options);
-			var tileDepth = 10;
-			magoManager.modeler.addObject(cylinder, tileDepth);
-			*/
-			// End test create a cylinder.-----------------------------------------
 			
-			var hola = 0;
+			
 			// End test.----------------------------------
 			/*
 			// Do a cone creating test.
@@ -320,7 +280,7 @@
 				hotDistance : 50.0,
 				falloffDistance : 60.0
 			};
-			
+
 			var spotLight = new Mago3D.SpotLight(options);
 			spotLight.setGeographicPosition(geoCoord, undefined, undefined, undefined);
 			magoManager.modeler.addObject(spotLight);
@@ -400,8 +360,7 @@
 		
 		// test camera laser.
 		//magoManager.TEST__cameraLaser();
-		//-----------------------------------------------------------------------------------------------
-		/*
+		
 		var sunSystem = magoManager.sceneState.sunSystem;
 		var currHours = sunSystem.date.getHours();
 		var date = new Date();
@@ -410,8 +369,7 @@
 		date.setMinutes(0);
 
 		sunSystem.setDate(date);
-		*/
-		//-----------------------------------------------------------------------------------------------
+		
 		/*
 
 		if(magoManager.waterManager)
@@ -431,32 +389,10 @@
 			magoManager.waterManager.resetSimulation();
 		}
 		*/
-		//-----------------------------------------------------------------------------------------------
+
 		// Test brightness & contrast.
 		//magoManager.sceneState.brightnessContrastSaturation[2] -= 0.02;
 		//magoManager.sceneState.brightnessContrastSaturation[2] -= 0.05;
-		//-----------------------------------------------------------------------------------------------
-		var weatherStation = magoManager.weatherStation;
-		if(weatherStation !== undefined)
-		{
-			if(weatherStation.soundSurfacesVolumesArray !== undefined && weatherStation.soundSurfacesVolumesArray.length > 0)
-			{
-				var soundVolumesCount = weatherStation.soundSurfacesVolumesArray.length;
-				for(var i=0; i<soundVolumesCount; i++)
-				{
-					var soundVolume = weatherStation.soundSurfacesVolumesArray[i];
-					if(soundVolume !== undefined && soundVolume.getSoundSurfacesLayersCount() > 0)
-					{
-						var soundLayer = soundVolume.getSoundLayer(0);
-						if(soundLayer !== undefined)
-						{
-							var currTimeSlideIdx = soundLayer.getCurrentTimeSliceIdx();
-							soundLayer.setCurrentTimeSliceIdx(currTimeSlideIdx - 1);
-						}
-					}
-				}
-			}
-		}
 	}
 
 	function light(){
@@ -465,7 +401,7 @@
 		
 		// test camera laser.
 		//magoManager.TEST__cameraLaser();
-		/*
+		
 		var sunSystem = magoManager.sceneState.sunSystem;
 		var currHours = sunSystem.date.getHours();
 		var date = new Date();
@@ -490,218 +426,18 @@
 			}
 			// simulationTimeStep
 		}
-		*/
 		
 		// Test brightness & contrast.
 		//magoManager.sceneState.brightnessContrastSaturation[2] += 0.05;
-		//-----------------------------------------------------------------------------------------------
-		var weatherStation = magoManager.weatherStation;
-		if(weatherStation !== undefined)
-		{
-			if(weatherStation.soundSurfacesVolumesArray !== undefined && weatherStation.soundSurfacesVolumesArray.length > 0)
-			{
-				var soundVolumesCount = weatherStation.soundSurfacesVolumesArray.length;
-				for(var i=0; i<soundVolumesCount; i++)
-				{
-					var soundVolume = weatherStation.soundSurfacesVolumesArray[i];
-					if(soundVolume !== undefined && soundVolume.getSoundSurfacesLayersCount() > 0)
-					{
-						var soundLayer = soundVolume.getSoundLayer(0);
-						if(soundLayer !== undefined)
-						{
-							var currTimeSlideIdx = soundLayer.getCurrentTimeSliceIdx();
-							soundLayer.setCurrentTimeSliceIdx(currTimeSlideIdx + 1);
-						}
-					}
-				}
-			}
-		}
 	}
 
 	function doTest4(){
 		var f4dController = MAGO3D_INSTANCE.getF4dController();
 		var magoManager = MAGO3D_INSTANCE.getMagoManager();
-
-		// Test vehicle.************************************************************************************************
-		/*
-		var lon = 126.608362;
-		var lat = 37.582042;
-		var alt = 10.0;
-		var geoCoord = new Mago3D.GeographicCoord(lon, lat, alt);
-
-		var carWidth = 3.0;
-		var carLength = 10.0;
-		var carHeight = 3.0;
-		var vehicle = new Mago3D.Vehicle(carWidth, carLength, carHeight);
-		vehicle.setGeographicPosition(geoCoord, 0.0, 0.0, 0.0);
-		magoManager.modeler.addObject(vehicle, 10);
-
-		// Now, add key event handler to control the vehicle.***
-		// https://sandcastle.cesium.com/?src=Camera%20Tutorial.html&label=All
-		function getFlagForKeyCode(keyCode) {
-			switch (keyCode) {
-				case 38:
-				return "moveForward";
-				case 40:
-				return "moveBackward";
-				case "Q".charCodeAt(0):
-				return "moveUp";
-				case "E".charCodeAt(0):
-				return "moveDown";
-				case 39:
-				return "moveRight";
-				case 37:
-				return "moveLeft";
-				default:
-				return undefined;
-			}
-			}
-
-		document.addEventListener(
-			"keydown",
-			function (e) {
-				const flagName = getFlagForKeyCode(e.keyCode);
-				if (typeof flagName !== "undefined") {
-					//flags[flagName] = true;
-					if(flagName === "moveForward")
-					{
-						vehicle.footOnAccel();
-					}
-					else if(flagName === "moveBackward")
-					{
-						vehicle.footOnReverseAccel();
-					}
-					else if(flagName === "moveRight")
-					{
-						vehicle.doChangeFrontAngleDeg("right");
-					}
-					else if(flagName === "moveLeft")
-					{
-						vehicle.doChangeFrontAngleDeg("left");
-					}
-				}
-				var hola = 0;
-			},
-			false
-		);
-
-		document.addEventListener(
-			"keyup",
-			function (e) {
-				const flagName = getFlagForKeyCode(e.keyCode);
-				if (typeof flagName !== "undefined") {
-					//flags[flagName] = false;
-					if(flagName === "moveForward")
-					{
-						vehicle.footOffAccel();
-					}
-					else if(flagName === "moveBackward")
-					{
-						vehicle.footOffAccel();
-					}
-					else if(flagName === "moveRight")
-					{
-						vehicle.stopChangeFrontAngleDeg();
-					}
-					else if(flagName === "moveLeft")
-					{
-						vehicle.stopChangeFrontAngleDeg();
-					}
-				}
-			},
-			false
-		);
-		*/
-		// End test vehicle.---------------------------------------------------------------------------------------------------------------------------------------------------
 		
-		// Sound & voxelization test.***************************************************************************************************************************************
-		//magoManager.soundManager = new Mago3D.SoundManager(magoManager);
+		// Sound & voxelization test.***
+		magoManager.soundManager = new Mago3D.SoundManager(magoManager);
 
-		// Itinerary test.**********************************************************************************************************************************************************
-		// 1rst, delete existing itineraryLayers.***
-		
-		if(magoManager.itineraryManager)
-		{
-			magoManager.itineraryManager.deleteObjects(magoManager.vboMemoryManager);
-			magoManager.itineraryManager = undefined;
-		}
-
-		var walkingManMosaicTexPath = "\\f4d\\result_personItinerary\\walk-right.png";
-		var options = {
-			magoManager : magoManager,
-			walkingManMosaicTexPath : walkingManMosaicTexPath,
-			walkingManMosaicColumnsCount : 6,
-			walkingManMosaicRowsCount : 1
-		};
-		magoManager.itineraryManager = new Mago3D.ItineraryManager(options);
-		var thickness = 5.0;
-
-		var path = "\\f4d\\result_personItinerary\\A_gps_20220915.json";
-		var layerOptions = {
-			filePath : path,
-			lineThickness : thickness,
-			thickLineColor : {
-				r : 0.5, g : 0.25, b : 0.95, a : 1.0
-			}
-		};
-
-		magoManager.itineraryManager.newItineraryLayer(layerOptions);
-
-		path = "\\f4d\\result_personItinerary\\B_gps_20220915.json";
-		layerOptions = {
-			filePath : path,
-			lineThickness : thickness,
-			thickLineColor : {
-				r : 1.0, g : 0.0, b : 0.0, a : 1.0
-			}
-		};
-
-		magoManager.itineraryManager.newItineraryLayer(layerOptions);
-		
-		var options = {
-			incrementalAddingTimeMilisec : 20
-		};
-
-		if(magoManager.animationTimeController === undefined)
-		{
-			magoManager.animationTimeController = new Mago3D.AnimationTimeController(options);
-		}
-
-		magoManager.animationTimeController.reset(options);
-		magoManager.animationTimeController.startAnimation();
-
-		// Load PollutionTest geoJson.*********************************************************************************************************************************
-		// 1rst, delete the existent pollution volume.***
-		// Inside of : function doTest4().***
-		var pollutionVolumesArray = magoManager.weatherStation.pollutionVolumesArray;
-		if(pollutionVolumesArray && pollutionVolumesArray.length > 0)
-		{
-			// delete all pollutionVolumes.***
-			var vboMemManager = magoManager.vboMemoryManager;
-			var pollVolumesCount = pollutionVolumesArray.length;
-			for(var i=0; i<pollVolumesCount; i++)
-			{
-				var pollVolumen = pollutionVolumesArray[i];
-				pollVolumen.deleteObjects(vboMemManager);
-				pollutionVolumesArray[i] = undefined;
-			}
-
-			magoManager.weatherStation.pollutionVolumesArray = undefined;
-		}
-
-		var geoJsonIndexFilePath = "\\f4d\\result_air_1minInterval\\JsonIndex.json"; // new dust data 20210208_1440
-		//var geoJsonIndexFilePath = "\\f4d\\result_soil_1minInterval\\JsonIndex.json"; // new dust data 20210208_1440
-		magoManager.weatherStation.loadPollutionTestGeoJsonIndexFile(geoJsonIndexFilePath);
-		
-		// Animation by path.*******************************************************************************************************************************************
-		if (magoManager.animationManager === undefined) {
-			magoManager.animationManager = new Mago3D.AnimationManager();
-		}
-		var animManager = magoManager.animationManager;
-		if(animManager)
-		{
-			animManager._TEST_SAMPLECODE_nodeAnimation(magoManager);
-		}
 
 		/*
 		// excavation test.
@@ -768,10 +504,10 @@
 			var waterManager = magoManager.waterManager;
 			waterManager.objectDeleted(nativeSel._guid);
 		}
-		
+		*/
 		// Test brightness & contrast.
 		//magoManager.sceneState.brightnessContrastSaturation[1] -= 0.05;
-		*/
+		/*
 		if(!magoManager.sceneState.applyBloomEffect)
 		{
 			magoManager.sceneState.applyBloomEffect = true;
@@ -780,7 +516,7 @@
 		{
 			magoManager.sceneState.applyBloomEffect = false;
 		}
-		
+		*/
 	}
 
 	function testWeather (){
@@ -826,63 +562,14 @@
 		//var dustGeoJsonFilePath = "\\f4d\\wind_yeonHwa\\request_sample_data\\GC_after_e\\pm2.5\\pm2.5.json"; // new dust data 20210208_1440
 		//magoManager.weatherStation.loadDustGeoJson(dustGeoJsonFilePath);
 
+		// Load PollutionTest geoJson.***
+		//var geoJsonIndexFilePath = "\\f4d\\result_json\\JsonIndex.json"; // new dust data 20210208_1440
+		//magoManager.weatherStation.loadPollutionTestGeoJsonIndexFile(geoJsonIndexFilePath);
+
+		// Load SoundSurface geoJson.***
+		var geoJsonIndexFilePath = "\\f4d\\result_soundJson\\JsonIndex.json"; // new dust data 20210208_1440
+		magoManager.weatherStation.loadSoundSurfaceGeoJsonIndexFile(geoJsonIndexFilePath);
 		
-
-		// load person itinerary too.***
-		
-
-		// Load SoundSurface geoJson.***************************************************************************************************************************************
-		/*
-		for(var i=0; i<1; i++)
-		{
-			var geoJsonIndexFilePath = "";
-			if(i === 0)
-			{
-				geoJsonIndexFilePath = "\\f4d\\result_sound_M\\JsonIndex.json"; // new dust data 20210208_1440
-			}
-			else if(i === 1)
-			{
-				geoJsonIndexFilePath = "\\f4d\\result_sound_plan2_json\\JsonIndex.json"; // new dust data 20210208_1440
-			}
-
-			magoManager.weatherStation.loadSoundSurfaceGeoJsonIndexFile(geoJsonIndexFilePath);
-			var soundSurfaceVolume = magoManager.weatherStation.getSoundSurfaceVolume(i);
-			
-			var legendColors4 = new Float32Array([0/255, 0/255, 143/255, 128/255,    // 0
-			0/255, 15/255, 255/255, 128/255,   // 1
-			0/255, 95/255, 255/255, 128/255,   // 2
-			0/255, 175/255, 255/255, 128/255,  // 3
-			0/255, 255/255, 255/255, 128/255,  // 4
-			79/255, 255/255, 175/255, 128/255, // 5
-			159/255, 255/255, 95/255, 128/255, // 6
-			239/255, 255/255, 15/255, 128/255, // 7
-			255/255, 191/255, 0/255, 128/255,  // 8
-			255/255, 111/255, 0/255, 128/255,  // 9
-			255/255, 31/255, 0/255, 128/255,   // 10
-			207/255, 0/255, 0/255, 128/255,    // 11
-			127/255, 0/255, 0/255, 128/255,
-			127/255, 0/255, 0/255, 128/255,   // 13
-			0, 0, 0, 0,   // 14
-			0, 0, 0, 0, ]);  // 15
-
-			var min = 45.71200180053711;
-			min = 0.0;
-			var max = 89.40699768066406;
-			var range = max - min;
-			var legendColorsCount = legendColors4.length / 4;
-			var incre = range / (legendColorsCount - 1);
-			var valuesArray = [];
-			for (var j=0; j<legendColorsCount; j++)
-			{
-				valuesArray.push(incre * j + min);
-			}
-			var legendValues = new Float32Array(valuesArray);
-
-			soundSurfaceVolume.setLegendColors4(legendColors4);
-			soundSurfaceVolume.setLegendValues(legendValues);
-		}
-		*/
-
 
 		// Test brightness & contrast.
 		//magoManager.sceneState.brightnessContrastSaturation[1] += 0.05;
@@ -932,23 +619,6 @@
 
 	function bSplineTest(){
 		var magoManager = MAGO3D_INSTANCE.getMagoManager();
-
-		// Test creating a geoCoords array.***
-		/*
-		var geoCoordsList = magoManager.modeler.getGeographicCoordsList();
-
-		var geoCoord = new Mago3D.GeographicCoord(126.602859, 37.578267, 4.0);
-		geoCoord.makeDefaultGeoLocationData();
-		geoCoordsList.addGeoCoord(geoCoord);
-
-		geoCoord = new Mago3D.GeographicCoord(126.609269, 37.578233, 4.0);
-		geoCoord.makeDefaultGeoLocationData();
-		geoCoordsList.addGeoCoord(geoCoord);
-
-		geoCoord = new Mago3D.GeographicCoord(126.609374, 37.582697, 4.0);
-		geoCoord.makeDefaultGeoLocationData();
-		geoCoordsList.addGeoCoord(geoCoord);
-		*/
 		
 		if (magoManager.modeler)
 		{ 
@@ -971,12 +641,10 @@
 			var terrainProvider = magoManager.scene.globe.terrainProvider;
 
 			// very small region.***
-			//var minLon = 127.28989;
-			//var maxLon = 127.29974;
-			//var minLat = 36.50500;
-			//var maxLat = 36.51211;
-
-			
+			var minLon = 127.28989;
+			var maxLon = 127.29974;
+			var minLat = 36.50500;
+			var maxLat = 36.51211;
 
 			// try to augment region.
 			var increAux = 0.005; // error
@@ -998,10 +666,10 @@
 
 			
 			// big region.***
-			//var minLon = 127.23534;
-			//var maxLon = 127.33815;
-			//var minLat = 36.45798;
-			//var maxLat = 36.52817;
+			var minLon = 127.23534;
+			var maxLon = 127.33815;
+			var minLat = 36.45798;
+			var maxLat = 36.52817;
 
 			// 2:1 aspect rectangle.
 			//var minLon = 127.23534;
@@ -1010,22 +678,16 @@
 			//var maxLat = 36.52817 - (36.52817 - 36.45798) / 2;
 
 			// Sihung:::
-			//var minLon = 126.82956;
-			//var maxLon = 126.96281;
-			//var minLat = 37.29476;
-			//var maxLat = 37.36637;
+			var minLon = 126.82956;
+			var maxLon = 126.96281;
+			var minLat = 37.29476;
+			var maxLat = 37.36637;
 
 			// left of sihung.***
-			//var minLon = 126.76;
-			//var maxLon = 126.810;
-			//var minLat = 37.35;
-			//var maxLat = 37.382;
-
-			// sang-am
-			let minLon = 127.17013162426913;
-            let maxLon = 127.19462605136856;
-            let minLat = 37.607610265623755;
-            let maxLat = 37.62690595570507;
+			var minLon = 126.76;
+			var maxLon = 126.810;
+			var minLat = 37.35;
+			var maxLat = 37.382;
 
 			var degToRad = Math.PI/180.0;
 
@@ -1045,33 +707,16 @@
 			waterOptions.rainType = 0; // -1 = NO rain. 0= rain by a value (mm/h). 1= rain by a texture.***
 			waterOptions.rainValue_mmHour = 300.0;
 			waterOptions.maxSimulationSize = 1500;
-			waterOptions.terrainHeightEncodingBytes = 4; // 1, 2 or 4.***
+			waterOptions.terrainHeightEncodingBytes = 1; // 1, 2 or 4.***
 			waterOptions.waterSourceUrl = '/images/en/black.png';
 			waterOptions.waterSourceRainUrl = '/images/en/waterSourceTexTest_rain.png'; // NO necessary if rainType == 0.***
 			waterOptions.DEMHighMapUrl = '/images/en/demSampleTest.png'; // NO necessary if terrainDemSourceType == "QUANTIZEDMESH".***
 			magoManager.waterManager = new Mago3D.WaterManager(magoManager, waterOptions);
+			magoManager.waterManager.bSsimulateWater = true;
 
-			var settingOptions = {
-				simulationTimeStep : 0.05,
-				minWaterHeightToRender : 0.04,
-				waterRenderingHeightOffset : 0.7
-			};
-			magoManager.waterManager.setSimulationSettings(settingOptions);
-			//magoManager.waterManager.bSsimulateWater = true;
-
-			//magoManager.waterManager.test__createContaminationBox_sejong(magoManager);
-			//magoManager.modeler.__TEST__extrusionBuildings_sejongForWaterSimulation();
-
-			// to load extrusion buildings into water simulation.***
-			var extrusion = new Extrusion(MAGO3D_INSTANCE.getMagoManager(), {
-				"geoserverDataUrl": "http://175.197.92.213:10202/geoserver/lhdt/wfs",
-				"geoserverDataWorkspace": "lhdt",
-			});
-
-			extrusion.add("deia_ws2_extrision");
+			magoManager.waterManager.test__createContaminationBox_sejong(magoManager);
+			magoManager.modeler.__TEST__extrusionBuildings_sejongForWaterSimulation();
 		}
-
-		
 		
 		/*
 		if(!magoManager.waterManager)
@@ -1163,7 +808,7 @@
 		{
 			magoManager.soundManager = new Mago3D.SoundManager(magoManager);
 		}
-		//magoManager.soundManager._test_sound(); // active this if has terrain dem.***
+		magoManager.soundManager._test_sound();
 
 		// Aditionally do a smartTile test.***
 		//var sceneState = magoManager.sceneState;
@@ -1177,27 +822,7 @@
 		var hola = 0;
 	}//
 
-	function Chemical_Accident_Test (){ // 
-		var magoManager = MAGO3D_INSTANCE.getMagoManager();
-
-		// create chemicalAccidentManager, if no exist.***
-		if(!magoManager.chemicalAccidentManager)
-		{
-			var options = {
-				magoManager : magoManager,
-				geoJsonIndexFileFolderPath : "\\f4d\\chemicalAccident"
-			};
-			magoManager.chemicalAccidentManager = new Mago3D.ChemicalAccidentManager(options);
-
-			// set the geoJsonIndexFilePath.***
-			var geoJsonIndexFilePath = "\\f4d\\chemicalAccident\\JsonIndex.json"; 
-			magoManager.chemicalAccidentManager.load_chemicalAccidentIndexFile(geoJsonIndexFilePath);
-		}
-
-		var hola = 0;
-	}
-
-	const ArchInfoController = function (archInfoList, magoManager) {
+	const ArchInfoController = function(archInfoList, magoManager) {
 		this.hash = {};
 		this.magoManager = magoManager;
 	}

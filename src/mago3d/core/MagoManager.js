@@ -2063,6 +2063,12 @@ MagoManager.prototype._renderManagers_transparentPass = function ()
 			}
 		}
 	}
+
+	if (this.chemicalAccidentManager) // TransparentPass.***
+	{
+		// process to render chemical accident (texture 3d).***
+		this.chemicalAccidentManager.render();
+	}
 };
 
 /**
@@ -2487,7 +2493,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		};
 		
 		this.renderer.renderScreenRectangle(gl, options); // debug component.
-		this.renderer.renderScreenRectangleMosaic(gl, options); // debug component.
+		//this.renderer.renderScreenRectangleMosaic(gl, options); // debug component.
 		*/
 		//-----------------------------------------------------------
 
@@ -2508,6 +2514,85 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 	// Restore cesium gl settings.**************************************************************************
 	gl.clearColor(keepClearColor.red, keepClearColor.green, keepClearColor.blue, keepClearColor.alpha);
 	//------------------------------------------------------------------------------------------------------
+
+	// GLB TEST:::::::::::::::::::::::::::::::::::::::::::
+	if (this._glb_test === undefined)
+	{
+		this._glb_test = true;
+		/*
+		const origin = Cesium.Cartesian3.fromDegrees(126.607814, 37.582109, 50.0);
+		const modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(origin);
+		const model = this.scene.primitives.add(Cesium.Model.fromGltf({
+			url                     : '../f4d/gltf/znkimGlb.glb',
+			show                    : true,
+			modelMatrix             : modelMatrix,
+			allowPicking            : false,
+			debugShowBoundingVolume : false,
+			debugWireframe          : false,
+			ready                   : true
+		}));
+		*/
+		
+
+		//var viewer 
+		//viewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
+		//const inspectorViewModel = viewer.cesium3DTilesInspector.viewModel;
+
+
+		// HanamKyosan.******************************************************************
+		var url = "";
+		var bShowBox = true;
+		url        = '../f4d/3dtiles/temp_mgSets_HanamKyosan_Mode1_48/tileset.json';
+		//url        = '../f4d/3dtiles/temp_mgSets_HanamKyosan_12B/tileset.json';
+		const tileset = this.scene.primitives.add(new Cesium.Cesium3DTileset({
+			url                     : url,
+			lightColor              : new Cesium.Cartesian3(30.0, 30.0, 30.0),
+			debugShowBoundingVolume : bShowBox
+		}));
+
+		// WangSuk.******************************************************************
+		//url        = '../f4d/3dtiles/temp_mgSets_WangSuk_12B/tileset.json';
+		//url        = '../f4d/3dtiles/ion-ws2/tileset.json';
+		//url        = '../f4d/3dtiles/smallTestData_3Dtile/tileset.json';
+		//url        = '../f4d/3dtiles/temp_mgSets_WangSuk_Mode1_48/tileset.json';
+		//url        = '../f4d/3dtiles/temp_mgSets_WangSuk_Mode1_48_kml/tileset.json';
+		url        = '../f4d/3dtiles/Test3dData_WangSuk_3Dtile/tileset.json';
+		const tileset2 = this.scene.primitives.add(new Cesium.Cesium3DTileset({
+			url                     : url,
+			lightColor              : new Cesium.Cartesian3(30.0, 30.0, 30.0),
+			debugShowBoundingVolume : bShowBox,
+			debugShowUrl            : false
+		}));
+
+		// IncheonKyeYang.******************************************************************
+		//url        = '../f4d/3dtiles/temp_mgSets_InCheonKyeYang_12B/tileset.json';//
+		url        = '../f4d/3dtiles/temp_mgSets_IncheonKyeYang_Mode1_48/tileset.json';
+		const tileset3 = this.scene.primitives.add(new Cesium.Cesium3DTileset({
+			url                     : url,
+			lightColor              : new Cesium.Cartesian3(30.0, 30.0, 30.0),
+			debugShowBoundingVolume : bShowBox
+		}));
+
+		// Youido.*******************************************************************
+		url        = '../f4d/3dtiles/temp_mgSets_Youido_Mode1_48/tileset.json';
+		//url        = '../f4d/3dtiles/temp_mgSets_Youido_Mode1_48_small/tileset.json';
+		//url        = '../f4d/3dtiles/temp_mgSets_Youido_Mode1_48_small_1building/tileset.json';
+		const tileset4 = this.scene.primitives.add(new Cesium.Cesium3DTileset({
+			url                     : url,
+			lightColor              : new Cesium.Cartesian3(30.0, 30.0, 30.0),
+			debugShowBoundingVolume : bShowBox
+		}));
+
+		// I3DM.**********************************************************************
+		// trees.***
+		url        = '../f4d/3dtiles/treesInstances_3Dtile/tileset.json';
+		const tileset5 = this.scene.primitives.add(new Cesium.Cesium3DTileset({
+			url                     : url,
+			lightColor              : new Cesium.Cartesian3(30.0, 30.0, 30.0),
+			debugShowBoundingVolume : bShowBox
+		}));
+
+	}
 };
 
 /**

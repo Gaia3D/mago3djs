@@ -2172,6 +2172,8 @@ Renderer.prototype.renderTerrainCopy = function ()
 	// restore gl settings.***
 	gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
+
+
 	for (var i=0; i<8; i++)
 	{
 		gl.activeTexture(gl.TEXTURE0 + i);
@@ -2287,7 +2289,8 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 	if (magoManager.depthTex)
 	{
-		texture = magoManager.depthTex;
+		//texture = magoManager.depthTex;
+		texture = magoManager.scene._context.defaultNormalTexture._texture;
 	}
 
 	if (magoManager.cesiumColorBuffer)
@@ -2363,7 +2366,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 	if (magoManager.selectionFbo)
 	{
-		texture = magoManager.selectionFbo.colorBuffer;
+		//texture = magoManager.selectionFbo.colorBuffer;
 	}
 
 	if (magoManager.selColorTex)
@@ -2454,7 +2457,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 			{
 				if (soundLayer.pressureMosaicTexture3d_A.texturesArray.length > 0)
 				{
-					texture = soundLayer.pressureMosaicTexture3d_A.texturesArray[0];
+					//texture = soundLayer.pressureMosaicTexture3d_A.texturesArray[0];
 					//gl.uniform1i(shader.uTextureType_loc, 4); // This decodes 4byte color4.***
 				}
 			}
@@ -2613,7 +2616,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 			if (waterLayer.demWithBuildingsTex && waterLayer.demWithBuildingsTex.texId)
 			{
-				texture = waterLayer.demWithBuildingsTex.texId;
+				//texture = waterLayer.demWithBuildingsTex.texId;
 			}
 
 			if (waterLayer.dem_texture && waterLayer.dem_texture.texId)

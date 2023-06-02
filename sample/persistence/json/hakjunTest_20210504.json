@@ -1,0 +1,30 @@
+{
+"attributes": {
+"isPhysical": false
+},
+"children": [
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": false
+    },
+    "children": [],
+    "data_key": "A_00010",
+    "data_name": "A_00010",
+    "mapping_type":"origin",
+    "longitude": 126.910690,
+    "latitude": 37.518546,
+    "height": 12.720995,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+],
+	"parent": 0,
+	"depth": 1,
+	"view_order": 2,
+	"data_key": "hakjunTest_20210504",
+	"data_name": "hakjunTest_20210504",
+    "mapping_type": "origin"
+}

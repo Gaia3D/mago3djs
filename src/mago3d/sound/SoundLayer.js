@@ -127,7 +127,7 @@ SoundLayer.prototype.prepareTextures = function ()
 			}
 			else
 			{
-				// use latRange to determine the closes tile depth.
+				// use latRange to determine the closest tile depth.
 				var angDepthRange;
 				for (var i=1; i<30; i++)
 				{

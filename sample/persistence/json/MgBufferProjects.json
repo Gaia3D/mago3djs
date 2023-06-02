@@ -1,0 +1,32 @@
+{
+"attributes": {
+		"isPhysical": false,
+		"nodeType": "root",
+		"projectType": "MgBufferProjects",
+		"specularLighting": true
+},
+"children": [
+{
+		"attributes": {
+			"isPhysical": true,
+			"nodeType": "3DS"
+		},
+		"children": [],
+		"data_key": "DC_library_del",
+		"data_name": "대방어린이도서관",
+		"mapping_type": "origin",
+		"heading": 540,
+		"height": 52,
+		"latitude": 37.58323113709158,
+		"longitude": 126.60707277144827,
+		"pitch": 0,
+		"roll": 0
+	}
+],
+	"parent": 0,
+	"depth": 1,
+	"view_order": 2,
+	"data_key": "MgBufferProjects",
+	"data_name": "MgBufferProjects",
+    "mapping_type": "origin"
+}

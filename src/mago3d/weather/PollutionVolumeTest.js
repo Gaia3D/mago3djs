@@ -3,7 +3,7 @@
 /**
  * @class PollutionVolumeTest
  */
-var PollutionVolumeTest = function(options) 
+var PollutionVolumeTest = function (options) 
 {
 	if (!(this instanceof PollutionVolumeTest)) 
 	{
@@ -82,6 +82,13 @@ PollutionVolumeTest.prototype.render = function (magoManager)
 	}
 
 	//this._timeScale = 1000.0; // test.***
+	if (magoManager.animationTimeController === undefined)
+	{
+		var options = {
+			incrementalAddingTimeMilisec: 50
+		  };
+		  magoManager.animationTimeController = new AnimationTimeController(options);
+	}
 
 	var totalAnimTime = this._totalAnimTime;
 	var currTime = magoManager.animationTimeController.getCurrentTimeMilisec();

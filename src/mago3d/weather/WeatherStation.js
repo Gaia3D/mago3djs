@@ -586,7 +586,7 @@ WeatherStation.prototype.renderWeather = function (magoManager)
 	}
 
 	//this._TEST_addSoundJsonsArray(); // test. Delete this.***
-	//this._TEST_addPollutionJsonsArray(); // test. Delete this.***
+	this._TEST_addPollutionJsonsArray(); // test. Delete this.***
 	//this._TEST_itineraryJsonsArray(); // test. Delete this.***
 
 	/*
@@ -918,7 +918,7 @@ WeatherStation.prototype._TEST_itineraryJsonsArray = function()
 	}
 };
 
-WeatherStation.prototype._TEST_addPollutionJsonsArray = function()
+WeatherStation.prototype._TEST_addPollutionJsonsArray = function ()
 {
 	// load the jsond and push it into pollutionLayers.***
 	if (this._test_addingPollutionJsonsProcess === undefined)
@@ -968,8 +968,10 @@ WeatherStation.prototype._TEST_addPollutionJsonsArray = function()
 			this._test_addingPollutionJsonsProcess = CODE.processState.FINISHED;
 
 			// All json are loaded, so do the test:
+			var geoJsonIndexFileFolderPath = "\\f4d\\result_air_1minInterval";
 			var options = {
-				samplingDataIncrementTimeMilisec: 100
+				samplingDataIncrementTimeMilisec : 100,
+				geoJsonIndexFileFolderPath       : geoJsonIndexFileFolderPath
 			};
 			var pollutionVolume = this.newPollutionVolumeTest(options);
 

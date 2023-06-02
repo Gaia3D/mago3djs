@@ -1,0 +1,32 @@
+{
+"attributes": {
+	"nodeType": "root",
+		"projectType": "3ds",
+"isPhysical": false
+},
+"children": [
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": false
+    },
+    "children": [],
+    "data_key": "A1_101_01",
+    "data_name": "A1_101_01",
+    "mapping_type":"origin",
+    "longitude": 126.80187,
+    "latitude": 37.42458,
+    "altitude": 200.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+],
+"parent": 0,
+"depth": 1,
+"view_order": 2,
+"data_key": "test_f4d",
+"data_name": "test_f4d",
+"mapping_type": "origin"
+}
