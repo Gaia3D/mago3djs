@@ -225,12 +225,12 @@ ChemicalAccidentManager.prototype.render = function ()
 		this._animationState = CODE.processState.STARTED;
 	}
 	
-	if (this._totalAnimTime === undefined) 
-	{
-		var pollLayer = this._pollutionLayersArray[0];
-		//this._totalAnimTime = pollLayer.getTotalAnimationTimeMinutes() * 60 * 1000.0; // miliseconds.***
-		this._totalAnimTime = 30000; // test delete.!! 30 seconds.***
-	}
+	//if (this._totalAnimTime === undefined) 
+	//{
+	//	var pollLayer = this._pollutionLayersArray[0];
+	//	//this._totalAnimTime = pollLayer.getTotalAnimationTimeMinutes() * 60 * 1000.0; // miliseconds.***
+	//	this._totalAnimTime = 30000; // test delete.!! 30 seconds.***
+	//}
 
 	if (this._timeScale === undefined) 
 	{
@@ -259,15 +259,23 @@ ChemicalAccidentManager.prototype.render = function ()
 		//this._animationStartTime += num * totalAnimTime;
 		//this._increTime = currTime - this._animationStartTime;
 	}
-	/*
+	
 	// Render layers.***
-	var pollutionLayersCount = this.getPollutionLayersCount();
+	var pollutionLayersCount = this.chemAccidentLayersArray.length;
 	for (var i=0; i<pollutionLayersCount; i++)
 	{
-		var pollLayer = this._pollutionLayersArray[i];
+		var pollLayer = this.chemAccidentLayersArray[i];
 		pollLayer.render(magoManager);
 	}
-	*/
+
+	// ************.MAIN-FRAMEBUFFER.************************************.MAIN-FRAMEBUFFER.************************
+	// Once finished simulation, bind the current framebuffer. 
+	
+	var gl = magoManager.getGl();
+	var sceneState = magoManager.sceneState;
+	magoManager.bindMainFramebuffer();
+	gl.viewport(0, 0, sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0]);
+	
 	var hola = 0;
 };
 

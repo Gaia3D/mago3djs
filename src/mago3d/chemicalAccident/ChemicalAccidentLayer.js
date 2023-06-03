@@ -85,7 +85,11 @@ var ChemicalAccidentLayer = function(options)
 
 	this._isPrepared = false;
 	//this._terrainSamplingState = CODE.processState.NO_STARTED;
+
+	// object to render.***
+	this.simulationBox = undefined;
 	this.vboKeysContainer;
+	this.volumeDepthFBO = undefined;
 
 	if (options)
 	{
@@ -145,7 +149,7 @@ ChemicalAccidentLayer.prototype._load_indexFile = function (indexFilePath)
 };
 
 
-ChemicalAccidentLayer.prototype._MakeDepthBox = function ()
+ChemicalAccidentLayer.prototype._makeSimulationBox = function ()
 {
 	// make the depth box.***
 	// the depth box is used for volumetric rendering. The depthBox renders rearFaces & frontFaces, so
@@ -191,9 +195,165 @@ ChemicalAccidentLayer.prototype._MakeDepthBox = function ()
 	var extrusionVector = undefined;
 	var bIncludeBottomCap = undefined;
 	var bIncludeTopCap = undefined;
-	var depthBoxMesh = Modeler.getExtrudedMesh(profile2d, extrusionDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, undefined);
+	var surfIndepMesh = Modeler.getExtrudedMesh(profile2d, extrusionDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, undefined);
 
+	// now make the renderable object of the simulationBox.***
+	if (!this.simulationBox)
+	{
+		this.simulationBox = new RenderableObject();
+	}
+	this.simulationBox.geoLocDataManager = new GeoLocationDataManager();
+	var geoLocDataOfBox = this.simulationBox.geoLocDataManager.newGeoLocationData();
+	var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
+
+	geoLocDataOfBox.copyFrom(geoLocData);
+
+	this.simulationBox.objectsArray.push(surfIndepMesh);
 	var hola = 0;
+};
+
+ChemicalAccidentLayer.prototype._getVolumeDepthFBO = function()
+{
+	//      +-----------+-----------+
+	//      |           |           | 
+	//      |   tex_0   |   tex_1   |
+	//      |           |           |
+	//      +-----------+-----------+
+	// Note : the width of fbo must be the double of the screen width.***
+	if (!this.volumeDepthFBO)
+	{
+		var magoManager = this.chemicalAccidentManager.magoManager;
+		var gl = magoManager.getGl();
+		var sceneState = magoManager.sceneState;
+		var bufferWidth = sceneState.drawingBufferWidth[0] * 2; // double of the screen width.***
+		var bufferHeight = sceneState.drawingBufferHeight[0];
+		var bUseMultiRenderTarget = magoManager.postFxShadersManager.bUseMultiRenderTarget;
+		this.volumeDepthFBO = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 4}); 
+	}
+
+	return this.volumeDepthFBO;
+};
+
+ChemicalAccidentLayer.prototype._renderDepthVolume = function ()
+{
+	// Render depth 2 times:
+	// 1- render the rear faces.
+	// 2- render the front faces.
+	//-------------------------------
+	var magoManager = this.chemicalAccidentManager.magoManager;
+	var sceneState = magoManager.sceneState;
+	var gl = magoManager.getGl();
+	var extbuffers = magoManager.extbuffers;
+
+	// Now, render the windPlane.
+	if (!this.visibleObjControler)
+	{
+		this.visibleObjControler = new VisibleObjectsController();
+	}
+
+	//this.simulationBox = this._getSimulationBox(magoManager);
+
+	if (this.simulationBox)
+	{ this.visibleObjControler.currentVisibleNativeObjects.opaquesArray[0] = this.simulationBox; }
+
+	// Bind FBO.***
+	//      +-----------------+----------------+
+	//      |                 |                | 
+	//      |   front depth   |   rear depth   |
+	//      |                 |                |
+	//      +-----------------+----------------+
+	// Note : the width of fbo must be the double of the screen width.***
+
+	// Front Face.***************************************************************************************************************************
+	var doubleFBO = this._getVolumeDepthFBO(magoManager);
+	doubleFBO.bind();
+	gl.viewport(0, 0, doubleFBO.width[0]/2, doubleFBO.height[0]);
+
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, doubleFBO.colorBuffersArray[0], 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, doubleFBO.colorBuffersArray[1], 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, doubleFBO.colorBuffersArray[2], 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, doubleFBO.colorBuffersArray[3], 0);
+
+	extbuffers.drawBuffersWEBGL([
+		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
+		extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - depthTex (front).
+		extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - normalTex
+		extbuffers.COLOR_ATTACHMENT3_WEBGL // gl_FragData[3] - albedoTex
+	  ]);
+
+	//if (magoManager.isFarestFrustum())// === 2)
+	if (magoManager.currentFrustumIdx === 2)
+	{
+		gl.clearColor(0, 0, 0, 0);
+		gl.clearDepth(1);
+		gl.clear(gl.COLOR_BUFFER_BIT);
+		gl.clearColor(0, 0, 0, 1);
+	}
+
+	gl.clear(gl.DEPTH_BUFFER_BIT);
+
+	var renderType = 1;
+	gl.frontFace(gl.CCW);
+	magoManager.renderer.renderGeometryBuffer(gl, renderType, this.visibleObjControler);
+
+	// Test:
+	this.simulBoxdoubleDepthTex = doubleFBO.colorBuffersArray[1];
+	this.simulBoxDoubleNormalTex = doubleFBO.colorBuffersArray[2];
+
+	// End front face.---------------------------------------------------------------------------------------------------------------------------
+
+	// Rear Face.***************************************************************************************************************************
+	gl.viewport(doubleFBO.width[0]/2, 0, doubleFBO.width[0]/2, doubleFBO.height[0]);
+
+
+	var renderType = 1;
+	gl.frontFace(gl.CW);
+	magoManager.renderer.renderGeometryBuffer(gl, renderType, this.visibleObjControler);
+	// End rear face.---------------------------------------------------------------------------------------------------------------------------
+
+	// unbind fbo.***
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, null, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0);
+	doubleFBO.unbind();
+
+	// Return to main framebuffer.************************
+	// return default values:
+	gl.frontFace(gl.CCW);
+	/*
+	magoManager.bindMainFramebuffer();
+
+	// unbind mago colorTextures:
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // depthTex.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // albedoTex.
+	extbuffers.drawBuffersWEBGL([
+		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
+		extbuffers.NONE, // gl_FragData[1]
+		extbuffers.NONE, // gl_FragData[2]
+		extbuffers.NONE, // gl_FragData[3]
+	]);
+	*/
+};
+
+ChemicalAccidentLayer.prototype.render = function ()
+{
+	// render the depthBox.***
+	if (this.simulationBox === undefined)
+	{
+		this._makeSimulationBox();
+	}
+
+	this._renderDepthVolume();
+
+	var magoManager = this.chemicalAccidentManager.magoManager;
+	var gl = magoManager.sceneState.gl;
+	var currentShader = magoManager.postFxShadersManager.getShader("modelRefDepth");
+
+	gl.disable(gl.BLEND);
+	gl.depthMask(true);
+	magoManager.postFxShadersManager.useProgram(null);
 };
 
 ChemicalAccidentLayer.prototype._prepareLayer = function ()
@@ -271,164 +431,18 @@ ChemicalAccidentLayer.prototype._prepareLayer = function ()
 		var roll = 0.0;
 
 		geoLocData = ManagerUtils.calculateGeoLocationData(centerGeoCoord.longitude, centerGeoCoord.latitude, centerGeoCoord.altitude, heading, pitch, roll, geoLocData);
-
-		// Note : the rectangle has buildingRotMatrix = Identity !
-		geoLocData.rotMatrix.Identity();
-		//---------------------------------------------------------
 	}
 
 	// make the depth box.***
 	// the depth box is used for volumetric rendering. The depthBox renders rearFaces & frontFaces, so
 	// creates the volumetric zone.***
-	if (!this._depthBoxMade)
+	if (!this.simulationBox)
 	{
-		this._MakeDepthBox();
-		/*
-		var magoManager = this.chemicalAccidentManager.magoManager;
-
-		// create a mesh data container.***
-		if (this.vboKeysContainer === undefined)
-		{
-			this.vboKeysContainer = new VBOVertexIdxCacheKeysContainer();
-
-			// create a vboKey.***
-			this.vboKeysContainer.newVBOVertexIdxCacheKey();
-		}
-		var vboKey = this.vboKeysContainer.getVboKey(0);
-
-		// Take the numCols & numRoes from the 1rst timeSlice.***
-		var timeSlice = this._timeSlicesArray[0];
-		var numCols = timeSlice._jsonFile.columnsCount;
-		var numRows = timeSlice._jsonFile.rowsCount;
-		numCols = 2;
-		numRows = 2;
-		var geoJsonIndexFile = this.chemicalAccidentManager._geoJsonIndexFile;
-		var centerGeoCoord = geoJsonIndexFile.centerGeographicCoord;
-
-		// must find the 4 geoCoords of the rectangle.***
-		var widthMeters = geoJsonIndexFile.height_km * 1000.0;
-		var heightMeters = geoJsonIndexFile.width_km * 1000.0;
-		var resultObject = Globe.getRectangleMeshOnEllisoideCenteredAtGeographicCoord(centerGeoCoord, widthMeters, heightMeters, numCols, numRows);
-
-		vboKey.setDataArrayIdx(resultObject.indices, magoManager.vboMemoryManager);
-
-		//////////////////////////////////////////////////////////////////////////////////////////////
-		var magoManager = this.chemicalAccidentManager.weatherStation.magoManager;
-		var terrainProvider = magoManager.scene.globe.terrainProvider;
-		var maxZoom = MagoManager.getMaximumLevelOfTerrainProvider(terrainProvider);
-		//////////////////////////////////////////////////////////////////////////////////////////////
-
-		// Now, must transform points to geoCoords.***
-		var bStoreAbsolutePosition = false;
-		var pointsArray = resultObject.pointsArray; // Point3D array.***
-		this._texCoordsArray = resultObject.texCoordsArray;
-		var result = Globe.Point3DToGeographicWgs84Array(pointsArray, bStoreAbsolutePosition);
-		var geoCoordsArray = result.geoCoordsArray;
-
-		// Now, transform geoCoords to Cesium.Cartographic {lonRad, latRad, height}.***
-		var geoCoordsCount = geoCoordsArray.length;
-		this._cartographicsArray = new Array(geoCoordsCount); // {lonRad, latRad, height} array.***
-		for (var i=0; i<geoCoordsCount; i++)
-		{
-			var geoCoord = geoCoordsArray[i];
-			this._cartographicsArray[i] = Cesium.Cartographic.fromDegrees(geoCoord.longitude, geoCoord.latitude);
-		}
-
-		// Finally sample terrain.***
-		var terrainLevel = 10;
-		if (terrainLevel > maxZoom)
-		{
-			terrainLevel = maxZoom;
-		}
-		var promise = Cesium.sampleTerrain(terrainProvider, terrainLevel, this._cartographicsArray);
-		var that = this;
-		Cesium.when(promise, function(updatedPositions) 
-		{
-			// positions[0].height and positions[1].height have been updated.
-			// updatedPositions is just a reference to positions.
-			//console.log('XXX - Height in meters is: ' + updatedPositions[0].height);
-			that._terrainSamplingState = CODE.processState.FINISHED;
-		});
-		*/
-		this._depthBoxMade = true;
+		this._makeSimulationBox();
 	}
 
-	if (this._terrainSamplingState !== CODE.processState.FINISHED)
-	{
-		return false;
-	}
 
-	if (this._makingRectangleMeshProcess === undefined)
-	{
-		this._makingRectangleMeshProcess = CODE.processState.NO_STARTED;
-	}
 
-	if (this._makingRectangleMeshProcess === CODE.processState.NO_STARTED)
-	{
-		// Now, make the rectangle's vbo.***
-		// 1rst, for all points, add 10m to altitude.***
-		var altitude = 10.0;
-		var cartographicsCount = this._cartographicsArray.length;
-		var lonArray = new Array(cartographicsCount);
-		var latArray = new Array(cartographicsCount);
-		var altArray = new Array(cartographicsCount);
-		for (var i=0; i<cartographicsCount; i++)
-		{
-			var cartographic = this._cartographicsArray[i]; // Cartographic {longitude, latitude, height}
-			lonArray[i] = cartographic.longitude;
-			latArray[i] = cartographic.latitude;
-			altArray[i] = cartographic.height + altitude;
-		}
-
-		var positions = Globe.geographicRadianArrayToFloat32ArrayWgs84(lonArray, latArray, altArray, undefined);
-
-		// Now, create a geolocationData.***
-		// Find the centerPosition, and recalculate all position to the centerPosition.***
-		var localPositions = GeometryUtils.getCenterPositionAndLocalPositions3DFloat32(positions);
-		var centerPos = localPositions.centerPos;
-
-		// Now, calculate the geoCoord of the centerPos.***
-		var centerGeoCoord = Globe.CartesianToGeographicWgs84(centerPos.x, centerPos.y, centerPos.z, undefined, false);
-
-		if (this.geoLocDataManager === undefined)
-		{ this.geoLocDataManager = new GeoLocationDataManager(); }
-
-		var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
-		if (geoLocData === undefined)
-		{
-			geoLocData = this.geoLocDataManager.newGeoLocationData("default");
-		}
-
-		var heading = 0.0;
-		var pitch = 0.0;
-		var roll = 0.0;
-
-		geoLocData = ManagerUtils.calculateGeoLocationData(centerGeoCoord.longitude, centerGeoCoord.latitude, centerGeoCoord.altitude, heading, pitch, roll, geoLocData);
-
-		// Note : the rectangle has buildingRotMatrix = Identity !
-		geoLocData.rotMatrix.Identity();
-		//---------------------------------------------------------
-
-		// Now, set vbo position & texCoords.***
-		var magoManager = this.chemicalAccidentManager.weatherStation.magoManager;
-		var vboKey = this.vboKeysContainer.getVboKey(0);
-		vboKey.setDataArrayPos(localPositions.localPosFloatArray, magoManager.vboMemoryManager);
-
-		// this._texCoordsArray
-		var texCoordsCount = this._texCoordsArray.length;
-		var texCoordsFloatArray = new Float32Array(texCoordsCount*2);
-		for (var i=0; i<texCoordsCount; i++)
-		{
-			var texCoord = this._texCoordsArray[i];
-			texCoordsFloatArray[2*i] = texCoord.x;
-			texCoordsFloatArray[2*i+1] = texCoord.y;
-		}
-		vboKey.setDataArrayTexCoord(texCoordsFloatArray, magoManager.vboMemoryManager);
-
-		// The process finished.***
-		this._makingRectangleMeshProcess = CODE.processState.FINISHED;
-		return false;
-	}
 
 	// If all process are finished, then set isPrepared as true.***
 	this._isPrepared = true;

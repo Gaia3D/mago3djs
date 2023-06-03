@@ -2583,6 +2583,26 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 		}
 	}
 
+	// chemicalAccidentManager.*** chemicalAccidentManager.*** chemicalAccidentManager.*** chemicalAccidentManager.*** chemicalAccidentManager.***
+	if (magoManager.chemicalAccidentManager && magoManager.chemicalAccidentManager.chemAccidentLayersArray)
+	{
+		if (magoManager.chemicalAccidentManager.chemAccidentLayersArray.length > 0)
+		{
+			var chemAccLayer = magoManager.chemicalAccidentManager.chemAccidentLayersArray[0];
+
+			if (chemAccLayer.simulBoxdoubleDepthTex)
+			{
+				texture = chemAccLayer.simulBoxdoubleDepthTex;
+			}
+	
+			if (chemAccLayer.simulBoxDoubleNormalTex)
+			{
+				//texture = chemAccLayer.simulBoxDoubleNormalTex;
+			}
+		}
+		
+	}
+
 	// waterManager.*** waterManager.*** waterManager.*** waterManager.*** waterManager.*** waterManager.*** waterManager.*** waterManager.*** waterManager.***
 	if (magoManager.waterManager)
 	{
