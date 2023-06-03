@@ -224,7 +224,7 @@ ChemicalAccidentManager.prototype.render = function ()
 	{
 		this._animationState = CODE.processState.STARTED;
 	}
-	/*
+	
 	if (this._totalAnimTime === undefined) 
 	{
 		var pollLayer = this._pollutionLayersArray[0];
@@ -259,7 +259,7 @@ ChemicalAccidentManager.prototype.render = function ()
 		//this._animationStartTime += num * totalAnimTime;
 		//this._increTime = currTime - this._animationStartTime;
 	}
-
+	/*
 	// Render layers.***
 	var pollutionLayersCount = this.getPollutionLayersCount();
 	for (var i=0; i<pollutionLayersCount; i++)

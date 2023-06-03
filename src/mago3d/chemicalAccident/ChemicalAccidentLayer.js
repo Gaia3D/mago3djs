@@ -53,6 +53,10 @@ ChemicalAccidentTimeSlice.prototype._prepare = function ()
 	return this._isPrepared;
 };
 
+//------------------------------------------------------------------------------------------------------------
+
+//************************************************************************************************************
+//************************************************************************************************************
 /**
  * @class ChemicalAccidentLayer
  */
@@ -78,6 +82,10 @@ var ChemicalAccidentLayer = function(options)
 	this._increTime;
 
 	this._timeSlicesArray;
+
+	this._isPrepared = false;
+	//this._terrainSamplingState = CODE.processState.NO_STARTED;
+	this.vboKeysContainer;
 
 	if (options)
 	{
@@ -136,6 +144,58 @@ ChemicalAccidentLayer.prototype._load_indexFile = function (indexFilePath)
 	}
 };
 
+
+ChemicalAccidentLayer.prototype._MakeDepthBox = function ()
+{
+	// make the depth box.***
+	// the depth box is used for volumetric rendering. The depthBox renders rearFaces & frontFaces, so
+	// creates the volumetric zone.***
+	//-------------------------------------------------------------------------------------------------
+
+	// 1. Calculate the rectangle in local coord.***
+	var magoManager = this.chemicalAccidentManager.magoManager;
+
+	var geoJsonIndexFile = this.chemicalAccidentManager._geoJsonIndexFile;
+	var centerGeoCoord = geoJsonIndexFile.centerGeographicCoord;
+
+	// must find the 4 geoCoords of the rectangle.***
+	var widthMeters = geoJsonIndexFile.height_km * 1000.0;
+	var heightMeters = geoJsonIndexFile.width_km * 1000.0;
+	var semiWidthMeters = widthMeters / 2.0;
+	var semiHeightMeters = heightMeters / 2.0;
+
+	// create the local rectangle.***
+	var pointsLCArray = [];
+
+	// leftDown corner.***
+	var point3d = new Point2D(-semiWidthMeters, -semiHeightMeters);
+	pointsLCArray.push(point3d);
+
+	// rightDown corner.***
+	point3d = new Point2D(semiWidthMeters, -semiHeightMeters);
+	pointsLCArray.push(point3d);
+
+	// rightUp corner.***
+	point3d = new Point2D(semiWidthMeters, semiHeightMeters);
+	pointsLCArray.push(point3d);
+
+	// leftUp corner.***
+	point3d = new Point2D(-semiWidthMeters, semiHeightMeters);
+	pointsLCArray.push(point3d);
+
+	var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
+
+	var profile2d = Profile2D.fromPoint2DArray(pointsLCArray);
+	var extrusionDist = 500.0;
+	var extrudeSegmentsCount = 1;
+	var extrusionVector = undefined;
+	var bIncludeBottomCap = undefined;
+	var bIncludeTopCap = undefined;
+	var depthBoxMesh = Modeler.getExtrudedMesh(profile2d, extrusionDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, undefined);
+
+	var hola = 0;
+};
+
 ChemicalAccidentLayer.prototype._prepareLayer = function ()
 {
 	if (this._isPrepared)
@@ -192,11 +252,39 @@ ChemicalAccidentLayer.prototype._prepareLayer = function ()
 		this._terrainSampled = false;
 	}
 
-	if (this._terrainSamplingState === CODE.processState.NO_STARTED)
+	if (this.geoLocDataManager === undefined)
 	{
-		this._terrainSamplingState = CODE.processState.STARTED;
+		// Now, calculate the geoCoord of the centerPos.***
+		var geoJsonIndexFile = this.chemicalAccidentManager._geoJsonIndexFile;
+		var centerGeoCoord = geoJsonIndexFile.centerGeographicCoord;
 
-		var magoManager = this._pollutionVolumeOwner.weatherStation.magoManager;
+		this.geoLocDataManager = new GeoLocationDataManager();
+
+		var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
+		if (geoLocData === undefined)
+		{
+			geoLocData = this.geoLocDataManager.newGeoLocationData("default");
+		}
+
+		var heading = 0.0;
+		var pitch = 0.0;
+		var roll = 0.0;
+
+		geoLocData = ManagerUtils.calculateGeoLocationData(centerGeoCoord.longitude, centerGeoCoord.latitude, centerGeoCoord.altitude, heading, pitch, roll, geoLocData);
+
+		// Note : the rectangle has buildingRotMatrix = Identity !
+		geoLocData.rotMatrix.Identity();
+		//---------------------------------------------------------
+	}
+
+	// make the depth box.***
+	// the depth box is used for volumetric rendering. The depthBox renders rearFaces & frontFaces, so
+	// creates the volumetric zone.***
+	if (!this._depthBoxMade)
+	{
+		this._MakeDepthBox();
+		/*
+		var magoManager = this.chemicalAccidentManager.magoManager;
 
 		// create a mesh data container.***
 		if (this.vboKeysContainer === undefined)
@@ -212,7 +300,9 @@ ChemicalAccidentLayer.prototype._prepareLayer = function ()
 		var timeSlice = this._timeSlicesArray[0];
 		var numCols = timeSlice._jsonFile.columnsCount;
 		var numRows = timeSlice._jsonFile.rowsCount;
-		var geoJsonIndexFile = this._pollutionVolumeOwner._geoJsonIndexFile;
+		numCols = 2;
+		numRows = 2;
+		var geoJsonIndexFile = this.chemicalAccidentManager._geoJsonIndexFile;
 		var centerGeoCoord = geoJsonIndexFile.centerGeographicCoord;
 
 		// must find the 4 geoCoords of the rectangle.***
@@ -223,7 +313,7 @@ ChemicalAccidentLayer.prototype._prepareLayer = function ()
 		vboKey.setDataArrayIdx(resultObject.indices, magoManager.vboMemoryManager);
 
 		//////////////////////////////////////////////////////////////////////////////////////////////
-		var magoManager = this._pollutionVolumeOwner.weatherStation.magoManager;
+		var magoManager = this.chemicalAccidentManager.weatherStation.magoManager;
 		var terrainProvider = magoManager.scene.globe.terrainProvider;
 		var maxZoom = MagoManager.getMaximumLevelOfTerrainProvider(terrainProvider);
 		//////////////////////////////////////////////////////////////////////////////////////////////
@@ -259,6 +349,8 @@ ChemicalAccidentLayer.prototype._prepareLayer = function ()
 			//console.log('XXX - Height in meters is: ' + updatedPositions[0].height);
 			that._terrainSamplingState = CODE.processState.FINISHED;
 		});
+		*/
+		this._depthBoxMade = true;
 	}
 
 	if (this._terrainSamplingState !== CODE.processState.FINISHED)
@@ -318,7 +410,7 @@ ChemicalAccidentLayer.prototype._prepareLayer = function ()
 		//---------------------------------------------------------
 
 		// Now, set vbo position & texCoords.***
-		var magoManager = this._pollutionVolumeOwner.weatherStation.magoManager;
+		var magoManager = this.chemicalAccidentManager.weatherStation.magoManager;
 		var vboKey = this.vboKeysContainer.getVboKey(0);
 		vboKey.setDataArrayPos(localPositions.localPosFloatArray, magoManager.vboMemoryManager);
 
