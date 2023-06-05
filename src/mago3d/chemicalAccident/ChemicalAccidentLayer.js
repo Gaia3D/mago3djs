@@ -10,11 +10,14 @@ var ChemicalAccidentTimeSlice = function(options)
 		 throw new Error(Messages.CONSTRUCT_ERROR);
 	 }
 
-	 this._fileileLoadState = CODE.fileLoadState.READY;
+	 this._fileLoadState = CODE.fileLoadState.READY;
 	 this._filePath;
 	 this._jsonFile;
 	 this._isPrepared = false;
 	 this._glTexture;
+
+	 this._texture3dCreated = false;
+	 this._texture3d;
 
 	 if (options !== undefined)
 	 {
@@ -32,18 +35,18 @@ ChemicalAccidentTimeSlice.prototype._prepare = function ()
 		return true;
 	}
 
-	if (this._fileileLoadState === CODE.fileLoadState.READY)
+	if (this._fileLoadState === CODE.fileLoadState.READY)
 	{
-		this._fileileLoadState = CODE.fileLoadState.LOADING_STARTED;
+		this._fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 		var that = this;
 		loadWithXhr(this._filePath, undefined, undefined, 'json', 'GET').done(function(res) 
 		{
-			that._fileileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			that._fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 			that._jsonFile = res;
 		});
 	}
 
-	if (this._fileileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
+	if (this._fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
 	{
 		return false;
 	}
@@ -51,6 +54,32 @@ ChemicalAccidentTimeSlice.prototype._prepare = function ()
 	this._isPrepared = true;
 
 	return this._isPrepared;
+};
+
+ChemicalAccidentTimeSlice.prototype._makeTextures = function (gl)
+{
+	if (!this._texture3dCreated)
+	{
+		this._texture3d = new MagoTexture3D();
+		this._texture3d.createTextures(gl);
+
+		// set seture3d params.***
+		this._texture3d.texture3DXSize = this._jsonFile.columnsCount;
+		this._texture3d.texture3DYSize = this._jsonFile.rowsCount;
+		this._texture3d.texture3DZSize = 50; // test HARDCODING.***
+
+		// The 3D texture into a mosaic texture matrix params.***
+		var result = Voxelizer.getMosaicColumnsAndRows(this._texture3d.texture3DXSize, this._texture3d.texture3DYSize, this._texture3d.texture3DZSize);
+		var mosaicXCount = result.numColumns;
+		var mosaicYCount = result.numRows;
+		this._texture3d.mosaicXCount = mosaicXCount;
+		this._texture3d.mosaicYCount = mosaicYCount;
+
+		//----------------------------------------------------------
+		this._texture3dCreated = true;
+	}
+
+	return this._texture3dCreated;
 };
 
 //------------------------------------------------------------------------------------------------------------
@@ -90,6 +119,7 @@ var ChemicalAccidentLayer = function(options)
 	this.simulationBox = undefined;
 	this.vboKeysContainer;
 	this.volumeDepthFBO = undefined;
+	this.screenFBO = undefined;
 
 	if (options)
 	{
@@ -234,6 +264,22 @@ ChemicalAccidentLayer.prototype._getVolumeDepthFBO = function()
 	return this.volumeDepthFBO;
 };
 
+ChemicalAccidentLayer.prototype._getScreenFBO = function(magoManager)
+{
+	// This is a screen size FBO.***
+	if (!this.screenFBO)
+	{
+		var gl = magoManager.getGl();
+		var sceneState = magoManager.sceneState;
+		var bufferWidth = sceneState.drawingBufferWidth[0]; 
+		var bufferHeight = sceneState.drawingBufferHeight[0];
+		var bUseMultiRenderTarget = magoManager.postFxShadersManager.bUseMultiRenderTarget;
+		this.screenFBO = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 4}); 
+	}
+
+	return this.screenFBO;
+};
+
 ChemicalAccidentLayer.prototype._renderDepthVolume = function ()
 {
 	// Render depth 2 times:
@@ -337,6 +383,23 @@ ChemicalAccidentLayer.prototype._renderDepthVolume = function ()
 	*/
 };
 
+ChemicalAccidentLayer.prototype._makeTextures = function (gl)
+{
+	var allTimeSlicesTexturesMade = true;
+	var timeSlicesCount = this._timeSlicesArray.length;
+	for (var i=0; i<timeSlicesCount; i++)
+	{
+		var timeSlice = this._timeSlicesArray[i];
+		if (!timeSlice._makeTextures(gl))
+		{
+			allTimeSlicesTexturesMade = false;
+		}
+	}
+
+	return allTimeSlicesTexturesMade;
+
+};
+
 ChemicalAccidentLayer.prototype.render = function ()
 {
 	// render the depthBox.***
@@ -346,14 +409,140 @@ ChemicalAccidentLayer.prototype.render = function ()
 	}
 
 	this._renderDepthVolume();
-
+	
+	// Now, do volumetric render with the mosaic textures 3d.***
 	var magoManager = this.chemicalAccidentManager.magoManager;
-	var gl = magoManager.sceneState.gl;
-	var currentShader = magoManager.postFxShadersManager.getShader("modelRefDepth");
+	var chemicalAccidentManager = this.chemicalAccidentManager;
+	var sceneState = magoManager.sceneState;
+	var gl = magoManager.getGl();
+	var fbo = this._getScreenFBO(magoManager);
+	var extbuffers = fbo.extbuffers;
+
+	fbo.bind();
+	gl.viewport(0, 0, fbo.width[0], fbo.height[0]);
+
+	var screenQuad = chemicalAccidentManager.getQuadBuffer();
+	var shader = magoManager.postFxShadersManager.getShader("volumetric"); // (waterQuadVertVS, chemicalAccidentVolumRenderFS)
+	magoManager.postFxShadersManager.useProgram(shader);
+
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, fbo.colorBuffersArray[0], 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, fbo.colorBuffersArray[1], 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, fbo.colorBuffersArray[2], 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, fbo.colorBuffersArray[3], 0);
+
+	// Test:
+	this.volumRenderTex = fbo.colorBuffersArray[0];
+
+	
+
+	extbuffers.drawBuffersWEBGL([
+		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
+		extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] 
+		extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2]
+		extbuffers.COLOR_ATTACHMENT3_WEBGL // gl_FragData[3]
+	  ]);
+
+	//if (magoManager.isFarestFrustum())// === 2)
+	if (magoManager.currentFrustumIdx === 2)
+	{
+		gl.clearColor(0, 0, 0, 0);
+		gl.clearDepth(1);
+		gl.clear(gl.COLOR_BUFFER_BIT);
+		gl.clearColor(0, 0, 0, 1);
+	}
+
+	gl.clear(gl.DEPTH_BUFFER_BIT);
+
+	// bind screenQuad positions.
+	FBO.bindAttribute(gl, screenQuad.posBuffer, shader.a_pos_loc, 2);
 
 	gl.disable(gl.BLEND);
-	gl.depthMask(true);
-	magoManager.postFxShadersManager.useProgram(null);
+	gl.enable(gl.DEPTH_TEST);
+
+	/*
+
+	var refTex3D = this.fluxRFUMosaicTexture3d_HIGH_A; // we can take any other texture3D.***
+
+	// bind uniforms.***
+	shader.bindUniformGenerals();
+
+	gl.uniform1iv(shader.u_texSize_loc, [refTex3D.texture3DXSize, refTex3D.texture3DYSize, refTex3D.texture3DZSize]); // The original texture3D size.***
+	gl.uniform1iv(shader.u_mosaicSize_loc, [refTex3D.mosaicXCount, refTex3D.mosaicYCount, refTex3D.finalSlicesCount]); // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***
+	var modelViewMatrixRelToEyeInv = sceneState.getModelViewRelToEyeMatrixInv();
+	gl.uniformMatrix4fv(shader.modelViewMatrixRelToEyeInv_loc, false, modelViewMatrixRelToEyeInv._floatArrays);
+	gl.uniform1f(shader.u_airMaxPressure_loc, soundManager.airMaxPressure);
+	gl.uniform1f(shader.u_airEnvirontmentPressure_loc, soundManager.airEnvirontmentPressure);
+	gl.uniform1f(shader.u_maxVelocity_loc, soundManager.airMaxVelocity);
+	gl.uniform2fv(shader.u_screenSize_loc, [sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0]]);
+	gl.uniform2fv(shader.uNearFarArray_loc, magoManager.frustumVolumeControl.nearFarArray);
+	gl.uniform3fv(shader.u_voxelSizeMeters_loc, [this.oneVoxelSizeInMeters[0], this.oneVoxelSizeInMeters[1], this.oneVoxelSizeInMeters[2]]); // The one voxel size in meters.***
+
+	this.simulationBox = this._getSimulationBox(magoManager);
+	var geoLocDataManager = this.simulationBox.geoLocDataManager;
+	var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
+	var simulBoxMatInv = geoLocData.getRotMatrixInv();
+	gl.uniformMatrix4fv(shader.u_simulBoxTMat_loc, false, geoLocData.rotMatrix._floatArrays);
+	gl.uniformMatrix4fv(shader.u_simulBoxTMatInv_loc, false, simulBoxMatInv._floatArrays);
+	gl.uniform3fv(shader.u_simulBoxPosHigh_loc, geoLocData.positionHIGH);
+	gl.uniform3fv(shader.u_simulBoxPosLow_loc, geoLocData.positionLOW);
+
+	var bboxLC = this.simulationBox.getBoundingBoxLC();
+	gl.uniform3fv(shader.u_simulBoxMinPosLC_loc, [bboxLC.minX, bboxLC.minY, bboxLC.minZ]);
+	gl.uniform3fv(shader.u_simulBoxMaxPosLC_loc, [bboxLC.maxX, bboxLC.maxY, bboxLC.maxZ]);
+
+	
+
+	// bind textures.***
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, this.simulBoxdoubleDepthTex); 
+	//gl.bindTexture(gl.TEXTURE_2D, magoManager.depthTex); 
+
+	gl.activeTexture(gl.TEXTURE1);
+	gl.bindTexture(gl.TEXTURE_2D, this.simulBoxDoubleNormalTex); 
+
+	gl.activeTexture(gl.TEXTURE2);
+	gl.bindTexture(gl.TEXTURE_2D, this.pressureMosaicTexture3d_A.getTexture( 0 )); 
+
+	gl.activeTexture(gl.TEXTURE3);
+	gl.bindTexture(gl.TEXTURE_2D, magoManager.depthTex); 
+
+	gl.activeTexture(gl.TEXTURE4);
+	gl.bindTexture(gl.TEXTURE_2D, magoManager.normalTex); 
+
+
+	gl.activeTexture(gl.TEXTURE5);
+	gl.bindTexture(gl.TEXTURE_2D, this.airVelocity_B.getTexture( 0 )); 
+
+	gl.activeTexture(gl.TEXTURE6);
+	gl.bindTexture(gl.TEXTURE_2D, this.maxPressureMosaicTexture3d_A.getTexture( 0 ));
+
+	// Draw screenQuad:
+	gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, null, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0);
+
+	for (var i=0; i<8; i++)
+	{
+		gl.activeTexture(gl.TEXTURE0+i);
+		gl.bindTexture(gl.TEXTURE_2D, null);
+	}
+
+	fbo.unbind();
+	*/
+
+	/*
+	uniform sampler2D simulationBoxDoubleDepthTex;
+	uniform sampler2D simulationBoxDoubleNormalTex; // used to calculate the current frustum idx.***
+	uniform sampler2D airPressureMosaicTex;
+
+	////uniform vec3 encodedCameraPositionMCHigh;
+	////uniform vec3 encodedCameraPositionMCLow;
+	////uniform float tangentOfHalfFovy;
+	////uniform float aspectRatio;
+	*/
 };
 
 ChemicalAccidentLayer.prototype._prepareLayer = function ()
@@ -400,6 +589,15 @@ ChemicalAccidentLayer.prototype._prepareLayer = function ()
 	{
 		return false;
 	}
+
+	// Now make the textures3D.***
+	if (!this._allTimeSlicesTextures3DReady)
+	{
+		var magoManager = this.chemicalAccidentManager.magoManager;
+		var gl = magoManager.sceneState.gl;
+		this._makeTextures(gl);
+	}
+	
 
 	// Now, make the surface mesh.***
 	if (this._timeSlicesArray.length === 0)
