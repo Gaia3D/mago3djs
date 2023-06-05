@@ -194,18 +194,21 @@ ChemicalAccidentManager.prototype.prepareVolume = function (magoManager)
 		return false;
 	}
 
+	// create default shaders.***
+	if (!this._createdShaders)
+	{
+		this.createDefaultShaders();
+		this._createdShaders = true;
+		return false;
+	}
+
 	// Now, check if pollutionLayers are prepared.***
 	if (!this._preparePollutionLayers())
 	{
 		return false;
 	}
 
-	// create default shaders.***
-	if (!this._createdShaders)
-	{
-		this.createDefaultShaders();
-		this._createdShaders = true;
-	}
+	
 
 	return true;
 };

@@ -2599,6 +2599,16 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 			{
 				//texture = chemAccLayer.simulBoxDoubleNormalTex;
 			}
+
+			if (chemAccLayer._timeSlicesArray && chemAccLayer._timeSlicesArray.length > 0)
+			{
+				var timeSlice = chemAccLayer._timeSlicesArray[90];
+				if (timeSlice._mosaicTexture)
+				{
+					texture = timeSlice._mosaicTexture.texturesArray[0];
+				}
+			}
+			
 		}
 		
 	}

@@ -96,6 +96,23 @@ MagoTexture3D.prototype.createTextures = function (gl)
 	}
 };
 
+MagoTexture3D.prototype.createTexture = function (gl, texIdx, texData)
+{
+	// 1rst delete existent texture.***
+	gl.deleteTexture(this.texturesArray[texIdx]);
+
+	var filter = gl.NEAREST;
+	var texWrap = gl.CLAMP_TO_EDGE;
+	var data = texData;
+
+	// 1rst, find the finally used texture size.***
+	this.finalTextureXSize = this.mosaicXCount * this.texture3DXSize;
+	this.finalTextureYSize = this.mosaicYCount * this.texture3DYSize;
+
+	var webglTex = Texture.createTexture(gl, filter, data, this.finalTextureXSize, this.finalTextureYSize, texWrap);
+	this.texturesArray[texIdx] = webglTex;		
+};
+
 MagoTexture3D.prototype.getTexturesCount = function ()
 {
 	if (!this.texturesArray)

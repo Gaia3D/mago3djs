@@ -15,15 +15,22 @@ var ChemicalAccidentTimeSlice = function(options)
 	 this._jsonFile;
 	 this._isPrepared = false;
 	 this._glTexture;
+	 this.owner = undefined;
 
 	 this._texture3dCreated = false;
 	 this._texture3d;
+	 this._mosaicTexture; // note : the mosaicTexture is a Texture3D too.***
 
 	 if (options !== undefined)
 	 {
 		if (options.filePath)
 		{
 			this._filePath = options.filePath;
+		}
+
+		if (options.owner)
+		{
+			this.owner = options.owner;
 		}
 	 }
 };
@@ -56,14 +63,53 @@ ChemicalAccidentTimeSlice.prototype._prepare = function ()
 	return this._isPrepared;
 };
 
+/**
+ * 
+ *This function returns a uint8array from an arraybuffer.
+ */
+ChemicalAccidentTimeSlice.getUint8ArrayRGBAFromArrayBuffer = function(arrayBuffer, minValue, maxValue)
+{
+	 var uint8Array = new Uint8Array(arrayBuffer.length * 4); // rgba.***
+	 var dataLength = arrayBuffer.length;
+	 for (var i=0; i<dataLength; i++)
+	 {
+		 var value = arrayBuffer[i];
+		 var normalizedValue = (value - minValue) / (maxValue - minValue);
+ 
+		 var encodedRgba = ManagerUtils.packDepth(normalizedValue);
+ 
+		 uint8Array[i*4] = encodedRgba[0] * 255;
+		 uint8Array[i*4+1] = encodedRgba[1] * 255;
+		 uint8Array[i*4+2] = encodedRgba[2] * 255;
+		 uint8Array[i*4+3] = encodedRgba[3] * 255;
+
+		 if (uint8Array[i*4] > 0 || uint8Array[i*4+1] > 0 || uint8Array[i*4+2] > 0 || uint8Array[i*4+3] > 0)
+		 {
+			var hola = 0;
+		 }
+	 }
+
+	 // test check.***
+	 for (var i=0; i<uint8Array.length; i+=1)
+	 {
+		if (uint8Array[i] > 0)
+		{
+			var val = uint8Array[i];
+			var hola = 0;
+		}
+	 }
+	 
+	 return uint8Array;
+};
+
 ChemicalAccidentTimeSlice.prototype._makeTextures = function (gl)
 {
 	if (!this._texture3dCreated)
 	{
 		this._texture3d = new MagoTexture3D();
-		this._texture3d.createTextures(gl);
+		this._mosaicTexture = new MagoTexture3D();
 
-		// set seture3d params.***
+		// set texture3d params.***
 		this._texture3d.texture3DXSize = this._jsonFile.columnsCount;
 		this._texture3d.texture3DYSize = this._jsonFile.rowsCount;
 		this._texture3d.texture3DZSize = 50; // test HARDCODING.***
@@ -72,10 +118,35 @@ ChemicalAccidentTimeSlice.prototype._makeTextures = function (gl)
 		var result = Voxelizer.getMosaicColumnsAndRows(this._texture3d.texture3DXSize, this._texture3d.texture3DYSize, this._texture3d.texture3DZSize);
 		var mosaicXCount = result.numColumns;
 		var mosaicYCount = result.numRows;
-		this._texture3d.mosaicXCount = mosaicXCount;
-		this._texture3d.mosaicYCount = mosaicYCount;
+		this._mosaicTexture.mosaicXCount = mosaicXCount;
+		this._mosaicTexture.mosaicYCount = mosaicYCount;
+		this._mosaicTexture.texture3DXSize = this._jsonFile.columnsCount;
+		this._mosaicTexture.texture3DYSize = this._jsonFile.rowsCount;
+		this._mosaicTexture.texture3DZSize = 50; // slices count = 1.***
+		this._mosaicTexture.finalTextureXSize = this._mosaicTexture.mosaicXCount * this._texture3d.texture3DXSize;
+		this._mosaicTexture.finalTextureYSize = this._mosaicTexture.mosaicYCount * this._texture3d.texture3DYSize;
+		this._mosaicTexture.createTextures(gl);
 
+		// Now, create the textures using the data of jsonFile.***
+		// Must transform textureData(array) to Uint8Array type data.***
+		var maxValue = this._jsonFile.maxValue;
+		var minValue = this._jsonFile.minValue;
+		var textureData = ChemicalAccidentTimeSlice.getUint8ArrayRGBAFromArrayBuffer(this._jsonFile.values, minValue, maxValue);
+
+		
+		// Do hard coding for test.***
+		// test : use "textureData" for all slices.***
+		var texSlicesCount = this._texture3d.texture3DZSize;
+		for (var i=0; i<texSlicesCount; i++)
+		{
+			this._texture3d.createTexture(gl, i, textureData);
+		}
 		//----------------------------------------------------------
+
+		// Now, make the mosaicTexture.***
+		var magoManager = this.owner.chemicalAccidentManager.magoManager;
+		this._mosaicTexture = Voxelizer.prototype.makeMosaicTexture3DFromRealTexture3D(magoManager, this._texture3d, this._mosaicTexture);
+
 		this._texture3dCreated = true;
 	}
 
@@ -566,7 +637,8 @@ ChemicalAccidentLayer.prototype._prepareLayer = function ()
 		{
 			var filePath = this.timeSliceFileFolderPath + "\\" + this.timeSliceFileNames[i];
 			var options = {
-				filePath: filePath
+				filePath : filePath,
+				owner    : this
 			};
 			var timeSlice = new ChemicalAccidentTimeSlice(options);
 			this._timeSlicesArray.push(timeSlice);
@@ -588,6 +660,15 @@ ChemicalAccidentLayer.prototype._prepareLayer = function ()
 	if (!isPrepared)
 	{
 		return false;
+	}
+
+	// create a voxelizer.***
+	if (!this.voxelizer)
+	{
+		// The voxelizer here is used to make the mosaicTexture from textures3D.***
+		// note : the mosaicTexture is Texture3D too.***
+		var options = {};
+		this.voxelizer = new Voxelizer(options);
 	}
 
 	// Now make the textures3D.***
