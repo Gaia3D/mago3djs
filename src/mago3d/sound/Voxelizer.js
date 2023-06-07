@@ -151,9 +151,9 @@ Voxelizer.prototype.makeMosaicTexture3DFromRealTexture3D = function (magoManager
 
 		//gl.uniform1i(shader.u_lowestMosaicSliceIndex_loc,  i*8);
 		// for each mosaicTextureSlice, must render col * row times.***
-		for (var c = 0; c<mosaicYCount; c++)
+		for (var c = 0; c<mosaicXCount; c++)
 		{
-			for (var r = 0; r<mosaicXCount; r++)
+			for (var r = 0; r<mosaicYCount; r++)
 			{
 				// calculate the coord of the screenQuad.***
 				var minX = c * unitaryXRange;

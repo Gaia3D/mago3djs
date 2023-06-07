@@ -1634,6 +1634,8 @@ Renderer.prototype.renderScreenQuad2 = function (gl)
 	gl.activeTexture(gl.TEXTURE6);
 	//gl.bindTexture(gl.TEXTURE_2D, null);
 
+	// Volumetric renders.**********************************************************************
+	// Sound3d volumetric render.***
 	var bSoundVolumetricTex = false;
 	if (magoManager.soundManager)
 	{
@@ -1644,6 +1646,21 @@ Renderer.prototype.renderScreenQuad2 = function (gl)
 			if (soundLayer.volumRenderTex)
 			{
 				gl.bindTexture(gl.TEXTURE_2D, soundLayer.volumRenderTex);
+				bSoundVolumetricTex = true;
+			}
+		}
+	}
+
+	// Chemical accident volumetric render.***
+	if (magoManager.chemicalAccidentManager && magoManager.chemicalAccidentManager.chemAccidentLayersArray)
+	{
+		// check if exist soundVolumetricTex.***
+		if (magoManager.chemicalAccidentManager.chemAccidentLayersArray.length > 0)
+		{
+			var chemAccLayer = magoManager.chemicalAccidentManager.chemAccidentLayersArray[0];
+			if (chemAccLayer.volumRenderTex)
+			{
+				gl.bindTexture(gl.TEXTURE_2D, chemAccLayer.volumRenderTex);
 				bSoundVolumetricTex = true;
 			}
 		}
@@ -2592,20 +2609,25 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 			if (chemAccLayer.simulBoxdoubleDepthTex)
 			{
-				texture = chemAccLayer.simulBoxdoubleDepthTex;
+				//texture = chemAccLayer.simulBoxdoubleDepthTex;
 			}
 	
 			if (chemAccLayer.simulBoxDoubleNormalTex)
 			{
-				//texture = chemAccLayer.simulBoxDoubleNormalTex;
+				texture = chemAccLayer.simulBoxDoubleNormalTex;
+			}
+
+			if (chemAccLayer.screenFBO)
+			{
+				//texture = chemAccLayer.screenFBO.colorBuffersArray[0];
 			}
 
 			if (chemAccLayer._timeSlicesArray && chemAccLayer._timeSlicesArray.length > 0)
 			{
-				var timeSlice = chemAccLayer._timeSlicesArray[90];
+				var timeSlice = chemAccLayer._timeSlicesArray[30];
 				if (timeSlice._mosaicTexture)
 				{
-					texture = timeSlice._mosaicTexture.texturesArray[0];
+					//texture = timeSlice._mosaicTexture.texturesArray[0];
 				}
 			}
 			

@@ -595,11 +595,9 @@ ShaderSource.chemicalAccidentVolumRenderFS = "//#version 300 es\n\
 	\n\
 uniform sampler2D simulationBoxDoubleDepthTex;\n\
 uniform sampler2D simulationBoxDoubleNormalTex; // used to calculate the current frustum idx.***\n\
-uniform sampler2D airPressureMosaicTex;\n\
+uniform sampler2D pollutionMosaicTex; // pollutionTex. (from chemical accident).***\n\
 uniform sampler2D sceneDepthTex; // scene depth texture.***\n\
 uniform sampler2D sceneNormalTex; // scene depth texture.***\n\
-uniform sampler2D airVelocityTex; \n\
-uniform sampler2D maxPressureMosaicTex;\n\
 \n\
 uniform int u_texSize[3]; // The original texture3D size.***\n\
 uniform int u_mosaicSize[3]; // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***\n\
@@ -612,9 +610,8 @@ uniform mat4 modelViewMatrixRelToEyeInv;\n\
 uniform vec3 encodedCameraPositionMCHigh;\n\
 uniform vec3 encodedCameraPositionMCLow;\n\
 \n\
-uniform float u_airMaxPressure;\n\
+uniform vec2 u_minMaxPollutionValues;\n\
 uniform float u_airEnvirontmentPressure;\n\
-uniform float u_maxVelocity;\n\
 uniform vec2 u_screenSize;\n\
 uniform vec2 uNearFarArray[4];\n\
 uniform float tangentOfHalfFovy;\n\
@@ -626,8 +623,6 @@ uniform vec3 u_simulBoxPosHigh;\n\
 uniform vec3 u_simulBoxPosLow;\n\
 uniform vec3 u_simulBoxMinPosLC;\n\
 uniform vec3 u_simulBoxMaxPosLC;\n\
-\n\
-uniform int u_renderType; // 0 = volumetric (generic), 1 = isosurface.\n\
 \n\
 \n\
 \n\
@@ -684,21 +679,6 @@ vec4 getNormal(in vec2 texCoord)\n\
     return decodeNormal(encodedNormal);\n\
 }\n\
 \n\
-vec3 encodeVelocity(in vec3 vel)\n\
-{\n\
-	return vel*0.5 + 0.5;\n\
-}\n\
-\n\
-vec3 decodeVelocity(in vec3 encodedVel)\n\
-{\n\
-	return vec3(encodedVel * 2.0 - 1.0);\n\
-}\n\
-\n\
-vec3 getVelocity(in vec2 texCoord)\n\
-{\n\
-    vec4 encodedVel = texture2D(airVelocityTex, texCoord);\n\
-    return decodeVelocity(encodedVel.xyz)*u_maxVelocity;\n\
-}\n\
 \n\
 vec4 getNormal_simulationBox(in vec2 texCoord)\n\
 {\n\
@@ -859,24 +839,17 @@ vec2 subTexCoord_to_texCoord(in vec2 subTexCoord, in int col, in int row)\n\
     return resultTexCoord;\n\
 }\n\
 \n\
-float getAirPressure_inMosaicTexture(in vec2 texCoord, in int pressureType)\n\
+float getPollution_inMosaicTexture(in vec2 texCoord)\n\
 {\n\
     vec4 color4;\n\
-    if(pressureType == 0)\n\
-    {\n\
-        color4 = texture2D(airPressureMosaicTex, texCoord);\n\
-    }\n\
-    else if(pressureType == 1)\n\
-    {\n\
-        color4 = texture2D(maxPressureMosaicTex, texCoord);\n\
-    } \n\
+    color4 = texture2D(pollutionMosaicTex, texCoord);\n\
     float decoded = unpackDepth(color4); // 32bit.\n\
-    float airPressure = decoded * u_airMaxPressure;\n\
+    float airPressure = decoded * u_minMaxPollutionValues[1];\n\
 \n\
     return airPressure;\n\
 }\n\
 \n\
-float _getAirPressure_triLinearInterpolation(in vec2 subTexCoord2d, in int col_mosaic, in int row_mosaic, in int pressureType)\n\
+float _getPollution_triLinearInterpolation(in vec2 subTexCoord2d, in int col_mosaic, in int row_mosaic)\n\
 {\n\
     // This function : given a subTexture2d(real texCoord.xy of a realTex3D), \n\
     // and the col & row into the mosaic texture, returns a trilinear interpolation of the pressure.***\n\
@@ -893,26 +866,26 @@ float _getAirPressure_triLinearInterpolation(in vec2 subTexCoord2d, in int col_m
     vec2 mosaicTexCoord_bl = subTexCoord_to_texCoord(texCoord_bl, col_mosaic, row_mosaic);\n\
     vec2 mosaicTexCoord_br = subTexCoord_to_texCoord(texCoord_br, col_mosaic, row_mosaic);\n\
 \n\
-    float ap_tl = getAirPressure_inMosaicTexture(mosaicTexCoord_tl, pressureType);\n\
-    float ap_tr = getAirPressure_inMosaicTexture(mosaicTexCoord_tr, pressureType);\n\
-    float ap_bl = getAirPressure_inMosaicTexture(mosaicTexCoord_bl, pressureType);\n\
-    float ap_br = getAirPressure_inMosaicTexture(mosaicTexCoord_br, pressureType);\n\
+    float ap_tl = getPollution_inMosaicTexture(mosaicTexCoord_tl);\n\
+    float ap_tr = getPollution_inMosaicTexture(mosaicTexCoord_tr);\n\
+    float ap_bl = getPollution_inMosaicTexture(mosaicTexCoord_bl);\n\
+    float ap_br = getPollution_inMosaicTexture(mosaicTexCoord_br);\n\
 \n\
     float airPressure = mix(mix(ap_tl, ap_tr, f.x), mix(ap_bl, ap_br, f.x), f.y);\n\
 \n\
     return airPressure;\n\
 }\n\
 \n\
-float _getAirPressure_nearest(in vec2 subTexCoord2d, in int col_mosaic, in int row_mosaic, in int pressureType)\n\
+float _getPollution_nearest(in vec2 subTexCoord2d, in int col_mosaic, in int row_mosaic)\n\
 {\n\
     // This function : given a subTexture2d(real texCoord.xy of a realTex3D), \n\
     // and the col & row into the mosaic texture, returns a nearest interpolation of the pressure.***\n\
     vec2 mosaicTexCoord = subTexCoord_to_texCoord(subTexCoord2d, col_mosaic, row_mosaic);\n\
-    float ap = getAirPressure_inMosaicTexture(mosaicTexCoord, pressureType);\n\
+    float ap = getPollution_inMosaicTexture(mosaicTexCoord);\n\
     return ap;\n\
 }\n\
 \n\
-bool get_airPressure_fromTexture3d_triLinearInterpolation(in vec3 texCoord3d, inout float airPressure, inout vec3 velocity, in int pressureType)\n\
+bool get_pollution_fromTexture3d_triLinearInterpolation(in vec3 texCoord3d, inout float airPressure)\n\
 {\n\
     // tex3d : airPressureMosaicTex\n\
     // 1rst, check texCoord3d boundary limits.***\n\
@@ -978,9 +951,8 @@ bool get_airPressure_fromTexture3d_triLinearInterpolation(in vec3 texCoord3d, in
     vec2 vc = (floor(texCoord3d.xy * sim_res3d.xy)) * px;\n\
     vec3 f = fract(texCoord3d * sim_res3d);\n\
 \n\
-    float airPressure_down = _getAirPressure_triLinearInterpolation(texCoord3d.xy, col_down, row_down, pressureType);\n\
+    float airPressure_down = _getPollution_triLinearInterpolation(texCoord3d.xy, col_down, row_down);\n\
 \n\
-    vec3 vel_down = getVelocity(mosaicTexCoord_down);\n\
 \n\
     // up slice.************************************************************\n\
     int col_up, row_up;\n\
@@ -1001,13 +973,11 @@ bool get_airPressure_fromTexture3d_triLinearInterpolation(in vec3 texCoord3d, in
     }\n\
 \n\
     // now, must calculate the mosaicTexCoord.***\n\
-    vec2 mosaicTexCoord_up = subTexCoord_to_texCoord(texCoord3d.xy, col_up, row_up);\n\
 \n\
-    float airPressure_up = _getAirPressure_triLinearInterpolation(texCoord3d.xy, col_up, row_up, pressureType);\n\
 \n\
-    vec3 vel_up = getVelocity(mosaicTexCoord_up);\n\
+    float airPressure_up = _getPollution_triLinearInterpolation(texCoord3d.xy, col_up, row_up);\n\
 \n\
-    velocity = mix(vel_down, vel_up, remain);\n\
+\n\
 \n\
 \n\
     airPressure = mix(airPressure_down, airPressure_up, f.z);\n\
@@ -1015,7 +985,7 @@ bool get_airPressure_fromTexture3d_triLinearInterpolation(in vec3 texCoord3d, in
     return true;\n\
 }\n\
 \n\
-bool get_airPressure_fromTexture3d_nearest(in vec3 texCoord3d, inout float airPressure, inout vec3 velocity, in int pressureType)\n\
+bool get_pollution_fromTexture3d_nearest(in vec3 texCoord3d, inout float airPressure)\n\
 {\n\
     // tex3d : airPressureMosaicTex\n\
     // 1rst, check texCoord3d boundary limits.***\n\
@@ -1076,10 +1046,8 @@ bool get_airPressure_fromTexture3d_nearest(in vec3 texCoord3d, inout float airPr
     }\n\
 \n\
     // now, must calculate the mosaicTexCoord.***\n\
-    vec2 mosaicTexCoord = subTexCoord_to_texCoord(texCoord3d.xy, col, row);\n\
 \n\
-    airPressure = _getAirPressure_nearest(texCoord3d.xy, col, row, pressureType);\n\
-    velocity = getVelocity(mosaicTexCoord);\n\
+    airPressure = _getPollution_nearest(texCoord3d.xy, col, row);\n\
 \n\
     return true;\n\
 }\n\
@@ -1256,45 +1224,44 @@ bool normalLC(vec3 texCoord3d, in float pressure, in float step_length, inout ve
     vec3 pix = 1.0 / sim_res3d;\n\
 \n\
     vec3 vc = texCoord3d;\n\
-    int pressureType = 0;\n\
 \n\
     // dx.*************************************************\n\
     float airPressure_dx = u_airEnvirontmentPressure;\n\
     vec3 velocity_dx;\n\
     vec3 texCoord3d_dx = vec3(vc + vec3(pix.x, 0.0, 0.0));\n\
-    bool succes_dx =  get_airPressure_fromTexture3d_nearest(texCoord3d_dx, airPressure_dx, velocity_dx, pressureType);\n\
+    bool succes_dx =  get_pollution_fromTexture3d_nearest(texCoord3d_dx, airPressure_dx);\n\
     if(!succes_dx)return false;\n\
 \n\
     float airPressure_dx_neg = u_airEnvirontmentPressure;\n\
     vec3 velocity_dx_neg;\n\
     vec3 texCoord3d_dx_neg = vec3(vc - vec3(pix.x, 0.0, 0.0));\n\
-    bool succes_dx_neg =  get_airPressure_fromTexture3d_nearest(texCoord3d_dx_neg, airPressure_dx_neg, velocity_dx_neg, pressureType);\n\
+    bool succes_dx_neg =  get_pollution_fromTexture3d_nearest(texCoord3d_dx_neg, airPressure_dx_neg);\n\
     if(!succes_dx_neg)return false;\n\
 \n\
     // dy.*************************************************\n\
     float airPressure_dy = u_airEnvirontmentPressure;\n\
     vec3 velocity_dy;\n\
     vec3 texCoord3d_dy = vec3(vc + vec3(0.0, pix.y, 0.0));\n\
-    bool succes_dy =  get_airPressure_fromTexture3d_nearest(texCoord3d_dy, airPressure_dy, velocity_dy, pressureType);\n\
+    bool succes_dy =  get_pollution_fromTexture3d_nearest(texCoord3d_dy, airPressure_dy);\n\
     if(!succes_dy)return false;\n\
 \n\
     float airPressure_dy_neg = u_airEnvirontmentPressure;\n\
     vec3 velocity_dy_neg;\n\
     vec3 texCoord3d_dy_neg = vec3(vc - vec3(0.0, pix.y, 0.0));\n\
-    bool succes_dy_neg =  get_airPressure_fromTexture3d_nearest(texCoord3d_dy_neg, airPressure_dy_neg, velocity_dy_neg, pressureType);\n\
+    bool succes_dy_neg =  get_pollution_fromTexture3d_nearest(texCoord3d_dy_neg, airPressure_dy_neg);\n\
     if(!succes_dy_neg)return false;\n\
 \n\
     // dz.*************************************************\n\
     float airPressure_dz = u_airEnvirontmentPressure;\n\
     vec3 velocity_dz;\n\
     vec3 texCoord3d_dz = vec3(vc + vec3(0.0, 0.0, pix.z));\n\
-    bool succes_dz =  get_airPressure_fromTexture3d_nearest(texCoord3d_dz, airPressure_dz, velocity_dz, pressureType);\n\
+    bool succes_dz =  get_pollution_fromTexture3d_nearest(texCoord3d_dz, airPressure_dz);\n\
     if(!succes_dz)return false;\n\
 \n\
     float airPressure_dz_neg = u_airEnvirontmentPressure;\n\
     vec3 velocity_dz_neg;\n\
     vec3 texCoord3d_dz_neg = vec3(vc - vec3(0.0, 0.0, pix.z));\n\
-    bool succes_dz_neg =  get_airPressure_fromTexture3d_nearest(texCoord3d_dz_neg, airPressure_dz_neg, velocity_dz_neg, pressureType);\n\
+    bool succes_dz_neg =  get_pollution_fromTexture3d_nearest(texCoord3d_dz_neg, airPressure_dz_neg);\n\
     if(!succes_dz_neg)return false;\n\
 \n\
     //result_normal = normalize(vec3(airPressure_dx - pressure, airPressure_dy - pressure, airPressure_dz - pressure));\n\
@@ -1329,6 +1296,8 @@ void main(){\n\
     //vec2 screenPos = vec2(gl_FragCoord.x / u_screenSize.x, gl_FragCoord.y / u_screenSize.y); // \n\
     vec2 screenPos = v_tex_pos;\n\
 \n\
+    \n\
+\n\
     // read normal in rear depth. If no exist normal, then, discard.***\n\
     // calculate the texCoord for rear normal:\n\
     vec2 frontTexCoord;\n\
@@ -1344,6 +1313,23 @@ void main(){\n\
     {\n\
         discard;\n\
     }\n\
+\n\
+    // Test***************************************************************************************\n\
+    vec4 testColor4 = vec4(normal, 1.0);\n\
+    gl_FragData[0] = testColor4;\n\
+\n\
+    #ifdef USE_MULTI_RENDER_TARGET\n\
+\n\
+        gl_FragData[1] = testColor4;\n\
+\n\
+        gl_FragData[2] = testColor4;\n\
+\n\
+        gl_FragData[3] = testColor4;\n\
+    #endif\n\
+\n\
+    return;\n\
+    \n\
+    //--------------------------------------------------------------------------------------------\n\
 \n\
     // 1rst, know the scene depth.***\n\
     vec4 normal4scene = getNormal(v_tex_pos);\n\
@@ -1426,7 +1412,6 @@ void main(){\n\
     //float dotProdAccum = 0.0;\n\
     vec4 color4Aux = vec4(0.0, 0.0, 0.0, 0.0);\n\
     //float dotProdFactor = 1.0;\n\
-    int pressureType = 0;\n\
     vec3 scenePosTexCoord3d_candidate = vec3(-1.0);\n\
     vec3 currSamplePosLC = vec3(frontPosLC);\n\
     vec3 step_vector_LC = samplingDirLC * increLength;\n\
@@ -1456,7 +1441,7 @@ void main(){\n\
         scenePosTexCoord3d_candidate = vec3(sampleTexCoord3d);\n\
         \n\
 \n\
-        if(get_airPressure_fromTexture3d_triLinearInterpolation(sampleTexCoord3d, airPressure, velocityLC, pressureType))\n\
+        if(get_pollution_fromTexture3d_triLinearInterpolation(sampleTexCoord3d, airPressure))\n\
         {\n\
             // normalLC(vec3 texCoord3d, in float pressure, in float step_length)\n\
             vec3 currNormalLC;\n\
@@ -1530,51 +1515,14 @@ void main(){\n\
     //if(deltaP > 0.0)\n\
     //if(deltaP > 0.00005)\n\
     {\n\
-        // Test with velocity:\n\
-        //vec4 velocityWC = u_simulBoxTMat * vec4(averageVelocityLC, 1.0);\n\
-        //vec4 velocityDirCC = modelViewMatrixRelToEye * vec4(velocityWC.xyz, 1.0);\n\
 \n\
-        //vec3 lightDirLC = normalize(vec3(0.1, 0.1, -0.9));\n\
-\n\
-        //vec4 lightDirWC = u_simulBoxTMat * vec4(lightDirLC, 1.0);\n\
-        //vec4 lightDirCC = modelViewMatrixRelToEye * vec4(lightDirWC.xyz, 1.0);\n\
-        //float lightDotProd = abs(dot(normalize(lightDirCC.xyz), normalize(velocityDirCC.xyz)));\n\
-        //float lightDotProd = -(dot(normalize(lightDirLC.xyz), normalize(averageVelocityLC.xyz)));\n\
-\n\
-        //float dotProd = abs(dot(camRay, normalize(velocityDirCC.xyz)));\n\
-        //float dotProdInv = 1.0 - abs(dotProd);\n\
-        //finalColor4.rgb *= lightDotProd;\n\
-\n\
-        //float alphaByP = deltaP * 10000.0 / u_airMaxPressure;\n\
-        //alpha = min(averageDotProdInv, alphaByP);\n\
-        //alpha = averageDotProdInv;// * 5.0;\n\
-        //float alpha_final = min(alphaByP, alpha);\n\
-        //color4Aux = vec4(rainbowCol3.rgb * averageDotProd, alphaByP);\n\
 \n\
         color4Aux = finalColor4;\n\
     }\n\
 \n\
     \n\
 \n\
-    // Now, check the max pressure record.***\n\
-    // Must check the \"scenePosTexCoord3d\".***\n\
-    /*\n\
-    pressureType = 1; // maxPressureRecord.***\n\
-    float sceneAirPressure;\n\
-    vec3 sceneVelocityLC;\n\
-    vec4 color_maxPressure = vec4(0.0);\n\
-\n\
-    if(get_airPressure_fromTexture3d_triLinearInterpolation(scenePosTexCoord3d_candidate, sceneAirPressure, sceneVelocityLC, pressureType))//\n\
-    {\n\
-        if(sceneAirPressure > u_airEnvirontmentPressure + 0.01)\n\
-        {\n\
-            maxPressure_reference = 1.6;\n\
-            //vec3 sceneColor = getRainbowColor_byHeight(sceneAirPressure, 0.8, maxPressure_reference, false);//\n\
-            color4Aux.rgb = getRainbowColor_byHeight(sceneAirPressure, 0.8, maxPressure_reference, false);//\n\
-            color4Aux.a = 0.8;\n\
-        }\n\
-    }\n\
-    */\n\
+    //color4Aux = vec4(1.0, 0.5, 0.25, 1.0); // test.***\n\
 \n\
     gl_FragData[0] = color4Aux;\n\
 \n\

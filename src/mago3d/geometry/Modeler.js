@@ -995,6 +995,7 @@ Modeler.getExtrudedMesh = function(profile2d, extrusionDist, extrudeSegmentsCoun
 	var solidMesh = Modeler.getExtrudedSolidMesh(profile2d, extrusionDist, extrudeSegmentsCount, extrusionVector, undefined);
 	resultMesh = solidMesh.getCopySurfaceIndependentMesh(resultMesh);
 	resultMesh.calculateVerticesNormals();
+	resultMesh.getBoundingBox(); // here calculates the boundingBox.***
 	
 	return resultMesh;
 };

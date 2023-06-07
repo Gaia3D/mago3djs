@@ -406,11 +406,11 @@ ChemicalAccidentManager.prototype.createDefaultShaders = function ()
 	
 	shader.simulationBoxDoubleDepthTex_loc = gl.getUniformLocation(shader.program, "simulationBoxDoubleDepthTex");
 	shader.simulationBoxDoubleNormalTex_loc = gl.getUniformLocation(shader.program, "simulationBoxDoubleNormalTex");
-	shader.airPressureMosaicTex_loc = gl.getUniformLocation(shader.program, "airPressureMosaicTex");
+	shader.pollutionMosaicTex_loc = gl.getUniformLocation(shader.program, "pollutionMosaicTex");
 	shader.sceneDepthTex_loc = gl.getUniformLocation(shader.program, "sceneDepthTex"); // scene depth tex.***
 	shader.sceneNormalTex_loc = gl.getUniformLocation(shader.program, "sceneNormalTex"); // scene normal tex.***
-	shader.airVelocityTex_loc = gl.getUniformLocation(shader.program, "airVelocityTex");
-	shader.maxPressureMosaicTex_loc = gl.getUniformLocation(shader.program, "maxPressureMosaicTex");
+	//shader.airVelocityTex_loc = gl.getUniformLocation(shader.program, "airVelocityTex");
+	//shader.maxPressureMosaicTex_loc = gl.getUniformLocation(shader.program, "maxPressureMosaicTex");
 
 	shader.a_pos_loc = gl.getAttribLocation(shader.program, "a_pos");
 	shader.u_screenSize_loc = gl.getUniformLocation(shader.program, "u_screenSize");
@@ -422,7 +422,7 @@ ChemicalAccidentManager.prototype.createDefaultShaders = function ()
 	shader.u_texSize_loc = gl.getUniformLocation(shader.program, "u_texSize"); // The original texture3D size.***
 	shader.u_mosaicTexSize_loc = gl.getUniformLocation(shader.program, "u_mosaicTexSize"); // The mosaic texture size.***
 	shader.u_mosaicSize_loc = gl.getUniformLocation(shader.program, "u_mosaicSize"); // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***
-	shader.u_airMaxPressure_loc = gl.getUniformLocation(shader.program, "u_airMaxPressure");
+	shader.u_minMaxPollutionValues_loc = gl.getUniformLocation(shader.program, "u_minMaxPollutionValues");//
 	shader.u_airEnvirontmentPressure_loc = gl.getUniformLocation(shader.program, "u_airEnvirontmentPressure");
 	shader.u_maxVelocity_loc = gl.getUniformLocation(shader.program, "u_maxVelocity");
 	shader.u_voxelSizeMeters_loc = gl.getUniformLocation(shader.program, "u_voxelSizeMeters");
@@ -437,11 +437,11 @@ ChemicalAccidentManager.prototype.createDefaultShaders = function ()
 	magoManager.postFxShadersManager.useProgram(shader);
 	gl.uniform1i(shader.simulationBoxDoubleDepthTex_loc, 0);
 	gl.uniform1i(shader.simulationBoxDoubleNormalTex_loc, 1);
-	gl.uniform1i(shader.airPressureMosaicTex_loc, 2);
+	gl.uniform1i(shader.pollutionMosaicTex_loc, 2);
 	gl.uniform1i(shader.sceneDepthTex_loc, 3);
 	gl.uniform1i(shader.sceneNormalTex_loc, 4);
-	gl.uniform1i(shader.airVelocityTex_loc, 5);
-	gl.uniform1i(shader.maxPressureMosaicTex_loc, 6);
+	//gl.uniform1i(shader.airVelocityTex_loc, 5);
+	//gl.uniform1i(shader.maxPressureMosaicTex_loc, 6);
 
 	magoManager.postFxShadersManager.useProgram(null);
 };

@@ -102,6 +102,18 @@ ChemicalAccidentTimeSlice.getUint8ArrayRGBAFromArrayBuffer = function(arrayBuffe
 	 return uint8Array;
 };
 
+ChemicalAccidentTimeSlice.prototype.getMinMaxPollutionValues = function ()
+{
+	if (this.minMaxPollutionValues === undefined)
+	{
+		this.minMaxPollutionValues = new Float32Array(2);
+		this.minMaxPollutionValues[0] = this._jsonFile.minValue;
+		this.minMaxPollutionValues[1] = this._jsonFile.maxValue;
+	}
+
+	return this.minMaxPollutionValues;
+};
+
 ChemicalAccidentTimeSlice.prototype._makeTextures = function (gl)
 {
 	if (!this._texture3dCreated)
@@ -383,6 +395,10 @@ ChemicalAccidentLayer.prototype._renderDepthVolume = function ()
 
 	// Front Face.***************************************************************************************************************************
 	var doubleFBO = this._getVolumeDepthFBO(magoManager);
+
+	this.simulBoxdoubleDepthTex = doubleFBO.colorBuffersArray[1];
+	this.simulBoxDoubleNormalTex = doubleFBO.colorBuffersArray[2];
+
 	doubleFBO.bind();
 	gl.viewport(0, 0, doubleFBO.width[0]/2, doubleFBO.height[0]);
 
@@ -489,6 +505,8 @@ ChemicalAccidentLayer.prototype.render = function ()
 	var fbo = this._getScreenFBO(magoManager);
 	var extbuffers = fbo.extbuffers;
 
+	this.volumRenderTex = fbo.colorBuffersArray[0];
+
 	fbo.bind();
 	gl.viewport(0, 0, fbo.width[0], fbo.height[0]);
 
@@ -530,25 +548,31 @@ ChemicalAccidentLayer.prototype.render = function ()
 	gl.disable(gl.BLEND);
 	gl.enable(gl.DEPTH_TEST);
 
-	/*
-
-	var refTex3D = this.fluxRFUMosaicTexture3d_HIGH_A; // we can take any other texture3D.***
+	
+	var testTimeSlice = this._timeSlicesArray[30];
+	var refTex3D = testTimeSlice._mosaicTexture; // a reference texture3D, to take parameters for the shader.***
 
 	// bind uniforms.***
 	shader.bindUniformGenerals();
 
+	var screenQuad = chemicalAccidentManager.getQuadBuffer();
+
+	// bind screenQuad positions.
+	FBO.bindAttribute(gl, screenQuad.posBuffer, shader.a_pos_loc, 2);
+
+	
 	gl.uniform1iv(shader.u_texSize_loc, [refTex3D.texture3DXSize, refTex3D.texture3DYSize, refTex3D.texture3DZSize]); // The original texture3D size.***
 	gl.uniform1iv(shader.u_mosaicSize_loc, [refTex3D.mosaicXCount, refTex3D.mosaicYCount, refTex3D.finalSlicesCount]); // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***
 	var modelViewMatrixRelToEyeInv = sceneState.getModelViewRelToEyeMatrixInv();
 	gl.uniformMatrix4fv(shader.modelViewMatrixRelToEyeInv_loc, false, modelViewMatrixRelToEyeInv._floatArrays);
-	gl.uniform1f(shader.u_airMaxPressure_loc, soundManager.airMaxPressure);
-	gl.uniform1f(shader.u_airEnvirontmentPressure_loc, soundManager.airEnvirontmentPressure);
-	gl.uniform1f(shader.u_maxVelocity_loc, soundManager.airMaxVelocity);
+	var minMaxPollutionValues = this.getMinMaxPollutionValues();
+	gl.uniform2fv(shader.u_minMaxPollutionValues_loc, [minMaxPollutionValues[0], minMaxPollutionValues[1]]);
+	
+	gl.uniform1f(shader.u_airEnvirontmentPressure_loc, 0); // delete this. no necessary.***
 	gl.uniform2fv(shader.u_screenSize_loc, [sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0]]);
 	gl.uniform2fv(shader.uNearFarArray_loc, magoManager.frustumVolumeControl.nearFarArray);
 	gl.uniform3fv(shader.u_voxelSizeMeters_loc, [this.oneVoxelSizeInMeters[0], this.oneVoxelSizeInMeters[1], this.oneVoxelSizeInMeters[2]]); // The one voxel size in meters.***
 
-	this.simulationBox = this._getSimulationBox(magoManager);
 	var geoLocDataManager = this.simulationBox.geoLocDataManager;
 	var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
 	var simulBoxMatInv = geoLocData.getRotMatrixInv();
@@ -562,7 +586,7 @@ ChemicalAccidentLayer.prototype.render = function ()
 	gl.uniform3fv(shader.u_simulBoxMaxPosLC_loc, [bboxLC.maxX, bboxLC.maxY, bboxLC.maxZ]);
 
 	
-
+	
 	// bind textures.***
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, this.simulBoxdoubleDepthTex); 
@@ -571,8 +595,11 @@ ChemicalAccidentLayer.prototype.render = function ()
 	gl.activeTexture(gl.TEXTURE1);
 	gl.bindTexture(gl.TEXTURE_2D, this.simulBoxDoubleNormalTex); 
 
+	// provisionally take the 1rst timeSlice.***
+	var testTimeSlice = this._timeSlicesArray[30];
+
 	gl.activeTexture(gl.TEXTURE2);
-	gl.bindTexture(gl.TEXTURE_2D, this.pressureMosaicTexture3d_A.getTexture( 0 )); 
+	gl.bindTexture(gl.TEXTURE_2D, testTimeSlice._mosaicTexture.getTexture( 0 )); 
 
 	gl.activeTexture(gl.TEXTURE3);
 	gl.bindTexture(gl.TEXTURE_2D, magoManager.depthTex); 
@@ -581,11 +608,11 @@ ChemicalAccidentLayer.prototype.render = function ()
 	gl.bindTexture(gl.TEXTURE_2D, magoManager.normalTex); 
 
 
-	gl.activeTexture(gl.TEXTURE5);
-	gl.bindTexture(gl.TEXTURE_2D, this.airVelocity_B.getTexture( 0 )); 
+	//gl.activeTexture(gl.TEXTURE5);
+	//gl.bindTexture(gl.TEXTURE_2D, this.airVelocity_B.getTexture( 0 )); 
 
-	gl.activeTexture(gl.TEXTURE6);
-	gl.bindTexture(gl.TEXTURE_2D, this.maxPressureMosaicTexture3d_A.getTexture( 0 ));
+	//gl.activeTexture(gl.TEXTURE6);
+	//gl.bindTexture(gl.TEXTURE_2D, this.maxPressureMosaicTexture3d_A.getTexture( 0 ));
 
 	// Draw screenQuad:
 	gl.drawArrays(gl.TRIANGLES, 0, 6);
@@ -602,7 +629,7 @@ ChemicalAccidentLayer.prototype.render = function ()
 	}
 
 	fbo.unbind();
-	*/
+	
 
 	/*
 	uniform sampler2D simulationBoxDoubleDepthTex;
@@ -614,6 +641,29 @@ ChemicalAccidentLayer.prototype.render = function ()
 	////uniform float tangentOfHalfFovy;
 	////uniform float aspectRatio;
 	*/
+};
+
+ChemicalAccidentLayer.prototype.getMinMaxPollutionValues = function ()
+{
+	if (this.minMaxPollutionValues === undefined)
+	{
+		this.minMaxPollutionValues = new Float32Array(2); 
+
+		var timeSliceCount = this._timeSlicesArray.length;
+		for (var i=0; i<timeSliceCount; i++)
+		{
+			var timeSlice = this._timeSlicesArray[i];
+			var minMaxValues = timeSlice.getMinMaxPollutionValues();
+			if (minMaxValues[0] < this.minMaxPollutionValues[0])
+			{ this.minMaxPollutionValues[0] = minMaxValues[0]; }
+
+			if (minMaxValues[1] > this.minMaxPollutionValues[1])
+			{ this.minMaxPollutionValues[1] = minMaxValues[1]; }
+
+		}
+	}	
+	
+	return this.minMaxPollutionValues;
 };
 
 ChemicalAccidentLayer.prototype._prepareLayer = function ()
@@ -662,6 +712,7 @@ ChemicalAccidentLayer.prototype._prepareLayer = function ()
 		return false;
 	}
 
+
 	// create a voxelizer.***
 	if (!this.voxelizer)
 	{
@@ -669,6 +720,25 @@ ChemicalAccidentLayer.prototype._prepareLayer = function ()
 		// note : the mosaicTexture is Texture3D too.***
 		var options = {};
 		this.voxelizer = new Voxelizer(options);
+	}
+
+	if (!this.oneVoxelSizeInMeters)
+	{
+		this.oneVoxelSizeInMeters = new Float32Array([1.0, 1.0, 1.0]);
+
+		var geoJsonIndexFile = this.chemicalAccidentManager._geoJsonIndexFile;
+		var widthMeters = geoJsonIndexFile.height_km * 1000.0;
+		var heightMeters = geoJsonIndexFile.width_km * 1000.0;
+
+		// take any timeSlice to get columnsCount and rowsCount.***
+		var timeSlice = this._timeSlicesArray[0];
+		var columnsCount = timeSlice._jsonFile.columnsCount;
+		var rowsCount = timeSlice._jsonFile.rowsCount;
+
+		this.oneVoxelSizeInMeters[0] = widthMeters / columnsCount;
+		this.oneVoxelSizeInMeters[1] = heightMeters / rowsCount;
+		this.oneVoxelSizeInMeters[2] = this.oneVoxelSizeInMeters[0]; // in z direction is the same.***
+		
 	}
 
 	// Now make the textures3D.***

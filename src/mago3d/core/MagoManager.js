@@ -2467,6 +2467,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 			////gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.cesiumColorBuffer, 0); 
 		}
 
+		// In renderScreenQuad2, adds the volumetric renders (sound3d volumetric render, chemAccident volumetric render, etc.).***
 		this.renderer.renderScreenQuad2(gl); // 2nd screenQuad. (lightFog)
 
 		this.renderCluster();

@@ -508,8 +508,9 @@ SoundLayer.prototype.renderWave = function (magoManager)
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, fbo.colorBuffersArray[2], 0);
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, fbo.colorBuffersArray[3], 0);
 
-	// Test:
+	// The "this.volumRenderTex" is used in renderer.renderScreenQuad2() to merge the volumetric render with the current cesium scene.***
 	this.volumRenderTex = fbo.colorBuffersArray[0];
+	//-----------------------------------------------------
 
 	extbuffers.drawBuffersWEBGL([
 		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
