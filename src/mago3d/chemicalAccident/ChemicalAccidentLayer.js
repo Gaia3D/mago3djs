@@ -127,8 +127,22 @@ ChemicalAccidentTimeSlice.prototype._makeTextures = function (gl, minmaxPollutio
 
 		// Now, create the textures using the data of jsonFile.***
 		// Must transform textureData(array) to Uint8Array type data.***
-		var minValue = minmaxPollutionValues[0];
-		var maxValue = minmaxPollutionValues[1];
+		var minValue = this._jsonFile.minValue;
+		var maxValue = this._jsonFile.maxValue;
+		var minValueTotal = minmaxPollutionValues[0];
+		var maxValueTotal = minmaxPollutionValues[1];
+
+		var dataLength = this._jsonFile.values.length;
+		for (var i=0; i<dataLength; i++)
+		{
+			var value = this._jsonFile.values[i];
+			var realValue = value * (maxValue - minValue) + minValue;
+			var quantizedValue = (realValue - minValueTotal) / (maxValueTotal - minValueTotal);
+			//var encodedRgba = ManagerUtils.packDepth(value);
+	
+			this._jsonFile.values[i] = quantizedValue;
+		}
+
 		var textureData = ChemicalAccidentTimeSlice.getUint8ArrayRGBAFromArrayBuffer(this._jsonFile.values);
 
 		

@@ -950,7 +950,7 @@ void main(){
             //}
 
             vec4 currColor4 = transfer_fnc(contaminationSample);
-            currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y, false);
+            currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);
             //vec3 normalizedVelocityLC = normalize(velocityLC);
             //vec4 velocityWC = u_simulBoxTMat * vec4(velocityLC, 1.0);
             //vec4 velocityDirCC = modelViewMatrixRelToEye * vec4(velocityWC.xyz, 1.0);
