@@ -2025,6 +2025,12 @@ MagoManager.prototype._renderManagers_transparentPass = function ()
 		this.soundManager.render();
 	};
 
+	if (this.chemicalAccidentManager) // TransparentPass.***
+	{
+		// process to render chemical accident (texture 3d).***
+		this.chemicalAccidentManager.render();
+	}
+
 	if (this.itineraryManager !== undefined)
 	{
 		if (this.animationTimeController === undefined)
@@ -2064,11 +2070,7 @@ MagoManager.prototype._renderManagers_transparentPass = function ()
 		}
 	}
 
-	if (this.chemicalAccidentManager) // TransparentPass.***
-	{
-		// process to render chemical accident (texture 3d).***
-		this.chemicalAccidentManager.render();
-	}
+	
 };
 
 /**

@@ -824,11 +824,63 @@ void posWCRelToEye_to_posLC(in vec4 posWC_relToEye, in mat4 local_mat4Inv, in ve
 	posLC = vPosRelToLight.xyz / vPosRelToLight.w;\n\
 }\n\
 \n\
+void checkTexCoordRange(inout vec2 texCoord)\n\
+{\n\
+    if(texCoord.x < 0.0)\n\
+    {\n\
+        texCoord.x = 0.0;\n\
+    }\n\
+    else if(texCoord.x > 1.0)\n\
+    {\n\
+        texCoord.x = 1.0;\n\
+    }\n\
+\n\
+    if(texCoord.y < 0.0)\n\
+    {\n\
+        texCoord.y = 0.0;\n\
+    }\n\
+    else if(texCoord.y > 1.0)\n\
+    {\n\
+        texCoord.y = 1.0;\n\
+    }\n\
+}\n\
+\n\
+void checkTexCoord3DRange(inout vec3 texCoord)\n\
+{\n\
+    if(texCoord.x < 0.0)\n\
+    {\n\
+        texCoord.x = 0.0;\n\
+    }\n\
+    else if(texCoord.x > 1.0)\n\
+    {\n\
+        texCoord.x = 1.0;\n\
+    }\n\
+\n\
+    if(texCoord.y < 0.0)\n\
+    {\n\
+        texCoord.y = 0.0;\n\
+    }\n\
+    else if(texCoord.y > 1.0)\n\
+    {\n\
+        texCoord.y = 1.0;\n\
+    }\n\
+\n\
+    if(texCoord.z < 0.0)\n\
+    {\n\
+        texCoord.z = 0.0;\n\
+    }\n\
+    else if(texCoord.z > 1.0)\n\
+    {\n\
+        texCoord.z = 1.0;\n\
+    }\n\
+}\n\
+\n\
 vec2 subTexCoord_to_texCoord(in vec2 subTexCoord, in int col, in int row)\n\
 {\n\
     // given col, row & subTexCoord, this function returns the texCoord into mosaic texture.***\n\
     // The \"subTexCoord\" is the texCoord of the subTexture[col, row].***\n\
     // u_mosaicSize =  The mosaic composition (xTexCount X yTexCount X zSlicesCount).***\n\
+    checkTexCoordRange(subTexCoord);\n\
     float sRange = 1.0 / float(u_mosaicSize[0]);\n\
     float tRange = 1.0 / float(u_mosaicSize[1]);\n\
 \n\
@@ -839,20 +891,24 @@ vec2 subTexCoord_to_texCoord(in vec2 subTexCoord, in int col, in int row)\n\
     return resultTexCoord;\n\
 }\n\
 \n\
+\n\
+\n\
 float getPollution_inMosaicTexture(in vec2 texCoord)\n\
 {\n\
+    checkTexCoordRange(texCoord);\n\
     vec4 color4;\n\
     color4 = texture2D(pollutionMosaicTex, texCoord);\n\
     float decoded = unpackDepth(color4); // 32bit.\n\
-    float airPressure = decoded * u_minMaxPollutionValues[1];\n\
+    float pollution = decoded * u_minMaxPollutionValues.y;\n\
 \n\
-    return airPressure;\n\
+    return pollution;\n\
 }\n\
 \n\
 float _getPollution_triLinearInterpolation(in vec2 subTexCoord2d, in int col_mosaic, in int row_mosaic)\n\
 {\n\
     // This function : given a subTexture2d(real texCoord.xy of a realTex3D), \n\
     // and the col & row into the mosaic texture, returns a trilinear interpolation of the pressure.***\n\
+    checkTexCoordRange(subTexCoord2d);\n\
     vec3 sim_res3d = vec3(u_texSize[0], u_texSize[1], u_texSize[2]);\n\
     vec2 px = 1.0 / sim_res3d.xy;\n\
     vec2 vc = (floor(subTexCoord2d * sim_res3d.xy)) * px;\n\
@@ -861,6 +917,10 @@ float _getPollution_triLinearInterpolation(in vec2 subTexCoord2d, in int col_mos
     vec2 texCoord_tr = vec2(vc + vec2(px.x, 0));\n\
     vec2 texCoord_bl = vec2(vc + vec2(0, px.y));\n\
     vec2 texCoord_br = vec2(vc + px);\n\
+    checkTexCoordRange(texCoord_tl);\n\
+    checkTexCoordRange(texCoord_tr);\n\
+    checkTexCoordRange(texCoord_bl);\n\
+    checkTexCoordRange(texCoord_br);\n\
     vec2 mosaicTexCoord_tl = subTexCoord_to_texCoord(texCoord_tl, col_mosaic, row_mosaic);\n\
     vec2 mosaicTexCoord_tr = subTexCoord_to_texCoord(texCoord_tr, col_mosaic, row_mosaic);\n\
     vec2 mosaicTexCoord_bl = subTexCoord_to_texCoord(texCoord_bl, col_mosaic, row_mosaic);\n\
@@ -880,6 +940,7 @@ float _getPollution_nearest(in vec2 subTexCoord2d, in int col_mosaic, in int row
 {\n\
     // This function : given a subTexture2d(real texCoord.xy of a realTex3D), \n\
     // and the col & row into the mosaic texture, returns a nearest interpolation of the pressure.***\n\
+    checkTexCoordRange(subTexCoord2d);\n\
     vec2 mosaicTexCoord = subTexCoord_to_texCoord(subTexCoord2d, col_mosaic, row_mosaic);\n\
     float ap = getPollution_inMosaicTexture(mosaicTexCoord);\n\
     return ap;\n\
@@ -909,7 +970,7 @@ bool get_pollution_fromTexture3d_triLinearInterpolation(in vec3 texCoord3d, inou
     int originalTexHeight = u_texSize[1];\n\
     int slicesCount = u_texSize[2];\n\
 \n\
-    float currSliceIdx_float = texCoord3d.z * float(slicesCount);\n\
+    float currSliceIdx_float = texCoord3d.z * float(slicesCount - 1);\n\
     int currSliceIdx_down = int(floor(currSliceIdx_float));\n\
     int currSliceIdx_up = currSliceIdx_down + 1;\n\
 \n\
@@ -1006,7 +1067,7 @@ bool get_pollution_fromTexture3d_nearest(in vec3 texCoord3d, inout float airPres
     // 1rst, determine the sliceIdx.***\n\
     int slicesCount = u_texSize[2];\n\
 \n\
-    float currSliceIdx_float = texCoord3d.z * float(slicesCount);\n\
+    float currSliceIdx_float = texCoord3d.z * float(slicesCount -  1);\n\
     int currSliceIdx_down = int(floor(currSliceIdx_float));\n\
     int currSliceIdx_up = currSliceIdx_down + 1;\n\
     int currSliceIdx = currSliceIdx_down;\n\
@@ -1217,48 +1278,50 @@ vec3 normal(vec3 position, float intensity)\n\
     return -normalize(NormalMatrix * vec3(dx, dy, dz));\n\
 }*/\n\
 \n\
-bool normalLC(vec3 texCoord3d, in float pressure, in float step_length, inout vec3 result_normal)\n\
+bool normalLC(vec3 texCoord3d, inout vec3 result_normal)\n\
 {\n\
     // Estimate the normal from a finite difference approximation of the gradient\n\
     vec3 sim_res3d = vec3(u_texSize[0], u_texSize[1], u_texSize[2]);\n\
     vec3 pix = 1.0 / sim_res3d;\n\
 \n\
+    checkTexCoord3DRange(texCoord3d);\n\
+\n\
     vec3 vc = texCoord3d;\n\
 \n\
     // dx.*************************************************\n\
-    float airPressure_dx = u_airEnvirontmentPressure;\n\
+    float airPressure_dx = 0.0;\n\
     vec3 velocity_dx;\n\
     vec3 texCoord3d_dx = vec3(vc + vec3(pix.x, 0.0, 0.0));\n\
     bool succes_dx =  get_pollution_fromTexture3d_nearest(texCoord3d_dx, airPressure_dx);\n\
     if(!succes_dx)return false;\n\
 \n\
-    float airPressure_dx_neg = u_airEnvirontmentPressure;\n\
+    float airPressure_dx_neg = 0.0;\n\
     vec3 velocity_dx_neg;\n\
     vec3 texCoord3d_dx_neg = vec3(vc - vec3(pix.x, 0.0, 0.0));\n\
     bool succes_dx_neg =  get_pollution_fromTexture3d_nearest(texCoord3d_dx_neg, airPressure_dx_neg);\n\
     if(!succes_dx_neg)return false;\n\
 \n\
     // dy.*************************************************\n\
-    float airPressure_dy = u_airEnvirontmentPressure;\n\
+    float airPressure_dy = 0.0;\n\
     vec3 velocity_dy;\n\
     vec3 texCoord3d_dy = vec3(vc + vec3(0.0, pix.y, 0.0));\n\
     bool succes_dy =  get_pollution_fromTexture3d_nearest(texCoord3d_dy, airPressure_dy);\n\
     if(!succes_dy)return false;\n\
 \n\
-    float airPressure_dy_neg = u_airEnvirontmentPressure;\n\
+    float airPressure_dy_neg = 0.0;\n\
     vec3 velocity_dy_neg;\n\
     vec3 texCoord3d_dy_neg = vec3(vc - vec3(0.0, pix.y, 0.0));\n\
     bool succes_dy_neg =  get_pollution_fromTexture3d_nearest(texCoord3d_dy_neg, airPressure_dy_neg);\n\
     if(!succes_dy_neg)return false;\n\
 \n\
     // dz.*************************************************\n\
-    float airPressure_dz = u_airEnvirontmentPressure;\n\
+    float airPressure_dz = 0.0;\n\
     vec3 velocity_dz;\n\
     vec3 texCoord3d_dz = vec3(vc + vec3(0.0, 0.0, pix.z));\n\
     bool succes_dz =  get_pollution_fromTexture3d_nearest(texCoord3d_dz, airPressure_dz);\n\
     if(!succes_dz)return false;\n\
 \n\
-    float airPressure_dz_neg = u_airEnvirontmentPressure;\n\
+    float airPressure_dz_neg = 0.0;\n\
     vec3 velocity_dz_neg;\n\
     vec3 texCoord3d_dz_neg = vec3(vc - vec3(0.0, 0.0, pix.z));\n\
     bool succes_dz_neg =  get_pollution_fromTexture3d_nearest(texCoord3d_dz_neg, airPressure_dz_neg);\n\
@@ -1279,10 +1342,10 @@ bool normalLC(vec3 texCoord3d, in float pressure, in float step_length, inout ve
 vec4 transfer_fnc(in float pressure)\n\
 {\n\
     // The transfer function specifies what color and opacity value should be assigned for a given value sampled from the volume. \n\
-    float maxPressureRef = 1.05;\n\
-    float minPressureRef = u_airEnvirontmentPressure;\n\
-    maxPressureRef = 1.005; // test.***\n\
-    minPressureRef = 1.0; // test.***\n\
+    //float maxPressureRef = 1.05;\n\
+    //float minPressureRef = u_airEnvirontmentPressure;\n\
+    float maxPressureRef = u_minMaxPollutionValues.y; // test.***\n\
+    float minPressureRef = u_minMaxPollutionValues.x; // test.***\n\
     bool bHotToCold = false; // we want coldToHot (blue = min to red = max).***\n\
     vec4 rainbowCol3 = getRainbowColor_byHeight(pressure, minPressureRef, maxPressureRef, bHotToCold);\n\
 \n\
@@ -1304,32 +1367,15 @@ void main(){\n\
     vec2 rearTexCoord;\n\
     get_FrontAndRear_depthTexCoords(screenPos, frontTexCoord, rearTexCoord);\n\
 \n\
-\n\
-    vec4 normal4rear = getNormal_simulationBox(rearTexCoord);\n\
-    vec4 normal4front = getNormal_simulationBox(frontTexCoord);\n\
-	vec3 normal = normal4rear.xyz;\n\
-    \n\
-	if(length(normal) < 0.1)\n\
+    vec4 encodedNormal = texture2D(simulationBoxDoubleNormalTex, frontTexCoord);\n\
+	if(length(encodedNormal.xyz) < 0.1)\n\
     {\n\
         discard;\n\
     }\n\
 \n\
-    // Test***************************************************************************************\n\
-    vec4 testColor4 = vec4(normal, 1.0);\n\
-    gl_FragData[0] = testColor4;\n\
-\n\
-    #ifdef USE_MULTI_RENDER_TARGET\n\
-\n\
-        gl_FragData[1] = testColor4;\n\
-\n\
-        gl_FragData[2] = testColor4;\n\
-\n\
-        gl_FragData[3] = testColor4;\n\
-    #endif\n\
-\n\
-    return;\n\
-    \n\
-    //--------------------------------------------------------------------------------------------\n\
+    vec4 normal4rear = getNormal_simulationBox(rearTexCoord);\n\
+    vec4 normal4front = getNormal_simulationBox(frontTexCoord);\n\
+	vec3 normal = normal4front.xyz;\n\
 \n\
     // 1rst, know the scene depth.***\n\
     vec4 normal4scene = getNormal(v_tex_pos);\n\
@@ -1342,6 +1388,8 @@ void main(){\n\
     float sceneLinearDepth = getDepth(v_tex_pos);\n\
     float distToCam = sceneLinearDepth * currFar_scene;\n\
     vec3 sceneDepthPosCC = getViewRay(v_tex_pos, distToCam - 1.0);\n\
+\n\
+    \n\
 \n\
     // Now, calculate the positions with the simulation box, front & rear.***\n\
     // rear.***\n\
@@ -1363,6 +1411,8 @@ void main(){\n\
     vec3 frontPosCC;\n\
     vec3 rearPosCC;\n\
     get_FrontAndRear_posCC(screenPos, currFar_rear, currFar_front, frontPosCC, rearPosCC);\n\
+\n\
+    \n\
     \n\
 \n\
     // Now, calculate frontPosWC & rearPosWC.***\n\
@@ -1390,7 +1440,7 @@ void main(){\n\
     //float totalAirPressure = 0.0;\n\
     vec3 totalVelocityLC = vec3(0.0);\n\
     //float totalDotProdInv = 0.0;\n\
-    float airPressure = 0.0;\n\
+    float contaminationSample = 0.0;\n\
     float smplingCount = 0.0;\n\
     //float currMaxPressure = 0.0;\n\
     float segmentLength = length(rearPosLC - frontPosLC);\n\
@@ -1400,9 +1450,9 @@ void main(){\n\
     //float increLength = 0.02; // original.***\n\
     float samplingsCount = 50.0;\n\
     float increLength = segmentLength / samplingsCount;\n\
-    if(increLength < u_voxelSizeMeters[0])\n\
+    if(increLength < u_voxelSizeMeters.x)\n\
     {\n\
-        increLength = u_voxelSizeMeters[0];\n\
+        increLength = u_voxelSizeMeters.x;\n\
     }\n\
 \n\
     vec3 velocityLC;\n\
@@ -1416,18 +1466,16 @@ void main(){\n\
     vec3 currSamplePosLC = vec3(frontPosLC);\n\
     vec3 step_vector_LC = samplingDirLC * increLength;\n\
     vec4 finalColor4 = vec4(0.0);\n\
+    float contaminationAccum = 0.0;\n\
+    // u_minMaxPollutionValues\n\
     \n\
     // Sampling far to near.***\n\
-    for(int i=0; i<50; i++)\n\
+    bool normalLC_calculated = true;\n\
+    for(int i=0; i<150; i++)\n\
     {\n\
         \n\
         // Note : for each smple, must depth check with the scene depthTexure.***\n\
         vec3 samplePosLC = frontPosLC + samplingDirLC * increLength * float(i);\n\
-\n\
-        //if(samplePosLC.z > 20.0)\n\
-        //{\n\
-        //    continue;\n\
-        //}\n\
 \n\
         vec3 samplePosCC = frontPosCC + samplingDirCC * increLength * float(i);\n\
         if(abs(samplePosCC.z) > distToCam)\n\
@@ -1435,18 +1483,19 @@ void main(){\n\
             break;\n\
         }\n\
 \n\
-        airPressure = 0.0;\n\
+        contaminationSample = 0.0;\n\
         vec3 sampleTexCoord3d = vec3((samplePosLC.x - u_simulBoxMinPosLC.x)/simulBoxRange.x, (samplePosLC.y - u_simulBoxMinPosLC.y)/simulBoxRange.y, (samplePosLC.z - u_simulBoxMinPosLC.z)/simulBoxRange.z);\n\
         //vec3 sampleTexCoord3d = vec3((currSamplePosLC.x - u_simulBoxMinPosLC.x)/simulBoxRange.x, (currSamplePosLC.y - u_simulBoxMinPosLC.y)/simulBoxRange.y, (currSamplePosLC.z - u_simulBoxMinPosLC.z)/simulBoxRange.z);\n\
         scenePosTexCoord3d_candidate = vec3(sampleTexCoord3d);\n\
         \n\
 \n\
-        if(get_pollution_fromTexture3d_triLinearInterpolation(sampleTexCoord3d, airPressure))\n\
+        if(get_pollution_fromTexture3d_triLinearInterpolation(sampleTexCoord3d, contaminationSample))\n\
         {\n\
-            // normalLC(vec3 texCoord3d, in float pressure, in float step_length)\n\
+\n\
             vec3 currNormalLC;\n\
-            if(!normalLC(sampleTexCoord3d, airPressure, increLength, currNormalLC))\n\
+            if(!normalLC(sampleTexCoord3d, currNormalLC))\n\
             {\n\
+                normalLC_calculated = false;\n\
                 continue;\n\
             }\n\
 \n\
@@ -1458,7 +1507,8 @@ void main(){\n\
             //    continue;\n\
             //}\n\
 \n\
-            vec4 currColor4 = transfer_fnc(airPressure);\n\
+            vec4 currColor4 = transfer_fnc(contaminationSample);\n\
+            currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y, false);\n\
             //vec3 normalizedVelocityLC = normalize(velocityLC);\n\
             //vec4 velocityWC = u_simulBoxTMat * vec4(velocityLC, 1.0);\n\
             //vec4 velocityDirCC = modelViewMatrixRelToEye * vec4(velocityWC.xyz, 1.0);\n\
@@ -1470,7 +1520,7 @@ void main(){\n\
             float dotProd = dot(camRay, normalCC);\n\
 \n\
             // Now, accumulate the color.***\n\
-            currColor4.rgb *= abs(dotProd);\n\
+            //currColor4.rgb *= abs(dotProd);\n\
 \n\
             vec4 vecAux = abs(vec4(currColor4.rgb, 1.0));\n\
  \n\
@@ -1480,14 +1530,19 @@ void main(){\n\
                 finalColor4.a += (1.0 - finalColor4.a) * currColor4.a;\n\
             }\n\
             \n\
-            totalVelocityLC += velocityLC;\n\
+            //totalVelocityLC += velocityLC;\n\
             smplingCount += 1.0;\n\
 \n\
             // Optimization: break out of the loop when the color is near opaque\n\
             if (finalColor4.a >= 0.95) {\n\
                 break;\n\
             }\n\
-            \n\
+\n\
+            contaminationAccum += contaminationSample;\n\
+            //finalColor4.rgb += vec3(contaminationSample, 0.0, 0.0);\n\
+            //finalColor4.a += contaminationSample;\n\
+\n\
+            //smplingCount += 1.0;\n\
             \n\
         }\n\
 \n\
@@ -1496,42 +1551,55 @@ void main(){\n\
 \n\
     if(smplingCount < 1.0)\n\
     {\n\
+        //discard;\n\
+    }\n\
+\n\
+    if(smplingCount < 1.0)\n\
+    {\n\
         smplingCount = 1.0;\n\
     }\n\
-    \n\
-    //float averageAirPressure = totalAirPressure / smplingCount;\n\
-    //vec3 averageVelocityLC = totalVelocityLC / smplingCount;\n\
-    //float averageDotProd = dotProdAccum / smplingCount;\n\
-    //float averageDotProdInv = totalDotProdInv / smplingCount;\n\
-    //averageDotProdInv /= dotProdFactor;\n\
-\n\
-    \n\
-    //float f = 1.0;\n\
-    //float deltaP = averageAirPressure - u_airEnvirontmentPressure;\n\
-    //float maxPressure_reference = u_airMaxPressure;\n\
-    //vec4 rainbowCol3 = getRainbowColor_byHeight(averageAirPressure * f, u_airEnvirontmentPressure, 1.05, false);//\n\
-\n\
-    //float alpha;\n\
-    //if(deltaP > 0.0)\n\
-    //if(deltaP > 0.00005)\n\
+    /*\n\
+    if(smplingCount < 10.0)\n\
     {\n\
-\n\
-\n\
-        color4Aux = finalColor4;\n\
+        color4Aux = vec4(1.0, 0.0, 0.0, 0.7);\n\
     }\n\
+    else if(smplingCount < 20.0)\n\
+    {\n\
+        color4Aux = vec4(0.0, 1.0, 0.0, 0.7);\n\
+    }\n\
+    else if(smplingCount < 30.0)\n\
+    {\n\
+        color4Aux = vec4(0.0, 0.0, 1.0, 0.7);\n\
+    }\n\
+    else if(smplingCount < 40.0)\n\
+    {\n\
+        color4Aux = vec4(1.0, 1.0, 0.0, 0.7);\n\
+    }\n\
+    else\n\
+    {\n\
+        color4Aux = vec4(1.0, 0.0, 1.0, 0.7);\n\
+    }\n\
+    */\n\
 \n\
-    \n\
+    vec4 rainbowColor = getRainbowColor_byHeight(contaminationAccum/smplingCount, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y, false);\n\
 \n\
-    //color4Aux = vec4(1.0, 0.5, 0.25, 1.0); // test.***\n\
+    //color4Aux = rainbowColor;\n\
+    //color4Aux.a *= 4.0;\n\
+\n\
+    //vec3 sampleTexCoord3d = vec3((rearPosLC.x - u_simulBoxMinPosLC.x)/simulBoxRange.x, (rearPosLC.y - u_simulBoxMinPosLC.y)/simulBoxRange.y, (rearPosLC.z - u_simulBoxMinPosLC.z)/simulBoxRange.z);\n\
+    //color4Aux = vec4(frontPosCC, 0.7);\n\
+    color4Aux = finalColor4;\n\
+\n\
+    if(!normalLC_calculated)\n\
+    {\n\
+        //color4Aux = vec4(1.0, 0.0, 0.0, 1.0);\n\
+    }\n\
 \n\
     gl_FragData[0] = color4Aux;\n\
 \n\
     #ifdef USE_MULTI_RENDER_TARGET\n\
-\n\
         gl_FragData[1] = color4Aux;\n\
-\n\
         gl_FragData[2] = color4Aux;\n\
-\n\
         gl_FragData[3] = color4Aux;\n\
     #endif\n\
 }\n\
@@ -13191,7 +13259,8 @@ bool get_airPressure_fromTexture3d_triLinearInterpolation(in vec3 texCoord3d, in
     int originalTexHeight = u_texSize[1];\n\
     int slicesCount = u_texSize[2];\n\
 \n\
-    float currSliceIdx_float = texCoord3d.z * float(slicesCount);\n\
+    //float currSliceIdx_float = texCoord3d.z * float(slicesCount); // original.***\n\
+    float currSliceIdx_float = texCoord3d.z * float(slicesCount - 1); // new, debugging with chemAccident volRender.***\n\
     int currSliceIdx_down = int(floor(currSliceIdx_float));\n\
     int currSliceIdx_up = currSliceIdx_down + 1;\n\
 \n\
@@ -13595,7 +13664,8 @@ void main(){\n\
     vec4 normal4front = getNormal_simulationBox(frontTexCoord);\n\
 	vec3 normal = normal4rear.xyz;\n\
     \n\
-	if(length(normal) < 0.1)\n\
+	vec4 encodedNormal = texture2D(simulationBoxDoubleNormalTex, frontTexCoord);\n\
+	if(length(encodedNormal.xyz) < 0.1)\n\
     {\n\
         discard;\n\
     }\n\
@@ -13669,9 +13739,9 @@ void main(){\n\
     //float increLength = 0.02; // original.***\n\
     float samplingsCount = 50.0;\n\
     float increLength = segmentLength / samplingsCount;\n\
-    if(increLength < u_voxelSizeMeters[0])\n\
+    if(increLength < u_voxelSizeMeters.x)\n\
     {\n\
-        increLength = u_voxelSizeMeters[0];\n\
+        increLength = u_voxelSizeMeters.x;\n\
     }\n\
 \n\
     vec3 velocityLC;\n\
@@ -13834,11 +13904,8 @@ void main(){\n\
     gl_FragData[0] = color4Aux;\n\
 \n\
     #ifdef USE_MULTI_RENDER_TARGET\n\
-\n\
         gl_FragData[1] = color4Aux;\n\
-\n\
         gl_FragData[2] = color4Aux;\n\
-\n\
         gl_FragData[3] = color4Aux;\n\
     #endif\n\
 }\n\

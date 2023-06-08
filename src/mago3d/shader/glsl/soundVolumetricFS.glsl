@@ -378,7 +378,8 @@ bool get_airPressure_fromTexture3d_triLinearInterpolation(in vec3 texCoord3d, in
     int originalTexHeight = u_texSize[1];
     int slicesCount = u_texSize[2];
 
-    float currSliceIdx_float = texCoord3d.z * float(slicesCount);
+    //float currSliceIdx_float = texCoord3d.z * float(slicesCount); // original.***
+    float currSliceIdx_float = texCoord3d.z * float(slicesCount - 1); // new, debugging with chemAccident volRender.***
     int currSliceIdx_down = int(floor(currSliceIdx_float));
     int currSliceIdx_up = currSliceIdx_down + 1;
 
@@ -782,7 +783,8 @@ void main(){
     vec4 normal4front = getNormal_simulationBox(frontTexCoord);
 	vec3 normal = normal4rear.xyz;
     
-	if(length(normal) < 0.1)
+	vec4 encodedNormal = texture2D(simulationBoxDoubleNormalTex, frontTexCoord);
+	if(length(encodedNormal.xyz) < 0.1)
     {
         discard;
     }
@@ -856,9 +858,9 @@ void main(){
     //float increLength = 0.02; // original.***
     float samplingsCount = 50.0;
     float increLength = segmentLength / samplingsCount;
-    if(increLength < u_voxelSizeMeters[0])
+    if(increLength < u_voxelSizeMeters.x)
     {
-        increLength = u_voxelSizeMeters[0];
+        increLength = u_voxelSizeMeters.x;
     }
 
     vec3 velocityLC;
@@ -1021,11 +1023,8 @@ void main(){
     gl_FragData[0] = color4Aux;
 
     #ifdef USE_MULTI_RENDER_TARGET
-
         gl_FragData[1] = color4Aux;
-
         gl_FragData[2] = color4Aux;
-
         gl_FragData[3] = color4Aux;
     #endif
 }

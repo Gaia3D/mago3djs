@@ -235,12 +235,12 @@ ChemicalAccidentManager.prototype.render = function ()
 		this._animationState = CODE.processState.STARTED;
 	}
 	
-	//if (this._totalAnimTime === undefined) 
-	//{
+	if (this._totalAnimTime === undefined) 
+	{
 	//	var pollLayer = this._pollutionLayersArray[0];
 	//	//this._totalAnimTime = pollLayer.getTotalAnimationTimeMinutes() * 60 * 1000.0; // miliseconds.***
-	//	this._totalAnimTime = 30000; // test delete.!! 30 seconds.***
-	//}
+		this._totalAnimTime = 30000; // test delete.!! 30 seconds.***
+	}
 
 	if (this._timeScale === undefined) 
 	{
@@ -262,12 +262,12 @@ ChemicalAccidentManager.prototype.render = function ()
 
 	if (this._increTime >= totalAnimTime)
 	{
-		this._animationState = CODE.processState.FINISHED;
-		return true;
+		//this._animationState = CODE.processState.FINISHED;
+		//return true;
 		// Modify the animationStartTime.***
-		//var num = Math.floor(this._increTime / totalAnimTime);
-		//this._animationStartTime += num * totalAnimTime;
-		//this._increTime = currTime - this._animationStartTime;
+		var num = Math.floor(currTime / totalAnimTime);
+		this._animationStartTime = num * totalAnimTime;
+		this._increTime = (currTime - this._animationStartTime)* this._timeScale;
 	}
 	
 	// Render layers.***

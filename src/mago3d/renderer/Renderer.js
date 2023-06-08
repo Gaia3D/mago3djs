@@ -1654,7 +1654,7 @@ Renderer.prototype.renderScreenQuad2 = function (gl)
 	// Chemical accident volumetric render.***
 	if (magoManager.chemicalAccidentManager && magoManager.chemicalAccidentManager.chemAccidentLayersArray)
 	{
-		// check if exist soundVolumetricTex.***
+		// check if exist chemAccidentVolumetricTex.***
 		if (magoManager.chemicalAccidentManager.chemAccidentLayersArray.length > 0)
 		{
 			var chemAccLayer = magoManager.chemicalAccidentManager.chemAccidentLayersArray[0];
@@ -1665,6 +1665,8 @@ Renderer.prototype.renderScreenQuad2 = function (gl)
 			}
 		}
 	}
+
+	// End volumetric renders.-----------------------------------------------------------------
 
 	gl.uniform1iv(currentShader.u_activeTex_loc, [bLightFogTex, bScreenSpaceObjectsTex, 0, 0, 0, 0, bSoundVolumetricTex, 0]);
 
@@ -2614,12 +2616,12 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 	
 			if (chemAccLayer.simulBoxDoubleNormalTex)
 			{
-				texture = chemAccLayer.simulBoxDoubleNormalTex;
+				//texture = chemAccLayer.simulBoxDoubleNormalTex;
 			}
 
 			if (chemAccLayer.screenFBO)
 			{
-				//texture = chemAccLayer.screenFBO.colorBuffersArray[0];
+				texture = chemAccLayer.screenFBO.colorBuffersArray[0];
 			}
 
 			if (chemAccLayer._timeSlicesArray && chemAccLayer._timeSlicesArray.length > 0)
