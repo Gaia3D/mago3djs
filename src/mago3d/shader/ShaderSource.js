@@ -826,52 +826,54 @@ void posWCRelToEye_to_posLC(in vec4 posWC_relToEye, in mat4 local_mat4Inv, in ve
 \n\
 void checkTexCoordRange(inout vec2 texCoord)\n\
 {\n\
+    float error = 0.0;\n\
     if(texCoord.x < 0.0)\n\
     {\n\
-        texCoord.x = 0.0;\n\
+        texCoord.x = 0.0 + error;\n\
     }\n\
     else if(texCoord.x > 1.0)\n\
     {\n\
-        texCoord.x = 1.0;\n\
+        texCoord.x = 1.0 - error;\n\
     }\n\
 \n\
     if(texCoord.y < 0.0)\n\
     {\n\
-        texCoord.y = 0.0;\n\
+        texCoord.y = 0.0 + error;\n\
     }\n\
     else if(texCoord.y > 1.0)\n\
     {\n\
-        texCoord.y = 1.0;\n\
+        texCoord.y = 1.0 - error;\n\
     }\n\
 }\n\
 \n\
 void checkTexCoord3DRange(inout vec3 texCoord)\n\
 {\n\
+    float error = 0.0;\n\
     if(texCoord.x < 0.0)\n\
     {\n\
-        texCoord.x = 0.0;\n\
+        texCoord.x = 0.0 + error;\n\
     }\n\
     else if(texCoord.x > 1.0)\n\
     {\n\
-        texCoord.x = 1.0;\n\
+        texCoord.x = 1.0 - error;\n\
     }\n\
 \n\
     if(texCoord.y < 0.0)\n\
     {\n\
-        texCoord.y = 0.0;\n\
+        texCoord.y = 0.0 + error;\n\
     }\n\
     else if(texCoord.y > 1.0)\n\
     {\n\
-        texCoord.y = 1.0;\n\
+        texCoord.y = 1.0 - error;\n\
     }\n\
 \n\
     if(texCoord.z < 0.0)\n\
     {\n\
-        texCoord.z = 0.0;\n\
+        texCoord.z = 0.0 + error;\n\
     }\n\
     else if(texCoord.z > 1.0)\n\
     {\n\
-        texCoord.z = 1.0;\n\
+        texCoord.z = 1.0 - error;\n\
     }\n\
 }\n\
 \n\
@@ -988,14 +990,14 @@ bool get_pollution_fromTexture3d_triLinearInterpolation(in vec3 texCoord3d, inou
 \n\
     // Down slice.************************************************************\n\
     int col_down, row_down;\n\
-    if(currSliceIdx_down <= u_mosaicSize[0])\n\
-    {\n\
+    //if(currSliceIdx_down <= u_mosaicSize[0])\n\
+    //{\n\
         // Our current sliceIdx_down is smaller than the columns count of the mosaic, so:\n\
         // in this case, the row = 0.***\n\
-        row_down = 0;\n\
-        col_down = currSliceIdx_down;\n\
-    }\n\
-    else\n\
+    //    row_down = 0;\n\
+    //    col_down = currSliceIdx_down;\n\
+   // }\n\
+    //else\n\
     {\n\
         float rowAux = floor(float(currSliceIdx_down) / float(u_mosaicSize[0]));\n\
         float colAux = float(currSliceIdx_down) - (rowAux * float(u_mosaicSize[0]));\n\
@@ -1033,7 +1035,19 @@ bool get_pollution_fromTexture3d_triLinearInterpolation(in vec3 texCoord3d, inou
         row_up = int(rowAux);\n\
     }\n\
 \n\
-    // now, must calculate the mosaicTexCoord.***\n\
+    // test.***\n\
+    col_up = col_down + 1;\n\
+    row_up = row_down;\n\
+    if(col_up >= u_mosaicSize[0])\n\
+    {\n\
+        col_up = 0;\n\
+        row_up = row_down + 1;\n\
+    }\n\
+\n\
+    if(row_up >= u_mosaicSize[1])\n\
+    {\n\
+        return false;\n\
+    }\n\
 \n\
 \n\
     float airPressure_up = _getPollution_triLinearInterpolation(texCoord3d.xy, col_up, row_up);\n\
@@ -1089,14 +1103,14 @@ bool get_pollution_fromTexture3d_nearest(in vec3 texCoord3d, inout float airPres
 \n\
     // ************************************************************\n\
     int col, row;\n\
-    if(currSliceIdx <= u_mosaicSize[0])\n\
-    {\n\
+    //if(currSliceIdx <= u_mosaicSize[0])\n\
+    //{\n\
         // Our current sliceIdx_down is smaller than the columns count of the mosaic, so:\n\
         // in this case, the row = 0.***\n\
-        row = 0;\n\
-        col = currSliceIdx;\n\
-    }\n\
-    else\n\
+    //    row = 0;\n\
+   //     col = currSliceIdx;\n\
+   /// }\n\
+    //else\n\
     {\n\
         float mosaicSize_x = float(u_mosaicSize[0]);\n\
         float rowAux = floor(float(currSliceIdx) / mosaicSize_x);\n\
@@ -1430,24 +1444,12 @@ void main(){\n\
 \n\
     // Now, with \"frontPosLC\" & \"rearPosLC\", calculate the frontTexCoord3d & rearTexCoord3d.***\n\
     vec3 simulBoxRange = vec3(u_simulBoxMaxPosLC.x - u_simulBoxMinPosLC.x, u_simulBoxMaxPosLC.y - u_simulBoxMinPosLC.y, u_simulBoxMaxPosLC.z - u_simulBoxMinPosLC.z);\n\
-    //vec3 frontTexCoord3d = vec3((frontPosLC.x - u_simulBoxMinPosLC.x)/simulBoxRange.x, (frontPosLC.y - u_simulBoxMinPosLC.y)/simulBoxRange.y, (frontPosLC.z - u_simulBoxMinPosLC.z)/simulBoxRange.z);\n\
-    //vec3 rearTexCoord3d = vec3((rearPosLC.x - u_simulBoxMinPosLC.x)/simulBoxRange.x, (rearPosLC.y - u_simulBoxMinPosLC.y)/simulBoxRange.y, (rearPosLC.z - u_simulBoxMinPosLC.z)/simulBoxRange.z);\n\
-    //vec3 scenePosTexCoord3d = vec3((scenePosLC.x - u_simulBoxMinPosLC.x)/simulBoxRange.x, (scenePosLC.y - u_simulBoxMinPosLC.y)/simulBoxRange.y, (scenePosLC.z - u_simulBoxMinPosLC.z)/simulBoxRange.z);\n\
 \n\
-    \n\
-    //bool testBool = false;\n\
-\n\
-    //float totalAirPressure = 0.0;\n\
-    vec3 totalVelocityLC = vec3(0.0);\n\
-    //float totalDotProdInv = 0.0;\n\
     float contaminationSample = 0.0;\n\
     float smplingCount = 0.0;\n\
-    //float currMaxPressure = 0.0;\n\
     float segmentLength = length(rearPosLC - frontPosLC);\n\
-    //vec3 samplingDir = normalize(rearTexCoord3d - frontTexCoord3d); // original.***\n\
     vec3 samplingDirLC = normalize(rearPosLC - frontPosLC);\n\
     vec3 samplingDirCC = normalize(rearPosCC - frontPosCC);\n\
-    //float increLength = 0.02; // original.***\n\
     float samplingsCount = 50.0;\n\
     float increLength = segmentLength / samplingsCount;\n\
     if(increLength < u_voxelSizeMeters.x)\n\
@@ -1455,13 +1457,11 @@ void main(){\n\
         increLength = u_voxelSizeMeters.x;\n\
     }\n\
 \n\
-    vec3 velocityLC;\n\
-\n\
     //vec3 camRay = normalize(getViewRay(v_tex_pos, 1.0));\n\
     vec3 camRay = normalize(sceneDepthPosCC);\n\
-    //float dotProdAccum = 0.0;\n\
+\n\
     vec4 color4Aux = vec4(0.0, 0.0, 0.0, 0.0);\n\
-    //float dotProdFactor = 1.0;\n\
+\n\
     vec3 scenePosTexCoord3d_candidate = vec3(-1.0);\n\
     vec3 currSamplePosLC = vec3(frontPosLC);\n\
     vec3 step_vector_LC = samplingDirLC * increLength;\n\

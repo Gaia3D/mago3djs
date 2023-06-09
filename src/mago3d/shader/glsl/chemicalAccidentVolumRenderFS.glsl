@@ -268,52 +268,54 @@ void posWCRelToEye_to_posLC(in vec4 posWC_relToEye, in mat4 local_mat4Inv, in ve
 
 void checkTexCoordRange(inout vec2 texCoord)
 {
+    float error = 0.0;
     if(texCoord.x < 0.0)
     {
-        texCoord.x = 0.0;
+        texCoord.x = 0.0 + error;
     }
     else if(texCoord.x > 1.0)
     {
-        texCoord.x = 1.0;
+        texCoord.x = 1.0 - error;
     }
 
     if(texCoord.y < 0.0)
     {
-        texCoord.y = 0.0;
+        texCoord.y = 0.0 + error;
     }
     else if(texCoord.y > 1.0)
     {
-        texCoord.y = 1.0;
+        texCoord.y = 1.0 - error;
     }
 }
 
 void checkTexCoord3DRange(inout vec3 texCoord)
 {
+    float error = 0.0;
     if(texCoord.x < 0.0)
     {
-        texCoord.x = 0.0;
+        texCoord.x = 0.0 + error;
     }
     else if(texCoord.x > 1.0)
     {
-        texCoord.x = 1.0;
+        texCoord.x = 1.0 - error;
     }
 
     if(texCoord.y < 0.0)
     {
-        texCoord.y = 0.0;
+        texCoord.y = 0.0 + error;
     }
     else if(texCoord.y > 1.0)
     {
-        texCoord.y = 1.0;
+        texCoord.y = 1.0 - error;
     }
 
     if(texCoord.z < 0.0)
     {
-        texCoord.z = 0.0;
+        texCoord.z = 0.0 + error;
     }
     else if(texCoord.z > 1.0)
     {
-        texCoord.z = 1.0;
+        texCoord.z = 1.0 - error;
     }
 }
 
@@ -430,14 +432,14 @@ bool get_pollution_fromTexture3d_triLinearInterpolation(in vec3 texCoord3d, inou
 
     // Down slice.************************************************************
     int col_down, row_down;
-    if(currSliceIdx_down <= u_mosaicSize[0])
-    {
+    //if(currSliceIdx_down <= u_mosaicSize[0])
+    //{
         // Our current sliceIdx_down is smaller than the columns count of the mosaic, so:
         // in this case, the row = 0.***
-        row_down = 0;
-        col_down = currSliceIdx_down;
-    }
-    else
+    //    row_down = 0;
+    //    col_down = currSliceIdx_down;
+   // }
+    //else
     {
         float rowAux = floor(float(currSliceIdx_down) / float(u_mosaicSize[0]));
         float colAux = float(currSliceIdx_down) - (rowAux * float(u_mosaicSize[0]));
@@ -475,7 +477,19 @@ bool get_pollution_fromTexture3d_triLinearInterpolation(in vec3 texCoord3d, inou
         row_up = int(rowAux);
     }
 
-    // now, must calculate the mosaicTexCoord.***
+    // test.***
+    col_up = col_down + 1;
+    row_up = row_down;
+    if(col_up >= u_mosaicSize[0])
+    {
+        col_up = 0;
+        row_up = row_down + 1;
+    }
+
+    if(row_up >= u_mosaicSize[1])
+    {
+        return false;
+    }
 
 
     float airPressure_up = _getPollution_triLinearInterpolation(texCoord3d.xy, col_up, row_up);
@@ -531,14 +545,14 @@ bool get_pollution_fromTexture3d_nearest(in vec3 texCoord3d, inout float airPres
 
     // ************************************************************
     int col, row;
-    if(currSliceIdx <= u_mosaicSize[0])
-    {
+    //if(currSliceIdx <= u_mosaicSize[0])
+    //{
         // Our current sliceIdx_down is smaller than the columns count of the mosaic, so:
         // in this case, the row = 0.***
-        row = 0;
-        col = currSliceIdx;
-    }
-    else
+    //    row = 0;
+   //     col = currSliceIdx;
+   /// }
+    //else
     {
         float mosaicSize_x = float(u_mosaicSize[0]);
         float rowAux = floor(float(currSliceIdx) / mosaicSize_x);
@@ -872,24 +886,12 @@ void main(){
 
     // Now, with "frontPosLC" & "rearPosLC", calculate the frontTexCoord3d & rearTexCoord3d.***
     vec3 simulBoxRange = vec3(u_simulBoxMaxPosLC.x - u_simulBoxMinPosLC.x, u_simulBoxMaxPosLC.y - u_simulBoxMinPosLC.y, u_simulBoxMaxPosLC.z - u_simulBoxMinPosLC.z);
-    //vec3 frontTexCoord3d = vec3((frontPosLC.x - u_simulBoxMinPosLC.x)/simulBoxRange.x, (frontPosLC.y - u_simulBoxMinPosLC.y)/simulBoxRange.y, (frontPosLC.z - u_simulBoxMinPosLC.z)/simulBoxRange.z);
-    //vec3 rearTexCoord3d = vec3((rearPosLC.x - u_simulBoxMinPosLC.x)/simulBoxRange.x, (rearPosLC.y - u_simulBoxMinPosLC.y)/simulBoxRange.y, (rearPosLC.z - u_simulBoxMinPosLC.z)/simulBoxRange.z);
-    //vec3 scenePosTexCoord3d = vec3((scenePosLC.x - u_simulBoxMinPosLC.x)/simulBoxRange.x, (scenePosLC.y - u_simulBoxMinPosLC.y)/simulBoxRange.y, (scenePosLC.z - u_simulBoxMinPosLC.z)/simulBoxRange.z);
 
-    
-    //bool testBool = false;
-
-    //float totalAirPressure = 0.0;
-    vec3 totalVelocityLC = vec3(0.0);
-    //float totalDotProdInv = 0.0;
     float contaminationSample = 0.0;
     float smplingCount = 0.0;
-    //float currMaxPressure = 0.0;
     float segmentLength = length(rearPosLC - frontPosLC);
-    //vec3 samplingDir = normalize(rearTexCoord3d - frontTexCoord3d); // original.***
     vec3 samplingDirLC = normalize(rearPosLC - frontPosLC);
     vec3 samplingDirCC = normalize(rearPosCC - frontPosCC);
-    //float increLength = 0.02; // original.***
     float samplingsCount = 50.0;
     float increLength = segmentLength / samplingsCount;
     if(increLength < u_voxelSizeMeters.x)
@@ -897,13 +899,11 @@ void main(){
         increLength = u_voxelSizeMeters.x;
     }
 
-    vec3 velocityLC;
-
     //vec3 camRay = normalize(getViewRay(v_tex_pos, 1.0));
     vec3 camRay = normalize(sceneDepthPosCC);
-    //float dotProdAccum = 0.0;
+
     vec4 color4Aux = vec4(0.0, 0.0, 0.0, 0.0);
-    //float dotProdFactor = 1.0;
+
     vec3 scenePosTexCoord3d_candidate = vec3(-1.0);
     vec3 currSamplePosLC = vec3(frontPosLC);
     vec3 step_vector_LC = samplingDirLC * increLength;

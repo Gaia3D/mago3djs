@@ -2621,15 +2621,20 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 			if (chemAccLayer.screenFBO)
 			{
-				texture = chemAccLayer.screenFBO.colorBuffersArray[0];
+				//texture = chemAccLayer.screenFBO.colorBuffersArray[0];
 			}
 
 			if (chemAccLayer._timeSlicesArray && chemAccLayer._timeSlicesArray.length > 0)
 			{
-				var timeSlice = chemAccLayer._timeSlicesArray[30];
+				var idx = chemAccLayer.testCurrIdx;
+				if (idx === undefined)
+				{
+					idx = 0;
+				}
+				var timeSlice = chemAccLayer._timeSlicesArray[idx];
 				if (timeSlice._mosaicTexture)
 				{
-					//texture = timeSlice._mosaicTexture.texturesArray[0];
+					texture = timeSlice._mosaicTexture.texturesArray[0];
 				}
 			}
 			

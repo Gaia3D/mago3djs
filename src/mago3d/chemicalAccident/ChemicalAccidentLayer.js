@@ -137,6 +137,7 @@ ChemicalAccidentTimeSlice.prototype._makeTextures = function (gl, minmaxPollutio
 		{
 			var value = this._jsonFile.values[i];
 			var realValue = value * (maxValue - minValue) + minValue;
+
 			var quantizedValue = (realValue - minValueTotal) / (maxValueTotal - minValueTotal);
 			//var encodedRgba = ManagerUtils.packDepth(value);
 	
@@ -516,6 +517,8 @@ ChemicalAccidentLayer.prototype.render = function ()
 	{
 		texIdxCurr = 0;
 	}
+
+	this.testCurrIdx = texIdxCurr;
 
 	//if (texIdxCurr >= timeSlicesCount)
 	////{
