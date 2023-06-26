@@ -1366,6 +1366,73 @@ vec4 transfer_fnc(in float pressure)\n\
     return rainbowCol3;\n\
 }\n\
 \n\
+bool isSimulationBoxEdge(vec2 screenPos)\n\
+{\n\
+    // This function is used to render the simulation box edges.***\n\
+    // check the normals.***\n\
+    vec2 frontTexCoord;\n\
+    vec2 rearTexCoord;\n\
+    get_FrontAndRear_depthTexCoords(screenPos, frontTexCoord, rearTexCoord);\n\
+    float pixelSize_x = 1.0 / (u_screenSize.x * 2.0);\n\
+    float pixelSize_y = 1.0 / u_screenSize.y;\n\
+    \n\
+    // check front.***\n\
+    vec4 normal4front = getNormal_simulationBox(frontTexCoord);\n\
+    vec4 normal4front_up = getNormal_simulationBox(vec2(frontTexCoord.x, frontTexCoord.y + pixelSize_y));\n\
+\n\
+    if(dot(normal4front.xyz, normal4front_up.xyz) < 0.95)\n\
+    {\n\
+        return true; // is edge.***\n\
+    }\n\
+\n\
+    vec4 normal4front_left = getNormal_simulationBox(vec2(frontTexCoord.x - pixelSize_x, frontTexCoord.y));    \n\
+    if(dot(normal4front.xyz, normal4front_left.xyz) < 0.95)\n\
+    {\n\
+        return true; // is edge.***\n\
+    }\n\
+\n\
+    vec4 normal4front_down = getNormal_simulationBox(vec2(frontTexCoord.x, frontTexCoord.y - pixelSize_y));    \n\
+    if(dot(normal4front.xyz, normal4front_down.xyz) < 0.95)\n\
+    {\n\
+        return true; // is edge.***\n\
+    }\n\
+\n\
+    vec4 normal4front_rigth = getNormal_simulationBox(vec2(frontTexCoord.x + pixelSize_x, frontTexCoord.y));    \n\
+    if(dot(normal4front.xyz, normal4front_rigth.xyz) < 0.95)\n\
+    {\n\
+        return true; // is edge.***\n\
+    }\n\
+\n\
+    // now, check the rear normals.***\n\
+    vec4 normal4rear = getNormal_simulationBox(rearTexCoord);\n\
+    vec4 normal4rear_up = getNormal_simulationBox(vec2(rearTexCoord.x, rearTexCoord.y + pixelSize_y));\n\
+\n\
+    if(dot(normal4rear.xyz, normal4rear_up.xyz) < 0.95)\n\
+    {\n\
+        return true; // is edge.***\n\
+    }\n\
+\n\
+    vec4 normal4rear_left = getNormal_simulationBox(vec2(rearTexCoord.x - pixelSize_x, rearTexCoord.y));    \n\
+    if(dot(normal4rear.xyz, normal4rear_left.xyz) < 0.95)\n\
+    {\n\
+        return true; // is edge.***\n\
+    }\n\
+\n\
+    vec4 normal4rear_down = getNormal_simulationBox(vec2(rearTexCoord.x, rearTexCoord.y - pixelSize_y));    \n\
+    if(dot(normal4rear.xyz, normal4rear_down.xyz) < 0.95)\n\
+    {\n\
+        return true; // is edge.***\n\
+    }\n\
+\n\
+    vec4 normal4rear_rigth = getNormal_simulationBox(vec2(rearTexCoord.x + pixelSize_x, rearTexCoord.y));    \n\
+    if(dot(normal4rear.xyz, normal4rear_rigth.xyz) < 0.95)\n\
+    {\n\
+        return true; // is edge.***\n\
+    }\n\
+\n\
+    return false;\n\
+}\n\
+\n\
 void main(){\n\
 \n\
     // 1rst, read front depth & rear depth and check if exist rear depth.***\n\
@@ -1373,7 +1440,18 @@ void main(){\n\
     //vec2 screenPos = vec2(gl_FragCoord.x / u_screenSize.x, gl_FragCoord.y / u_screenSize.y); // \n\
     vec2 screenPos = v_tex_pos;\n\
 \n\
-    \n\
+    if(isSimulationBoxEdge(screenPos))\n\
+    {\n\
+        vec4 edgeColor = vec4(0.25, 0.5, 0.99, 1.0);\n\
+        gl_FragData[0] = edgeColor;\n\
+\n\
+        #ifdef USE_MULTI_RENDER_TARGET\n\
+            gl_FragData[1] = edgeColor;\n\
+            gl_FragData[2] = edgeColor;\n\
+            gl_FragData[3] = edgeColor;\n\
+        #endif\n\
+        return;\n\
+    }\n\
 \n\
     // read normal in rear depth. If no exist normal, then, discard.***\n\
     // calculate the texCoord for rear normal:\n\

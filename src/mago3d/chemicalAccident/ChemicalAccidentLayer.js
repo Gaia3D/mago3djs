@@ -105,7 +105,7 @@ ChemicalAccidentTimeSlice.prototype._makeTextures = function (gl, minmaxPollutio
 		this._texture3d = new MagoTexture3D();
 		this._mosaicTexture = new MagoTexture3D();
 
-		var slicesCount = 30; // test hardcoding.***
+		var slicesCount = 15; // test hardcoding.***
 
 		// set texture3d params.***
 		this._texture3d.texture3DXSize = this._jsonFile.columnsCount;
