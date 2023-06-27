@@ -78,7 +78,7 @@ AirPollutionTimeSlice.prototype._makeTextures = function (gl, minmaxPollutionVal
 		this._texture3d = new MagoTexture3D();
 		this._mosaicTexture = new MagoTexture3D();
 
-		var slicesCount = 6; // test hardcoding.***
+		var slicesCount = 3; // test hardcoding.***
 
 		var texWidth = this.owner.airPollutionManager._geoJsonIndexFile.layers[0].textureWidth;
 		var texHeight = this.owner.airPollutionManager._geoJsonIndexFile.layers[0].textureHeight;
@@ -296,6 +296,351 @@ AirPollutionLayer.prototype._makeSimulationBox = function ()
 	var hola = 0;
 };
 
+AirPollutionLayer.prototype._getScreenFBO = function(magoManager)
+{
+	// This is a screen size FBO.***
+	if (!this.screenFBO)
+	{
+		var gl = magoManager.getGl();
+		var sceneState = magoManager.sceneState;
+		var bufferWidth = sceneState.drawingBufferWidth[0]; 
+		var bufferHeight = sceneState.drawingBufferHeight[0];
+		var bUseMultiRenderTarget = magoManager.postFxShadersManager.bUseMultiRenderTarget;
+		this.screenFBO = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 4}); 
+	}
+
+	return this.screenFBO;
+};
+
+AirPollutionLayer.prototype._getVolumeDepthFBO = function()
+{
+	//      +-----------+-----------+
+	//      |           |           | 
+	//      |   tex_0   |   tex_1   |
+	//      |           |           |
+	//      +-----------+-----------+
+	// Note : the width of fbo must be the double of the screen width.***
+	if (!this.volumeDepthFBO)
+	{
+		var magoManager = this.airPollutionManager.magoManager;
+		var gl = magoManager.getGl();
+		var sceneState = magoManager.sceneState;
+		var bufferWidth = sceneState.drawingBufferWidth[0] * 2; // double of the screen width.***
+		var bufferHeight = sceneState.drawingBufferHeight[0];
+		var bUseMultiRenderTarget = magoManager.postFxShadersManager.bUseMultiRenderTarget;
+		this.volumeDepthFBO = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 4}); 
+	}
+
+	return this.volumeDepthFBO;
+};
+
+AirPollutionLayer.prototype._renderDepthVolume = function ()
+{
+	// Render depth 2 times:
+	// 1- render the rear faces.
+	// 2- render the front faces.
+	//-------------------------------
+	var magoManager = this.airPollutionManager.magoManager;
+	var sceneState = magoManager.sceneState;
+	var gl = magoManager.getGl();
+	var extbuffers = magoManager.extbuffers;
+
+	// Now, render the windPlane.
+	if (!this.visibleObjControler)
+	{
+		this.visibleObjControler = new VisibleObjectsController();
+	}
+
+	//this.simulationBox = this._getSimulationBox(magoManager);
+
+	if (this.simulationBox)
+	{ this.visibleObjControler.currentVisibleNativeObjects.opaquesArray[0] = this.simulationBox; }
+
+	// Bind FBO.***
+	//      +-----------------+----------------+
+	//      |                 |                | 
+	//      |   front depth   |   rear depth   |
+	//      |                 |                |
+	//      +-----------------+----------------+
+	// Note : the width of fbo must be the double of the screen width.***
+
+	// Front Face.***************************************************************************************************************************
+	var doubleFBO = this._getVolumeDepthFBO(magoManager);
+
+	this.simulBoxdoubleDepthTex = doubleFBO.colorBuffersArray[1];
+	this.simulBoxDoubleNormalTex = doubleFBO.colorBuffersArray[2];
+
+	//var currentShader = magoManager.postFxShadersManager.getShader("gBuffer"); 
+	//magoManager.postFxShadersManager.useProgram(currentShader);
+	//gl.uniform1i(currentShader.clippingType_loc, 0);
+
+	doubleFBO.bind();
+	gl.viewport(0, 0, doubleFBO.width[0]/2, doubleFBO.height[0]);
+
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, doubleFBO.colorBuffersArray[0], 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, doubleFBO.colorBuffersArray[1], 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, doubleFBO.colorBuffersArray[2], 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, doubleFBO.colorBuffersArray[3], 0);
+
+	extbuffers.drawBuffersWEBGL([
+		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
+		extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - depthTex (front).
+		extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - normalTex
+		extbuffers.COLOR_ATTACHMENT3_WEBGL // gl_FragData[3] - albedoTex
+	  ]);
+
+	//if (magoManager.isFarestFrustum())// === 2)
+	if (magoManager.currentFrustumIdx === 2)
+	{
+		gl.clearColor(0, 0, 0, 0);
+		gl.clearDepth(1);
+		gl.clear(gl.COLOR_BUFFER_BIT);
+		gl.clearColor(0, 0, 0, 1);
+	}
+
+	gl.clear(gl.DEPTH_BUFFER_BIT);
+
+	var renderType = 1;
+	gl.frontFace(gl.CCW);
+	magoManager.renderer.renderGeometryBuffer(gl, renderType, this.visibleObjControler);
+
+	// End front face.---------------------------------------------------------------------------------------------------------------------------
+
+	// Rear Face.***************************************************************************************************************************
+	gl.viewport(doubleFBO.width[0]/2, 0, doubleFBO.width[0]/2, doubleFBO.height[0]);
+
+
+	var renderType = 1;
+	gl.frontFace(gl.CW);
+	magoManager.renderer.renderGeometryBuffer(gl, renderType, this.visibleObjControler);
+	// End rear face.---------------------------------------------------------------------------------------------------------------------------
+
+	// unbind fbo.***
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, null, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0);
+	doubleFBO.unbind();
+
+	// Return to main framebuffer.************************
+	// return default values:
+	gl.frontFace(gl.CCW);
+	/*
+	magoManager.bindMainFramebuffer();
+
+	// unbind mago colorTextures:
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // depthTex.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // albedoTex.
+	extbuffers.drawBuffersWEBGL([
+		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
+		extbuffers.NONE, // gl_FragData[1]
+		extbuffers.NONE, // gl_FragData[2]
+		extbuffers.NONE, // gl_FragData[3]
+	]);
+	*/
+};
+
+AirPollutionLayer.prototype.render = function ()
+{
+	// render the depthBox.***
+	if (this.simulationBox === undefined)
+	{
+		this._makeSimulationBox();
+	}
+
+	var magoManager = this.airPollutionManager.magoManager;
+
+	// animation time control.***
+	var timeSlicesCount = this._timeSlicesArray.length;
+	var totalAnimTime = this.airPollutionManager._totalAnimTime; 
+	var increTime = this.airPollutionManager._increTime;
+
+	var timeFactor = increTime / totalAnimTime;
+	var f = timeFactor * timeSlicesCount;
+	var ffract = f - Math.floor(f); // this is the interpolation factor between currTex & nexTex.***
+	var texIdxCurr = Math.floor(f);
+	var texIdxNext = texIdxCurr + 1;
+	if (texIdxNext >= timeSlicesCount)
+	{
+		texIdxNext = texIdxCurr;
+	}
+
+	if (texIdxCurr > this._timeSlicesArray.length - 1)
+	{
+		texIdxCurr = this._timeSlicesArray.length - 1;
+	}
+	else if (texIdxCurr < 0 )
+	{
+		texIdxCurr = 0;
+	}
+
+	this.testCurrIdx = texIdxCurr;
+
+	//if (texIdxCurr >= timeSlicesCount)
+	////{
+	//	texIdxCurr = timeSlicesCount - 1;
+	//}
+
+	//var texIdxNext = texIdxCurr + 1;
+	//if (texIdxNext >= timeSlicesCount)
+	//{
+	//	texIdxNext = texIdxCurr;
+	//}
+
+	// end animation time control.---
+
+	this._renderDepthVolume();
+	
+	// Now, do volumetric render with the mosaic textures 3d.***
+	
+	var airPollutionManager = this.airPollutionManager;
+	var sceneState = magoManager.sceneState;
+	var gl = magoManager.getGl();
+	var fbo = this._getScreenFBO(magoManager);
+	var extbuffers = fbo.extbuffers;
+
+	this.volumRenderTex = fbo.colorBuffersArray[0];
+
+	fbo.bind();
+	gl.viewport(0, 0, fbo.width[0], fbo.height[0]);
+
+	var screenQuad = airPollutionManager.getQuadBuffer();
+	var shader = magoManager.postFxShadersManager.getShader("volumetricAirPollution"); // (waterQuadVertVS, chemicalAccidentVolumRenderFS)
+	magoManager.postFxShadersManager.useProgram(shader);
+
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, fbo.colorBuffersArray[0], 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, fbo.colorBuffersArray[1], 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, fbo.colorBuffersArray[2], 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, fbo.colorBuffersArray[3], 0);
+
+	// Test:
+	this.volumRenderTex = fbo.colorBuffersArray[0];
+
+	
+
+	extbuffers.drawBuffersWEBGL([
+		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
+		extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] 
+		extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2]
+		extbuffers.COLOR_ATTACHMENT3_WEBGL // gl_FragData[3]
+	  ]);
+
+	//if (magoManager.isFarestFrustum())// === 2)
+	if (magoManager.currentFrustumIdx === 2)
+	{
+		gl.clearColor(0, 0, 0, 0);
+		gl.clearDepth(1);
+		gl.clear(gl.COLOR_BUFFER_BIT);
+		gl.clearColor(0, 0, 0, 1);
+	}
+
+	gl.clear(gl.DEPTH_BUFFER_BIT);
+
+	// bind screenQuad positions.
+	FBO.bindAttribute(gl, screenQuad.posBuffer, shader.a_pos_loc, 2);
+
+	gl.disable(gl.BLEND);
+	gl.enable(gl.DEPTH_TEST);
+
+	
+	var testTimeSlice = this._timeSlicesArray[texIdxCurr];
+	var refTex3D = testTimeSlice._mosaicTexture; // a reference texture3D, to take parameters for the shader.***
+
+	// bind uniforms.***
+	shader.bindUniformGenerals();
+
+	var screenQuad = airPollutionManager.getQuadBuffer();
+
+	// bind screenQuad positions.
+	FBO.bindAttribute(gl, screenQuad.posBuffer, shader.a_pos_loc, 2);
+
+	
+	gl.uniform1iv(shader.u_texSize_loc, [refTex3D.texture3DXSize, refTex3D.texture3DYSize, refTex3D.texture3DZSize]); // The original texture3D size.***
+	gl.uniform1iv(shader.u_mosaicSize_loc, [refTex3D.mosaicXCount, refTex3D.mosaicYCount, refTex3D.finalSlicesCount]); // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***
+	var modelViewMatrixRelToEyeInv = sceneState.getModelViewRelToEyeMatrixInv();
+	gl.uniformMatrix4fv(shader.modelViewMatrixRelToEyeInv_loc, false, modelViewMatrixRelToEyeInv._floatArrays);
+	var minMaxPollutionValues = this.getMinMaxPollutionValues();
+	gl.uniform2fv(shader.u_minMaxPollutionValues_loc, [minMaxPollutionValues[0], minMaxPollutionValues[1]]);
+	
+	gl.uniform1f(shader.u_airEnvirontmentPressure_loc, 0); // delete this. no necessary.***
+	gl.uniform2fv(shader.u_screenSize_loc, [sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0]]);
+	gl.uniform2fv(shader.uNearFarArray_loc, magoManager.frustumVolumeControl.nearFarArray);
+	gl.uniform3fv(shader.u_voxelSizeMeters_loc, [this.oneVoxelSizeInMeters[0], this.oneVoxelSizeInMeters[1], this.oneVoxelSizeInMeters[2]]); // The one voxel size in meters.***
+
+	var geoLocDataManager = this.simulationBox.geoLocDataManager;
+	var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
+	var simulBoxMatInv = geoLocData.getRotMatrixInv();
+	gl.uniformMatrix4fv(shader.u_simulBoxTMat_loc, false, geoLocData.rotMatrix._floatArrays);
+	gl.uniformMatrix4fv(shader.u_simulBoxTMatInv_loc, false, simulBoxMatInv._floatArrays);
+	gl.uniform3fv(shader.u_simulBoxPosHigh_loc, geoLocData.positionHIGH);
+	gl.uniform3fv(shader.u_simulBoxPosLow_loc, geoLocData.positionLOW);
+
+	var bboxLC = this.simulationBox.getBoundingBoxLC();
+	gl.uniform3fv(shader.u_simulBoxMinPosLC_loc, [bboxLC.minX, bboxLC.minY, bboxLC.minZ]);
+	gl.uniform3fv(shader.u_simulBoxMaxPosLC_loc, [bboxLC.maxX, bboxLC.maxY, bboxLC.maxZ]);// 
+
+	gl.uniform1f(shader.u_interpolationFactor_loc, ffract); // Interpolation factor.***
+	
+	// bind textures.***
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, this.simulBoxdoubleDepthTex); 
+	//gl.bindTexture(gl.TEXTURE_2D, magoManager.depthTex); 
+
+	gl.activeTexture(gl.TEXTURE1);
+	gl.bindTexture(gl.TEXTURE_2D, this.simulBoxDoubleNormalTex); 
+
+	// provisionally take the 1rst timeSlice.***
+	var testTimeSlice = this._timeSlicesArray[texIdxCurr];
+	var timeSliceNext = this._timeSlicesArray[texIdxNext];
+
+	gl.activeTexture(gl.TEXTURE2); // CURRENT time slice.***
+	gl.bindTexture(gl.TEXTURE_2D, testTimeSlice._mosaicTexture.getTexture( 0 )); 
+
+	gl.activeTexture(gl.TEXTURE3);
+	gl.bindTexture(gl.TEXTURE_2D, magoManager.depthTex); 
+
+	gl.activeTexture(gl.TEXTURE4);
+	gl.bindTexture(gl.TEXTURE_2D, magoManager.normalTex); 
+
+	gl.activeTexture(gl.TEXTURE5); // NEXT time slice.***
+	gl.bindTexture(gl.TEXTURE_2D, timeSliceNext._mosaicTexture.getTexture( 0 )); 
+
+
+	// Draw screenQuad:
+	gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, null, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0);
+
+	for (var i=0; i<8; i++)
+	{
+		gl.activeTexture(gl.TEXTURE0+i);
+		gl.bindTexture(gl.TEXTURE_2D, null);
+	}
+
+	fbo.unbind();
+	
+
+	/*
+	uniform sampler2D simulationBoxDoubleDepthTex;
+	uniform sampler2D simulationBoxDoubleNormalTex; // used to calculate the current frustum idx.***
+	uniform sampler2D airPressureMosaicTex;
+
+	////uniform vec3 encodedCameraPositionMCHigh;
+	////uniform vec3 encodedCameraPositionMCLow;
+	////uniform float tangentOfHalfFovy;
+	////uniform float aspectRatio;
+	*/
+};
+
+AirPollutionLayer.prototype.getMinMaxPollutionValues = function ()
+{
+	return [0.0, this.airPollutionManager._geoJsonIndexFile.pollutionMaxValue];
+};
+
 AirPollutionLayer.prototype._prepareLayer = function ()
 {
 	if (this._isPrepared)
@@ -352,33 +697,36 @@ AirPollutionLayer.prototype._prepareLayer = function ()
 		this.voxelizer = new Voxelizer(options);
 	}
 
-	/*
+	
 	if (!this.oneVoxelSizeInMeters)
 	{
 		this.oneVoxelSizeInMeters = new Float32Array([1.0, 1.0, 1.0]);
 
-		var geoJsonIndexFile = this.chemicalAccidentManager._geoJsonIndexFile;
+		var geoJsonIndexFile = this.airPollutionManager._geoJsonIndexFile;
 		var widthMeters = geoJsonIndexFile.height_km * 1000.0;
 		var heightMeters = geoJsonIndexFile.width_km * 1000.0;
 
 		// take any timeSlice to get columnsCount and rowsCount.***
+		var texWidth = this.airPollutionManager._geoJsonIndexFile.layers[0].textureWidth;
+		var texHeight = this.airPollutionManager._geoJsonIndexFile.layers[0].textureHeight;
+
 		var timeSlice = this._timeSlicesArray[0];
-		var columnsCount = timeSlice._jsonFile.columnsCount;
-		var rowsCount = timeSlice._jsonFile.rowsCount;
+		var columnsCount = texWidth;
+		var rowsCount = texHeight;
 
 		this.oneVoxelSizeInMeters[0] = widthMeters / columnsCount;
 		this.oneVoxelSizeInMeters[1] = heightMeters / rowsCount;
 		this.oneVoxelSizeInMeters[2] = this.oneVoxelSizeInMeters[0]; // in z direction is the same.***
 		
 	}
-	*/
+	
 
 	// Now make the textures3D.***
 	if (!this._allTimeSlicesTextures3DReady)
 	{
 		var magoManager = this.airPollutionManager.magoManager;
 		var gl = magoManager.sceneState.gl;
-		var minmaxPollutionValues = [0.0, this.airPollutionManager._geoJsonIndexFile.pollutionMaxValue];
+		var minmaxPollutionValues = this.getMinMaxPollutionValues();
 		this._makeTextures(gl, minmaxPollutionValues);
 	}
 	

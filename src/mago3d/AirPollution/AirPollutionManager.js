@@ -116,9 +116,9 @@ AirPollutionManager.prototype.createDefaultShaders = function ()
 	gl.uniform1i(shader.texToCopy_loc, 0);
 
 	// 1) volumetric Shader.*********************************************************************************************
-	shaderName = "volumetric";
+	shaderName = "volumetricAirPollution";
 	vs_source = ShaderSource.waterQuadVertVS;
-	fs_source = ShaderSource.chemicalAccidentVolumRenderFS;
+	fs_source = ShaderSource.airPollutionVolumRenderFS;
 	
 	fs_source = fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
 	fs_source = fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
@@ -127,6 +127,7 @@ AirPollutionManager.prototype.createDefaultShaders = function ()
 	shader.simulationBoxDoubleDepthTex_loc = gl.getUniformLocation(shader.program, "simulationBoxDoubleDepthTex");
 	shader.simulationBoxDoubleNormalTex_loc = gl.getUniformLocation(shader.program, "simulationBoxDoubleNormalTex");
 	shader.pollutionMosaicTex_loc = gl.getUniformLocation(shader.program, "pollutionMosaicTex");
+	shader.pollutionMosaicTex_next_loc = gl.getUniformLocation(shader.program, "pollutionMosaicTex_next");
 	shader.sceneDepthTex_loc = gl.getUniformLocation(shader.program, "sceneDepthTex"); // scene depth tex.***
 	shader.sceneNormalTex_loc = gl.getUniformLocation(shader.program, "sceneNormalTex"); // scene normal tex.***
 	//shader.airVelocityTex_loc = gl.getUniformLocation(shader.program, "airVelocityTex");
@@ -153,6 +154,7 @@ AirPollutionManager.prototype.createDefaultShaders = function ()
 	shader.u_simulBoxPosLow_loc = gl.getUniformLocation(shader.program, "u_simulBoxPosLow");
 	shader.u_simulBoxMinPosLC_loc = gl.getUniformLocation(shader.program, "u_simulBoxMinPosLC");
 	shader.u_simulBoxMaxPosLC_loc = gl.getUniformLocation(shader.program, "u_simulBoxMaxPosLC");
+	shader.u_interpolationFactor_loc = gl.getUniformLocation(shader.program, "uInterpolationFactor");
 	
 	magoManager.postFxShadersManager.useProgram(shader);
 	gl.uniform1i(shader.simulationBoxDoubleDepthTex_loc, 0);
@@ -160,7 +162,7 @@ AirPollutionManager.prototype.createDefaultShaders = function ()
 	gl.uniform1i(shader.pollutionMosaicTex_loc, 2);
 	gl.uniform1i(shader.sceneDepthTex_loc, 3);
 	gl.uniform1i(shader.sceneNormalTex_loc, 4);
-	//gl.uniform1i(shader.airVelocityTex_loc, 5);
+	gl.uniform1i(shader.pollutionMosaicTex_next_loc, 5);
 	//gl.uniform1i(shader.maxPressureMosaicTex_loc, 6);
 
 	magoManager.postFxShadersManager.useProgram(null);
@@ -340,6 +342,22 @@ AirPollutionManager.prototype._preparePollutionLayers = function (magoManager)
 	return false;
 };
 
+AirPollutionManager.prototype.getQuadBuffer = function ()
+{
+	if (!this.screenQuad)
+	{
+		var gl = this.magoManager.getGl();
+		var posData = new Float32Array([0, 0,   1, 0,   0, 1,   0, 1,   1, 0,   1, 1]); // total screen.
+		var webglposBuffer = FBO.createBuffer(gl, posData);
+
+		this.screenQuad = {
+			posBuffer: webglposBuffer
+		};
+	}
+
+	return this.screenQuad;
+};
+
 AirPollutionManager.prototype.render = function ()
 {
 	if (!this._geoJsonIndexFilePath)
@@ -357,7 +375,7 @@ AirPollutionManager.prototype.render = function ()
 	if (!this.prepareVolume(magoManager))
 	{ return false; }
 	
-	/*
+	
 	if (this._animationState === CODE.processState.NO_STARTED)
 	{
 		this._animationState = CODE.processState.STARTED;
@@ -397,10 +415,10 @@ AirPollutionManager.prototype.render = function ()
 	}
 	
 	// Render layers.***
-	var pollutionLayersCount = this.chemAccidentLayersArray.length;
+	var pollutionLayersCount = this.airPollutionLayersArray.length;
 	for (var i=0; i<pollutionLayersCount; i++)
 	{
-		var pollLayer = this.chemAccidentLayersArray[i];
+		var pollLayer = this.airPollutionLayersArray[i];
 		pollLayer.render(magoManager);
 	}
 
@@ -411,6 +429,6 @@ AirPollutionManager.prototype.render = function ()
 	var sceneState = magoManager.sceneState;
 	magoManager.bindMainFramebuffer();
 	gl.viewport(0, 0, sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0]);
-	*/
+	
 	var hola = 0;
 };

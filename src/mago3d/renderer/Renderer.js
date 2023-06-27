@@ -1665,6 +1665,19 @@ Renderer.prototype.renderScreenQuad2 = function (gl)
 			}
 		}
 	}
+	else if (magoManager.airPollutionManager && magoManager.airPollutionManager.airPollutionLayersArray)
+	{
+		// check if exist chemAccidentVolumetricTex.***
+		if (magoManager.airPollutionManager.airPollutionLayersArray.length > 0)
+		{
+			var airPollLayer = magoManager.airPollutionManager.airPollutionLayersArray[0];
+			if (airPollLayer.volumRenderTex)
+			{
+				gl.bindTexture(gl.TEXTURE_2D, airPollLayer.volumRenderTex);
+				bSoundVolumetricTex = true;
+			}
+		}
+	}
 
 	// End volumetric renders.-----------------------------------------------------------------
 

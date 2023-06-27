@@ -2027,12 +2027,14 @@ MagoManager.prototype._renderManagers_transparentPass = function ()
 
 	if (this.chemicalAccidentManager) // TransparentPass.***
 	{
+		// Note : the chemAccManager's rendering is added in screenQuad2 render.***
 		// process to render chemical accident (texture 3d).***
 		this.chemicalAccidentManager.render();
 	}
 
 	if (this.airPollutionManager) // TransparentPass.***
 	{
+		// Note : the airPollutionManager's rendering is added in screenQuad2 render.***
 		// process to render chemical accident (texture 3d).***
 		this.airPollutionManager.render();
 	}
