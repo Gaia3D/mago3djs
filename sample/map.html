@@ -171,8 +171,10 @@
 				serverPolicy.initAltitude = 3000;
 				MAGO3D_INSTANCE = new Mago3D.Mago3d(renderDivId, serverPolicy, {loadend : loadend}, cesiumViewerOption);
 
-				MAGO3D_INSTANCE.getViewer().extend(Cesium.viewerCesium3DTilesInspectorMixin);
-        		const inspectorViewModel = MAGO3D_INSTANCE.getViewer().cesium3DTilesInspector.viewModel;
+				// Active this code for tile inspector.**************************************************************************************
+				//MAGO3D_INSTANCE.getViewer().extend(Cesium.viewerCesium3DTilesInspectorMixin);
+        		//const inspectorViewModel = MAGO3D_INSTANCE.getViewer().cesium3DTilesInspector.viewModel;
+				// Active this code for tile inspector.**************************************************************************************
 				
 				
 				//MAGO3D_INSTANCE.getViewer().scene.globe.translucency.enabled = true;

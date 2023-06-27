@@ -987,7 +987,7 @@ void main(){
     float segmentLength = length(rearPosLC - frontPosLC);
     vec3 samplingDirLC = normalize(rearPosLC - frontPosLC);
     vec3 samplingDirCC = normalize(rearPosCC - frontPosCC);
-    float samplingsCount = 50.0;
+    float samplingsCount = 150.0;
     float increLength = segmentLength / samplingsCount;
     if(increLength < u_voxelSizeMeters.x)
     {
@@ -1009,11 +1009,11 @@ void main(){
     
     // Sampling far to near.***
     bool normalLC_calculated = true;
-    bool bUseNormal = false;
+    bool bUseNormal = true;
 
     // Note : "texIdx" is used to interpolated between "pollutionMosaicTex" & "pollutionMosaicTex_next".***
     int texIdx = 0;
-    for(int i=0; i<100; i++)
+    for(int i=0; i<150; i++)
     {
         // Note : for each smple, must depth check with the scene depthTexure.***
         vec3 samplePosLC = frontPosLC + samplingDirLC * increLength * float(i);
@@ -1032,7 +1032,10 @@ void main(){
 
         if(get_pollution_fromTexture3d_triLinearInterpolation(sampleTexCoord3d, contaminationSample, texIdx))
         {
-            if(bUseNormal) // provisionally deactived.***
+            vec4 currColor4 = transfer_fnc(contaminationSample);
+            currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.7, false);
+
+            if(bUseNormal && i>1) // provisionally deactived.***
             {
                 vec3 currNormalLC;
                 if(!normalLC(sampleTexCoord3d, currNormalLC, texIdx))
@@ -1045,12 +1048,9 @@ void main(){
                 vec4 currNormalWC = u_simulBoxTMat * vec4(currNormalLC, 1.0);
                 vec4 currNormalCC = modelViewMatrixRelToEye * vec4(currNormalWC.xyz, 1.0);
                 vec3 normalCC = normalize(currNormalCC.xyz);
-                float dotProd = dot(camRay, normalCC);
+                float dotProd = max(0.4, dot(camRay, normalCC));
+                currColor4.rgb *= abs(dotProd);
             }
-            
-
-            vec4 currColor4 = transfer_fnc(contaminationSample);
-            currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);
 
             // Now, accumulate the color.***
             vec4 vecAux = abs(vec4(currColor4.rgb, 1.0));
@@ -1065,7 +1065,10 @@ void main(){
             int texIdx_next = 1;
             if(get_pollution_fromTexture3d_triLinearInterpolation(sampleTexCoord3d, contaminationSample, texIdx_next))
             {
-                if(bUseNormal) // provisionally deactived.***
+                vec4 currColor4 = transfer_fnc(contaminationSample);
+                currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.7, false);
+
+                if(bUseNormal && i>1) // provisionally deactived.***
                 {
                     vec3 currNormalLC;
                     if(!normalLC(sampleTexCoord3d, currNormalLC, texIdx_next))
@@ -1078,12 +1081,9 @@ void main(){
                     vec4 currNormalWC = u_simulBoxTMat * vec4(currNormalLC, 1.0);
                     vec4 currNormalCC = modelViewMatrixRelToEye * vec4(currNormalWC.xyz, 1.0);
                     vec3 normalCC = normalize(currNormalCC.xyz);
-                    float dotProd = dot(camRay, normalCC);
+                    float dotProd = max(0.4, dot(camRay, normalCC));
+                    currColor4.rgb *= abs(dotProd);
                 }
-                
-
-                vec4 currColor4 = transfer_fnc(contaminationSample);
-                currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);
 
                 // Now, accumulate the color.***
                 vec4 vecAux = abs(vec4(currColor4.rgb, 1.0));
