@@ -74,6 +74,9 @@
 	<li onclick="AirPollution_Test();">
 		Air Pollution Test
 	</li>
+	<li onclick="Test3DTiles();">
+		Test 3DTiles
+	</li>
 
 </ul>
 <div id="magoContainer" class="mapWrap"></div>
@@ -1202,7 +1205,7 @@
 		var hola = 0;
 	}
 
-	function AirPollution_Test (){ // 
+	function AirPollution_Test (){ // Test3DTiles
 		var magoManager = MAGO3D_INSTANCE.getMagoManager();
 
 		// create chemicalAccidentManager, if no exist.***
@@ -1219,6 +1222,12 @@
 			magoManager.airPollutionManager.load_airPollutionIndexFile(geoJsonIndexFilePath);
 		}
 
+		var hola = 0;
+	}
+
+	function Test3DTiles (){ // 
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+		magoManager.TEST_3DTiles();
 		var hola = 0;
 	}
 

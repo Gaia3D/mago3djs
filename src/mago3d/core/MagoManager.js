@@ -2525,8 +2525,14 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 	// Restore cesium gl settings.**************************************************************************
 	gl.clearColor(keepClearColor.red, keepClearColor.green, keepClearColor.blue, keepClearColor.alpha);
 	//------------------------------------------------------------------------------------------------------
+};
 
-	// GLB TEST:::::::::::::::::::::::::::::::::::::::::::
+/**
+ * Binds the magoWorld frameBuffer.
+ * @private
+ */
+MagoManager.prototype.TEST_3DTiles = function () 
+{
 	if (this._glb_test === undefined)
 	{
 		this._glb_test = true;
@@ -2567,7 +2573,8 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		//url        = '../f4d/3dtiles/smallTestData_3Dtile/tileset.json';
 		//url        = '../f4d/3dtiles/temp_mgSets_WangSuk_Mode1_48/tileset.json';
 		//url        = '../f4d/3dtiles/temp_mgSets_WangSuk_Mode1_48_kml/tileset.json';
-		url        = '../f4d/3dtiles/Test3dData_WangSuk_3Dtile/tileset.json';
+		//url        = '../f4d/3dtiles/Test3dData_WangSuk_3Dtile/tileset.json';
+		url        = '../f4d/3dtiles/bldg_wangSuk_kml/tileset.json'; // recently made. 20230628
 		const tileset2 = this.scene.primitives.add(new Cesium.Cesium3DTileset({
 			url                     : url,
 			lightColor              : new Cesium.Cartesian3(30.0, 30.0, 30.0),
