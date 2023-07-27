@@ -2006,6 +2006,17 @@ MagoManager.prototype.doRenderORT = function (frustumVolumenObject)
 
 MagoManager.prototype._renderManagers_transparentPass = function () 
 {
+	if (this.otherManagers !== undefined)
+	{
+		// check if exist oceanFluxManager.***
+		if (this.otherManagers.oceanFluxManager !== undefined)
+		{
+			var oceanFluxManager = this.otherManagers.oceanFluxManager;
+			oceanFluxManager.render();
+			var hola = 0;
+		}
+	}
+
 	if (this.waterManager) // TransparentPass.***
 	{
 		// 1rst, do objects intersection culling.
@@ -2533,6 +2544,8 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
  */
 MagoManager.prototype.TEST_3DTiles = function () 
 {
+	// Function called from "map.html".***
+	// Function called from "map.html".***
 	if (this._glb_test === undefined)
 	{
 		this._glb_test = true;
@@ -2559,11 +2572,11 @@ MagoManager.prototype.TEST_3DTiles = function ()
 		// HanamKyosan.******************************************************************
 		var url = "";
 		var bShowBox = true;
-		url        = '../f4d/3dtiles/temp_mgSets_HanamKyosan_Mode1_48/tileset.json';
+		//url        = '../f4d/3dtiles/temp_mgSets_HanamKyosan_Mode1_48/tileset.json';
+		url        = '../f4d/3dtiles/3d-tiles-gs2/tileset.json';
 		//url        = '../f4d/3dtiles/temp_mgSets_HanamKyosan_12B/tileset.json';
 		const tileset = this.scene.primitives.add(new Cesium.Cesium3DTileset({
 			url                     : url,
-			lightColor              : new Cesium.Cartesian3(30.0, 30.0, 30.0),
 			debugShowBoundingVolume : bShowBox
 		}));
 
@@ -2574,20 +2587,27 @@ MagoManager.prototype.TEST_3DTiles = function ()
 		//url        = '../f4d/3dtiles/temp_mgSets_WangSuk_Mode1_48/tileset.json';
 		//url        = '../f4d/3dtiles/temp_mgSets_WangSuk_Mode1_48_kml/tileset.json';
 		//url        = '../f4d/3dtiles/Test3dData_WangSuk_3Dtile/tileset.json';
-		url        = '../f4d/3dtiles/bldg_wangSuk_kml/tileset.json'; // recently made. 20230628
+		//url        = '../f4d/3dtiles/bldg_wangSuk_kml/tileset.json'; // recently made. 20230628
+		url        = '../f4d/3dtiles/3d-tiles-ws2/tileset.json'; // recently made. 20230628
 		const tileset2 = this.scene.primitives.add(new Cesium.Cesium3DTileset({
 			url                     : url,
-			lightColor              : new Cesium.Cartesian3(30.0, 30.0, 30.0),
+			debugShowBoundingVolume : bShowBox,
+			debugShowUrl            : false
+		}));
+
+		url        = '../f4d/3dtiles/3d-tiles-ws1/tileset.json'; // recently made. 20230628
+		const tileset21 = this.scene.primitives.add(new Cesium.Cesium3DTileset({
+			url                     : url,
 			debugShowBoundingVolume : bShowBox,
 			debugShowUrl            : false
 		}));
 
 		// IncheonKyeYang.******************************************************************
 		//url        = '../f4d/3dtiles/temp_mgSets_InCheonKyeYang_12B/tileset.json';//
-		url        = '../f4d/3dtiles/temp_mgSets_IncheonKyeYang_Mode1_48/tileset.json';
+		//url        = '../f4d/3dtiles/temp_mgSets_IncheonKyeYang_Mode1_48/tileset.json';
+		url        = '../f4d/3dtiles/3d-tiles-gy/tileset.json';
 		const tileset3 = this.scene.primitives.add(new Cesium.Cesium3DTileset({
 			url                     : url,
-			lightColor              : new Cesium.Cartesian3(30.0, 30.0, 30.0),
 			debugShowBoundingVolume : bShowBox
 		}));
 

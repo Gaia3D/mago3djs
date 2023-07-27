@@ -989,9 +989,9 @@ void main(){
     vec3 samplingDirCC = normalize(rearPosCC - frontPosCC);
     float samplingsCount = 150.0;
     float increLength = segmentLength / samplingsCount;
-    if(increLength < u_voxelSizeMeters.x)
+    if(increLength < u_voxelSizeMeters.x)// * 0.5)
     {
-        increLength = u_voxelSizeMeters.x;
+        increLength = u_voxelSizeMeters.x;// * 0.5;
     }
 
     //vec3 camRay = normalize(getViewRay(v_tex_pos, 1.0));

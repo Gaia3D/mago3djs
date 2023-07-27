@@ -596,8 +596,8 @@ AirPollutionLayer.prototype.render = function ()
 	var timeSliceNext = this._timeSlicesArray[texIdxNext];
 
 	// Test rendering only 1 slice.******************************************************
-	var testTimeSlice = this._timeSlicesArray[8];
-	var timeSliceNext = this._timeSlicesArray[8];
+	//var testTimeSlice = this._timeSlicesArray[8];
+	//var timeSliceNext = this._timeSlicesArray[8];
 	//************************************************************************************
 
 	gl.activeTexture(gl.TEXTURE2); // CURRENT time slice.***
