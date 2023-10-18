@@ -11109,7 +11109,7 @@ int getRealFrustumIdx(in int estimatedFrustumIdx, inout int dataType)\n\
     //----------------------------------------------\n\
     int realFrustumIdx = -1;\n\
     \n\
-     if(estimatedFrustumIdx >= 10)\n\
+    if(estimatedFrustumIdx >= 10)\n\
     {\n\
         estimatedFrustumIdx -= 10;\n\
         if(estimatedFrustumIdx >= 10)\n\
@@ -24827,6 +24827,284 @@ void main() {\n\
 	}\n\
 	#endif\n\
 }";
+ShaderSource.windStreamThickLineRAD_FS = "precision highp float;\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+uniform bool bUseLogarithmicDepth;\n\
+uniform bool bUseMultiRenderTarget;\n\
+uniform int uFrustumIdx;\n\
+uniform int uElemIndex;\n\
+uniform int uTotalPointsCount; // total points to draw.\n\
+uniform vec2 viewport;\n\
+uniform float thickness;\n\
+varying vec4 vColor;\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
+varying float vDepth;\n\
+varying float vCurrentIndex;\n\
+\n\
+varying float vSense;\n\
+\n\
+vec3 encodeNormal(in vec3 normal)\n\
+{\n\
+	return normal*0.5 + 0.5;\n\
+}\n\
+\n\
+vec3 decodeNormal(in vec3 normal)\n\
+{\n\
+	return normal * 2.0 - 1.0;\n\
+}\n\
+\n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+  return enc;\n\
+}\n\
+\n\
+void main() {\n\
+	// calculate the transparency.\n\
+	float alpha = 1.0 - (vCurrentIndex - float(uElemIndex))/float(uTotalPointsCount);\n\
+\n\
+	// use vSense to calculate aditional transparency in the borders of the thick line.***\n\
+	float beta = sin(acos(vSense));\n\
+	alpha *= beta;\n\
+\n\
+	vec4 finalColor =  vec4(vColor.rgb, alpha);\n\
+\n\
+	gl_FragData[0] = finalColor; // original.***\n\
+\n\
+	#ifdef USE_MULTI_RENDER_TARGET\n\
+	if(bUseMultiRenderTarget)\n\
+	{\n\
+		gl_FragData[1] = packDepth(vDepth);\n\
+		\n\
+\n\
+		// Note: points cloud data has frustumIdx 20 .. 23.********\n\
+		float frustumIdx = 0.1; // realFrustumIdx = 0.1 * 100 = 10. \n\
+		\n\
+		if(uFrustumIdx == 0)\n\
+		frustumIdx = 0.005; // frustumIdx = 20.***\n\
+		else if(uFrustumIdx == 1)\n\
+		frustumIdx = 0.015; // frustumIdx = 21.***\n\
+		else if(uFrustumIdx == 2)\n\
+		frustumIdx = 0.025; // frustumIdx = 22.***\n\
+		else if(uFrustumIdx == 3)\n\
+		frustumIdx = 0.035; // frustumIdx = 23.***\n\
+\n\
+		vec3 normal = encodeNormal(vec3(0.0, 0.0, 1.0));\n\
+		gl_FragData[2] = vec4(normal, frustumIdx); // save normal.***\n\
+\n\
+		// now, albedo.\n\
+		gl_FragData[3] = finalColor;\n\
+		\n\
+	}\n\
+	#endif\n\
+\n\
+	#ifdef USE_LOGARITHMIC_DEPTH\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
+	}\n\
+	#endif\n\
+}";
+ShaderSource.windStreamThickLineRAD_VS = "\n\
+attribute vec4 prev;\n\
+attribute vec4 current;\n\
+attribute vec4 next;\n\
+attribute vec4 color4;\n\
+attribute float index;\n\
+\n\
+uniform float thickness;\n\
+uniform mat4 buildingRotMatrix;\n\
+uniform mat4 projectionMatrix;\n\
+uniform mat4 modelViewMatrix;\n\
+uniform mat4 modelViewMatrixRelToEye; \n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform vec2 viewport;\n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+uniform vec4 oneColor4;\n\
+uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
+uniform float near;\n\
+uniform float far;\n\
+uniform bool bUseLogarithmicDepth;\n\
+uniform float uFCoef_logDepth;\n\
+\n\
+varying vec4 vColor;\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
+varying float vDepth;\n\
+varying float vCurrentIndex;\n\
+\n\
+varying float vSense;\n\
+\n\
+const float error = 0.001;\n\
+\n\
+// see https://weekly-geekly.github.io/articles/331164/index.html\n\
+// see too https://github.com/ridiculousfish/wavefiz/blob/master/ts/polyline.ts#L306\n\
+\n\
+vec2 project(vec4 p){\n\
+	return (0.5 * p.xyz / p.w + 0.5).xy * viewport;\n\
+}\n\
+\n\
+bool isEqual(float value, float valueToCompare)\n\
+{\n\
+	if(value + error > valueToCompare && value - error < valueToCompare)\n\
+	return true;\n\
+	\n\
+	return false;\n\
+}\n\
+\n\
+vec3 geographicToCartesianWgs84(float lonRad, float latRad, float altitude)\n\
+{\n\
+	// a = semi-major axis.\n\
+	// e2 = firstEccentricitySquared.\n\
+	// v = a / sqrt(1 - e2 * sin2(lat)).\n\
+	// x = (v+h)*cos(lat)*cos(lon).\n\
+	// y = (v+h)*cos(lat)*sin(lon).\n\
+	// z = [v*(1-e2)+h]*sin(lat).\n\
+	float equatorialRadius = 6378137.0;\n\
+	float firstEccentricitySquared = 6.69437999014E-3;\n\
+	float cosLon = cos(lonRad);\n\
+	float cosLat = cos(latRad);\n\
+	float sinLon = sin(lonRad);\n\
+	float sinLat = sin(latRad);\n\
+	float a = equatorialRadius;\n\
+	float e2 = firstEccentricitySquared;\n\
+	float v = a/sqrt(1.0 - e2 * sinLat * sinLat);\n\
+	//float h = altitude; // original.***\n\
+	float h = 2000.0;\n\
+	\n\
+	vec3 resultCartesian = vec3((v+h)*cosLat*cosLon, (v+h)*cosLat*sinLon, (v*(1.0-e2)+h)*sinLat);\n\
+	\n\
+	return resultCartesian;\n\
+}\n\
+\n\
+vec4 getPointRelToEye(in vec4 point)\n\
+{\n\
+	vec3 posWC = geographicToCartesianWgs84(point.x, point.y, point.z);\n\
+	vec4 rotatedCurrent = vec4(posWC.xyz, 1.0);\n\
+	vec3 objPosHigh = buildingPosHIGH;\n\
+	vec3 objPosLow = buildingPosLOW.xyz + rotatedCurrent.xyz;\n\
+	vec3 highDifference = rotatedCurrent.xyz -encodedCameraPositionMCHigh.xyz;\n\
+	vec3 lowDifference = vec3(0.0) - encodedCameraPositionMCLow.xyz;\n\
+	return vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+}\n\
+\n\
+void main(){\n\
+	// current, prev & next.***\n\
+	vec4 vCurrent = getPointRelToEye(vec4(current.xyz, 1.0));\n\
+	vec4 vPrev = getPointRelToEye(vec4(prev.xyz, 1.0));\n\
+	vec4 vNext = getPointRelToEye(vec4(next.xyz, 1.0));\n\
+	\n\
+	float order_w = current.w;\n\
+	//float order_w = float(order);\n\
+	float sense = 1.0;\n\
+	int orderInt = 0;\n\
+	if(order_w > 0.0)\n\
+	{\n\
+		sense = -1.0;\n\
+		if(order_w < 1.5)\n\
+		{\n\
+			orderInt = 1;\n\
+		}\n\
+		else{\n\
+			orderInt = 2;\n\
+		}\n\
+	}\n\
+	else\n\
+	{\n\
+		sense = 1.0;\n\
+		if(order_w > -1.5)\n\
+		{\n\
+			orderInt = -1;\n\
+		}\n\
+		else{\n\
+			orderInt = -2;\n\
+		}\n\
+	}\n\
+	\n\
+	float aspect = viewport.x / viewport.y;\n\
+	vec2 aspectVec = vec2(aspect, 1.0);\n\
+	\n\
+	vec4 previousProjected = ModelViewProjectionMatrixRelToEye * vPrev;\n\
+	vec4 currentProjected = ModelViewProjectionMatrixRelToEye * vCurrent;\n\
+	vec4 nextProjected = ModelViewProjectionMatrixRelToEye * vNext;\n\
+\n\
+	vec4 orthoPos = modelViewMatrixRelToEye * vCurrent;\n\
+	vDepth = -orthoPos.z/far;\n\
+	\n\
+	float projectedDepth = currentProjected.w;                \n\
+	// Get 2D screen space with W divide and aspect correction\n\
+	vec2 currentScreen = currentProjected.xy / currentProjected.w * aspectVec;\n\
+	vec2 previousScreen = previousProjected.xy / previousProjected.w * aspectVec;\n\
+	vec2 nextScreen = nextProjected.xy / nextProjected.w * aspectVec;\n\
+					\n\
+	// This helps us handle 90 degree turns correctly\n\
+	vec2 tangentNext = normalize(nextScreen - currentScreen);\n\
+	vec2 tangentPrev = normalize(currentScreen - previousScreen);\n\
+	vec2 normal; \n\
+	if(orderInt == 1 || orderInt == -1)\n\
+	{\n\
+		normal = vec2(-tangentPrev.y, tangentPrev.x);\n\
+	}\n\
+	else{\n\
+		normal = vec2(-tangentNext.y, tangentNext.x);\n\
+	}\n\
+	normal *= thickness/2.0;\n\
+	normal.x /= aspect;\n\
+	float realThickness = (thickness*sense*projectedDepth)/1000.0;\n\
+	\n\
+	// Offset our position along the normal\n\
+	vec4 offset = vec4(normal * realThickness, 0.0, 0.0);\n\
+	gl_Position = currentProjected + offset; \n\
+	vSense = sense;\n\
+\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		// logarithmic zBuffer:\n\
+		// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
+		float Fcoef = 2.0 / log2(far + 1.0);\n\
+		gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;\n\
+\n\
+		flogz = 1.0 + gl_Position.w;\n\
+		Fcoef_half = 0.5 * Fcoef;\n\
+	}\n\
+	\n\
+	if(colorType == 0)\n\
+		vColor = oneColor4;\n\
+	else if(colorType == 1)\n\
+		vColor = color4; //vec4(color4.r+0.8, color4.g+0.8, color4.b+0.8, color4.a+0.8);\n\
+	else\n\
+		vColor = oneColor4;\n\
+\n\
+	vCurrentIndex = index;\n\
+}\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+";
 ShaderSource.windStreamThickLineVS = "\n\
 attribute vec4 prev;\n\
 attribute vec4 current;\n\

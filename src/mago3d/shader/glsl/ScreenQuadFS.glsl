@@ -205,7 +205,7 @@ int getRealFrustumIdx(in int estimatedFrustumIdx, inout int dataType)
     //----------------------------------------------
     int realFrustumIdx = -1;
     
-     if(estimatedFrustumIdx >= 10)
+    if(estimatedFrustumIdx >= 10)
     {
         estimatedFrustumIdx -= 10;
         if(estimatedFrustumIdx >= 10)

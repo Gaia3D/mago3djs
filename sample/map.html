@@ -77,6 +77,9 @@
 	<li onclick="Test3DTiles();">
 		Test 3DTiles
 	</li>
+	<li onclick="TestOceanFlux();">
+		Test oceanFlux
+	</li>
 
 </ul>
 <div id="magoContainer" class="mapWrap"></div>
@@ -159,13 +162,19 @@
 
 
 				//serverPolicy.terrainType = 'cesium-customer';
-				serverPolicy.terrainValue = 'https://terrain.cdn.ntruss.com/tilesets/ws2/';
+				serverPolicy.terrainValue = '../f4d/terrain_ws2_sangam/terrain_ws2_sangam/';
 				//serverPolicy.terrainValue = 'http://211.106.171.246:49998/tilesets/terrain_sj/'; // from Kim Jin Ho 20220420 (to test terrain excavation bugs).***
 				//serverPolicy.terrainValue = 'http://175.197.92.213:10207/tilesets/terrain_ws2_sangam/';
 
 				//cesiumViewerOption.terrainProvider = new Cesium.EditableCesiumTerrainProvider({
 				//										url: 'http://211.106.171.246:49998/tilesets/terrain_sj/'
 				//										});
+
+				//serverPolicy.terrainType = 'cesium-customer';
+				/*cesiumViewerOption.terrainProvider = new Cesium.CesiumTerrainProvider({
+														url: '../f4d/terrain_ws2_sangam/terrain_ws2_sangam/'
+														//url: 'http://localhost:8000/tilesets/terrain_ws2_nearest'
+														});*/
 				
 				
 
@@ -175,8 +184,8 @@
 				MAGO3D_INSTANCE = new Mago3D.Mago3d(renderDivId, serverPolicy, {loadend : loadend}, cesiumViewerOption);
 
 				// Active this code for tile inspector.**************************************************************************************
-				//MAGO3D_INSTANCE.getViewer().extend(Cesium.viewerCesium3DTilesInspectorMixin);
-        		//const inspectorViewModel = MAGO3D_INSTANCE.getViewer().cesium3DTilesInspector.viewModel;
+				MAGO3D_INSTANCE.getViewer().extend(Cesium.viewerCesium3DTilesInspectorMixin);
+        		const inspectorViewModel = MAGO3D_INSTANCE.getViewer().cesium3DTilesInspector.viewModel;
 				// Active this code for tile inspector.**************************************************************************************
 				
 				
@@ -230,11 +239,10 @@
 		var r = Math.random() * 0.5 + 0.5;
 		var g = Math.random() * 0.5 + 0.5;
 		var b = Math.random() * 0.5 + 0.5;
-		magoManager.gjMaster = magoManager.addKoreaBuildingMaster('https://dtdata.cdn.ntruss.com/buildingmaster/gwangju/15/', 'geojson', {
+		/*magoManager.gjMaster = magoManager.addKoreaBuildingMaster('https://dtdata.cdn.ntruss.com/buildingmaster/gwangju/15/', 'geojson', {
 			show : true,
-			/* color : new self.Mago3D.Color(241/255, 231/255, 200/255 ,1) */
 			color : new self.Mago3D.Color(r, g, b ,1)
-		});
+		});*/
 
 		//magoManager.gjMaster = magoManager.addKoreaBuildingMaster('https://dtdata.cdn.ntruss.com/buildingmaster/seoul/15/', 'geojson', {
 		//	show : true,
@@ -824,8 +832,8 @@
 		//var windGeoJsonFilePath = "\\f4d\\wind_yeonhwa_20210713\\OBS-QWM_2019110700.json";
 		//var windGeoJsonFilePath = "\\f4d\\wind_kyongHeeDe\\2017_M05_D02_0000(UTC+0900)_L01_1HR.json";
 		//var windGeoJsonFilePath = "\\f4d\\wind_yeonhwa_20211215\\AlphaMet_OBS_Wind.2019072006.json";
-		//var windGeoJsonFilePath = "\\f4d\\wind_yeonhwa_20220517\\after_n\\wind.json";
-		//magoManager.weatherStation.loadWindGeoJson(windGeoJsonFilePath);
+		var windGeoJsonFilePath = "\\f4d\\wind_yeonhwa_20220517\\after_n\\wind.json";
+		magoManager.weatherStation.loadWindGeoJson(windGeoJsonFilePath);
 
 		// Load dust geoJson.***
 		//var dustGeoJsonFilePath = "\\f4d\\wind_yeonHwa\\windAndDust_sample\\GC_after_e\\pm2.5\\pm2.5.json";
@@ -1193,12 +1201,12 @@
 		{
 			var options = {
 				magoManager : magoManager,
-				geoJsonIndexFileFolderPath : "\\f4d\\chemicalAccident"
+				geoJsonIndexFileFolderPath : "\\f4d\\chemicalAccident\\output_chemicalAccident"
 			};
 			magoManager.chemicalAccidentManager = new Mago3D.ChemicalAccidentManager(options);
 
 			// set the geoJsonIndexFilePath.***
-			var geoJsonIndexFilePath = "\\f4d\\chemicalAccident\\JsonIndex.json"; 
+			var geoJsonIndexFilePath = "\\f4d\\chemicalAccident\\output_chemicalAccident\\JsonIndex.json"; 
 			magoManager.chemicalAccidentManager.load_chemicalAccidentIndexFile(geoJsonIndexFilePath);
 		}
 
@@ -1228,6 +1236,20 @@
 	function Test3DTiles (){ // 
 		var magoManager = MAGO3D_INSTANCE.getMagoManager();
 		magoManager.TEST_3DTiles();
+		var hola = 0;
+	}
+
+	function TestOceanFlux (){ // 
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+		magoManager.otherManagers = {};
+		var oceanFluxManager = new Mago3D.OceanFluxManager({magoManager : magoManager,
+			oceanFluxMapFolderPath : "\\f4d\\oceanFlux\\project1"});
+
+		magoManager.otherManagers["oceanFluxManager"] = oceanFluxManager;
+
+		var oceanFluxGeoJsonFilePath = "\\f4d\\oceanFlux\\project1\\ocean1.json";
+		oceanFluxManager.newOceanFluxLayer(oceanFluxGeoJsonFilePath);
+		
 		var hola = 0;
 	}
 

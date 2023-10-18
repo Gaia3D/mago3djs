@@ -12,14 +12,25 @@ var OceanFluxManager = function (options)
 
 	this.magoManager = options.magoManager;
 	this.oceanFluxLayersMap = {};
+	this.oceanFluxMapFolderPath = undefined;
 
+	if (options)
+	{
+		if (options.oceanFluxMapFolderPath)
+		{
+			this.oceanFluxMapFolderPath = options.oceanFluxMapFolderPath;
+		}
+	}
 
 };
 
 OceanFluxManager.prototype.newOceanFluxLayer = function(geoJsonFilePath)
 {
 	var options = {
-		geoJsonFilePath: geoJsonFilePath
+		oceanFluxManager       : this,
+		geoJsonFilePath        : geoJsonFilePath,
+		oceanFluxMapFolderPath : this.oceanFluxMapFolderPath,
+		gl                     : this.magoManager.sceneState.gl
 	};
 	var oceanFluxLayer = new OceanFluxLayer(options);
 	this.oceanFluxLayersMap[oceanFluxLayer.geoJsonFilePath] = oceanFluxLayer;
@@ -34,7 +45,7 @@ OceanFluxManager.prototype.render = function()
 		if (this.oceanFluxLayersMap.hasOwnProperty(key))
 		{
 			var oceanFluxLayer = this.oceanFluxLayersMap[key];
-		    oceanFluxLayer.render();
+		    oceanFluxLayer.renderMode3DThickLines(this.magoManager);
 		}
 		
 	}

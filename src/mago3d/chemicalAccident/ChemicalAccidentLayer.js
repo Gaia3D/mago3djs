@@ -131,14 +131,16 @@ ChemicalAccidentTimeSlice.prototype._makeTextures = function (gl, minmaxPollutio
 		var maxValue = this._jsonFile.maxValue;
 		var minValueTotal = minmaxPollutionValues[0];
 		var maxValueTotal = minmaxPollutionValues[1];
+		var valueRange = maxValue - minValue;
+		var valueTotalRange = maxValueTotal - minValueTotal;
 
 		var dataLength = this._jsonFile.values.length;
 		for (var i=0; i<dataLength; i++)
 		{
 			var value = this._jsonFile.values[i];
-			var realValue = value * (maxValue - minValue) + minValue;
+			var realValue = value * valueRange + minValue;
 
-			var quantizedValue = (realValue - minValueTotal) / (maxValueTotal - minValueTotal);
+			var quantizedValue = (realValue - minValueTotal) / valueTotalRange;
 			//var encodedRgba = ManagerUtils.packDepth(value);
 	
 			this._jsonFile.values[i] = quantizedValue;

@@ -1358,7 +1358,7 @@ Renderer.prototype.renderScreenQuad = function (gl)
 	if (dayNightLightingFactor < 0.0)
 	{ dayNightLightingFactor = 0.0; }
 
-	//dayNightLightingFactor = 1.0; // delete.!!!!!!!!!!!!!!!!!!!!!!!!
+	dayNightLightingFactor = 1.0; // delete.!!!!!!!!!!!!!!!!!!!!!!!!
 
 	gl.uniform1f(currentShader.uSceneDayNightLightingFactor_loc, dayNightLightingFactor);
 

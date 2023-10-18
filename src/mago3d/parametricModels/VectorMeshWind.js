@@ -111,6 +111,7 @@ VectorMeshWind.prototype.render = function(magoManager, shader, options)
 	{ this.thickness = 2.0; }
 	
 	gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, this.color4.a]);
+	gl.uniform1f(shader.thickness_loc, this.thickness);
 
 	var vboPos = vbo.vboBufferPos;
 	var dim = vboPos.dataDimensions; // in this case dimensions = 4.

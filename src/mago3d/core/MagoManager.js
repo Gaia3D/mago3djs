@@ -2568,6 +2568,25 @@ MagoManager.prototype.TEST_3DTiles = function ()
 		//viewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
 		//const inspectorViewModel = viewer.cesium3DTilesInspector.viewModel;
 
+		// complicated.******************************************************************
+		var url = "";
+		var bShowBox = true;
+		url        = '../f4d/3dtiles/nKorea51/tileset.json';
+		const tileset_delete2 = this.scene.primitives.add(new Cesium.Cesium3DTileset({
+			url                     : url,
+			debugShowBoundingVolume : bShowBox
+		}));
+
+
+		// complicated.******************************************************************
+		var url = "";
+		var bShowBox = true;
+		url        = '../f4d/3dtiles/3dTiles_complicatedModels/tileset.json';
+		const tileset_delete = this.scene.primitives.add(new Cesium.Cesium3DTileset({
+			url                     : url,
+			debugShowBoundingVolume : bShowBox
+		}));
+
 
 		// HanamKyosan.******************************************************************
 		var url = "";
@@ -2588,14 +2607,15 @@ MagoManager.prototype.TEST_3DTiles = function ()
 		//url        = '../f4d/3dtiles/temp_mgSets_WangSuk_Mode1_48_kml/tileset.json';
 		//url        = '../f4d/3dtiles/Test3dData_WangSuk_3Dtile/tileset.json';
 		//url        = '../f4d/3dtiles/bldg_wangSuk_kml/tileset.json'; // recently made. 20230628
-		url        = '../f4d/3dtiles/3d-tiles-ws2/tileset.json'; // recently made. 20230628
+		//url        = '../f4d/3dtiles/3d-tiles-ws2/tileset.json'; // recently made. 20230628 // 
+		url        = '../f4d/3dtiles/3dTiles_ws2_fromKml/tileset.json';
 		const tileset2 = this.scene.primitives.add(new Cesium.Cesium3DTileset({
 			url                     : url,
 			debugShowBoundingVolume : bShowBox,
 			debugShowUrl            : false
 		}));
 
-		url        = '../f4d/3dtiles/3d-tiles-ws1/tileset.json'; // recently made. 20230628
+		url        = '../f4d/3dtiles/3d-tiles-ws1_3Dtile/tileset.json'; // recently made. 20230628
 		const tileset21 = this.scene.primitives.add(new Cesium.Cesium3DTileset({
 			url                     : url,
 			debugShowBoundingVolume : bShowBox,

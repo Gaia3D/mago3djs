@@ -127,7 +127,7 @@ ChemicalAccidentManager.prototype._preparePollutionLayers = function (magoManage
 		var layersCount = this._geoJsonIndexFile.layersCount; // usually layersCount = 1.***
 		var timeSliceFileFolderPath = this._geoJsonIndexFileFolderPath;
 
-		for (var i=0; i<layersCount; i++) // usually layersCount = 1.***
+		for (var i=0; i<layersCount; i++) // each layer represents an altitude.***
 		{
 			var layer = this._geoJsonIndexFile.layers[i];
 			var options = {

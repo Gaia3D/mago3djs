@@ -848,6 +848,44 @@ PostFxShadersManager.prototype._createShader_windStreamThickLine = function()
 	return shader;
 };
 
+PostFxShadersManager.prototype._createShader_windStreamThickLineRAD = function() 
+{
+	var use_linearOrLogarithmicDepth = this._get_useLinearOrLogarithmicDepth_string();
+	var use_multi_render_target = this._get_useMultiRenderTarget_string();
+	var gl = this.gl;
+
+	var shaderName = "windStreamThickLineRAD";
+	var ssao_vs_source = ShaderSource.windStreamThickLineRAD_VS;
+	var ssao_fs_source = ShaderSource.windStreamThickLineRAD_FS;
+	ssao_fs_source = ssao_fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
+	ssao_fs_source = ssao_fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
+	var shader = this.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this.magoManager);
+	// ThickLine shader locations.***
+	shader.projectionMatrix_loc = gl.getUniformLocation(shader.program, "projectionMatrix");
+	shader.modelViewMatrix_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
+	shader.viewport_loc = gl.getUniformLocation(shader.program, "viewport");
+	shader.thickness_loc = gl.getUniformLocation(shader.program, "thickness");
+	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
+	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
+	shader.bUseMultiRenderTarget_loc = gl.getUniformLocation(shader.program, "bUseMultiRenderTarget");
+	shader.uFrustumIdx_loc = gl.getUniformLocation(shader.program, "uFrustumIdx");
+	shader.uElemIndex_loc = gl.getUniformLocation(shader.program, "uElemIndex");
+	shader.uTotalPointsCount_loc = gl.getUniformLocation(shader.program, "uTotalPointsCount");
+	gl.bindAttribLocation(shader.program, 0, "prev");
+	gl.bindAttribLocation(shader.program, 1, "current");
+	gl.bindAttribLocation(shader.program, 2, "next");
+	gl.bindAttribLocation(shader.program, 3, "color4");
+	gl.bindAttribLocation(shader.program, 4, "index");
+	shader.prev_loc = 0;
+	shader.current_loc = 1;
+	shader.next_loc = 2;
+	shader.color4_loc = 3;
+	shader.index_loc = 4;
+
+	this.shadersMap[shaderName] = shader;
+	return shader;
+};
+
 PostFxShadersManager.prototype._createShader_thickLineExtruded = function() 
 {
 	var use_linearOrLogarithmicDepth = this._get_useLinearOrLogarithmicDepth_string();
@@ -1166,6 +1204,8 @@ PostFxShadersManager.prototype._createShaderByName = function (shaderName)
 		break;
 	case  "windStreamThickLine":
 		this._createShader_windStreamThickLine();
+	case  "windStreamThickLineRAD":
+		this._createShader_windStreamThickLineRAD();
 		break;
 	case  "thickLineExtruded":
 		this._createShader_thickLineExtruded();
