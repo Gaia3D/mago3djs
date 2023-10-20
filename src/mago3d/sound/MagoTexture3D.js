@@ -29,6 +29,8 @@ var MagoTexture3D = function(options)
 
 	this.texturesArray = [];
 
+	this._fileLoadState = CODE.fileLoadState.READY;
+
 	if (options !== undefined)
 	{
 		if (options.texture3DXSize !== undefined)

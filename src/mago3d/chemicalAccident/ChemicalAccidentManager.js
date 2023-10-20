@@ -124,23 +124,22 @@ ChemicalAccidentManager.prototype._preparePollutionLayers = function (magoManage
 	if (pollutionLayersCount === 0)
 	{
 		// use "GeoJsonIndexFile" to create pollutionLayers.***
-		var layersCount = this._geoJsonIndexFile.layersCount; // usually layersCount = 1.***
+		//var layersCount = this._geoJsonIndexFile.layersCount; // usually layersCount = 1.***
+		var layersCount = 1;
 		var timeSliceFileFolderPath = this._geoJsonIndexFileFolderPath;
 
-		for (var i=0; i<layersCount; i++) // each layer represents an altitude.***
+		for (var i=0; i<layersCount; i++) 
 		{
-			var layer = this._geoJsonIndexFile.layers[i];
+			//var layer = this._geoJsonIndexFile.layers[i];
 			var options = {
-				pollutionVolumeOwner    : this, 
-				altitude                : layer.altitude,
-				timeInterval_min        : layer.timeInterval_min,
-				timeSlicesCount         : layer.timeSlicesCount,
-				timeSliceFileNames      : layer.timeSliceFileNames,
-				timeSliceFileFolderPath : timeSliceFileFolderPath
+				pollutionVolumeOwner       : this, 
+				mosaicTexMetaDataFileNames : this._geoJsonIndexFile.mosaicTexMetaDataFileNames,
+				metadataFolderPath       		: timeSliceFileFolderPath,
 			};
 			var chemAccidentLayer = this.newChemAccidentLayer(options);
 
 			// Now, check if the geoJsonIndexFile has timeSlices data embeded.***
+			/*
 			var embededTimeSlicesArray = this._geoJsonIndexFile.layers[i].timeSliceFiles; // embeded timeSlicesFiles.***
 			if (embededTimeSlicesArray !== undefined)
 			{
@@ -161,6 +160,7 @@ ChemicalAccidentManager.prototype._preparePollutionLayers = function (magoManage
 					pollutionLayer._timeSlicesArray.push(timeSlice);
 				}
 			}
+			*/
 		}
 	}
 

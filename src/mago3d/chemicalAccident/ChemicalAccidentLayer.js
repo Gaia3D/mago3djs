@@ -20,6 +20,7 @@ var ChemicalAccidentTimeSlice = function(options)
 	 this._texture3dCreated = false;
 	 this._texture3d;
 	 this._mosaicTexture; // note : the mosaicTexture is a Texture3D too.***
+	 this._texture2dAux;	// aux texture.***
 
 	 if (options !== undefined)
 	 {
@@ -56,6 +57,43 @@ ChemicalAccidentTimeSlice.prototype._prepare = function ()
 	if (this._fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
 	{
 		return false;
+	}
+
+	// load the mosaicTexture.***
+	if (this._mosaicTexture === undefined)
+	{
+		this._mosaicTexture = new MagoTexture3D();
+	}
+
+	if (this._texture2dAux === undefined)
+	{
+		this._texture2dAux = new Texture();
+	}
+
+	if (this._texture2dAux.fileLoadState === CODE.fileLoadState.READY)
+	{
+		this._texture2dAux.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+		var that = this;
+		var mosaicTextureFolderPath = this.owner.chemicalAccidentManager._geoJsonIndexFileFolderPath;
+		var mosaicTextureFilePath = mosaicTextureFolderPath + "\\" + this._jsonFile.mosaicTextureFileName;
+		var flip_y_texCoord = false;
+		TexturesManager.loadTexture(mosaicTextureFilePath, this._texture2dAux, this.owner.chemicalAccidentManager.magoManager, flip_y_texCoord);
+	}
+
+	if (this._texture2dAux.fileLoadState === CODE.fileLoadState.LOAD_FAILED )
+	{
+		return false;
+	}
+	
+	// check if the mosaicTexture is loaded.***
+	if (this._texture2dAux.fileLoadState !== CODE.fileLoadState.BINDING_FINISHED )
+	{
+		return false;
+	}
+	else if (this._texture2dAux.fileLoadState === CODE.fileLoadState.BINDING_FINISHED)
+	{
+		this._mosaicTexture.texturesArray.push(this._texture2dAux.texId);
+		this._mosaicTexture.fileLoadState = CODE.fileLoadState.BINDING_FINISHED;
 	}
 
 	this._isPrepared = true;
@@ -103,30 +141,34 @@ ChemicalAccidentTimeSlice.prototype._makeTextures = function (gl, minmaxPollutio
 	if (!this._texture3dCreated)
 	{
 		this._texture3d = new MagoTexture3D();
-		this._mosaicTexture = new MagoTexture3D();
+		//this._mosaicTexture = new MagoTexture3D();
 
-		var slicesCount = 15; // test hardcoding.***
+		var slicesCount = this._jsonFile.dataSlices.length;
 
 		// set texture3d params.***
-		this._texture3d.texture3DXSize = this._jsonFile.columnsCount;
-		this._texture3d.texture3DYSize = this._jsonFile.rowsCount;
-		this._texture3d.texture3DZSize = slicesCount; // test HARDCODING.***
+		//this._texture3d.texture3DXSize = this._jsonFile.columnsCount;
+		//this._texture3d.texture3DYSize = this._jsonFile.rowsCount;
+		//this._texture3d.texture3DZSize = slicesCount; // test HARDCODING.***
 
 		// The 3D texture into a mosaic texture matrix params.***
-		var result = Voxelizer.getMosaicColumnsAndRows(this._texture3d.texture3DXSize, this._texture3d.texture3DYSize, this._texture3d.texture3DZSize);
-		var mosaicXCount = result.numColumns;
-		var mosaicYCount = result.numRows;
-		this._mosaicTexture.mosaicXCount = mosaicXCount;
-		this._mosaicTexture.mosaicYCount = mosaicYCount;
-		this._mosaicTexture.texture3DXSize = this._jsonFile.columnsCount;
-		this._mosaicTexture.texture3DYSize = this._jsonFile.rowsCount;
-		this._mosaicTexture.texture3DZSize = slicesCount; // slices count = 1.***
+		//var result = Voxelizer.getMosaicColumnsAndRows(this._texture3d.texture3DXSize, this._texture3d.texture3DYSize, this._texture3d.texture3DZSize);
+		//var mosaicXCount = result.numColumns;
+		//var mosaicYCount = result.numRows;
+
+		var someSlice = this._jsonFile.dataSlices[0];
+
+		this._mosaicTexture.mosaicXCount = this._jsonFile.mosaicColumnsCount;
+		this._mosaicTexture.mosaicYCount = this._jsonFile.mosaicRowsCount;
+		this._mosaicTexture.texture3DXSize = someSlice.width;
+		this._mosaicTexture.texture3DYSize = someSlice.height;
+		this._mosaicTexture.texture3DZSize = slicesCount; 
 		this._mosaicTexture.finalTextureXSize = this._mosaicTexture.mosaicXCount * this._texture3d.texture3DXSize;
 		this._mosaicTexture.finalTextureYSize = this._mosaicTexture.mosaicYCount * this._texture3d.texture3DYSize;
-		this._mosaicTexture.createTextures(gl);
+		//this._mosaicTexture.createTextures(gl);
 
 		// Now, create the textures using the data of jsonFile.***
 		// Must transform textureData(array) to Uint8Array type data.***
+		/*
 		var minValue = this._jsonFile.minValue;
 		var maxValue = this._jsonFile.maxValue;
 		var minValueTotal = minmaxPollutionValues[0];
@@ -161,6 +203,7 @@ ChemicalAccidentTimeSlice.prototype._makeTextures = function (gl, minmaxPollutio
 		// Now, make the mosaicTexture.***
 		var magoManager = this.owner.chemicalAccidentManager.magoManager;
 		this._mosaicTexture = Voxelizer.prototype.makeMosaicTexture3DFromRealTexture3D(magoManager, this._texture3d, this._mosaicTexture);
+		*/
 
 		this._texture3dCreated = true;
 	}
@@ -201,6 +244,9 @@ var ChemicalAccidentLayer = function(options)
 	this._isPrepared = false;
 	//this._terrainSamplingState = CODE.processState.NO_STARTED;
 
+	this._mosaicTexMetaDataFileNamesArray;
+	this._metadataFolderPath;
+
 	// object to render.***
 	this.simulationBox = undefined;
 	this.vboKeysContainer;
@@ -209,14 +255,14 @@ var ChemicalAccidentLayer = function(options)
 
 	if (options)
 	{
+		if (options.mosaicTexMetaDataFileNames)
+		{
+			this._mosaicTexMetaDataFileNamesArray = options.mosaicTexMetaDataFileNames;
+		}
+
 		if (options.chemicalAccidentManager)
 		{
 			this.chemicalAccidentManager = options.chemicalAccidentManager;
-		}
-
-		if (options.altitude !== undefined)
-		{
-			this.altitude = options.altitude;
 		}
 
 		if (options.timeInterval_min !== undefined)
@@ -234,9 +280,9 @@ var ChemicalAccidentLayer = function(options)
 			this.timeSliceFileNames = options.timeSliceFileNames;
 		}
 
-		if (options.timeSliceFileFolderPath !== undefined)
+		if (options.metadataFolderPath !== undefined)
 		{
-			this.timeSliceFileFolderPath = options.timeSliceFileFolderPath;
+			this._metadataFolderPath = options.metadataFolderPath;
 		}
 	}
 
@@ -728,11 +774,13 @@ ChemicalAccidentLayer.prototype._prepareLayer = function ()
 
 	if (this._timeSlicesArray.length === 0)
 	{
+		//this._mosaicTexMetaDataFileNamesArray
+
 		// start to load files.***
-		var timeSliceFileNamesCount = this.timeSliceFileNames.length;
+		var timeSliceFileNamesCount = this._mosaicTexMetaDataFileNamesArray.length;
 		for (var i=0; i<timeSliceFileNamesCount; i++)
 		{
-			var filePath = this.timeSliceFileFolderPath + "\\" + this.timeSliceFileNames[i];
+			var filePath = this._metadataFolderPath + "\\" + this._mosaicTexMetaDataFileNamesArray[i];
 			var options = {
 				filePath : filePath,
 				owner    : this
@@ -745,13 +793,18 @@ ChemicalAccidentLayer.prototype._prepareLayer = function ()
 	// now, check if all timeSlices are ready.***
 	var isPrepared = true;
 	var timeSlicesCount = this._timeSlicesArray.length;
+	var counterAux = 0;
 	for (var i=0; i<timeSlicesCount; i++)
 	{
 		var timeSlice = this._timeSlicesArray[i];
 		if (!timeSlice._prepare())
 		{
 			isPrepared = false;
+			counterAux++;
 		}
+
+		if (counterAux > 3)
+		{ break; }
 	}
 
 	if (!isPrepared)
@@ -773,28 +826,37 @@ ChemicalAccidentLayer.prototype._prepareLayer = function ()
 	{
 		this.oneVoxelSizeInMeters = new Float32Array([1.0, 1.0, 1.0]);
 
+		var someSlice3D = this._timeSlicesArray[0];
+
 		var geoJsonIndexFile = this.chemicalAccidentManager._geoJsonIndexFile;
 		var widthMeters = geoJsonIndexFile.height_km * 1000.0;
 		var heightMeters = geoJsonIndexFile.width_km * 1000.0;
 
-		// take any timeSlice to get columnsCount and rowsCount.***
-		var timeSlice = this._timeSlicesArray[0];
-		var columnsCount = timeSlice._jsonFile.columnsCount;
-		var rowsCount = timeSlice._jsonFile.rowsCount;
+		// take any slice2d to get columnsCount and rowsCount.***
+		var slice2d = someSlice3D._jsonFile.dataSlices[0];
+		var columnsCount = slice2d.width;
+		var rowsCount = slice2d.height;
 
 		this.oneVoxelSizeInMeters[0] = widthMeters / columnsCount;
 		this.oneVoxelSizeInMeters[1] = heightMeters / rowsCount;
 		this.oneVoxelSizeInMeters[2] = this.oneVoxelSizeInMeters[0]; // in z direction is the same.***
-		
 	}
 
 	// Now make the textures3D.***
 	if (!this._allTimeSlicesTextures3DReady)
 	{
+		if (this.minMaxPollutionValues === undefined)
+		{
+			this.minMaxPollutionValues = new Float32Array(2); 
+		}
+		var someSlice3D = this._timeSlicesArray[0];
+		this.minMaxPollutionValues[0] = someSlice3D._jsonFile.minValue;
+		this.minMaxPollutionValues[1] = someSlice3D._jsonFile.maxValue;
+
 		var magoManager = this.chemicalAccidentManager.magoManager;
 		var gl = magoManager.sceneState.gl;
-		var minmaxPollutionValues = this.getMinMaxPollutionValues();
-		this._makeTextures(gl, minmaxPollutionValues);
+		//var minmaxPollutionValues = this.getMinMaxPollutionValues();
+		this._makeTextures(gl, this.minMaxPollutionValues);
 	}
 	
 
