@@ -103,6 +103,8 @@ TexturesManager.loadTexture = function(imagePath, texture, magoManager, flip_y_t
 		if (flip_y_texCoord === undefined)
 		{ flip_y_texCoord = false; }
 		
+		texture.imageWidth = imageToLoad.width;
+		texture.imageHeight = imageToLoad.height;
 		handleTextureLoaded(gl, imageToLoad, texture.texId, flip_y_texCoord, {
 			magFilter: gl.NEAREST
 		});

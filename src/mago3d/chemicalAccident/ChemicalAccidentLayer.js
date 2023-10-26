@@ -22,6 +22,9 @@ var ChemicalAccidentTimeSlice = function(options)
 	 this._mosaicTexture; // note : the mosaicTexture is a Texture3D too.***
 	 this._texture2dAux;	// aux texture.***
 
+	 // uniforms.***
+	this.uMinMaxAltitudeSlices = undefined; // the uniform (vec2) is limited to 32.***
+
 	 if (options !== undefined)
 	 {
 		if (options.filePath)
@@ -34,6 +37,74 @@ var ChemicalAccidentTimeSlice = function(options)
 			this.owner = options.owner;
 		}
 	 }
+};
+
+ChemicalAccidentTimeSlice.prototype.getTotalMinMaxAltitudes = function ()
+{
+	var dataSlicesArray = this._jsonFile.dataSlices;
+	var dataSlicesCount = dataSlicesArray.length;
+	var resultTotalMinMaxAltitudes = new Float32Array(2);
+	resultTotalMinMaxAltitudes[0] = dataSlicesArray[0].minAltitude;
+	resultTotalMinMaxAltitudes[1] = dataSlicesArray[dataSlicesCount-1].maxAltitude;
+	return resultTotalMinMaxAltitudes;
+};
+
+ChemicalAccidentTimeSlice.loadTexture = function (imagePath, texture, magoManager, flip_y_texCoord)
+{
+	var imageToLoad = new Image();
+	texture.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+
+	imageToLoad.onload = function() 
+	{
+		var gl = magoManager.getGl();
+		
+		if (texture.texId === undefined) 
+		{ texture.texId = gl.createTexture(); }
+		else
+		{
+			gl.deleteTexture(texture.texId);
+			texture.texId = gl.createTexture();
+		}
+		
+		if (flip_y_texCoord === undefined)
+		{ flip_y_texCoord = false; }
+		
+		texture.imageWidth = imageToLoad.width;
+		texture.imageHeight = imageToLoad.height;
+
+		
+
+		//handleTextureLoaded(gl, imageToLoad, texture.texId, flip_y_texCoord, {
+		//	magFilter: gl.NEAREST
+		//});
+		
+		var flip_y_texCoords = false;
+		gl.bindTexture(gl.TEXTURE_2D, texture.texId);
+		gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, flip_y_texCoords); // if need vertical mirror of the image.
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imageToLoad); // Original.
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+		//gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+		//gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+		gl.bindTexture(gl.TEXTURE_2D, null);
+
+		//if (gl.getError() !== gl.NO_ERROR)
+		//{
+		//	var hola = 0;
+		//}
+		
+
+		texture.fileLoadState = CODE.fileLoadState.BINDING_FINISHED;
+	};
+
+	imageToLoad.onerror = function() 
+	{
+		texture.fileLoadState = CODE.fileLoadState.LOAD_FAILED;
+	};
+	imageToLoad.crossOrigin = "Anonymous";
+	imageToLoad.src = imagePath;
 };
 
 ChemicalAccidentTimeSlice.prototype._prepare = function ()
@@ -59,6 +130,21 @@ ChemicalAccidentTimeSlice.prototype._prepare = function ()
 		return false;
 	}
 
+	if (this.uMinMaxAltitudeSlices === undefined)
+	{
+		this.uMinMaxAltitudeSlices = new Float32Array(2 * 32); // 32 is the max slices count.***
+
+		// make the minmaxAltitudeSlices.***
+		var dataSlicesArray = this._jsonFile.dataSlices;
+		var dataSlicesCount = dataSlicesArray.length;
+		for (var i=0; i<dataSlicesCount; i++)
+		{
+			var dataSlice = dataSlicesArray[i];
+			this.uMinMaxAltitudeSlices[i*2] = dataSlice.minAltitude;
+			this.uMinMaxAltitudeSlices[i*2+1] = dataSlice.maxAltitude;
+		}
+	}
+
 	// load the mosaicTexture.***
 	if (this._mosaicTexture === undefined)
 	{
@@ -77,7 +163,40 @@ ChemicalAccidentTimeSlice.prototype._prepare = function ()
 		var mosaicTextureFolderPath = this.owner.chemicalAccidentManager._geoJsonIndexFileFolderPath;
 		var mosaicTextureFilePath = mosaicTextureFolderPath + "\\" + this._jsonFile.mosaicTextureFileName;
 		var flip_y_texCoord = false;
-		TexturesManager.loadTexture(mosaicTextureFilePath, this._texture2dAux, this.owner.chemicalAccidentManager.magoManager, flip_y_texCoord);
+
+		var byteDataArray = this._jsonFile.byteData;
+		var dataLength = byteDataArray.length;
+		var mosaicTexWidth = this._jsonFile.width;
+		var mosaicTexHeight = this._jsonFile.height;
+
+		var uint8Array = new Uint8Array(dataLength); // rgba.***
+		for (var i=0; i<dataLength; i++)
+		{
+			uint8Array[i] = byteDataArray[i];
+		}
+
+		//ChemicalAccidentTimeSlice.loadTexture(mosaicTextureFilePath, this._texture2dAux, this.owner.chemicalAccidentManager.magoManager, flip_y_texCoord);
+
+		// make texture with the embedded data into json file.***
+		var magoManager = this.owner.chemicalAccidentManager.magoManager;
+		var gl = magoManager.getGl();
+		
+		var texWrap = gl.CLAMP_TO_EDGE;
+		var filter = gl.NEAREST;
+		var bPremultiplyAlphaWebgl = false;
+
+		this._texture2dAux.texId = Texture.createTexture(gl, filter, uint8Array, mosaicTexWidth, mosaicTexHeight, texWrap, bPremultiplyAlphaWebgl);
+		this._texture2dAux.fileLoadState = CODE.fileLoadState.BINDING_FINISHED;
+
+		this._jsonFile.byteData = undefined; // free memory.***
+
+		this._mosaicTexture.texturesArray.push(this._texture2dAux.texId);
+		this._mosaicTexture.finalTextureXSize = mosaicTexWidth;
+		this._mosaicTexture.finalTextureYSize = mosaicTexHeight;
+		this._mosaicTexture.fileLoadState = CODE.fileLoadState.BINDING_FINISHED;
+		this._isPrepared = true;
+
+		return false;
 	}
 
 	if (this._texture2dAux.fileLoadState === CODE.fileLoadState.LOAD_FAILED )
@@ -90,15 +209,19 @@ ChemicalAccidentTimeSlice.prototype._prepare = function ()
 	{
 		return false;
 	}
-	else if (this._texture2dAux.fileLoadState === CODE.fileLoadState.BINDING_FINISHED)
+
+	if (this._texture2dAux.fileLoadState === CODE.fileLoadState.BINDING_FINISHED && this._mosaicTexture.fileLoadState !== CODE.fileLoadState.BINDING_FINISHED)
 	{
 		this._mosaicTexture.texturesArray.push(this._texture2dAux.texId);
+		this._texture2dAux.texId = undefined;
+		this._mosaicTexture.finalTextureXSize = this._mosaicTexture.mosaicXCount * this._texture2dAux.imageWidth;
+		this._mosaicTexture.finalTextureYSize = this._mosaicTexture.mosaicYCount * this._texture2dAux.imageHeight;
 		this._mosaicTexture.fileLoadState = CODE.fileLoadState.BINDING_FINISHED;
+		this._isPrepared = true;
 	}
 
-	this._isPrepared = true;
 
-	return this._isPrepared;
+	return false;
 };
 
 /**
@@ -140,20 +263,7 @@ ChemicalAccidentTimeSlice.prototype._makeTextures = function (gl, minmaxPollutio
 {
 	if (!this._texture3dCreated)
 	{
-		this._texture3d = new MagoTexture3D();
-		//this._mosaicTexture = new MagoTexture3D();
-
 		var slicesCount = this._jsonFile.dataSlices.length;
-
-		// set texture3d params.***
-		//this._texture3d.texture3DXSize = this._jsonFile.columnsCount;
-		//this._texture3d.texture3DYSize = this._jsonFile.rowsCount;
-		//this._texture3d.texture3DZSize = slicesCount; // test HARDCODING.***
-
-		// The 3D texture into a mosaic texture matrix params.***
-		//var result = Voxelizer.getMosaicColumnsAndRows(this._texture3d.texture3DXSize, this._texture3d.texture3DYSize, this._texture3d.texture3DZSize);
-		//var mosaicXCount = result.numColumns;
-		//var mosaicYCount = result.numRows;
 
 		var someSlice = this._jsonFile.dataSlices[0];
 
@@ -162,48 +272,6 @@ ChemicalAccidentTimeSlice.prototype._makeTextures = function (gl, minmaxPollutio
 		this._mosaicTexture.texture3DXSize = someSlice.width;
 		this._mosaicTexture.texture3DYSize = someSlice.height;
 		this._mosaicTexture.texture3DZSize = slicesCount; 
-		this._mosaicTexture.finalTextureXSize = this._mosaicTexture.mosaicXCount * this._texture3d.texture3DXSize;
-		this._mosaicTexture.finalTextureYSize = this._mosaicTexture.mosaicYCount * this._texture3d.texture3DYSize;
-		//this._mosaicTexture.createTextures(gl);
-
-		// Now, create the textures using the data of jsonFile.***
-		// Must transform textureData(array) to Uint8Array type data.***
-		/*
-		var minValue = this._jsonFile.minValue;
-		var maxValue = this._jsonFile.maxValue;
-		var minValueTotal = minmaxPollutionValues[0];
-		var maxValueTotal = minmaxPollutionValues[1];
-		var valueRange = maxValue - minValue;
-		var valueTotalRange = maxValueTotal - minValueTotal;
-
-		var dataLength = this._jsonFile.values.length;
-		for (var i=0; i<dataLength; i++)
-		{
-			var value = this._jsonFile.values[i];
-			var realValue = value * valueRange + minValue;
-
-			var quantizedValue = (realValue - minValueTotal) / valueTotalRange;
-			//var encodedRgba = ManagerUtils.packDepth(value);
-	
-			this._jsonFile.values[i] = quantizedValue;
-		}
-
-		var textureData = ChemicalAccidentTimeSlice.getUint8ArrayRGBAFromArrayBuffer(this._jsonFile.values);
-
-		
-		// Do hard coding for test.***
-		// test : use "textureData" for all slices.***
-		var texSlicesCount = this._texture3d.texture3DZSize;
-		for (var i=0; i<texSlicesCount; i++)
-		{
-			this._texture3d.createTexture(gl, i, textureData);
-		}
-		//----------------------------------------------------------
-
-		// Now, make the mosaicTexture.***
-		var magoManager = this.owner.chemicalAccidentManager.magoManager;
-		this._mosaicTexture = Voxelizer.prototype.makeMosaicTexture3DFromRealTexture3D(magoManager, this._texture3d, this._mosaicTexture);
-		*/
 
 		this._texture3dCreated = true;
 	}
@@ -252,6 +320,8 @@ var ChemicalAccidentLayer = function(options)
 	this.vboKeysContainer;
 	this.volumeDepthFBO = undefined;
 	this.screenFBO = undefined;
+
+	
 
 	if (options)
 	{
@@ -353,7 +423,8 @@ ChemicalAccidentLayer.prototype._makeSimulationBox = function ()
 
 	// take the 1rst timeSlice:
 	var timeSlice = this._timeSlicesArray[0];
-	var extrusionDist = 100 * timeSlice._texture3d.texture3DZSize; // z slices count.***
+	var totalMinMaxAltitudes = timeSlice.getTotalMinMaxAltitudes();
+	var extrusionDist = totalMinMaxAltitudes[1] - totalMinMaxAltitudes[0];
 	var extrudeSegmentsCount = 1;
 	var extrusionVector = undefined;
 	var bIncludeBottomCap = undefined;
@@ -545,7 +616,22 @@ ChemicalAccidentLayer.prototype.render = function ()
 		this._makeSimulationBox();
 	}
 
+	if (this.renderCounter === undefined)
+	{
+		this.renderCounter = 0;
+	}
+
+	this.renderCounter += 1;
+
 	var magoManager = this.chemicalAccidentManager.magoManager;
+	var gl = magoManager.getGl();
+
+	if (gl.getError() !== gl.NO_ERROR)
+	{
+		var hola = 0;
+	}
+
+	
 
 	// animation time control.***
 	var timeSlicesCount = this._timeSlicesArray.length;
@@ -554,7 +640,7 @@ ChemicalAccidentLayer.prototype.render = function ()
 
 	var timeFactor = increTime / totalAnimTime;
 	var f = timeFactor * timeSlicesCount;
-	var ffract = f - Math.floor(f); // this is the interpolation factor between currTex & nexTex.***
+	var ffract = f - Math.floor(f); // this is the interpolation factor between currTex & nextTex.***
 	var texIdxCurr = Math.floor(f);
 
 	if (texIdxCurr > this._timeSlicesArray.length - 1)
@@ -566,7 +652,69 @@ ChemicalAccidentLayer.prototype.render = function ()
 		texIdxCurr = 0;
 	}
 
-	this.testCurrIdx = texIdxCurr;
+	this.chemicalAccidentManager.counterAux; // test.***
+
+	if (this.chemicalAccidentManager.counterAux === 0)
+	{
+		this.testCurrIdx = texIdxCurr;
+	}
+	else 
+	{
+		if (this.counterTest === undefined)
+		{
+			this.counterTest = this.renderCounter;
+		}
+	}
+
+	//if (this.chemicalAccidentManager.counterAux === 0)
+	//{
+	//	return;
+	//}
+
+	// test check.************************************************************************************************************
+	/*
+	var imageWidth = 450;
+	var imageHeight = 450;
+	var dataSize = imageWidth * imageHeight * 4;
+	if (this.pixelsData === undefined)
+	{
+		this.pixelsData = new Uint8Array(dataSize);  // Un arreglo de 4 bytes para almacenar los valores RGBA de un píxel
+	}
+	var testTimeSlice = this._timeSlicesArray[this.testCurrIdx];
+	var webGlTex = testTimeSlice._mosaicTexture.getTexture( 0 );
+	
+	gl.bindTexture(gl.TEXTURE_2D, webGlTex);
+	gl.readPixels(0, 0, imageWidth, imageHeight, gl.RGBA, gl.UNSIGNED_BYTE, this.pixelsData);
+	gl.bindTexture(gl.TEXTURE_2D, null);
+
+	var totalDataR = 0;
+	var totalDataG = 0;
+	var totalDataB = 0;
+	var totalDataA = 0;
+	for (var i=0; i<dataSize; i+=4)
+	{
+		totalDataR += this.pixelsData[i];
+		totalDataG += this.pixelsData[i+1];
+		totalDataB += this.pixelsData[i+2];
+		totalDataA += this.pixelsData[i+3];
+	}
+
+	if (totalDataR !== 0 || totalDataG !== 0 || totalDataB !== 0 || totalDataA !== 51637500)
+	{ 
+		var hola = 0; 
+	}
+
+	if (totalDataR === 0 && totalDataG === 0 && totalDataB === 0 && totalDataA === 0)
+	{ 
+		var hola = 0; 
+	}
+	*/
+	// end test check.************************************************************************************************************
+		
+	if (gl.getError() !== gl.NO_ERROR)
+	{
+		var hola = 0;
+	}
 
 	//if (texIdxCurr >= timeSlicesCount)
 	////{
@@ -587,7 +735,7 @@ ChemicalAccidentLayer.prototype.render = function ()
 	
 	var chemicalAccidentManager = this.chemicalAccidentManager;
 	var sceneState = magoManager.sceneState;
-	var gl = magoManager.getGl();
+	
 	var fbo = this._getScreenFBO(magoManager);
 	var extbuffers = fbo.extbuffers;
 
@@ -607,6 +755,11 @@ ChemicalAccidentLayer.prototype.render = function ()
 
 	// Test:
 	this.volumRenderTex = fbo.colorBuffersArray[0];
+
+	if (gl.getError() !== gl.NO_ERROR)
+	{
+		var hola = 0;
+	}
 
 	
 
@@ -635,8 +788,15 @@ ChemicalAccidentLayer.prototype.render = function ()
 	gl.enable(gl.DEPTH_TEST);
 
 	
-	var testTimeSlice = this._timeSlicesArray[texIdxCurr];
+	var testTimeSlice = this._timeSlicesArray[this.testCurrIdx];
 	var refTex3D = testTimeSlice._mosaicTexture; // a reference texture3D, to take parameters for the shader.***
+
+	if (gl.getError() !== gl.NO_ERROR)
+	{
+		var hola = 0;
+	}
+
+	
 
 	// bind uniforms.***
 	shader.bindUniformGenerals();
@@ -671,34 +831,44 @@ ChemicalAccidentLayer.prototype.render = function ()
 	gl.uniform3fv(shader.u_simulBoxMinPosLC_loc, [bboxLC.minX, bboxLC.minY, bboxLC.minZ]);
 	gl.uniform3fv(shader.u_simulBoxMaxPosLC_loc, [bboxLC.maxX, bboxLC.maxY, bboxLC.maxZ]);
 
+	// uMinMaxAltitudeSlices is a vec2 array.***
+	gl.uniform2fv(shader.uMinMaxAltitudeSlices_loc, testTimeSlice.uMinMaxAltitudeSlices);
+
+	if (gl.getError() !== gl.NO_ERROR)
+	{
+		var hola = 0;
+	}
+
 	
 	
 	// bind textures.***
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, this.simulBoxdoubleDepthTex); 
-	//gl.bindTexture(gl.TEXTURE_2D, magoManager.depthTex); 
 
 	gl.activeTexture(gl.TEXTURE1);
 	gl.bindTexture(gl.TEXTURE_2D, this.simulBoxDoubleNormalTex); 
 
 	// provisionally take the 1rst timeSlice.***
-	var testTimeSlice = this._timeSlicesArray[texIdxCurr];
+	var testTimeSlice = this._timeSlicesArray[this.testCurrIdx];
+
+	if (testTimeSlice._mosaicTexture.texturesArray.length !== 1)
+	{
+		var hola = 0;
+	}
 
 	gl.activeTexture(gl.TEXTURE2);
-	gl.bindTexture(gl.TEXTURE_2D, testTimeSlice._mosaicTexture.getTexture( 0 )); 
+	var webGlTex = testTimeSlice._mosaicTexture.getTexture( 0 );
+	if (webGlTex === undefined)
+	{
+		var hola = 0;
+	}
+	gl.bindTexture(gl.TEXTURE_2D, webGlTex); 
 
 	gl.activeTexture(gl.TEXTURE3);
 	gl.bindTexture(gl.TEXTURE_2D, magoManager.depthTex); 
 
 	gl.activeTexture(gl.TEXTURE4);
 	gl.bindTexture(gl.TEXTURE_2D, magoManager.normalTex); 
-
-
-	//gl.activeTexture(gl.TEXTURE5);
-	//gl.bindTexture(gl.TEXTURE_2D, this.airVelocity_B.getTexture( 0 )); 
-
-	//gl.activeTexture(gl.TEXTURE6);
-	//gl.bindTexture(gl.TEXTURE_2D, this.maxPressureMosaicTexture3d_A.getTexture( 0 ));
 
 	// Draw screenQuad:
 	gl.drawArrays(gl.TRIANGLES, 0, 6);
@@ -715,18 +885,11 @@ ChemicalAccidentLayer.prototype.render = function ()
 	}
 
 	fbo.unbind();
-	
 
-	/*
-	uniform sampler2D simulationBoxDoubleDepthTex;
-	uniform sampler2D simulationBoxDoubleNormalTex; // used to calculate the current frustum idx.***
-	uniform sampler2D airPressureMosaicTex;
-
-	////uniform vec3 encodedCameraPositionMCHigh;
-	////uniform vec3 encodedCameraPositionMCLow;
-	////uniform float tangentOfHalfFovy;
-	////uniform float aspectRatio;
-	*/
+	if (gl.getError() !== gl.NO_ERROR)
+	{
+		var hola = 0;
+	}
 };
 
 ChemicalAccidentLayer.prototype.getMinMaxPollutionValues = function ()
@@ -774,8 +937,6 @@ ChemicalAccidentLayer.prototype._prepareLayer = function ()
 
 	if (this._timeSlicesArray.length === 0)
 	{
-		//this._mosaicTexMetaDataFileNamesArray
-
 		// start to load files.***
 		var timeSliceFileNamesCount = this._mosaicTexMetaDataFileNamesArray.length;
 		for (var i=0; i<timeSliceFileNamesCount; i++)
@@ -788,6 +949,8 @@ ChemicalAccidentLayer.prototype._prepareLayer = function ()
 			var timeSlice = new ChemicalAccidentTimeSlice(options);
 			this._timeSlicesArray.push(timeSlice);
 		}
+
+		return false;
 	}
 
 	// now, check if all timeSlices are ready.***
@@ -803,7 +966,7 @@ ChemicalAccidentLayer.prototype._prepareLayer = function ()
 			counterAux++;
 		}
 
-		if (counterAux > 3)
+		if (counterAux > 2)
 		{ break; }
 	}
 
@@ -811,6 +974,8 @@ ChemicalAccidentLayer.prototype._prepareLayer = function ()
 	{
 		return false;
 	}
+
+	
 
 
 	// create a voxelizer.***

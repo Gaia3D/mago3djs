@@ -2639,15 +2639,34 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 			if (chemAccLayer._timeSlicesArray && chemAccLayer._timeSlicesArray.length > 0)
 			{
+				var slicesCount = chemAccLayer._timeSlicesArray.length;
+				if (this._currChemIdx === undefined)
+				{
+					this._currChemIdx = 0;
+					this._chemCounterAux = 0;
+				}
+
 				var idx = chemAccLayer.testCurrIdx;
 				if (idx === undefined)
 				{
 					idx = 0;
 				}
+
 				var timeSlice = chemAccLayer._timeSlicesArray[idx];
 				if (timeSlice._mosaicTexture)
 				{
 					texture = timeSlice._mosaicTexture.texturesArray[0];
+				}
+
+				this._chemCounterAux += 1;
+
+				if (this._chemCounterAux > 20)
+				{
+					this._chemCounterAux = 0;
+					this._currChemIdx += 1;
+					if (this._currChemIdx >= slicesCount)
+					{ this._currChemIdx = 0; }
+
 				}
 			}
 			

@@ -24,6 +24,9 @@ var ChemicalAccidentManager = function (options)
 	this._totalAnimTime;
 	this._increTime;
 
+	// aux vars.***
+	this.counterAux = 0;
+
 	if (options)
 	{
 		if (options.magoManager)
@@ -188,6 +191,11 @@ ChemicalAccidentManager.prototype.prepareVolume = function (magoManager)
 	// 1- GeoJsonIndexFile.
 	// 2- pollution-layers (if GeoJsonIndexFile is loaded).
 	//-------------------------------------------
+	if (this.volumePrepared)
+	{
+		return true;
+	}
+
 	// 1rst, check if the geoJson is loaded.***
 	if (!this._preparePollutionGeoJsonIndexFile())
 	{
@@ -208,9 +216,9 @@ ChemicalAccidentManager.prototype.prepareVolume = function (magoManager)
 		return false;
 	}
 
-	
+	this.volumePrepared = true;
 
-	return true;
+	return false;
 };
 
 ChemicalAccidentManager.prototype.render = function ()
@@ -237,8 +245,6 @@ ChemicalAccidentManager.prototype.render = function ()
 	
 	if (this._totalAnimTime === undefined) 
 	{
-	//	var pollLayer = this._pollutionLayersArray[0];
-	//	//this._totalAnimTime = pollLayer.getTotalAnimationTimeMinutes() * 60 * 1000.0; // miliseconds.***
 		this._totalAnimTime = 30000; // test delete.!! 30 seconds.***
 	}
 
@@ -270,13 +276,15 @@ ChemicalAccidentManager.prototype.render = function ()
 		this._increTime = (currTime - this._animationStartTime)* this._timeScale;
 	}
 	
-	// Render layers.***
+	// Render layers.***************************************************************************************************************
+
 	var pollutionLayersCount = this.chemAccidentLayersArray.length;
 	for (var i=0; i<pollutionLayersCount; i++)
 	{
 		var pollLayer = this.chemAccidentLayersArray[i];
 		pollLayer.render(magoManager);
 	}
+
 
 	// ************.MAIN-FRAMEBUFFER.************************************.MAIN-FRAMEBUFFER.************************
 	// Once finished simulation, bind the current framebuffer. 
@@ -433,6 +441,7 @@ ChemicalAccidentManager.prototype.createDefaultShaders = function ()
 	shader.u_simulBoxPosLow_loc = gl.getUniformLocation(shader.program, "u_simulBoxPosLow");
 	shader.u_simulBoxMinPosLC_loc = gl.getUniformLocation(shader.program, "u_simulBoxMinPosLC");
 	shader.u_simulBoxMaxPosLC_loc = gl.getUniformLocation(shader.program, "u_simulBoxMaxPosLC");
+	shader.uMinMaxAltitudeSlices_loc = gl.getUniformLocation(shader.program, "uMinMaxAltitudeSlices");
 	
 	magoManager.postFxShadersManager.useProgram(shader);
 	gl.uniform1i(shader.simulationBoxDoubleDepthTex_loc, 0);
