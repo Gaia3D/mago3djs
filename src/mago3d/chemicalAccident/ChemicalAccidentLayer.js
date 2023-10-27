@@ -118,6 +118,7 @@ ChemicalAccidentTimeSlice.prototype._prepare = function ()
 	{
 		this._fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 		var that = this;
+
 		loadWithXhr(this._filePath, undefined, undefined, 'json', 'GET').done(function(res) 
 		{
 			that._fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
@@ -164,37 +165,47 @@ ChemicalAccidentTimeSlice.prototype._prepare = function ()
 		var mosaicTextureFilePath = mosaicTextureFolderPath + "\\" + this._jsonFile.mosaicTextureFileName;
 		var flip_y_texCoord = false;
 
-		var byteDataArray = this._jsonFile.byteData;
-		var dataLength = byteDataArray.length;
+		var byteDataArray = this._jsonFile.byteData; // embeded data.***
 		var mosaicTexWidth = this._jsonFile.width;
 		var mosaicTexHeight = this._jsonFile.height;
 
-		var uint8Array = new Uint8Array(dataLength); // rgba.***
-		for (var i=0; i<dataLength; i++)
+		// check if exist embeded data.***
+		if (byteDataArray === undefined)
 		{
-			uint8Array[i] = byteDataArray[i];
+			// load the mosaicTexture from file.***
+			ChemicalAccidentTimeSlice.loadTexture(mosaicTextureFilePath, this._texture2dAux, this.owner.chemicalAccidentManager.magoManager, flip_y_texCoord);
+			return false;
 		}
+		else 
+		{
+			var dataLength = byteDataArray.length;
+			var uint8Array = new Uint8Array(dataLength); // rgba.***
+			for (var i=0; i<dataLength; i++)
+			{
+				uint8Array[i] = byteDataArray[i];
+			}
 
-		//ChemicalAccidentTimeSlice.loadTexture(mosaicTextureFilePath, this._texture2dAux, this.owner.chemicalAccidentManager.magoManager, flip_y_texCoord);
+			//ChemicalAccidentTimeSlice.loadTexture(mosaicTextureFilePath, this._texture2dAux, this.owner.chemicalAccidentManager.magoManager, flip_y_texCoord);
 
-		// make texture with the embedded data into json file.***
-		var magoManager = this.owner.chemicalAccidentManager.magoManager;
-		var gl = magoManager.getGl();
-		
-		var texWrap = gl.CLAMP_TO_EDGE;
-		var filter = gl.NEAREST;
-		var bPremultiplyAlphaWebgl = false;
+			// make texture with the embedded data into json file.***
+			var magoManager = this.owner.chemicalAccidentManager.magoManager;
+			var gl = magoManager.getGl();
+			
+			var texWrap = gl.CLAMP_TO_EDGE;
+			var filter = gl.NEAREST;
+			var bPremultiplyAlphaWebgl = false;
 
-		this._texture2dAux.texId = Texture.createTexture(gl, filter, uint8Array, mosaicTexWidth, mosaicTexHeight, texWrap, bPremultiplyAlphaWebgl);
-		this._texture2dAux.fileLoadState = CODE.fileLoadState.BINDING_FINISHED;
+			this._texture2dAux.texId = Texture.createTexture(gl, filter, uint8Array, mosaicTexWidth, mosaicTexHeight, texWrap, bPremultiplyAlphaWebgl);
+			this._texture2dAux.fileLoadState = CODE.fileLoadState.BINDING_FINISHED;
 
-		this._jsonFile.byteData = undefined; // free memory.***
+			this._jsonFile.byteData = undefined; // free memory.***
 
-		this._mosaicTexture.texturesArray.push(this._texture2dAux.texId);
-		this._mosaicTexture.finalTextureXSize = mosaicTexWidth;
-		this._mosaicTexture.finalTextureYSize = mosaicTexHeight;
-		this._mosaicTexture.fileLoadState = CODE.fileLoadState.BINDING_FINISHED;
-		this._isPrepared = true;
+			this._mosaicTexture.texturesArray.push(this._texture2dAux.texId);
+			this._mosaicTexture.finalTextureXSize = mosaicTexWidth;
+			this._mosaicTexture.finalTextureYSize = mosaicTexHeight;
+			this._mosaicTexture.fileLoadState = CODE.fileLoadState.BINDING_FINISHED;
+			this._isPrepared = true;
+		}
 
 		return false;
 	}

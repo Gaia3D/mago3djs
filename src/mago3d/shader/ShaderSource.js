@@ -2253,34 +2253,10 @@ float _getPollution_nearest(in vec2 subTexCoord2d, in int col_mosaic, in int row
     return ap;\n\
 }\n\
 \n\
-bool get_pollution_fromTexture3d_triLinearInterpolation(in vec3 texCoord3d, in vec3 posLC, inout float airPressure)\n\
+bool getUpDownSlicesIdx(in vec3 posLC, inout int sliceDownIdx, inout int sliceUpIdx, inout float distUp, inout float distDown)\n\
 {\n\
-    // tex3d : airPressureMosaicTex\n\
-    // 1rst, check texCoord3d boundary limits.***\n\
-    if(texCoord3d.x < 0.0 || texCoord3d.x > 1.0)\n\
-    {\n\
-        return false;\n\
-    }\n\
-\n\
-    if(texCoord3d.y < 0.0 || texCoord3d.y > 1.0)\n\
-    {\n\
-        return false;\n\
-    }\n\
-\n\
-    if(texCoord3d.z < 0.0 || texCoord3d.z > 1.0)\n\
-    {\n\
-        return false;\n\
-    }\n\
-    // 1rst, determine the sliceIdx.***\n\
-    // u_texSize[3]; // The original texture3D size.***\n\
-    int slicesCount = u_texSize[2];\n\
-\n\
-    float currSliceIdx_float = texCoord3d.z * float(slicesCount - 1);\n\
-    int currSliceIdx_down = int(floor(currSliceIdx_float));\n\
-    int currSliceIdx_up = currSliceIdx_down + 1;\n\
-\n\
-    // determine the currSliceIdx_down & currSliceIdx_up.***\n\
-    //uMinMaxAltitudeSlices[32]; // limited to 32 slices.***\n\
+    // uMinMaxAltitudeSlices[32]; // limited to 32 slices.***\n\
+    // u_texSize[3] =  The original texture3D size.***\n\
     float altitude = posLC.z;\n\
     int currSliceIdx = -1;\n\
     for(int i=0; i<32; i++)\n\
@@ -2299,13 +2275,18 @@ bool get_pollution_fromTexture3d_triLinearInterpolation(in vec3 texCoord3d, in v
 \n\
     if(currSliceIdx == 0)\n\
     {\n\
-        currSliceIdx_down = currSliceIdx;\n\
-        currSliceIdx_up = currSliceIdx;\n\
+        sliceDownIdx = currSliceIdx;\n\
+        sliceUpIdx = currSliceIdx;\n\
     }\n\
     else\n\
     {\n\
-        currSliceIdx_down = currSliceIdx - 1;\n\
-        currSliceIdx_up = currSliceIdx;\n\
+        sliceDownIdx = currSliceIdx-1;\n\
+        sliceUpIdx = currSliceIdx;\n\
+    }\n\
+\n\
+    if(sliceUpIdx > u_texSize[2] - 1)\n\
+    {\n\
+        sliceUpIdx = u_texSize[2] - 1;\n\
     }\n\
 \n\
     // +------------------------------+ <- sliceUp\n\
@@ -2321,7 +2302,7 @@ bool get_pollution_fromTexture3d_triLinearInterpolation(in vec3 texCoord3d, in v
     float sliceDownAltitude = 0.0;\n\
     for(int i=0; i<32; i++)\n\
     {\n\
-        if(currSliceIdx_down == i)\n\
+        if(sliceUpIdx == i)\n\
         {\n\
             sliceUpAltitude = uMinMaxAltitudeSlices[i].y;\n\
             sliceDownAltitude = uMinMaxAltitudeSlices[i].x;\n\
@@ -2329,8 +2310,46 @@ bool get_pollution_fromTexture3d_triLinearInterpolation(in vec3 texCoord3d, in v
         }\n\
     }\n\
 \n\
-    float distUp = abs(sliceUpAltitude - altitude);\n\
-    float distDown = abs(altitude - sliceDownAltitude);\n\
+    distUp = abs(sliceUpAltitude - altitude);\n\
+    distDown = abs(altitude - sliceDownAltitude);\n\
+\n\
+    return true;\n\
+}\n\
+\n\
+bool get_pollution_fromTexture3d_triLinearInterpolation(in vec3 texCoord3d, in vec3 posLC, inout float airPressure)\n\
+{\n\
+    // tex3d : airPressureMosaicTex\n\
+    // 1rst, check texCoord3d boundary limits.***\n\
+    float error = 1e-8;\n\
+    if(texCoord3d.x < 0.0 + error || texCoord3d.x > 1.0 - error)\n\
+    {\n\
+        return false;\n\
+    }\n\
+\n\
+    if(texCoord3d.y < 0.0 + error || texCoord3d.y > 1.0 - error)\n\
+    {\n\
+        return false;\n\
+    }\n\
+\n\
+    if(texCoord3d.z < 0.0 + error || texCoord3d.z > 1.0 - error)\n\
+    {\n\
+        return false;\n\
+    }\n\
+    // 1rst, determine the sliceIdx.***\n\
+    // u_texSize[3]; // The original texture3D size.***\n\
+    //int slicesCount = u_texSize[2];\n\
+\n\
+    //float currSliceIdx_float = texCoord3d.z * float(slicesCount - 1);\n\
+    int currSliceIdx_down = -1;\n\
+    int currSliceIdx_up = -1;\n\
+    float distUp = 0.0;\n\
+    float distDown = 0.0;\n\
+\n\
+    if(!getUpDownSlicesIdx(posLC, currSliceIdx_down, currSliceIdx_up, distUp, distDown))\n\
+    {\n\
+        return false;\n\
+    }\n\
+\n\
     float distUpAndDown = distUp + distDown;\n\
     float distUpRatio = distUp / distUpAndDown;\n\
     float distDownRatio = distDown / distUpAndDown;\n\
@@ -2339,7 +2358,7 @@ bool get_pollution_fromTexture3d_triLinearInterpolation(in vec3 texCoord3d, in v
 \n\
     // now, calculate the mod.***\n\
     //float remain = currSliceIdx_float -  floor(currSliceIdx_float);\n\
-    float remain = fract(currSliceIdx_float);\n\
+    //float remain = fract(currSliceIdx_float);\n\
 \n\
     // Now, calculate the \"col\" & \"row\" in the mosaic texture3d.***\n\
     // u_mosaicSize[3]; // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***\n\
@@ -2363,12 +2382,12 @@ bool get_pollution_fromTexture3d_triLinearInterpolation(in vec3 texCoord3d, in v
     }\n\
 \n\
     // now, must calculate the mosaicTexCoord.***\n\
-    vec2 mosaicTexCoord_down = subTexCoord_to_texCoord(texCoord3d.xy, col_down, row_down);\n\
+    //vec2 mosaicTexCoord_down = subTexCoord_to_texCoord(texCoord3d.xy, col_down, row_down);\n\
     \n\
-    vec3 sim_res3d = vec3(u_texSize[0], u_texSize[1], u_texSize[2]);\n\
-    vec2 px = 1.0 / sim_res3d.xy;\n\
-    vec2 vc = (floor(texCoord3d.xy * sim_res3d.xy)) * px;\n\
-    vec3 f = fract(texCoord3d * sim_res3d);\n\
+    //vec3 sim_res3d = vec3(u_texSize[0], u_texSize[1], u_texSize[2]);\n\
+    //vec2 px = 1.0 / sim_res3d.xy;\n\
+    //vec2 vc = (floor(texCoord3d.xy * sim_res3d.xy)) * px;\n\
+    //vec3 f = fract(texCoord3d * sim_res3d);\n\
 \n\
     float airPressure_down = _getPollution_triLinearInterpolation(texCoord3d.xy, col_down, row_down);\n\
 \n\
@@ -2408,7 +2427,8 @@ bool get_pollution_fromTexture3d_triLinearInterpolation(in vec3 texCoord3d, in v
 \n\
     //airPressure = mix(airPressure_down, airPressure_up, f.z); // old.***\n\
     airPressure = mix(airPressure_down, airPressure_up, distDownRatio);\n\
-    //airPressure = airPressure_down; // test delete.***\n\
+    //airPressure = mix(airPressure_down, airPressure_up, 0.5);\n\
+\n\
     return true;\n\
 }\n\
 \n\
@@ -2898,6 +2918,59 @@ bool isSimulationBoxEdge(vec2 screenPos)\n\
     return false;\n\
 }\n\
 \n\
+bool findFirstSamplePosition(in vec3 frontPosLC, in vec3 rearPosLC, in vec3 samplingDirLC, in float increLength, in vec3 simulBoxRange, inout vec3 result_samplePos)\n\
+{\n\
+    // This function finds the first sample position.***\n\
+    float contaminationSample = 0.0;\n\
+    vec3 samplePosLC;\n\
+    vec3 samplePosLC_prev;\n\
+    for(int i=0; i<200; i++)\n\
+    {\n\
+        // Note : for each smple, must depth check with the scene depthTexure.***\n\
+        float dist = float(i) * increLength;\n\
+        samplePosLC = frontPosLC + samplingDirLC * dist;\n\
+\n\
+        if(i == 0)\n\
+        {\n\
+            samplePosLC_prev = samplePosLC;\n\
+        }\n\
+\n\
+        contaminationSample = 0.0;\n\
+        vec3 sampleTexCoord3d = vec3((samplePosLC.x - u_simulBoxMinPosLC.x)/simulBoxRange.x, (samplePosLC.y - u_simulBoxMinPosLC.y)/simulBoxRange.y, (samplePosLC.z - u_simulBoxMinPosLC.z)/simulBoxRange.z);\n\
+\n\
+        if(get_pollution_fromTexture3d_triLinearInterpolation(sampleTexCoord3d, samplePosLC, contaminationSample))\n\
+        {\n\
+            if(contaminationSample > u_minMaxPollutionValues[0])\n\
+            {\n\
+                // check the prev semiPos.***\n\
+                vec3 samplePosLC_semiPrev = samplePosLC - samplingDirLC * increLength * 0.5;\n\
+                if(get_pollution_fromTexture3d_triLinearInterpolation(sampleTexCoord3d, samplePosLC_semiPrev, contaminationSample))\n\
+                {\n\
+                    if(contaminationSample > u_minMaxPollutionValues[0])\n\
+                    {\n\
+                        result_samplePos = samplePosLC_prev;\n\
+                        return true;\n\
+                    }\n\
+                    else\n\
+                    {\n\
+                        //result_samplePos = (samplePosLC + samplePosLC_prev) * 0.5;\n\
+                        result_samplePos = samplePosLC_semiPrev;\n\
+                        return true;\n\
+                    }\n\
+                }\n\
+\n\
+                //result_samplePos = (samplePosLC + samplePosLC_prev) * 0.5;\n\
+                result_samplePos = samplePosLC_prev;\n\
+                return true;\n\
+            }\n\
+        }\n\
+        //currSamplePosLC += step_vector_LC;\n\
+        samplePosLC_prev = samplePosLC;\n\
+    }\n\
+\n\
+    return false;\n\
+}\n\
+\n\
 void main(){\n\
 \n\
     // 1rst, read front depth & rear depth and check if exist rear depth.***\n\
@@ -2993,11 +3066,11 @@ void main(){\n\
     float segmentLength = length(rearPosLC - frontPosLC);\n\
     vec3 samplingDirLC = normalize(rearPosLC - frontPosLC);\n\
     vec3 samplingDirCC = normalize(rearPosCC - frontPosCC);\n\
-    float samplingsCount = 50.0;\n\
+    float samplingsCount = 200.0;\n\
     float increLength = segmentLength / samplingsCount;\n\
     if(increLength < u_voxelSizeMeters.x)\n\
     {\n\
-        increLength = u_voxelSizeMeters.x;\n\
+        //increLength = u_voxelSizeMeters.x;\n\
     }\n\
 \n\
     //vec3 camRay = normalize(getViewRay(v_tex_pos, 1.0));\n\
@@ -3011,16 +3084,40 @@ void main(){\n\
     vec4 finalColor4 = vec4(0.0);\n\
     float contaminationAccum = 0.0;\n\
     // u_minMaxPollutionValues\n\
+\n\
+    vec3 firstPosLC = vec3(frontPosLC);\n\
+\n\
+    if(!findFirstSamplePosition(frontPosLC, rearPosLC, samplingDirLC, increLength, simulBoxRange, firstPosLC))\n\
+    {\n\
+        vec4 colorDiscard = vec4(1.0, 0.0, 0.0, 1.0);\n\
+        gl_FragData[0] = colorDiscard;\n\
+\n\
+        #ifdef USE_MULTI_RENDER_TARGET\n\
+            gl_FragData[1] = colorDiscard;\n\
+            gl_FragData[2] = colorDiscard;\n\
+            gl_FragData[3] = colorDiscard;\n\
+        #endif\n\
+        return;\n\
+    }\n\
+\n\
+    // recalculate segmentLength & increLength.***\n\
+    samplingsCount = 50.0;\n\
+    segmentLength = length(rearPosLC - firstPosLC);\n\
+    increLength = segmentLength / samplingsCount;\n\
+    //if(increLength < u_voxelSizeMeters.x)\n\
+    //{\n\
+    //    increLength = u_voxelSizeMeters.x;\n\
+    //}\n\
     \n\
     // Sampling far to near.***\n\
     bool normalLC_calculated = true;\n\
-    for(int i=0; i<150; i++)\n\
+    for(int i=0; i<50; i++)\n\
     {\n\
         \n\
         // Note : for each smple, must depth check with the scene depthTexure.***\n\
-        vec3 samplePosLC = frontPosLC + samplingDirLC * increLength * float(i);\n\
+        vec3 samplePosLC = firstPosLC + samplingDirLC * increLength * float(i);\n\
 \n\
-        vec3 samplePosCC = frontPosCC + samplingDirCC * increLength * float(i);\n\
+        vec3 samplePosCC = firstPosLC + samplingDirCC * increLength * float(i);\n\
         if(abs(samplePosCC.z) > distToCam)\n\
         {\n\
             break;\n\
@@ -3034,23 +3131,12 @@ void main(){\n\
 \n\
         if(get_pollution_fromTexture3d_triLinearInterpolation(sampleTexCoord3d, samplePosLC, contaminationSample))\n\
         {\n\
-            //finalColor4 = vec4(samplePosLC.z / 3000.0, samplePosLC.z / 3000.0, samplePosLC.z / 3000.0, 1.0);\n\
-            //break;\n\
-\n\
             vec3 currNormalLC;\n\
             if(!normalLC(sampleTexCoord3d, currNormalLC))\n\
             {\n\
                 normalLC_calculated = false;\n\
                 //continue;\n\
             }\n\
-\n\
-            // test iso surface:\n\
-            //float pressureWanted = 1.02;\n\
-            //float diffAux = abs(pressureWanted - airPressure);\n\
-            //if(diffAux > 0.01)\n\
-            //{\n\
-            //    continue;\n\
-            //}\n\
 \n\
             vec4 currColor4 = transfer_fnc(contaminationSample);\n\
             currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);\n\
@@ -3071,11 +3157,11 @@ void main(){\n\
  \n\
             //if(length(currNormalLC) > 0.0)\n\
             {\n\
+                // https://www.willusher.io/webgl/2019/01/13/volume-rendering-with-webgl\n\
                 finalColor4.rgb += (1.0 - finalColor4.a) * currColor4.a * vecAux.rgb; // test. render normal color:\n\
                 finalColor4.a += (1.0 - finalColor4.a) * currColor4.a;\n\
             }\n\
             \n\
-            //totalVelocityLC += velocityLC;\n\
             smplingCount += 1.0;\n\
 \n\
             // Optimization: break out of the loop when the color is near opaque\n\
@@ -3086,10 +3172,9 @@ void main(){\n\
             contaminationAccum += contaminationSample;\n\
             //finalColor4.rgb += vec3(contaminationSample, 0.0, 0.0);\n\
             //finalColor4.a += contaminationSample;\n\
-\n\
-            //smplingCount += 1.0;\n\
             \n\
         }\n\
+\n\
 \n\
         currSamplePosLC += step_vector_LC;\n\
     }\n\
@@ -3128,12 +3213,9 @@ void main(){\n\
 \n\
     //vec4 rainbowColor = getRainbowColor_byHeight(contaminationAccum/smplingCount, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y, false);\n\
 \n\
-    //if(finalColor4.a < 1e-10)\n\
-    //{\n\
-    //    finalColor4 = vec4( 1.0, 0.0, 0.0, 1.0);\n\
-    //}\n\
+\n\
     float finalAlpha = finalColor4.a;\n\
-    finalAlpha *= 10.0;\n\
+    finalAlpha *= 2.0;\n\
     if(finalAlpha > 1.0)\n\
     {\n\
         finalAlpha = 1.0;\n\
