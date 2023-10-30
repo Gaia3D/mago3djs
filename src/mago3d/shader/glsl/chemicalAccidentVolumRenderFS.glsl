@@ -320,7 +320,7 @@ void checkTexCoord3DRange(inout vec3 texCoord)
     }
 }
 
-vec2 subTexCoord_to_texCoord(in vec2 subTexCoord, in int col, in int row)
+vec2 subTexCoord_to_texCoord(in vec2 subTexCoord, in int col_mosaic, in int row_mosaic)
 {
     // given col, row & subTexCoord, this function returns the texCoord into mosaic texture.***
     // The "subTexCoord" is the texCoord of the subTexture[col, row].***
@@ -329,10 +329,11 @@ vec2 subTexCoord_to_texCoord(in vec2 subTexCoord, in int col, in int row)
     float sRange = 1.0 / float(u_mosaicSize[0]);
     float tRange = 1.0 / float(u_mosaicSize[1]);
 
-    float s = float(col) * sRange + subTexCoord.x * sRange;
-    float t = float(row) * tRange + subTexCoord.y * tRange;
+    float s = float(col_mosaic) * sRange + subTexCoord.x * sRange;
+    float t = float(row_mosaic) * tRange + subTexCoord.y * tRange;
 
     vec2 resultTexCoord = vec2(s, t);
+
     return resultTexCoord;
 }
 
@@ -361,7 +362,8 @@ float _getPollution_triLinearInterpolation(in vec2 subTexCoord2d, in int col_mos
     vec2 texCoord_tl = vec2(vc);
     vec2 texCoord_tr = vec2(vc + vec2(px.x, 0));
     vec2 texCoord_bl = vec2(vc + vec2(0, px.y));
-    vec2 texCoord_br = vec2(vc + px);
+    vec2 texCoord_br = vec2(vc + vec2(px.x, px.y));
+
     checkTexCoordRange(texCoord_tl);
     checkTexCoordRange(texCoord_tr);
     checkTexCoordRange(texCoord_bl);
@@ -370,6 +372,10 @@ float _getPollution_triLinearInterpolation(in vec2 subTexCoord2d, in int col_mos
     vec2 mosaicTexCoord_tr = subTexCoord_to_texCoord(texCoord_tr, col_mosaic, row_mosaic);
     vec2 mosaicTexCoord_bl = subTexCoord_to_texCoord(texCoord_bl, col_mosaic, row_mosaic);
     vec2 mosaicTexCoord_br = subTexCoord_to_texCoord(texCoord_br, col_mosaic, row_mosaic);
+    //vec2 mosaicTexCoord_tr = mosaicTexCoord_tl + vec2(px.x, 0);
+    //vec2 mosaicTexCoord_bl = mosaicTexCoord_tl + vec2(0, px.y);
+    //vec2 mosaicTexCoord_br = mosaicTexCoord_tl + px;
+
 
     float ap_tl = getPollution_inMosaicTexture(mosaicTexCoord_tl);
     float ap_tr = getPollution_inMosaicTexture(mosaicTexCoord_tr);
@@ -455,11 +461,50 @@ bool getUpDownSlicesIdx(in vec3 posLC, inout int sliceDownIdx, inout int sliceUp
     return true;
 }
 
-bool get_pollution_fromTexture3d_triLinearInterpolation(in vec3 texCoord3d, in vec3 posLC, inout float airPressure)
+bool getUpDownSlicesIdx_FAST(in vec3 posLC, inout int sliceDownIdx, inout int sliceUpIdx)
+{
+    // uMinMaxAltitudeSlices[32]; // limited to 32 slices.***
+    // u_texSize[3] =  The original texture3D size.***
+    float altitude = posLC.z;
+    int currSliceIdx = -1;
+    for(int i=0; i<32; i++)
+    {
+        if(altitude >= uMinMaxAltitudeSlices[i].x && altitude < uMinMaxAltitudeSlices[i].y)
+        {
+            currSliceIdx = i;
+            break;
+        }
+    }
+
+    if(currSliceIdx < 0)
+    {
+        return false;
+    }
+
+    if(currSliceIdx == 0)
+    {
+        sliceDownIdx = currSliceIdx;
+        sliceUpIdx = currSliceIdx;
+    }
+    else
+    {
+        sliceDownIdx = currSliceIdx-1;
+        sliceUpIdx = currSliceIdx;
+    }
+
+    if(sliceUpIdx > u_texSize[2] - 1)
+    {
+        sliceUpIdx = u_texSize[2] - 1;
+    }
+
+    return true;
+}
+
+bool get_pollution_fromTexture3d_triLinearInterpolation_FAST(in vec3 texCoord3d, in vec3 posLC, inout float airPressure)
 {
     // tex3d : airPressureMosaicTex
     // 1rst, check texCoord3d boundary limits.***
-    float error = 1e-8;
+    float error = 0.001;
     if(texCoord3d.x < 0.0 + error || texCoord3d.x > 1.0 - error)
     {
         return false;
@@ -475,10 +520,109 @@ bool get_pollution_fromTexture3d_triLinearInterpolation(in vec3 texCoord3d, in v
         return false;
     }
     // 1rst, determine the sliceIdx.***
-    // u_texSize[3]; // The original texture3D size.***
-    //int slicesCount = u_texSize[2];
+    int currSliceIdx_down = -1;
+    int currSliceIdx_up = -1;
+    float distUp = 0.0;
+    float distDown = 0.0;
 
-    //float currSliceIdx_float = texCoord3d.z * float(slicesCount - 1);
+    if(!getUpDownSlicesIdx_FAST(posLC, currSliceIdx_down, currSliceIdx_up))
+    {
+        return false;
+    }
+
+    float distUpAndDown = distUp + distDown;
+    float distUpRatio = distUp / distUpAndDown;
+    float distDownRatio = distDown / distUpAndDown;
+
+    // Down slice.************************************************************
+    int col_down, row_down;
+    //if(currSliceIdx_down <= u_mosaicSize[0])
+    //{
+        // Our current sliceIdx_down is smaller than the columns count of the mosaic, so:
+        // in this case, the row = 0.***
+    //    row_down = 0;
+    //    col_down = currSliceIdx_down;
+    //}
+    //else
+    {
+        float rowAux = floor(float(currSliceIdx_down) / float(u_mosaicSize[0]));
+        float colAux = float(currSliceIdx_down) - (rowAux * float(u_mosaicSize[0]));
+
+        col_down = int(colAux);
+        row_down = int(rowAux);
+    }
+
+    float airPressure_down = _getPollution_nearest(texCoord3d.xy, col_down, row_down);
+
+    if(airPressure_down > 0.0)
+    {
+        airPressure = airPressure_down;
+        return true;
+    }
+
+    // up slice.************************************************************
+    int col_up, row_up;
+    if(currSliceIdx_up <= u_mosaicSize[0])
+    {
+        // Our current sliceIdx_up is smaller than the columns count of the mosaic, so:
+        // in this case, the row = 0.***
+        row_up = 0;
+        col_up = currSliceIdx_up;
+    }
+    else
+    {
+        float rowAux = floor(float(currSliceIdx_up) / float(u_mosaicSize[0]));
+        float colAux = float(currSliceIdx_up) - (rowAux * float(u_mosaicSize[0]));
+
+        col_up = int(colAux);
+        row_up = int(rowAux);
+    }
+
+    // test.***
+    col_up = col_down + 1;
+    row_up = row_down;
+    if(col_up >= u_mosaicSize[0])
+    {
+        col_up = 0;
+        row_up = row_down + 1;
+    }
+
+    if(row_up >= u_mosaicSize[1])
+    {
+        return false;
+    }
+
+    float airPressure_up = _getPollution_nearest(texCoord3d.xy, col_up, row_up);
+    if(airPressure_up > 0.0)
+    {
+        airPressure = airPressure_up;
+        return true;
+    }
+
+
+    return false;
+}
+
+bool get_pollution_fromTexture3d_triLinearInterpolation(in vec3 texCoord3d, in vec3 posLC, inout float airPressure)
+{
+    // tex3d : airPressureMosaicTex
+    // 1rst, check texCoord3d boundary limits.***
+    float error = 0.001;
+    if(texCoord3d.x < 0.0 + error || texCoord3d.x > 1.0 - error)
+    {
+        return false;
+    }
+
+    if(texCoord3d.y < 0.0 + error || texCoord3d.y > 1.0 - error)
+    {
+        return false;
+    }
+
+    if(texCoord3d.z < 0.0 + error || texCoord3d.z > 1.0 - error)
+    {
+        return false;
+    }
+    // 1rst, determine the sliceIdx.***
     int currSliceIdx_down = -1;
     int currSliceIdx_up = -1;
     float distUp = 0.0;
@@ -492,15 +636,6 @@ bool get_pollution_fromTexture3d_triLinearInterpolation(in vec3 texCoord3d, in v
     float distUpAndDown = distUp + distDown;
     float distUpRatio = distUp / distUpAndDown;
     float distDownRatio = distDown / distUpAndDown;
-    //distDownRatio = 0.0; // test delete.***
-
-
-    // now, calculate the mod.***
-    //float remain = currSliceIdx_float -  floor(currSliceIdx_float);
-    //float remain = fract(currSliceIdx_float);
-
-    // Now, calculate the "col" & "row" in the mosaic texture3d.***
-    // u_mosaicSize[3]; // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***
 
     // Down slice.************************************************************
     int col_down, row_down;
@@ -510,7 +645,7 @@ bool get_pollution_fromTexture3d_triLinearInterpolation(in vec3 texCoord3d, in v
         // in this case, the row = 0.***
     //    row_down = 0;
     //    col_down = currSliceIdx_down;
-   // }
+    //}
     //else
     {
         float rowAux = floor(float(currSliceIdx_down) / float(u_mosaicSize[0]));
@@ -519,14 +654,6 @@ bool get_pollution_fromTexture3d_triLinearInterpolation(in vec3 texCoord3d, in v
         col_down = int(colAux);
         row_down = int(rowAux);
     }
-
-    // now, must calculate the mosaicTexCoord.***
-    //vec2 mosaicTexCoord_down = subTexCoord_to_texCoord(texCoord3d.xy, col_down, row_down);
-    
-    //vec3 sim_res3d = vec3(u_texSize[0], u_texSize[1], u_texSize[2]);
-    //vec2 px = 1.0 / sim_res3d.xy;
-    //vec2 vc = (floor(texCoord3d.xy * sim_res3d.xy)) * px;
-    //vec3 f = fract(texCoord3d * sim_res3d);
 
     float airPressure_down = _getPollution_triLinearInterpolation(texCoord3d.xy, col_down, row_down);
 
@@ -564,7 +691,6 @@ bool get_pollution_fromTexture3d_triLinearInterpolation(in vec3 texCoord3d, in v
 
     float airPressure_up = _getPollution_triLinearInterpolation(texCoord3d.xy, col_up, row_up);
 
-    //airPressure = mix(airPressure_down, airPressure_up, f.z); // old.***
     airPressure = mix(airPressure_down, airPressure_up, distDownRatio);
     //airPressure = mix(airPressure_down, airPressure_up, 0.5);
 
@@ -1077,24 +1203,27 @@ bool findFirstSamplePosition(in vec3 frontPosLC, in vec3 rearPosLC, in vec3 samp
         contaminationSample = 0.0;
         vec3 sampleTexCoord3d = vec3((samplePosLC.x - u_simulBoxMinPosLC.x)/simulBoxRange.x, (samplePosLC.y - u_simulBoxMinPosLC.y)/simulBoxRange.y, (samplePosLC.z - u_simulBoxMinPosLC.z)/simulBoxRange.z);
 
-        if(get_pollution_fromTexture3d_triLinearInterpolation(sampleTexCoord3d, samplePosLC, contaminationSample))
+        if(get_pollution_fromTexture3d_triLinearInterpolation_FAST(sampleTexCoord3d, samplePosLC, contaminationSample))
         {
             if(contaminationSample > u_minMaxPollutionValues[0])
             {
-                // check the prev semiPos.***
-                vec3 samplePosLC_semiPrev = samplePosLC - samplingDirLC * increLength * 0.5;
-                if(get_pollution_fromTexture3d_triLinearInterpolation(sampleTexCoord3d, samplePosLC_semiPrev, contaminationSample))
+                if(i > 0)
                 {
-                    if(contaminationSample > u_minMaxPollutionValues[0])
+                    // check the prev semiPos.***
+                    vec3 samplePosLC_semiPrev = samplePosLC - samplingDirLC * increLength * 0.5;
+                    if(get_pollution_fromTexture3d_triLinearInterpolation_FAST(sampleTexCoord3d, samplePosLC_semiPrev, contaminationSample))
                     {
-                        result_samplePos = samplePosLC_prev;
-                        return true;
-                    }
-                    else
-                    {
-                        //result_samplePos = (samplePosLC + samplePosLC_prev) * 0.5;
-                        result_samplePos = samplePosLC_semiPrev;
-                        return true;
+                        if(contaminationSample > u_minMaxPollutionValues[0])
+                        {
+                            result_samplePos = samplePosLC_prev;
+                            return true;
+                        }
+                        else
+                        {
+                            //result_samplePos = (samplePosLC + samplePosLC_prev) * 0.5;
+                            result_samplePos = samplePosLC_semiPrev;
+                            return true;
+                        }
                     }
                 }
 
@@ -1217,7 +1346,6 @@ void main(){
 
     vec4 color4Aux = vec4(0.0, 0.0, 0.0, 0.0);
 
-    vec3 scenePosTexCoord3d_candidate = vec3(-1.0);
     vec3 currSamplePosLC = vec3(frontPosLC);
     vec3 step_vector_LC = samplingDirLC * increLength;
     vec4 finalColor4 = vec4(0.0);
@@ -1238,6 +1366,7 @@ void main(){
         #endif
         return;
     }
+    
 
     // recalculate segmentLength & increLength.***
     samplingsCount = 50.0;
@@ -1256,17 +1385,28 @@ void main(){
         // Note : for each smple, must depth check with the scene depthTexure.***
         vec3 samplePosLC = firstPosLC + samplingDirLC * increLength * float(i);
 
-        vec3 samplePosCC = firstPosLC + samplingDirCC * increLength * float(i);
-        if(abs(samplePosCC.z) > distToCam)
-        {
-            break;
-        }
+        //vec3 samplePosCC = firstPosLC + samplingDirCC * increLength * float(i);
+        //if(abs(samplePosCC.z) > distToCam)
+        //{
+        //    break;
+        //}
 
         contaminationSample = 0.0;
         vec3 sampleTexCoord3d = vec3((samplePosLC.x - u_simulBoxMinPosLC.x)/simulBoxRange.x, (samplePosLC.y - u_simulBoxMinPosLC.y)/simulBoxRange.y, (samplePosLC.z - u_simulBoxMinPosLC.z)/simulBoxRange.z);
-        //vec3 sampleTexCoord3d = vec3((currSamplePosLC.x - u_simulBoxMinPosLC.x)/simulBoxRange.x, (currSamplePosLC.y - u_simulBoxMinPosLC.y)/simulBoxRange.y, (currSamplePosLC.z - u_simulBoxMinPosLC.z)/simulBoxRange.z);
-        scenePosTexCoord3d_candidate = vec3(sampleTexCoord3d);
-        
+        if(sampleTexCoord3d.x < 0.0 || sampleTexCoord3d.x > 1.0 || sampleTexCoord3d.y < 0.0 || sampleTexCoord3d.y > 1.0 || sampleTexCoord3d.z < 0.0 || sampleTexCoord3d.z > 1.0)
+        {
+            vec4 colorDiscard = vec4(1.0, 0.0, 0.0, 1.0);
+            gl_FragData[0] = colorDiscard;
+
+            #ifdef USE_MULTI_RENDER_TARGET
+                gl_FragData[1] = colorDiscard;
+                gl_FragData[2] = colorDiscard;
+                gl_FragData[3] = colorDiscard;
+            #endif
+            return;
+        }
+
+        checkTexCoord3DRange(sampleTexCoord3d);
 
         if(get_pollution_fromTexture3d_triLinearInterpolation(sampleTexCoord3d, samplePosLC, contaminationSample))
         {
@@ -1293,11 +1433,14 @@ void main(){
             //currColor4.rgb *= abs(dotProd);
 
             vec4 vecAux = abs(vec4(currColor4.rgb, 1.0));
+            currColor4.r = sampleTexCoord3d.x;
+            currColor4.g = sampleTexCoord3d.y;
+            currColor4.b = sampleTexCoord3d.z;
  
             //if(length(currNormalLC) > 0.0)
             {
                 // https://www.willusher.io/webgl/2019/01/13/volume-rendering-with-webgl
-                finalColor4.rgb += (1.0 - finalColor4.a) * currColor4.a * vecAux.rgb; // test. render normal color:
+                finalColor4.rgb += (1.0 - finalColor4.a) * currColor4.a * currColor4.rgb; // test. render normal color:
                 finalColor4.a += (1.0 - finalColor4.a) * currColor4.a;
             }
             

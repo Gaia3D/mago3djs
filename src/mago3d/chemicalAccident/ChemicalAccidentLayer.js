@@ -668,9 +668,11 @@ ChemicalAccidentLayer.prototype.render = function ()
 	if (this.chemicalAccidentManager.counterAux === 0)
 	{
 		this.testCurrIdx = texIdxCurr;
+		
 	}
 	else 
 	{
+		this.testCurrIdx = 1024; // test hardcode.***
 		if (this.counterTest === undefined)
 		{
 			this.counterTest = this.renderCounter;
