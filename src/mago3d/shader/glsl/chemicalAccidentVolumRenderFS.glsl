@@ -502,6 +502,8 @@ bool getUpDownSlicesIdx_FAST(in vec3 posLC, inout int sliceDownIdx, inout int sl
 
 bool get_pollution_fromTexture3d_triLinearInterpolation_FAST(in vec3 texCoord3d, in vec3 posLC, inout float airPressure)
 {
+    // Here is not important the pollution value. Only need know if the pollution value is zero or not.***
+    // this function is called by "findFirstSamplePosition".***
     // tex3d : airPressureMosaicTex
     // 1rst, check texCoord3d boundary limits.***
     float error = 0.001;
@@ -888,7 +890,7 @@ vec4 getRainbowColor_byHeight(in float height, in float minHeight_rainbow, in fl
         //gray = 0.95;
     }
 
-    vec4 resultColor = vec4(0.0, 0.0, 0.0, gray);
+    vec4 resultColor = vec4(0.0, 0.0, 0.0, (gray));
 
     if(hotToCold)
     {
@@ -1042,7 +1044,7 @@ vec3 normal(vec3 position, float intensity)
     return -normalize(NormalMatrix * vec3(dx, dy, dz));
 }*/
 
-bool normalLC(vec3 texCoord3d, inout vec3 result_normal)
+bool normalLC(vec3 texCoord3d, in vec3 posLC, inout vec3 result_normal)
 {
     // Estimate the normal from a finite difference approximation of the gradient
     vec3 sim_res3d = vec3(u_texSize[0], u_texSize[1], u_texSize[2]);
@@ -1056,39 +1058,39 @@ bool normalLC(vec3 texCoord3d, inout vec3 result_normal)
     float airPressure_dx = 0.0;
     vec3 velocity_dx;
     vec3 texCoord3d_dx = vec3(vc + vec3(pix.x, 0.0, 0.0));
-    bool succes_dx =  get_pollution_fromTexture3d_nearest(texCoord3d_dx, airPressure_dx);
+    bool succes_dx =  get_pollution_fromTexture3d_triLinearInterpolation(texCoord3d_dx, posLC, airPressure_dx);
     if(!succes_dx)return false;
 
     float airPressure_dx_neg = 0.0;
     vec3 velocity_dx_neg;
     vec3 texCoord3d_dx_neg = vec3(vc - vec3(pix.x, 0.0, 0.0));
-    bool succes_dx_neg =  get_pollution_fromTexture3d_nearest(texCoord3d_dx_neg, airPressure_dx_neg);
+    bool succes_dx_neg =  get_pollution_fromTexture3d_triLinearInterpolation(texCoord3d_dx_neg, posLC, airPressure_dx_neg);
     if(!succes_dx_neg)return false;
 
     // dy.*************************************************
     float airPressure_dy = 0.0;
     vec3 velocity_dy;
     vec3 texCoord3d_dy = vec3(vc + vec3(0.0, pix.y, 0.0));
-    bool succes_dy =  get_pollution_fromTexture3d_nearest(texCoord3d_dy, airPressure_dy);
+    bool succes_dy =  get_pollution_fromTexture3d_triLinearInterpolation(texCoord3d_dy, posLC, airPressure_dy);
     if(!succes_dy)return false;
 
     float airPressure_dy_neg = 0.0;
     vec3 velocity_dy_neg;
     vec3 texCoord3d_dy_neg = vec3(vc - vec3(0.0, pix.y, 0.0));
-    bool succes_dy_neg =  get_pollution_fromTexture3d_nearest(texCoord3d_dy_neg, airPressure_dy_neg);
+    bool succes_dy_neg =  get_pollution_fromTexture3d_triLinearInterpolation(texCoord3d_dy_neg, posLC, airPressure_dy_neg);
     if(!succes_dy_neg)return false;
 
     // dz.*************************************************
     float airPressure_dz = 0.0;
     vec3 velocity_dz;
     vec3 texCoord3d_dz = vec3(vc + vec3(0.0, 0.0, pix.z));
-    bool succes_dz =  get_pollution_fromTexture3d_nearest(texCoord3d_dz, airPressure_dz);
+    bool succes_dz =  get_pollution_fromTexture3d_triLinearInterpolation(texCoord3d_dz, posLC, airPressure_dz);
     if(!succes_dz)return false;
 
     float airPressure_dz_neg = 0.0;
     vec3 velocity_dz_neg;
     vec3 texCoord3d_dz_neg = vec3(vc - vec3(0.0, 0.0, pix.z));
-    bool succes_dz_neg =  get_pollution_fromTexture3d_nearest(texCoord3d_dz_neg, airPressure_dz_neg);
+    bool succes_dz_neg =  get_pollution_fromTexture3d_triLinearInterpolation(texCoord3d_dz_neg, posLC, airPressure_dz_neg);
     if(!succes_dz_neg)return false;
 
     //result_normal = normalize(vec3(airPressure_dx - pressure, airPressure_dy - pressure, airPressure_dz - pressure));
@@ -1186,6 +1188,7 @@ bool isSimulationBoxEdge(vec2 screenPos)
 bool findFirstSamplePosition(in vec3 frontPosLC, in vec3 rearPosLC, in vec3 samplingDirLC, in float increLength, in vec3 simulBoxRange, inout vec3 result_samplePos)
 {
     // This function finds the first sample position.***
+    // Here is not important the pollution value. Only need know if the pollution value is zero or not.***
     float contaminationSample = 0.0;
     vec3 samplePosLC;
     vec3 samplePosLC_prev;
@@ -1324,7 +1327,6 @@ void main(){
     //vec3 scenePosLC;
     posWCRelToEye_to_posLC(frontPosWCRelToEye, u_simulBoxTMatInv, u_simulBoxPosHigh, u_simulBoxPosLow, frontPosLC);
     posWCRelToEye_to_posLC(rearPosWCRelToEye, u_simulBoxTMatInv, u_simulBoxPosHigh, u_simulBoxPosLow, rearPosLC);
-    //posWCRelToEye_to_posLC(scenePosWCRelToEye, u_simulBoxTMatInv, u_simulBoxPosHigh, u_simulBoxPosLow, scenePosLC);
 
     // Now, with "frontPosLC" & "rearPosLC", calculate the frontTexCoord3d & rearTexCoord3d.***
     vec3 simulBoxRange = vec3(u_simulBoxMaxPosLC.x - u_simulBoxMinPosLC.x, u_simulBoxMaxPosLC.y - u_simulBoxMinPosLC.y, u_simulBoxMaxPosLC.z - u_simulBoxMinPosLC.z);
@@ -1356,6 +1358,7 @@ void main(){
 
     if(!findFirstSamplePosition(frontPosLC, rearPosLC, samplingDirLC, increLength, simulBoxRange, firstPosLC))
     {
+        /*
         vec4 colorDiscard = vec4(1.0, 0.0, 0.0, 1.0);
         gl_FragData[0] = colorDiscard;
 
@@ -1364,6 +1367,7 @@ void main(){
             gl_FragData[2] = colorDiscard;
             gl_FragData[3] = colorDiscard;
         #endif
+        */
         return;
     }
     
@@ -1393,29 +1397,16 @@ void main(){
 
         contaminationSample = 0.0;
         vec3 sampleTexCoord3d = vec3((samplePosLC.x - u_simulBoxMinPosLC.x)/simulBoxRange.x, (samplePosLC.y - u_simulBoxMinPosLC.y)/simulBoxRange.y, (samplePosLC.z - u_simulBoxMinPosLC.z)/simulBoxRange.z);
-        if(sampleTexCoord3d.x < 0.0 || sampleTexCoord3d.x > 1.0 || sampleTexCoord3d.y < 0.0 || sampleTexCoord3d.y > 1.0 || sampleTexCoord3d.z < 0.0 || sampleTexCoord3d.z > 1.0)
-        {
-            vec4 colorDiscard = vec4(1.0, 0.0, 0.0, 1.0);
-            gl_FragData[0] = colorDiscard;
-
-            #ifdef USE_MULTI_RENDER_TARGET
-                gl_FragData[1] = colorDiscard;
-                gl_FragData[2] = colorDiscard;
-                gl_FragData[3] = colorDiscard;
-            #endif
-            return;
-        }
-
         checkTexCoord3DRange(sampleTexCoord3d);
 
         if(get_pollution_fromTexture3d_triLinearInterpolation(sampleTexCoord3d, samplePosLC, contaminationSample))
         {
             vec3 currNormalLC;
-            if(!normalLC(sampleTexCoord3d, currNormalLC))
-            {
-                normalLC_calculated = false;
-                //continue;
-            }
+            //if(!normalLC(sampleTexCoord3d, samplePosLC, currNormalLC))
+            //{
+           //     normalLC_calculated = false;
+            //    continue;
+            //}
 
             vec4 currColor4 = transfer_fnc(contaminationSample);
             currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);
@@ -1424,18 +1415,24 @@ void main(){
             //vec4 velocityDirCC = modelViewMatrixRelToEye * vec4(velocityWC.xyz, 1.0);
 
             // Now, calculate alpha by normalCC.***
+            /*
             vec4 currNormalWC = u_simulBoxTMat * vec4(currNormalLC, 1.0);
             vec4 currNormalCC = modelViewMatrixRelToEye * vec4(currNormalWC.xyz, 1.0);
             vec3 normalCC = normalize(currNormalCC.xyz);
             float dotProd = dot(camRay, normalCC);
 
             // Now, accumulate the color.***
-            //currColor4.rgb *= abs(dotProd);
+            if(dotProd < 0.0)
+            {
+                currColor4.rgb *= abs(dotProd);
+            }
+            */
+            
 
-            vec4 vecAux = abs(vec4(currColor4.rgb, 1.0));
-            currColor4.r = sampleTexCoord3d.x;
-            currColor4.g = sampleTexCoord3d.y;
-            currColor4.b = sampleTexCoord3d.z;
+            //vec4 vecAux = abs(vec4(currColor4.rgb, 1.0));
+            //currColor4.r = sampleTexCoord3d.x;
+            //currColor4.g = sampleTexCoord3d.y;
+            //currColor4.b = sampleTexCoord3d.z;
  
             //if(length(currNormalLC) > 0.0)
             {

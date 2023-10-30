@@ -2363,6 +2363,8 @@ bool getUpDownSlicesIdx_FAST(in vec3 posLC, inout int sliceDownIdx, inout int sl
 \n\
 bool get_pollution_fromTexture3d_triLinearInterpolation_FAST(in vec3 texCoord3d, in vec3 posLC, inout float airPressure)\n\
 {\n\
+    // Here is not important the pollution value. Only need know if the pollution value is zero or not.***\n\
+    // this function is called by \"findFirstSamplePosition\".***\n\
     // tex3d : airPressureMosaicTex\n\
     // 1rst, check texCoord3d boundary limits.***\n\
     float error = 0.001;\n\
@@ -2749,7 +2751,7 @@ vec4 getRainbowColor_byHeight(in float height, in float minHeight_rainbow, in fl
         //gray = 0.95;\n\
     }\n\
 \n\
-    vec4 resultColor = vec4(0.0, 0.0, 0.0, gray);\n\
+    vec4 resultColor = vec4(0.0, 0.0, 0.0, (gray));\n\
 \n\
     if(hotToCold)\n\
     {\n\
@@ -2903,7 +2905,7 @@ vec3 normal(vec3 position, float intensity)\n\
     return -normalize(NormalMatrix * vec3(dx, dy, dz));\n\
 }*/\n\
 \n\
-bool normalLC(vec3 texCoord3d, inout vec3 result_normal)\n\
+bool normalLC(vec3 texCoord3d, in vec3 posLC, inout vec3 result_normal)\n\
 {\n\
     // Estimate the normal from a finite difference approximation of the gradient\n\
     vec3 sim_res3d = vec3(u_texSize[0], u_texSize[1], u_texSize[2]);\n\
@@ -2917,39 +2919,39 @@ bool normalLC(vec3 texCoord3d, inout vec3 result_normal)\n\
     float airPressure_dx = 0.0;\n\
     vec3 velocity_dx;\n\
     vec3 texCoord3d_dx = vec3(vc + vec3(pix.x, 0.0, 0.0));\n\
-    bool succes_dx =  get_pollution_fromTexture3d_nearest(texCoord3d_dx, airPressure_dx);\n\
+    bool succes_dx =  get_pollution_fromTexture3d_triLinearInterpolation(texCoord3d_dx, posLC, airPressure_dx);\n\
     if(!succes_dx)return false;\n\
 \n\
     float airPressure_dx_neg = 0.0;\n\
     vec3 velocity_dx_neg;\n\
     vec3 texCoord3d_dx_neg = vec3(vc - vec3(pix.x, 0.0, 0.0));\n\
-    bool succes_dx_neg =  get_pollution_fromTexture3d_nearest(texCoord3d_dx_neg, airPressure_dx_neg);\n\
+    bool succes_dx_neg =  get_pollution_fromTexture3d_triLinearInterpolation(texCoord3d_dx_neg, posLC, airPressure_dx_neg);\n\
     if(!succes_dx_neg)return false;\n\
 \n\
     // dy.*************************************************\n\
     float airPressure_dy = 0.0;\n\
     vec3 velocity_dy;\n\
     vec3 texCoord3d_dy = vec3(vc + vec3(0.0, pix.y, 0.0));\n\
-    bool succes_dy =  get_pollution_fromTexture3d_nearest(texCoord3d_dy, airPressure_dy);\n\
+    bool succes_dy =  get_pollution_fromTexture3d_triLinearInterpolation(texCoord3d_dy, posLC, airPressure_dy);\n\
     if(!succes_dy)return false;\n\
 \n\
     float airPressure_dy_neg = 0.0;\n\
     vec3 velocity_dy_neg;\n\
     vec3 texCoord3d_dy_neg = vec3(vc - vec3(0.0, pix.y, 0.0));\n\
-    bool succes_dy_neg =  get_pollution_fromTexture3d_nearest(texCoord3d_dy_neg, airPressure_dy_neg);\n\
+    bool succes_dy_neg =  get_pollution_fromTexture3d_triLinearInterpolation(texCoord3d_dy_neg, posLC, airPressure_dy_neg);\n\
     if(!succes_dy_neg)return false;\n\
 \n\
     // dz.*************************************************\n\
     float airPressure_dz = 0.0;\n\
     vec3 velocity_dz;\n\
     vec3 texCoord3d_dz = vec3(vc + vec3(0.0, 0.0, pix.z));\n\
-    bool succes_dz =  get_pollution_fromTexture3d_nearest(texCoord3d_dz, airPressure_dz);\n\
+    bool succes_dz =  get_pollution_fromTexture3d_triLinearInterpolation(texCoord3d_dz, posLC, airPressure_dz);\n\
     if(!succes_dz)return false;\n\
 \n\
     float airPressure_dz_neg = 0.0;\n\
     vec3 velocity_dz_neg;\n\
     vec3 texCoord3d_dz_neg = vec3(vc - vec3(0.0, 0.0, pix.z));\n\
-    bool succes_dz_neg =  get_pollution_fromTexture3d_nearest(texCoord3d_dz_neg, airPressure_dz_neg);\n\
+    bool succes_dz_neg =  get_pollution_fromTexture3d_triLinearInterpolation(texCoord3d_dz_neg, posLC, airPressure_dz_neg);\n\
     if(!succes_dz_neg)return false;\n\
 \n\
     //result_normal = normalize(vec3(airPressure_dx - pressure, airPressure_dy - pressure, airPressure_dz - pressure));\n\
@@ -3047,6 +3049,7 @@ bool isSimulationBoxEdge(vec2 screenPos)\n\
 bool findFirstSamplePosition(in vec3 frontPosLC, in vec3 rearPosLC, in vec3 samplingDirLC, in float increLength, in vec3 simulBoxRange, inout vec3 result_samplePos)\n\
 {\n\
     // This function finds the first sample position.***\n\
+    // Here is not important the pollution value. Only need know if the pollution value is zero or not.***\n\
     float contaminationSample = 0.0;\n\
     vec3 samplePosLC;\n\
     vec3 samplePosLC_prev;\n\
@@ -3185,7 +3188,6 @@ void main(){\n\
     //vec3 scenePosLC;\n\
     posWCRelToEye_to_posLC(frontPosWCRelToEye, u_simulBoxTMatInv, u_simulBoxPosHigh, u_simulBoxPosLow, frontPosLC);\n\
     posWCRelToEye_to_posLC(rearPosWCRelToEye, u_simulBoxTMatInv, u_simulBoxPosHigh, u_simulBoxPosLow, rearPosLC);\n\
-    //posWCRelToEye_to_posLC(scenePosWCRelToEye, u_simulBoxTMatInv, u_simulBoxPosHigh, u_simulBoxPosLow, scenePosLC);\n\
 \n\
     // Now, with \"frontPosLC\" & \"rearPosLC\", calculate the frontTexCoord3d & rearTexCoord3d.***\n\
     vec3 simulBoxRange = vec3(u_simulBoxMaxPosLC.x - u_simulBoxMinPosLC.x, u_simulBoxMaxPosLC.y - u_simulBoxMinPosLC.y, u_simulBoxMaxPosLC.z - u_simulBoxMinPosLC.z);\n\
@@ -3217,6 +3219,7 @@ void main(){\n\
 \n\
     if(!findFirstSamplePosition(frontPosLC, rearPosLC, samplingDirLC, increLength, simulBoxRange, firstPosLC))\n\
     {\n\
+        /*\n\
         vec4 colorDiscard = vec4(1.0, 0.0, 0.0, 1.0);\n\
         gl_FragData[0] = colorDiscard;\n\
 \n\
@@ -3225,6 +3228,7 @@ void main(){\n\
             gl_FragData[2] = colorDiscard;\n\
             gl_FragData[3] = colorDiscard;\n\
         #endif\n\
+        */\n\
         return;\n\
     }\n\
     \n\
@@ -3254,29 +3258,16 @@ void main(){\n\
 \n\
         contaminationSample = 0.0;\n\
         vec3 sampleTexCoord3d = vec3((samplePosLC.x - u_simulBoxMinPosLC.x)/simulBoxRange.x, (samplePosLC.y - u_simulBoxMinPosLC.y)/simulBoxRange.y, (samplePosLC.z - u_simulBoxMinPosLC.z)/simulBoxRange.z);\n\
-        if(sampleTexCoord3d.x < 0.0 || sampleTexCoord3d.x > 1.0 || sampleTexCoord3d.y < 0.0 || sampleTexCoord3d.y > 1.0 || sampleTexCoord3d.z < 0.0 || sampleTexCoord3d.z > 1.0)\n\
-        {\n\
-            vec4 colorDiscard = vec4(1.0, 0.0, 0.0, 1.0);\n\
-            gl_FragData[0] = colorDiscard;\n\
-\n\
-            #ifdef USE_MULTI_RENDER_TARGET\n\
-                gl_FragData[1] = colorDiscard;\n\
-                gl_FragData[2] = colorDiscard;\n\
-                gl_FragData[3] = colorDiscard;\n\
-            #endif\n\
-            return;\n\
-        }\n\
-\n\
         checkTexCoord3DRange(sampleTexCoord3d);\n\
 \n\
         if(get_pollution_fromTexture3d_triLinearInterpolation(sampleTexCoord3d, samplePosLC, contaminationSample))\n\
         {\n\
             vec3 currNormalLC;\n\
-            if(!normalLC(sampleTexCoord3d, currNormalLC))\n\
-            {\n\
-                normalLC_calculated = false;\n\
-                //continue;\n\
-            }\n\
+            //if(!normalLC(sampleTexCoord3d, samplePosLC, currNormalLC))\n\
+            //{\n\
+           //     normalLC_calculated = false;\n\
+            //    continue;\n\
+            //}\n\
 \n\
             vec4 currColor4 = transfer_fnc(contaminationSample);\n\
             currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);\n\
@@ -3285,18 +3276,24 @@ void main(){\n\
             //vec4 velocityDirCC = modelViewMatrixRelToEye * vec4(velocityWC.xyz, 1.0);\n\
 \n\
             // Now, calculate alpha by normalCC.***\n\
+            /*\n\
             vec4 currNormalWC = u_simulBoxTMat * vec4(currNormalLC, 1.0);\n\
             vec4 currNormalCC = modelViewMatrixRelToEye * vec4(currNormalWC.xyz, 1.0);\n\
             vec3 normalCC = normalize(currNormalCC.xyz);\n\
             float dotProd = dot(camRay, normalCC);\n\
 \n\
             // Now, accumulate the color.***\n\
-            //currColor4.rgb *= abs(dotProd);\n\
+            if(dotProd < 0.0)\n\
+            {\n\
+                currColor4.rgb *= abs(dotProd);\n\
+            }\n\
+            */\n\
+            \n\
 \n\
-            vec4 vecAux = abs(vec4(currColor4.rgb, 1.0));\n\
-            currColor4.r = sampleTexCoord3d.x;\n\
-            currColor4.g = sampleTexCoord3d.y;\n\
-            currColor4.b = sampleTexCoord3d.z;\n\
+            //vec4 vecAux = abs(vec4(currColor4.rgb, 1.0));\n\
+            //currColor4.r = sampleTexCoord3d.x;\n\
+            //currColor4.g = sampleTexCoord3d.y;\n\
+            //currColor4.b = sampleTexCoord3d.z;\n\
  \n\
             //if(length(currNormalLC) > 0.0)\n\
             {\n\
