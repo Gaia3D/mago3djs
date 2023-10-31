@@ -336,6 +336,8 @@ SoundSurfaceLayer.prototype.render = function (magoManager)
 	gl.uniform1fv(currentShader.uLegendValues_loc, legendValues);
 
 	gl.enable(gl.BLEND);
+	//gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); // alpha blending. znkim
 	//gl.disable(gl.CULL_FACE);
 
 	// Render the rectangleMesh.*********************************************************************
