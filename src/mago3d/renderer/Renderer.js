@@ -2624,7 +2624,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 			if (chemAccLayer.simulBoxdoubleDepthTex)
 			{
-				//texture = chemAccLayer.simulBoxdoubleDepthTex;
+				texture = chemAccLayer.simulBoxdoubleDepthTex;
 			}
 	
 			if (chemAccLayer.simulBoxDoubleNormalTex)
@@ -2655,7 +2655,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 				var timeSlice = chemAccLayer._timeSlicesArray[idx];
 				if (timeSlice._mosaicTexture)
 				{
-					texture = timeSlice._mosaicTexture.texturesArray[0];
+					//texture = timeSlice._mosaicTexture.texturesArray[0];
 				}
 
 				this._chemCounterAux += 1;

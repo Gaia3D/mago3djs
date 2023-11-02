@@ -60,6 +60,10 @@ AnimationTimeController.prototype.setCurrentTimeMilisec = function (timeMilisec)
 
 AnimationTimeController.prototype.incrementCurrentTime = function ()
 {
+	if (this._animationState === CODE.processState.PAUSED)
+	{
+		return;
+	}
 	this._currentTimeMilisec += this._incrementalAddingTimeMilisec;
 };
 
@@ -71,6 +75,11 @@ AnimationTimeController.prototype.setAnimationStartTimeMilisec = function (start
 AnimationTimeController.prototype.startAnimation = function ()
 {
 	this._animationState = CODE.processState.STARTED;
+};
+
+AnimationTimeController.prototype.pauseAnimation = function ()
+{
+	this._animationState = CODE.processState.PAUSED;
 };
 
 AnimationTimeController.prototype.getAnimationState = function ()

@@ -3053,7 +3053,7 @@ bool findFirstSamplePosition(in vec3 frontPosLC, in vec3 rearPosLC, in vec3 samp
     float contaminationSample = 0.0;\n\
     vec3 samplePosLC;\n\
     vec3 samplePosLC_prev;\n\
-    for(int i=0; i<200; i++)\n\
+    for(int i=0; i<30; i++)\n\
     {\n\
         // Note : for each smple, must depth check with the scene depthTexure.***\n\
         float dist = float(i) * increLength;\n\
@@ -3132,7 +3132,12 @@ void main(){\n\
     vec4 encodedNormal = texture2D(simulationBoxDoubleNormalTex, frontTexCoord);\n\
 	if(length(encodedNormal.xyz) < 0.1)\n\
     {\n\
-        discard;\n\
+        vec4 encodedNormal_rear = texture2D(simulationBoxDoubleNormalTex, rearTexCoord);\n\
+        if(length(encodedNormal_rear.xyz) < 0.1)\n\
+        {\n\
+            discard;\n\
+        }\n\
+        //discard;\n\
     }\n\
 \n\
     vec4 normal4rear = getNormal_simulationBox(rearTexCoord);\n\
@@ -3197,7 +3202,7 @@ void main(){\n\
     float segmentLength = length(rearPosLC - frontPosLC);\n\
     vec3 samplingDirLC = normalize(rearPosLC - frontPosLC);\n\
     vec3 samplingDirCC = normalize(rearPosCC - frontPosCC);\n\
-    float samplingsCount = 200.0;\n\
+    float samplingsCount = 30.0;\n\
     float increLength = segmentLength / samplingsCount;\n\
     if(increLength < u_voxelSizeMeters.x)\n\
     {\n\
@@ -3234,7 +3239,7 @@ void main(){\n\
     \n\
 \n\
     // recalculate segmentLength & increLength.***\n\
-    samplingsCount = 50.0;\n\
+    samplingsCount = 30.0;\n\
     segmentLength = length(rearPosLC - firstPosLC);\n\
     increLength = segmentLength / samplingsCount;\n\
     //if(increLength < u_voxelSizeMeters.x)\n\
@@ -3244,7 +3249,7 @@ void main(){\n\
     \n\
     // Sampling far to near.***\n\
     bool normalLC_calculated = true;\n\
-    for(int i=0; i<50; i++)\n\
+    for(int i=0; i<30; i++)\n\
     {\n\
         \n\
         // Note : for each smple, must depth check with the scene depthTexure.***\n\

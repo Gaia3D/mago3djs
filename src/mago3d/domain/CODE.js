@@ -85,6 +85,7 @@ CODE.processState = {
 	"NO_STARTED" : 0,
 	"STARTED"    : 1,
 	"FINISHED"   : 2,
+	"PAUSED"     : 3
 };
 
 CODE.modelerDrawingElement = {
