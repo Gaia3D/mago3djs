@@ -637,13 +637,6 @@ ChemicalAccidentLayer.prototype.render = function ()
 	var magoManager = this.chemicalAccidentManager.magoManager;
 	var gl = magoManager.getGl();
 
-	if (gl.getError() !== gl.NO_ERROR)
-	{
-		var hola = 0;
-	}
-
-	
-
 	// animation time control.***
 	var timeSlicesCount = this._timeSlicesArray.length;
 	var totalAnimTime = this.chemicalAccidentManager._totalAnimTime; 
@@ -672,7 +665,7 @@ ChemicalAccidentLayer.prototype.render = function ()
 	}
 	else 
 	{
-		this.testCurrIdx = 1024; // test hardcode.***
+		//this.testCurrIdx = 1024; // test hardcode.***
 		if (this.counterTest === undefined)
 		{
 			this.counterTest = this.renderCounter;
@@ -724,10 +717,6 @@ ChemicalAccidentLayer.prototype.render = function ()
 	*/
 	// end test check.************************************************************************************************************
 		
-	if (gl.getError() !== gl.NO_ERROR)
-	{
-		var hola = 0;
-	}
 
 	//if (texIdxCurr >= timeSlicesCount)
 	////{
@@ -769,13 +758,6 @@ ChemicalAccidentLayer.prototype.render = function ()
 	// Test:
 	this.volumRenderTex = fbo.colorBuffersArray[0];
 
-	if (gl.getError() !== gl.NO_ERROR)
-	{
-		var hola = 0;
-	}
-
-	
-
 	extbuffers.drawBuffersWEBGL([
 		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
 		extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] 
@@ -803,13 +785,6 @@ ChemicalAccidentLayer.prototype.render = function ()
 	
 	var testTimeSlice = this._timeSlicesArray[this.testCurrIdx];
 	var refTex3D = testTimeSlice._mosaicTexture; // a reference texture3D, to take parameters for the shader.***
-
-	if (gl.getError() !== gl.NO_ERROR)
-	{
-		var hola = 0;
-	}
-
-	
 
 	// bind uniforms.***
 	shader.bindUniformGenerals();
@@ -847,12 +822,6 @@ ChemicalAccidentLayer.prototype.render = function ()
 	// uMinMaxAltitudeSlices is a vec2 array.***
 	gl.uniform2fv(shader.uMinMaxAltitudeSlices_loc, testTimeSlice.uMinMaxAltitudeSlices);
 
-	if (gl.getError() !== gl.NO_ERROR)
-	{
-		var hola = 0;
-	}
-
-	
 	
 	// bind textures.***
 	gl.activeTexture(gl.TEXTURE0);
@@ -864,17 +833,10 @@ ChemicalAccidentLayer.prototype.render = function ()
 	// provisionally take the 1rst timeSlice.***
 	var testTimeSlice = this._timeSlicesArray[this.testCurrIdx];
 
-	if (testTimeSlice._mosaicTexture.texturesArray.length !== 1)
-	{
-		var hola = 0;
-	}
 
 	gl.activeTexture(gl.TEXTURE2);
 	var webGlTex = testTimeSlice._mosaicTexture.getTexture( 0 );
-	if (webGlTex === undefined)
-	{
-		var hola = 0;
-	}
+
 	gl.bindTexture(gl.TEXTURE_2D, webGlTex); 
 
 	gl.activeTexture(gl.TEXTURE3);
@@ -899,10 +861,6 @@ ChemicalAccidentLayer.prototype.render = function ()
 
 	fbo.unbind();
 
-	if (gl.getError() !== gl.NO_ERROR)
-	{
-		var hola = 0;
-	}
 };
 
 ChemicalAccidentLayer.prototype.getMinMaxPollutionValues = function ()
