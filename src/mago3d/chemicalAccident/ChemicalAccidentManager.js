@@ -24,6 +24,8 @@ var ChemicalAccidentManager = function (options)
 	this._totalAnimTime;
 	this._increTime;
 
+	this.volumePrepared = false;
+
 	// aux vars.***
 	this.counterAux = 0;
 
@@ -190,12 +192,8 @@ ChemicalAccidentManager.prototype.prepareVolume = function (magoManager)
 	// We need:
 	// 1- GeoJsonIndexFile.
 	// 2- pollution-layers (if GeoJsonIndexFile is loaded).
-	//-------------------------------------------
-	if (this.volumePrepared === undefined)
-	{
-		this.volumePrepared = false;
-	}
-	
+	//-------------------------------------------------------------
+
 	if (this.volumePrepared)
 	{
 		return true;
