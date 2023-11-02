@@ -228,20 +228,15 @@ ChemicalAccidentManager.prototype.render = function ()
 		return false;
 	}
 
-	if (this._animationState === CODE.processState.FINISHED || this._animationState === CODE.processState.NO_STARTED)
-	{
-		return true;
-	}
-
 	var magoManager = this.magoManager;
 	
 	if (!this.prepareVolume(magoManager))
 	{ return false; }
 	
-	//if (this._animationState === CODE.processState.NO_STARTED)
-	//{
-	//	this._animationState = CODE.processState.STARTED;
-	//}
+	if (this._animationState === CODE.processState.FINISHED || this._animationState === CODE.processState.NO_STARTED)
+	{
+		return true;
+	}
 	
 	if (this._totalAnimTime === undefined) 
 	{
