@@ -191,6 +191,11 @@ ChemicalAccidentManager.prototype.prepareVolume = function (magoManager)
 	// 1- GeoJsonIndexFile.
 	// 2- pollution-layers (if GeoJsonIndexFile is loaded).
 	//-------------------------------------------
+	if (this.volumePrepared === undefined)
+	{
+		this.volumePrepared = false;
+	}
+	
 	if (this.volumePrepared)
 	{
 		return true;
