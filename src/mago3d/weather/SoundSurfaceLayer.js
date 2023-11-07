@@ -283,7 +283,8 @@ SoundSurfaceLayer.prototype.render = function (magoManager)
 	// Now, bind the rectangleMesh vbo.***
 	var shaderManager = magoManager.postFxShadersManager;
 	
-	var currentShader = shaderManager.getShader("soundSurface");
+	var currentShader = shaderManager.getShader("soundSurface"); // SoundSurfaceVS SoundSurfaceFS.***
+	
 	
 	magoManager.postFxShadersManager.useProgram(currentShader);
 	gl.uniform1i(currentShader.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
@@ -312,22 +313,6 @@ SoundSurfaceLayer.prototype.render = function (magoManager)
 	// 0= oneColor, 1= attribColor, 2= texture, 3= colorByHeight, 4= grayByHeight, 5= color-legend.***
 	gl.uniform1i(currentShader.colorType_loc, this._soundSurfaceVolumeOwner._colorType); 
 
-	// set the soundLevel minmax values.***
-	var timeSlice = this._timeSlicesArray[this._currTimeSliceIdx];
-	/*
-		timeSlice._jsonFile = {
-			centerGeographicCoord,
-			indices[],
-			maxSoundValue,
-			minSoundValue,
-			positions[],
-			soundLevelValues[],
-		}
-		*/
-	var minVal = timeSlice._jsonFile.minSoundValue;
-	var maxVal = timeSlice._jsonFile.maxSoundValue;
-	gl.uniform1fv(currentShader.uMinMaxValue_loc, new Float32Array([minVal, maxVal]));
-
 	// Color legend.***
 	var legendColors = this._soundSurfaceVolumeOwner._legendColors4;
 	var legendValues = this._soundSurfaceVolumeOwner._legendValues;
@@ -336,9 +321,7 @@ SoundSurfaceLayer.prototype.render = function (magoManager)
 	gl.uniform1fv(currentShader.uLegendValues_loc, legendValues);
 
 	gl.enable(gl.BLEND);
-	//gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); // alpha blending. znkim
-	//gl.disable(gl.CULL_FACE);
 
 	// Render the rectangleMesh.*********************************************************************
 	// Init uniforms.
@@ -346,40 +329,61 @@ SoundSurfaceLayer.prototype.render = function (magoManager)
 	gl.uniform1f(currentShader.uModelOpacity_loc, 1.0);
 	gl.uniform4fv(currentShader.oneColor4_loc, [0.99, 0.5, 0.25, 1.0]); //.***
 
-	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
-	buildingGeoLocation.bindGeoLocationUniforms(gl, currentShader); // rotMatrix, positionHIGH, positionLOW.
-
-	var vboMemManager = magoManager.vboMemoryManager;
-	var vboKeysCount = timeSlice.vboKeysContainer.vboCacheKeysArray.length;
-	for (var i=0; i<vboKeysCount; i++)
+	// set the soundLevel minmax values.***
+	var slicesCount = this._timeSlicesArray.length;
+	for (var j=0; j<slicesCount; j++)
 	{
-		var vboKey = timeSlice.vboKeysContainer.vboCacheKeysArray[i];
-		if (!vboKey) 
+		var timeSlice = this._timeSlicesArray[j];
+		/*
+			timeSlice._jsonFile = {
+				centerGeographicCoord,
+				indices[],
+				maxSoundValue,
+				minSoundValue,
+				positions[],
+				soundLevelValues[],
+			}
+			*/
+		var minVal = timeSlice._jsonFile.minSoundValue;
+		var maxVal = timeSlice._jsonFile.maxSoundValue;
+		gl.uniform1fv(currentShader.uMinMaxValue_loc, new Float32Array([minVal, maxVal]));
+		
+
+		var buildingGeoLocation = timeSlice.geoLocDataManager.getCurrentGeoLocationData();
+		buildingGeoLocation.bindGeoLocationUniforms(gl, currentShader); // rotMatrix, positionHIGH, positionLOW.
+
+		var vboMemManager = magoManager.vboMemoryManager;
+		var vboKeysCount = timeSlice.vboKeysContainer.vboCacheKeysArray.length;
+		for (var i=0; i<vboKeysCount; i++)
 		{
-			return false;
+			var vboKey = timeSlice.vboKeysContainer.vboCacheKeysArray[i];
+			if (!vboKey) 
+			{
+				return false;
+			}
+			
+			// Positions.
+			if (!vboKey.bindDataPosition(currentShader, vboMemManager))
+			{ return false; }
+
+			// Sound level values (decibels).***
+			var name = "soundLevelValue";
+			if (!vboKey.bindDataCustom(currentShader, vboMemManager, name, currentShader.value_loc))
+			{ return false; }
+
+
+			
+			// Indices.
+			if (!vboKey.bindDataIndice(currentShader, vboMemManager))
+			{ return false; }
+			
+			var primitive = gl.TRIANGLES;
+			//primitive = gl.LINE_LOOP;
+			
+			var glType = vboKey.vboBufferIdx.dataGlType;
+			//gl.drawElements(primitive, vboKey.indicesCount, gl.UNSIGNED_SHORT, 0); // old.***
+			gl.drawElements(primitive, vboKey.indicesCount, glType, 0);
 		}
-		
-		// Positions.
-		if (!vboKey.bindDataPosition(currentShader, vboMemManager))
-		{ return false; }
-
-		// Sound level values (decibels).***
-		var name = "soundLevelValue";
-		if (!vboKey.bindDataCustom(currentShader, vboMemManager, name, currentShader.value_loc))
-		{ return false; }
-
-
-		
-		// Indices.
-		if (!vboKey.bindDataIndice(currentShader, vboMemManager))
-		{ return false; }
-		
-		var primitive = gl.TRIANGLES;
-		//primitive = gl.LINE_LOOP;
-		
-		var glType = vboKey.vboBufferIdx.dataGlType;
-		//gl.drawElements(primitive, vboKey.indicesCount, gl.UNSIGNED_SHORT, 0); // old.***
-		gl.drawElements(primitive, vboKey.indicesCount, glType, 0);
 	}
 	// End render rectangleMesh.---------------------------------------------------------------------
 	gl.disable(gl.BLEND);

@@ -327,39 +327,50 @@ SoundSurfaceVolume.prototype.prepareVolume = function (magoManager)
 	return true;
 };
 
+SoundSurfaceVolume.prototype.getCurrentLayerIdx = function ()
+{
+	return this.currLayerIdx;
+};
+
+SoundSurfaceVolume.prototype.setCurrentLayerIdx = function (idx)
+{
+	if (idx === undefined)
+	{
+		return false;
+	}
+
+	if (idx < 0)
+	{
+		idx = 0;
+	}
+	else if (idx >= this.getSoundSurfacesLayersCount())
+	{
+		idx = this.getSoundSurfacesLayersCount() - 1;
+	}
+
+	this.currLayerIdx = idx;
+};
+
 SoundSurfaceVolume.prototype.render = function (magoManager)
 {
-	
 	if (!this.prepareVolume(magoManager))
 	{ return false; }
-	/*
-	if (this._animationStartTime === 0) 
-	{
-		this._animationStartTime = magoManager.getCurrentTime();
-	}
 
-	if (this._totalAnimTime === undefined) 
-	{
-		this._totalAnimTime = 20000; // 10 seconds.***
-	}
-
-	var totalAnimTime = this._totalAnimTime;
-	var currTime = magoManager.getCurrentTime();
-	this._increTime = currTime - this._animationStartTime;
-
-	if (this._increTime >= totalAnimTime)
-	{
-		// Modify the animationStartTime.***
-		var num = Math.floor(this._increTime / totalAnimTime);
-		this._animationStartTime += num * totalAnimTime;
-		this._increTime = currTime - this._animationStartTime;
-	}
-	*/
-	// Render layers.***
 	var soundLayersCount = this.getSoundSurfacesLayersCount();
-	for (var i=0; i<soundLayersCount; i++)
+	if (soundLayersCount === 0)
 	{
-		var soundLayer = this._soundSurfLayersArray[i];
+		return false;
+	}
+
+	// Render layers.***
+	if (this.currLayerIdx === undefined)
+	{
+		this.currLayerIdx = 0;
+	}
+	
+	//for (var i=0; i<soundLayersCount; i++)
+	{
+		var soundLayer = this._soundSurfLayersArray[this.currLayerIdx];
 		soundLayer.render(magoManager);
 	}
     
