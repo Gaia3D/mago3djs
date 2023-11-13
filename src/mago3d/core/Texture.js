@@ -175,7 +175,7 @@ Texture.createTexture = function(gl, filter, data, width, height, texWrap, bPrem
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, texWrap);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filter);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filter);
-	if (data instanceof Uint8Array || data === null) 
+	if (data instanceof Uint8Array || data instanceof Uint8ClampedArray || data === null) 
 	{
 		//Reference : https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texImage2D
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, data);

@@ -227,7 +227,7 @@ SoundSurfaceVolume.prototype._prepareSoundSurfacesLayers = function (magoManager
 	var soundLayersCount = this.getSoundSurfacesLayersCount();
 	if (soundLayersCount === 0)
 	{
-		// use "GeoJsonIndexFile" to create pollutionLayers.***
+		// use "GeoJsonIndexFile" to create soundLayers.***
 		var layersCount = this._geoJsonIndexFile.layersCount;
 		var timeSliceFileFolderPath = this._geoJsonIndexFileFolderPath;
 
@@ -245,7 +245,7 @@ SoundSurfaceVolume.prototype._prepareSoundSurfacesLayers = function (magoManager
 		}
 	}
 
-	// Now, check if all pollutionLayers are prepared.***
+	// Now, check if all soundLayers are prepared.***
 	var allLayersArePrepared = true;
 	var soundLayersCount = this.getSoundSurfacesLayersCount();
 	for (var i=0; i<soundLayersCount; i++)

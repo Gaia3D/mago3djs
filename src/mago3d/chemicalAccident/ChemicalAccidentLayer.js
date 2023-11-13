@@ -58,12 +58,9 @@ ChemicalAccidentTimeSlice.loadTexture = function (imagePath, texture, magoManage
 	{
 		var gl = magoManager.getGl();
 		
-		if (texture.texId === undefined) 
-		{ texture.texId = gl.createTexture(); }
-		else
-		{
+		if (texture.texId !== undefined && texture.texId !== null) 
+		{ 
 			gl.deleteTexture(texture.texId);
-			texture.texId = gl.createTexture();
 		}
 		
 		if (flip_y_texCoord === undefined)
@@ -72,30 +69,11 @@ ChemicalAccidentTimeSlice.loadTexture = function (imagePath, texture, magoManage
 		texture.imageWidth = imageToLoad.width;
 		texture.imageHeight = imageToLoad.height;
 
-		
+		var texWrap = gl.CLAMP_TO_EDGE;
+		var filter = gl.NEAREST;
+		var bPremultiplyAlphaWebgl = false;
 
-		//handleTextureLoaded(gl, imageToLoad, texture.texId, flip_y_texCoord, {
-		//	magFilter: gl.NEAREST
-		//});
-		
-		var flip_y_texCoords = false;
-		gl.bindTexture(gl.TEXTURE_2D, texture.texId);
-		gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, flip_y_texCoords); // if need vertical mirror of the image.
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imageToLoad); // Original.
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-		//gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-		//gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
-		gl.bindTexture(gl.TEXTURE_2D, null);
-
-		//if (gl.getError() !== gl.NO_ERROR)
-		//{
-		//	var hola = 0;
-		//}
-		
-
+		texture.texId = Texture.createTexture(gl, filter, imageToLoad, texture.imageWidth, texture.imageHeight, texWrap, bPremultiplyAlphaWebgl);
 		texture.fileLoadState = CODE.fileLoadState.BINDING_FINISHED;
 	};
 
