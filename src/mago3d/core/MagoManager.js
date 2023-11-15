@@ -2071,7 +2071,6 @@ MagoManager.prototype._renderManagers_transparentPass = function ()
 				{
 					// provisional.***
 					// sample weather condition for the itinearies at the current time.***
-					
 					var weatherStation = this.weatherStation;
 					if (weatherStation.pollutionVolumesArray !== undefined && weatherStation.pollutionVolumesArray.length > 0)
 					{
@@ -2083,6 +2082,19 @@ MagoManager.prototype._renderManagers_transparentPass = function ()
 							var pollutionLayer = pollutionVolume._pollutionLayersArray[0]; // provisional.***
 							this.itineraryManager.sampleWeatherPollution(currTime, pollutionLayer);
 						}
+					}
+				}
+
+				// sample chemical contamination.***
+				if (this.chemicalAccidentManager !== undefined)
+				{
+					var chemicalAccidentManager = this.chemicalAccidentManager;
+					if (chemicalAccidentManager.chemAccidentLayersArray !== undefined && chemicalAccidentManager.chemAccidentLayersArray.length > 0)
+					{
+						var chemicalLayer = chemicalAccidentManager.chemAccidentLayersArray[0]; // usually there are only one chemical layer.***
+						var currTime = this.animationTimeController.getCurrentTimeMilisec();
+						this.itineraryManager.sampleChemicalContamination(currTime, chemicalLayer);
+						
 					}
 				}
 			}

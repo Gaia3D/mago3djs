@@ -295,7 +295,7 @@ PollutionLayerTest.prototype.getPollutionValue = function (posWC, currTime)
 
 	var timeFactor = increTime / totalAnimTime;
 	var f = timeFactor * timeSlicesCount;
-	var ffract = f - Math.floor(f); // this is the interpolation factor between currTex & nexTex.***
+	var ffract = f - Math.floor(f); // this is the interpolation factor between currTex & nextTex.***
 	var texIdxCurr = Math.floor(f);
 
 	if (texIdxCurr >= timeSlicesCount)

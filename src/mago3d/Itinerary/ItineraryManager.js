@@ -178,6 +178,28 @@ ItineraryManager.prototype.sampleWeatherPollution = function (currTime, pollutio
 	return true;
 };
 
+ItineraryManager.prototype.sampleChemicalContamination = function (currTime, chemContaminationLayer)
+{
+	if (this._itineraryLayersArray === undefined)
+	{
+		return false;
+	}
+
+	var itisCount = this.getItineraryLayersCount();
+	if (itisCount === 0)
+	{
+		return false;
+	}
+
+	for (var i=0; i<itisCount; i++)
+	{
+		var itiLayer = this.getItineraryLayer(i);
+		itiLayer.sampleChemicalContamination(currTime, chemContaminationLayer);
+	}
+
+	return true;
+};
+
 ItineraryManager.prototype.render = function ()
 {
 	if (this._itineraryLayersArray === undefined)
@@ -225,15 +247,24 @@ ItineraryManager.prototype.render = function ()
 
 	gl.enable(gl.BLEND);
 
+	var itineraryLayersPrepared = true;
 	for (var i=0; i<itisCount; i++)
 	{
 		var itiLayer = this.getItineraryLayer(i);
-		itiLayer.render(thickLineShader);
+		if (!itiLayer.render(thickLineShader))
+		{
+			itineraryLayersPrepared = false;
+		}
 	}
 
 	// return to the current shader.
 	gl.useProgram(null);
 	gl.disable(gl.BLEND);
+
+	if (!itineraryLayersPrepared)
+	{
+		return false;
+	}
 
 	// render sampling data.**********************************************************************************************************
 	// Deactive depth & normal framebuffer, to render without ssao.***

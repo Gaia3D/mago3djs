@@ -163,8 +163,6 @@ ChemicalAccidentTimeSlice.prototype._prepare = function ()
 				uint8Array[i] = byteDataArray[i];
 			}
 
-			//ChemicalAccidentTimeSlice.loadTexture(mosaicTextureFilePath, this._texture2dAux, this.owner.chemicalAccidentManager.magoManager, flip_y_texCoord);
-
 			// make texture with the embedded data into json file.***
 			var magoManager = this.owner.chemicalAccidentManager.magoManager;
 			var gl = magoManager.getGl();
@@ -838,6 +836,25 @@ ChemicalAccidentLayer.prototype.render = function ()
 	}
 
 	fbo.unbind();
+
+};
+
+ChemicalAccidentLayer.prototype.getContaminationValue = function(posWC, currTime)
+{
+	// posWC = position in world coordinates.***
+	if (!this._prepareLayer())
+	{
+		return undefined;
+	}
+
+	var contaminationValue = 0.0;
+
+	// convert posWC to posLC.***
+	var geoLocDataManager = this.simulationBox.geoLocDataManager;
+	var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
+	var posLC = geoLocData.worldCoordToLocalCoord(posWC, undefined);
+
+	var hola = 0;
 
 };
 

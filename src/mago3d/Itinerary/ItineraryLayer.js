@@ -235,7 +235,17 @@ ItineraryLayer.prototype._prepare = function ()
 				endPosLC           : posNext
 			};
 
+			if (diffTimeSeconds < 0.0)
+			{
+				var hola = 0;
+			}
+
 			this._totalItineraryTimeSec += diffTimeSeconds;
+
+			if (this._totalItineraryTimeSec < 0.0)
+			{
+				var hola = 0;
+			}
 
 			var hola = 0;
 		}
@@ -284,7 +294,7 @@ ItineraryLayer.prototype.render = function (thickLineShader)
 	geoLocData.bindGeoLocationUniforms(gl, thickLineShader);
 	streamLine.render(magoManager, thickLineShader, renderType);
 	
-	
+	return true;
 };
 
 ItineraryLayer.prototype._getWalkingManPositionLC_forIncreTimeSec = function (diffTimeSec, result_walkingManPosLC)
@@ -458,6 +468,125 @@ ItineraryLayer.prototype.sampleWeatherPollution = function (currTime, pollutionL
 	}
 
 	var pollutionMinMaxValue = pollutionLayer._getMinMaxQuantizedValues();
+
+	if (pollutionMinMaxValue === undefined)
+	{
+		return false;
+	}
+
+	if (this._lastSamplingTime === undefined)
+	{
+		this._lastSamplingTime = 0;
+	}
+
+	if (diffTimeSec - this._lastSamplingTime < this._itineraryManager._samplingDataIncrementTimeMilisec)
+	{
+		return false;
+	}
+	else
+	{
+		this._lastSamplingTime = diffTimeSec;
+	}
+
+	// now, store the sampled data.***
+	// this._samplingDataObj;
+	// this._samplingData_vboKeysContainer;
+	if (this._samplingDataObj === undefined)
+	{
+		this._samplingDataObj = {};
+	}
+
+	// calculate the local position respect to "geoLocData = this.vectorMesh.geoLocDataManager.getCurrentGeoLocationData()"
+	var geoLocData = this.vectorMesh.geoLocDataManager.getCurrentGeoLocationData();
+	var posLC = geoLocData.worldCoordToLocalCoord(currPosWC, undefined);
+
+	if (this._samplingDataObj.posLC_floatArray === undefined)
+	{
+		this._samplingDataObj.posLC_floatArray = [];
+	}
+
+	this._samplingDataObj.posLC_floatArray.push(posLC.x, posLC.y, posLC.z);
+
+	// now, convert pollutionValue to color by legend.***
+	var polutionQuantized = (pollutionValue - pollutionMinMaxValue[0]) / (pollutionMinMaxValue[1] - pollutionMinMaxValue[0]);
+
+	if (this._samplingDataObj.color4_uIntArray === undefined)
+	{
+		this._samplingDataObj.color4_uIntArray = [];
+	}
+
+	if (this._samplingDataObj.valuesArray === undefined)
+	{
+		this._samplingDataObj.valuesArray = [];
+	}
+
+	if (this._samplingDataObj.timesArray === undefined)
+	{
+		this._samplingDataObj.timesArray = [];
+	}
+
+	if (this._samplingDataObj.positionWCArray === undefined)
+	{
+		this._samplingDataObj.positionWCArray = [];
+	}
+
+	this._samplingDataObj.timesArray.push(diffTimeSec);
+
+	this._samplingDataObj.valuesArray.push(pollutionValue);
+	this._samplingDataObj.positionWCArray.push(currPosWC);
+
+	var hotToCold = false;
+	var color4RGBA = Color.getRainbowColor_byHeight(polutionQuantized,  0.0, 0.08, hotToCold);
+
+	this._samplingDataObj.color4_uIntArray.push(Math.floor(color4RGBA.r*255), Math.floor(color4RGBA.g*255), Math.floor(color4RGBA.b*255), Math.floor(color4RGBA.a*255));
+
+	// Now make vbo. 1rst delete existing vbo bcos another sample point was added.***
+	if (this._samplingData_vboKeysContainer === undefined)
+	{
+		this._samplingData_vboKeysContainer = new VBOVertexIdxCacheKeysContainer();
+		var vbo = this._samplingData_vboKeysContainer.newVBOVertexIdxCacheKey();
+	}
+	var magoManager = this._itineraryManager.magoManager;
+	var samplingVbo = this._samplingData_vboKeysContainer.getVboKey(0);
+	var posVboDataArray = new Float32Array(this._samplingDataObj.posLC_floatArray); 
+	var colorVboDataArray = new Uint8Array(this._samplingDataObj.color4_uIntArray);
+	samplingVbo.deleteGlObjects(magoManager.vboMemoryManager);
+	samplingVbo.setDataArrayPos(posVboDataArray, magoManager.vboMemoryManager);
+	samplingVbo.setDataArrayCol(colorVboDataArray, magoManager.vboMemoryManager);
+
+	return true;
+};
+
+ItineraryLayer.prototype.sampleChemicalContamination = function (currTime, chemContaminationLayer)
+{
+	if (this.vectorMesh === undefined)
+	{
+		return false;
+	}
+
+	// 1rst, need currentPosition of the walkingMan.***
+	var diffTimeSec = this._getDiffTimeSec(currTime);
+	var totalItineraryTimeSec = this.getTotalItineraryTime();
+	if (diffTimeSec > totalItineraryTimeSec)
+	{
+		return false;
+	}
+
+	var currPosWC = this._getWalkingManPositionWC_forIncreTimeSec(diffTimeSec, undefined);
+
+	if (currPosWC === undefined)
+	{
+		return false;
+	}
+	
+	var pollutionValue = chemContaminationLayer.getContaminationValue(currPosWC, currTime);
+
+	if (pollutionValue === undefined)
+	{
+		return false;
+	}
+
+	var pollutionMinMaxValue = chemContaminationLayer.getMinMaxPollutionValues();
 
 	if (pollutionMinMaxValue === undefined)
 	{
