@@ -22,6 +22,9 @@ var ChemicalAccidentTimeSlice = function(options)
 	 this._mosaicTexture; // note : the mosaicTexture is a Texture3D too.***
 	 this._texture2dAux;	// aux texture.***
 
+	 this._startUnixTimeMiliseconds;
+	 this._endUnixTimeMiliseconds;
+
 	 // uniforms.***
 	this.uMinMaxAltitudeSlices = undefined; // the uniform (vec2) is limited to 32.***
 
@@ -35,6 +38,16 @@ var ChemicalAccidentTimeSlice = function(options)
 		if (options.owner)
 		{
 			this.owner = options.owner;
+		}
+
+		if (options.startUnixTimeMiliseconds !== undefined)
+		{
+			this._startUnixTimeMiliseconds = options.startUnixTimeMiliseconds;
+		}
+
+		if (options.endUnixTimeMiliseconds !== undefined)
+		{
+			this._endUnixTimeMiliseconds = options.endUnixTimeMiliseconds;
 		}
 	 }
 };
@@ -595,6 +608,23 @@ ChemicalAccidentLayer.prototype._makeTextures = function (gl, minmaxPollutionVal
 
 };
 
+ChemicalAccidentLayer.prototype.getTimeSliceIdxByCurrentUnixTimeMiliseconds = function (currUnixTimeMiliseconds)
+{
+	var timeSlicesCount = this._timeSlicesArray.length;
+	var timeSliceIdx = -1;
+	for (var i=0; i<timeSlicesCount; i++)
+	{
+		var timeSlice = this._timeSlicesArray[i];
+		if (currUnixTimeMiliseconds >= timeSlice._startUnixTimeMiliseconds && currUnixTimeMiliseconds <= timeSlice._endUnixTimeMiliseconds)
+		{
+			timeSliceIdx = i;
+			break;
+		}
+	}
+
+	return timeSliceIdx;
+};
+
 ChemicalAccidentLayer.prototype.render = function ()
 {
 	// render the depthBox.***
@@ -904,13 +934,38 @@ ChemicalAccidentLayer.prototype._prepareLayer = function ()
 	if (this._timeSlicesArray.length === 0)
 	{
 		// start to load files.***
+		var geoJsonIndexFile = this.chemicalAccidentManager._geoJsonIndexFile;
+		var year = geoJsonIndexFile.year;
+		var month = geoJsonIndexFile.month - 1; // month is 0 to 11.***
+		var day = geoJsonIndexFile.day;
+		var hour = geoJsonIndexFile.hour;
+		var minute = geoJsonIndexFile.minute;
+		var second = geoJsonIndexFile.second;
+		var millisecond = geoJsonIndexFile.millisecond;
+
+		var timeIncrementMilisecond = 0;
+		var timeInterval = geoJsonIndexFile.timeInterval;
+		var timeIntervalUnits = geoJsonIndexFile.timeIntervalUnits;
+
+		if (timeIntervalUnits === "minutes" || timeIntervalUnits === "minute")
+		{
+			timeIncrementMilisecond = timeInterval * 60 * 1000;
+		}
+
+		var date = new Date(year, month, day, hour, minute, second, millisecond);
+		var startUnixTimeMiliseconds = date.getTime();
+
 		var timeSliceFileNamesCount = this._mosaicTexMetaDataFileNamesArray.length;
 		for (var i=0; i<timeSliceFileNamesCount; i++)
 		{
+			var timeSliceStartUnixTimeMiliseconds = startUnixTimeMiliseconds + i * timeIncrementMilisecond;
+			var timeSliceEndUnixTimeMiliseconds = timeSliceStartUnixTimeMiliseconds + timeIncrementMilisecond;
 			var filePath = this._metadataFolderPath + "\\" + this._mosaicTexMetaDataFileNamesArray[i];
 			var options = {
-				filePath : filePath,
-				owner    : this
+				filePath                 : filePath,
+				owner                    : this,
+				startUnixTimeMiliseconds : timeSliceStartUnixTimeMiliseconds,
+				endUnixTimeMiliseconds   : timeSliceEndUnixTimeMiliseconds
 			};
 			var timeSlice = new ChemicalAccidentTimeSlice(options);
 			this._timeSlicesArray.push(timeSlice);

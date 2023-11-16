@@ -10,9 +10,19 @@ var AnimationTimeController = function(options)
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
+	this._year = 2023;
+	this._month = 0; // month starts in 0.***
+	this._day = 1;
+	this._hour = 0;
+	this._minute = 0;
+	this._second = 0;
+	this._milisecond = 0;
+
 	this._animationState === CODE.processState.NO_STARTED;
-	this._animationStartTimeMilisec = 0;
-	this._currentTimeMilisec = 0;
+	this._animationStartUnixTimeMilisec = 0;
+	this._animationStartTimeMilisec = 0; // old.***
+	this._currentUnixTimeMilisec = 0;
+	this._currentTimeMilisec = 0; // old.***
 	this._timeScale = 1.0;
 	this._date; // a referencial date.***
 
@@ -21,18 +31,87 @@ var AnimationTimeController = function(options)
 
 	if (options !== undefined)
 	{
+		if (options.year !== undefined)
+		{
+			this._year = options.year;
+		}
+		if (options.month !== undefined)
+		{
+			this._month = options.month;
+		}
+		if (options.day !== undefined)
+		{
+			this._day = options.day;
+		}
+		if (options.hour !== undefined)
+		{
+			this._hour = options.hour;
+		}
+		if (options.minute !== undefined)
+		{
+			this._minute = options.minute;
+		}
+		if (options.second !== undefined)
+		{
+			this._second = options.second;
+		}
+		if (options.milisecond !== undefined)
+		{
+			this._milisecond = options.milisecond;
+		}
 		if (options.incrementalAddingTimeMilisec !== undefined)
 		{
 			this._incrementalAddingTimeMilisec = options.incrementalAddingTimeMilisec;
 		}
 	}
+
+	// now calculate the unixTime.***
+	this._animationStartUnixTimeMilisec = new Date(this._year, this._month, this._day, this._hour, this._minute, this._second, this._milisecond);
+	this._currentUnixTimeMilisec = this._animationStartUnixTimeMilisec;
+};
+
+AnimationTimeController.prototype.setYearMonthDayHourSecondMilisecond = function (year, month, day, hour, minute, second, milisecond)
+{
+	if (year !== undefined)
+	{
+		this._year = year;
+	}
+	if (month !== undefined)
+	{
+		this._month = month;
+	}
+	if (day !== undefined)
+	{
+		this._day = day;
+	}
+	if (hour !== undefined)
+	{
+		this._hour = hour;
+	}
+	if (minute !== undefined)
+	{
+		this._minute = minute;
+	}
+	if (second !== undefined)
+	{
+		this._second = second;
+	}
+	if (milisecond !== undefined)
+	{
+		this._milisecond = milisecond;
+	}
+
+	// now calculate the unixTime.***
+	this._animationStartUnixTimeMilisec = new Date(this._year, this._month, this._day, this._hour, this._minute, this._second, this._milisecond);
+	this._currentUnixTimeMilisec = this._animationStartUnixTimeMilisec;
 };
 
 AnimationTimeController.prototype.reset = function (options)
 {
 	this._animationState === CODE.processState.NO_STARTED;
+	this._currentUnixTimeMilisec = this._animationStartUnixTimeMilisec;
 	this._animationStartTimeMilisec = 0;
-	this._currentTimeMilisec = 0;
+	this._currentTimeMilisec = 0; // old.***
 	this._timeScale = 1.0;
 	this._date; // a referencial date.***
 
@@ -50,7 +129,12 @@ AnimationTimeController.prototype.reset = function (options)
 
 AnimationTimeController.prototype.getCurrentTimeMilisec = function ()
 {
-	return this._currentTimeMilisec;
+	return this._currentTimeMilisec; // old.***
+};
+
+AnimationTimeController.prototype.getCurrentUnixTimeMilisec = function ()
+{
+	return this._currentUnixTimeMilisec;
 };
 
 AnimationTimeController.prototype.setCurrentTimeMilisec = function (timeMilisec)
@@ -60,16 +144,12 @@ AnimationTimeController.prototype.setCurrentTimeMilisec = function (timeMilisec)
 
 AnimationTimeController.prototype.incrementCurrentTime = function ()
 {
-	if (this._animationState === CODE.processState.PAUSED)
+	if (this._animationState !== CODE.processState.STARTED)
 	{
 		return;
 	}
-	this._currentTimeMilisec += this._incrementalAddingTimeMilisec;
-};
-
-AnimationTimeController.prototype.setAnimationStartTimeMilisec = function (startTimeMilisec)
-{
-	this._animationStartTimeMilisec = startTimeMilisec;
+	this._currentTimeMilisec += this._incrementalAddingTimeMilisec; // old.***
+	this._currentUnixTimeMilisec += this._incrementalAddingTimeMilisec * this._timeScale;
 };
 
 AnimationTimeController.prototype.startAnimation = function ()
