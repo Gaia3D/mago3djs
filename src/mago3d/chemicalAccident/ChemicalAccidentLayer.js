@@ -641,17 +641,10 @@ ChemicalAccidentLayer.prototype.render = function ()
 	this.renderCounter += 1;
 
 	var magoManager = this.chemicalAccidentManager.magoManager;
+	var animTimeController = magoManager.animationTimeController;
 	var gl = magoManager.getGl();
 
-	// animation time control.***
-	var timeSlicesCount = this._timeSlicesArray.length;
-	var totalAnimTime = this.chemicalAccidentManager._totalAnimTime; 
-	var increTime = this.chemicalAccidentManager._increTime;
-
-	var timeFactor = increTime / totalAnimTime;
-	var f = timeFactor * timeSlicesCount;
-	var ffract = f - Math.floor(f); // this is the interpolation factor between currTex & nextTex.***
-	var texIdxCurr = Math.floor(f);
+	var texIdxCurr = this.getTimeSliceIdxByCurrentUnixTimeMiliseconds(animTimeController._currentUnixTimeMilisec);
 
 	if (texIdxCurr > this._timeSlicesArray.length - 1)
 	{
@@ -677,65 +670,6 @@ ChemicalAccidentLayer.prototype.render = function ()
 			this.counterTest = this.renderCounter;
 		}
 	}
-
-	//if (this.chemicalAccidentManager.counterAux === 0)
-	//{
-	//	return;
-	//}
-
-	// test check.************************************************************************************************************
-	/*
-	var imageWidth = 450;
-	var imageHeight = 450;
-	var dataSize = imageWidth * imageHeight * 4;
-	if (this.pixelsData === undefined)
-	{
-		this.pixelsData = new Uint8Array(dataSize);  // Un arreglo de 4 bytes para almacenar los valores RGBA de un píxel
-	}
-	var testTimeSlice = this._timeSlicesArray[this.testCurrIdx];
-	var webGlTex = testTimeSlice._mosaicTexture.getTexture( 0 );
-	
-	gl.bindTexture(gl.TEXTURE_2D, webGlTex);
-	gl.readPixels(0, 0, imageWidth, imageHeight, gl.RGBA, gl.UNSIGNED_BYTE, this.pixelsData);
-	gl.bindTexture(gl.TEXTURE_2D, null);
-
-	var totalDataR = 0;
-	var totalDataG = 0;
-	var totalDataB = 0;
-	var totalDataA = 0;
-	for (var i=0; i<dataSize; i+=4)
-	{
-		totalDataR += this.pixelsData[i];
-		totalDataG += this.pixelsData[i+1];
-		totalDataB += this.pixelsData[i+2];
-		totalDataA += this.pixelsData[i+3];
-	}
-
-	if (totalDataR !== 0 || totalDataG !== 0 || totalDataB !== 0 || totalDataA !== 51637500)
-	{ 
-		var hola = 0; 
-	}
-
-	if (totalDataR === 0 && totalDataG === 0 && totalDataB === 0 && totalDataA === 0)
-	{ 
-		var hola = 0; 
-	}
-	*/
-	// end test check.************************************************************************************************************
-		
-
-	//if (texIdxCurr >= timeSlicesCount)
-	////{
-	//	texIdxCurr = timeSlicesCount - 1;
-	//}
-
-	//var texIdxNext = texIdxCurr + 1;
-	//if (texIdxNext >= timeSlicesCount)
-	//{
-	//	texIdxNext = texIdxCurr;
-	//}
-
-	// end animation time control.---
 
 	this._renderDepthVolume();
 	

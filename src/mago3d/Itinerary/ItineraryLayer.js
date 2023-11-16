@@ -206,19 +206,21 @@ ItineraryLayer.prototype._prepare = function ()
 			// calculate the time difference in seconds.***
 			var dateCurr = new Date();
 			dateCurr.setFullYear(jsonDateCurr.year);
-			dateCurr.setMonth(jsonDateCurr.month);
+			dateCurr.setMonth(jsonDateCurr.month - 1);
 			dateCurr.setDate(jsonDateCurr.day);
 			dateCurr.setHours(jsonDateCurr.hour);
 			dateCurr.setMinutes(jsonDateCurr.minute);
+			var currUnixTimeMillisec = dateCurr.getTime();
 
 			var dateNext = new Date();
 			dateNext.setFullYear(jsonDateNext.year);
-			dateNext.setMonth(jsonDateNext.month);
+			dateNext.setMonth(jsonDateNext.month - 1);
 			dateNext.setDate(jsonDateNext.day);
 			dateNext.setHours(jsonDateNext.hour);
 			dateNext.setMinutes(jsonDateNext.minute);
+			var nextUnixTimeMillisec = dateNext.getTime();
 
-			var diffTimeSeconds = (dateNext.getTime() - dateCurr.getTime()) / 1000.0;
+			var diffTimeSeconds = (nextUnixTimeMillisec - currUnixTimeMillisec) / 1000.0;
 
 			// now calculate the distance between nodes. use local positions.***
 			var posCurr = new Point3D(points3dArray[i].x, points3dArray[i].y, points3dArray[i].z);
@@ -228,11 +230,12 @@ ItineraryLayer.prototype._prepare = function ()
 			var vel_metersSec = dist / diffTimeSeconds;
 
 			this._segmentsInfoArray[i] = {
-				dist               : dist,
-				diffTimeSec        : diffTimeSeconds,
-				velocity_metersSec : vel_metersSec,
-				startPosLC         : posCurr,
-				endPosLC           : posNext
+				dist                : dist,
+				unixTimeMillisecond : currUnixTimeMillisec,
+				diffTimeSec         : diffTimeSeconds,
+				velocity_metersSec  : vel_metersSec,
+				startPosLC          : posCurr,
+				endPosLC            : posNext
 			};
 
 			if (diffTimeSeconds < 0.0)
@@ -383,6 +386,148 @@ ItineraryLayer.prototype._getWalkingManPositionWC_forIncreTimeSec = function (di
 	// given a diffTime in seconds, this function returns the position of the walkingMan.***
 	// 1rst, find the posLC. Then calculate posWC.***
 	var walkingManPosLC = this._getWalkingManPositionLC_forIncreTimeSec(diffTimeSec, undefined);
+
+	if (walkingManPosLC === undefined)
+	{
+		return undefined;
+	}
+
+	if (this.vectorMesh === undefined)
+	{
+		return undefined;
+	}
+
+	if (result_walkingManPosWC === undefined)
+	{
+		result_walkingManPosWC = new Point3D();
+	}
+
+	// 2nd, calculate posWC.***
+	var geoLocData = this.vectorMesh.geoLocDataManager.getCurrentGeoLocationData();
+	result_walkingManPosWC = geoLocData.localCoordToWorldCoord(walkingManPosLC, result_walkingManPosWC);
+
+	return result_walkingManPosWC;
+};
+
+
+ItineraryLayer.prototype._getSegmentIdx_forUnixTimeMillisec = function (unixTimeMillisec)
+{
+	if (this._segmentsInfoArray === undefined || this._segmentsInfoArray.length === 0)
+	{
+		return undefined;
+	}
+
+	var segmentsCount = this._segmentsInfoArray.length;
+	var segmentFound = false;
+	var i=0;
+
+	var segmentInfoLast = this._segmentsInfoArray[segmentsCount - 1];
+	var segmentUnixTimeMillisecLast = segmentInfoLast.unixTimeMillisecond;
+
+	if (unixTimeMillisec > segmentUnixTimeMillisecLast)
+	{
+		return segmentsCount - 1;
+	}
+
+	while (!segmentFound && i<segmentsCount - 1)
+	{
+		var segmentInfo = this._segmentsInfoArray[i];
+		var segmentInfoNext = this._segmentsInfoArray[i + 1];
+		var segmentUnixTimeMillisec = segmentInfo.unixTimeMillisecond;
+		var segmentUnixTimeMillisecNext = segmentInfoNext.unixTimeMillisecond;
+
+		if (segmentUnixTimeMillisec < unixTimeMillisec && unixTimeMillisec < segmentUnixTimeMillisecNext)
+		{
+			segmentFound = true;
+			return i;
+		}
+		
+		i++;
+	}
+
+	return -1;
+};
+
+ItineraryLayer.prototype._getWalkingManPositionLC_forUnixTimeMillisec = function (unixTimeMillisec, result_walkingManPosLC)
+{
+	// given a diffTime in seconds, this function returns the position of the walkingMan.***
+	if (this._segmentsInfoArray === undefined || this._segmentsInfoArray.length === 0)
+	{
+		return undefined;
+	}
+
+	var segmentsCount = this._segmentsInfoArray.length;
+	var segmentFound = true;
+	var i=0;
+
+	if (result_walkingManPosLC === undefined)
+	{
+		result_walkingManPosLC = new Point3D();
+	}
+
+	var currSegmentIdx = this._getSegmentIdx_forUnixTimeMillisec(unixTimeMillisec);
+
+	if (currSegmentIdx === -1)
+	{
+		segmentFound = false;
+	}
+
+	if (segmentFound)
+	{
+		var segmentInfo = this._segmentsInfoArray[currSegmentIdx];
+		var segmentLength = segmentInfo.dist;
+		var segmentVel = segmentInfo.velocity_metersSec;
+		var segmentDiffTimeSec = segmentInfo.diffTimeSec;
+		var segmentUnixTimeMillisec = segmentInfo.unixTimeMillisecond;
+		var currDiffTimeSec = (unixTimeMillisec - segmentUnixTimeMillisec) / 1000.0;
+
+		var currDist = segmentVel * currDiffTimeSec;
+
+		var segStartPosLC = segmentInfo.startPosLC;
+		var segEndPosLC = segmentInfo.endPosLC;
+
+		if (currDist < 1e-12)
+		{
+			// the walkingMan is stopped.***
+			if (result_walkingManPosLC === undefined)
+			{
+				result_walkingManPosLC = new Point3D();
+			}
+
+			result_walkingManPosLC.set(segStartPosLC.x, segStartPosLC.y, segStartPosLC.z);
+		}
+		else
+		{
+			var dir = segStartPosLC.getVectorToPoint(segEndPosLC, undefined);
+			dir.unitary();
+
+			if (result_walkingManPosLC === undefined)
+			{
+				result_walkingManPosLC = new Point3D();
+			}
+
+			result_walkingManPosLC.set(segStartPosLC.x + dir.x * currDist, segStartPosLC.y + dir.y * currDist, segStartPosLC.z + dir.z * currDist);
+		}
+	}
+
+
+	if (!segmentFound)
+	{
+		// set position as endPoint of the last segement.***
+		var segmentInfo = this._segmentsInfoArray[segmentsCount - 1];
+		var segEndPosLC = segmentInfo.endPosLC;
+		result_walkingManPosLC.set(segEndPosLC.x, segEndPosLC.y, segEndPosLC.z);
+	}
+
+	return result_walkingManPosLC;
+};
+
+
+ItineraryLayer.prototype._getWalkingManPositionWC_forUnixTimeMillisec = function (unixTimeMillisec, result_walkingManPosWC)
+{
+	// given a diffTime in seconds, this function returns the position of the walkingMan.***
+	// 1rst, find the posLC. Then calculate posWC.***
+	var walkingManPosLC = this._getWalkingManPositionLC_forUnixTimeMillisec(unixTimeMillisec, undefined);
 
 	if (walkingManPosLC === undefined)
 	{

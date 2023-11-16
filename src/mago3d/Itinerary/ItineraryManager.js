@@ -282,7 +282,7 @@ ItineraryManager.prototype.render = function ()
 	for (var i=0; i<itisCount; i++)
 	{
 		var itiLayer = this.getItineraryLayer(i);
-		itiLayer.renderWalkingMan(); // here renders sampling points data.***
+		//itiLayer.renderWalkingMan(); // here renders sampling points data.***
 	}
 	
 
@@ -403,9 +403,12 @@ ItineraryManager.prototype.render = function ()
 		}
 
 		var currTime = magoManager.animationTimeController.getCurrentTimeMilisec();
-		var diffTimeSec = itiLayer._getDiffTimeSec(currTime);
+		//var diffTimeSec = itiLayer._getDiffTimeSec(currTime);
 
-		var posWC = itiLayer._getWalkingManPositionWC_forIncreTimeSec(diffTimeSec, undefined);
+		var currUnixTimeMillisec = magoManager.animationTimeController.getCurrentUnixTimeMilisec();
+
+		//var posWC = itiLayer._getWalkingManPositionWC_forIncreTimeSec(diffTimeSec, undefined);
+		var posWC = itiLayer._getWalkingManPositionWC_forUnixTimeMillisec(currUnixTimeMillisec, undefined);
 
 		// now bind the posHIGH & posLOW.***
 		var positionHIGH = new Float32Array([0.0, 0.0, 0.0]); 

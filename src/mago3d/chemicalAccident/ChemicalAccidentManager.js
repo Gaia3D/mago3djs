@@ -240,38 +240,10 @@ ChemicalAccidentManager.prototype.render = function ()
 	{
 		return true;
 	}
-	
-	if (this._totalAnimTime === undefined) 
-	{
-		this._totalAnimTime = 30000; // test delete.!! 30 seconds.***
-	}
 
-	if (this._timeScale === undefined) 
+	if (magoManager.animationTimeController._animationState === CODE.processState.NO_STARTED)
 	{
-		this._timeScale = 1.0;
-	}
-
-	//this._timeScale = 1000.0; // test.***
-	if (magoManager.animationTimeController === undefined)
-	{
-		var options = {
-			incrementalAddingTimeMilisec: 50
-		  };
-		  magoManager.animationTimeController = new AnimationTimeController(options);
-	}
-
-	var totalAnimTime = this._totalAnimTime;
-	var currTime = magoManager.animationTimeController.getCurrentTimeMilisec();
-	this._increTime = (currTime - this._animationStartTime) * this._timeScale;
-
-	if (this._increTime >= totalAnimTime)
-	{
-		//this._animationState = CODE.processState.FINISHED;
-		//return true;
-		// Modify the animationStartTime.***
-		var num = Math.floor(currTime / totalAnimTime);
-		this._animationStartTime = num * totalAnimTime;
-		this._increTime = (currTime - this._animationStartTime)* this._timeScale;
+		magoManager.animationTimeController.startAnimation();
 	}
 	
 	// Render layers.***************************************************************************************************************

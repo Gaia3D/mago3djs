@@ -18,7 +18,7 @@ var AnimationTimeController = function(options)
 	this._second = 0;
 	this._milisecond = 0;
 
-	this._animationState === CODE.processState.NO_STARTED;
+	this._animationState = CODE.processState.NO_STARTED;
 	this._animationStartUnixTimeMilisec = 0;
 	this._animationStartTimeMilisec = 0; // old.***
 	this._currentUnixTimeMilisec = 0;
@@ -29,6 +29,11 @@ var AnimationTimeController = function(options)
 	// intern parameters.***
 	this._incrementalAddingTimeMilisec = 0;
 
+	this.setOptions(options);
+};
+
+AnimationTimeController.prototype.setOptions = function (options)
+{
 	if (options !== undefined)
 	{
 		if (options.year !== undefined)
@@ -59,6 +64,10 @@ var AnimationTimeController = function(options)
 		{
 			this._milisecond = options.milisecond;
 		}
+		if (options.timeScale !== undefined)
+		{
+			this._timeScale = options.timeScale;
+		}
 		if (options.incrementalAddingTimeMilisec !== undefined)
 		{
 			this._incrementalAddingTimeMilisec = options.incrementalAddingTimeMilisec;
@@ -66,65 +75,23 @@ var AnimationTimeController = function(options)
 	}
 
 	// now calculate the unixTime.***
-	this._animationStartUnixTimeMilisec = new Date(this._year, this._month, this._day, this._hour, this._minute, this._second, this._milisecond);
-	this._currentUnixTimeMilisec = this._animationStartUnixTimeMilisec;
+	this.calculateAnimationStartUnixTimeMilisec();
+
 };
 
-AnimationTimeController.prototype.setYearMonthDayHourSecondMilisecond = function (year, month, day, hour, minute, second, milisecond)
+AnimationTimeController.prototype.calculateAnimationStartUnixTimeMilisec = function ()
 {
-	if (year !== undefined)
-	{
-		this._year = year;
-	}
-	if (month !== undefined)
-	{
-		this._month = month;
-	}
-	if (day !== undefined)
-	{
-		this._day = day;
-	}
-	if (hour !== undefined)
-	{
-		this._hour = hour;
-	}
-	if (minute !== undefined)
-	{
-		this._minute = minute;
-	}
-	if (second !== undefined)
-	{
-		this._second = second;
-	}
-	if (milisecond !== undefined)
-	{
-		this._milisecond = milisecond;
-	}
+	var time = new Date(this._year, this._month - 1, this._day, this._hour, this._minute, this._second, this._milisecond);
+	this._animationStartUnixTimeMilisec = time.getTime();
 
 	// now calculate the unixTime.***
-	this._animationStartUnixTimeMilisec = new Date(this._year, this._month, this._day, this._hour, this._minute, this._second, this._milisecond);
 	this._currentUnixTimeMilisec = this._animationStartUnixTimeMilisec;
 };
 
 AnimationTimeController.prototype.reset = function (options)
 {
-	this._animationState === CODE.processState.NO_STARTED;
-	this._currentUnixTimeMilisec = this._animationStartUnixTimeMilisec;
-	this._animationStartTimeMilisec = 0;
-	this._currentTimeMilisec = 0; // old.***
-	this._timeScale = 1.0;
-	this._date; // a referencial date.***
-
-	// intern parameters.***
-	this._incrementalAddingTimeMilisec = 0;
-
-	if (options !== undefined)
-	{
-		if (options.incrementalAddingTimeMilisec !== undefined)
-		{
-			this._incrementalAddingTimeMilisec = options.incrementalAddingTimeMilisec;
-		}
-	}
+	this._animationState = CODE.processState.NO_STARTED;
+	this.setOptions(options);
 };
 
 AnimationTimeController.prototype.getCurrentTimeMilisec = function ()
@@ -148,6 +115,9 @@ AnimationTimeController.prototype.incrementCurrentTime = function ()
 	{
 		return;
 	}
+	// var currTime = new Date();
+	// var currUnixTime = currTime.getTime();
+	// var deltaTimeMilisec = currUnixTime - this._currentUnixTimeMilisec;
 	this._currentTimeMilisec += this._incrementalAddingTimeMilisec; // old.***
 	this._currentUnixTimeMilisec += this._incrementalAddingTimeMilisec * this._timeScale;
 };
