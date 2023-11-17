@@ -259,6 +259,111 @@ ChemicalAccidentTimeSlice.prototype.getMinMaxPollutionValues = function ()
 	return this.minMaxPollutionValues;
 };
 
+ChemicalAccidentTimeSlice.prototype._getSliceIdx = function (altitude)
+{
+	var dataSlicesArray = this._jsonFile.dataSlices;
+	var dataSlicesCount = dataSlicesArray.length;
+
+	if (dataSlicesCount === 0)
+	{
+		return -1;
+	}
+
+	if (altitude < dataSlicesArray[0].minAltitude)
+	{
+		return -1;
+	}
+
+	var resultSliceIdx = -1;
+	for (var i=0; i<dataSlicesCount; i++)
+	{
+		var dataSlice = dataSlicesArray[i];
+		if (altitude >= dataSlice.minAltitude && altitude < dataSlice.maxAltitude)
+		{
+			resultSliceIdx = i;
+			break;
+		}
+	}
+
+	return resultSliceIdx;
+};
+
+ChemicalAccidentTimeSlice.prototype.getContaminationValue = function (posLC, simulationWidth, simulationHeight, gl)
+{
+	// 1rst, transform the posLC to texCoord3d.***
+	var mosaicTexture = this._mosaicTexture;
+
+	var mosaicXCount = mosaicTexture.mosaicXCount;
+	var mosaicYCount = mosaicTexture.mosaicYCount;
+	var mosaicZCount = mosaicTexture.finalSlicesCount;
+	var mosaicXSize = mosaicTexture.texture3DXSize;
+	var mosaicYSize = mosaicTexture.texture3DYSize;
+	var mosaicZSize = mosaicTexture.texture3DZSize;
+	var finalTextureXSize = mosaicTexture.finalTextureXSize;
+	var finalTextureYSize = mosaicTexture.finalTextureYSize;
+
+	var semiWidth = simulationWidth / 2.0;
+	var semiHeight = simulationHeight / 2.0;
+
+	var texCoordX = (posLC.x + semiWidth) / simulationWidth;
+	var texCoordY = (posLC.y + semiHeight) / simulationHeight;
+	
+	var sliceIdx = this._getSliceIdx(posLC.z);
+
+	if (sliceIdx === -1)
+	{
+		return 0;
+	}
+
+	// now calculate the mosaicTexCoord.***
+	var col_mosaic = sliceIdx % mosaicXCount;
+	var row_mosaic = Math.floor(sliceIdx / mosaicXCount);
+	var subTexCoord = new Point2D(texCoordX, texCoordY);
+	var sRange = 1.0 / mosaicXCount;
+	var tRange = 1.0 / mosaicYCount;
+	var s = col_mosaic * sRange + subTexCoord.x * sRange;
+	var t = row_mosaic * tRange + subTexCoord.y * tRange;
+	var mosaicTexCoord = new Point2D(s, t);
+
+	// now bind the mosaicTexture and readPixel in the mosaicTexCoord.***
+	var mosaicWebGlTex = this._mosaicTexture.getTexture( 0 );
+
+	// // Now, bind framebuffer.***
+	if (!this.fboValuesTex) 
+	{
+		var bUseMultiRenderTarget = false;
+		this.fboValuesTex = new FBO(gl, finalTextureXSize, finalTextureYSize, {matchCanvasSize: false, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 1}); 
+	}
+
+	// // Now, bind valuesTex in to the framebuffer and read pixel in posLC_quantized position.***
+	var pixelPos_x = Math.floor(mosaicTexCoord.x * finalTextureXSize);
+	var pixelPos_y = Math.floor(mosaicTexCoord.y * finalTextureYSize);
+
+	var pixel = new Uint8Array(4);
+	this.fboValuesTex.bind();
+
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, mosaicWebGlTex, 0);
+	gl.readPixels(pixelPos_x, pixelPos_y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
+	this.fboValuesTex.unbind();
+
+	if (pixel[0] !== 0 || pixel[1] !== 0 || pixel[2] !== 0 || pixel[3] !== 0)
+	{
+		var hola = 0;
+	}
+
+	var currMinValue = this._jsonFile.minValue;
+	var currMaxValue = this._jsonFile.maxValue;
+
+	// var nextMinValue = timeSliceNext._jsonFile.minValue;
+	// var nextMaxValue = timeSliceNext._jsonFile.maxValue;
+
+	var pixelFloats = [pixel[0] / 255.0, pixel[1] / 255.0, pixel[2] / 255.0, pixel[3] / 255.0];
+	var decodedCurr = ManagerUtils.unpackDepth(pixelFloats);
+	var pollutionValue_curr = (decodedCurr * (currMaxValue - currMinValue) + currMinValue);
+
+	return pollutionValue_curr;
+};
+
 ChemicalAccidentTimeSlice.prototype._makeTextures = function (gl, minmaxPollutionValues)
 {
 	if (!this._texture3dCreated)
@@ -803,7 +908,7 @@ ChemicalAccidentLayer.prototype.render = function ()
 
 };
 
-ChemicalAccidentLayer.prototype.getContaminationValue = function(posWC, currTime)
+ChemicalAccidentLayer.prototype.getContaminationValue = function (posWC, currUnixTimeMillisec)
 {
 	// posWC = position in world coordinates.***
 	if (!this._prepareLayer())
@@ -817,6 +922,26 @@ ChemicalAccidentLayer.prototype.getContaminationValue = function(posWC, currTime
 	var geoLocDataManager = this.simulationBox.geoLocDataManager;
 	var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
 	var posLC = geoLocData.worldCoordToLocalCoord(posWC, undefined);
+
+	if (posLC.z < 0.0) // clamp to 0.***
+	{
+		posLC.z = 0.0;
+	}
+
+	// now, find the timeSlice.***
+	var timeSliceIdx = this.getTimeSliceIdxByCurrentUnixTimeMiliseconds(currUnixTimeMillisec);
+
+	if (timeSliceIdx < 0)
+	{
+		return undefined;
+	}
+
+	var gl = this.chemicalAccidentManager.magoManager.getGl();
+
+	var timeSlice = this._timeSlicesArray[timeSliceIdx];
+	var simulationWidth = this.chemicalAccidentManager._geoJsonIndexFile.width_km * 1000.0;
+	var simulationHeight = this.chemicalAccidentManager._geoJsonIndexFile.height_km * 1000.0;
+	timeSlice.getContaminationValue(posLC, simulationWidth, simulationHeight, gl);
 
 	var hola = 0;
 

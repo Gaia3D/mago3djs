@@ -702,7 +702,7 @@ ItineraryLayer.prototype.sampleWeatherPollution = function (currTime, pollutionL
 	return true;
 };
 
-ItineraryLayer.prototype.sampleChemicalContamination = function (currTime, chemContaminationLayer)
+ItineraryLayer.prototype.sampleChemicalContamination = function (currUnixTimeMillisec, chemContaminationLayer)
 {
 	if (this.vectorMesh === undefined)
 	{
@@ -710,21 +710,21 @@ ItineraryLayer.prototype.sampleChemicalContamination = function (currTime, chemC
 	}
 
 	// 1rst, need currentPosition of the walkingMan.***
-	var diffTimeSec = this._getDiffTimeSec(currTime);
-	var totalItineraryTimeSec = this.getTotalItineraryTime();
-	if (diffTimeSec > totalItineraryTimeSec)
-	{
-		return false;
-	}
+	// var diffTimeSec = this._getDiffTimeSec(currTime);
+	// var totalItineraryTimeSec = this.getTotalItineraryTime();
+	// if (diffTimeSec > totalItineraryTimeSec)
+	// {
+	// 	return false;
+	// }
 
-	var currPosWC = this._getWalkingManPositionWC_forIncreTimeSec(diffTimeSec, undefined);
+	var currPosWC = this._getWalkingManPositionWC_forUnixTimeMillisec(currUnixTimeMillisec, undefined);
 
 	if (currPosWC === undefined)
 	{
 		return false;
 	}
 	
-	var pollutionValue = chemContaminationLayer.getContaminationValue(currPosWC, currTime);
+	var pollutionValue = chemContaminationLayer.getContaminationValue(currPosWC, currUnixTimeMillisec);
 
 	if (pollutionValue === undefined)
 	{

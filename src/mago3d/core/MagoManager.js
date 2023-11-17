@@ -2092,8 +2092,9 @@ MagoManager.prototype._renderManagers_transparentPass = function ()
 					if (chemicalAccidentManager.chemAccidentLayersArray !== undefined && chemicalAccidentManager.chemAccidentLayersArray.length > 0)
 					{
 						var chemicalLayer = chemicalAccidentManager.chemAccidentLayersArray[0]; // usually there are only one chemical layer.***
-						var currTime = this.animationTimeController.getCurrentTimeMilisec();
-						this.itineraryManager.sampleChemicalContamination(currTime, chemicalLayer);
+						//var currTime = this.animationTimeController.getCurrentTimeMilisec();
+						var currUnixTimeMillisec = this.animationTimeController.getCurrentUnixTimeMilisec();
+						this.itineraryManager.sampleChemicalContamination(currUnixTimeMillisec, chemicalLayer);
 						
 					}
 				}

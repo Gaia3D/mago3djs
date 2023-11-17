@@ -178,7 +178,7 @@ ItineraryManager.prototype.sampleWeatherPollution = function (currTime, pollutio
 	return true;
 };
 
-ItineraryManager.prototype.sampleChemicalContamination = function (currTime, chemContaminationLayer)
+ItineraryManager.prototype.sampleChemicalContamination = function (currUnixTimeMillisec, chemContaminationLayer)
 {
 	if (this._itineraryLayersArray === undefined)
 	{
@@ -194,7 +194,7 @@ ItineraryManager.prototype.sampleChemicalContamination = function (currTime, che
 	for (var i=0; i<itisCount; i++)
 	{
 		var itiLayer = this.getItineraryLayer(i);
-		itiLayer.sampleChemicalContamination(currTime, chemContaminationLayer);
+		itiLayer.sampleChemicalContamination(currUnixTimeMillisec, chemContaminationLayer);
 	}
 
 	return true;
