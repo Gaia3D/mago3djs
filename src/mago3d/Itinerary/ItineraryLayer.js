@@ -18,7 +18,6 @@ var ItineraryLayer = function(options)
 	 this._jsonFile;
 	 this._isPrepared = false;
 	 this.vectorMesh;
-	 this._walkingManCurrentPosition;
 	 this._animationStartTime = 0;
 	 this._totalItineraryTimeSec;
 
@@ -85,7 +84,6 @@ ItineraryLayer.prototype.deleteObjects = function (vboMemManager)
 		this.vectorMesh = undefined;
 	}
 
-	this._walkingManCurrentPosition = undefined;
 	this._animationStartTime = undefined;
 	this._totalItineraryTimeSec = undefined;
 
@@ -738,18 +736,23 @@ ItineraryLayer.prototype.sampleChemicalContamination = function (currUnixTimeMil
 		return false;
 	}
 
-	if (this._lastSamplingTime === undefined)
+	var magoManager = this._itineraryManager.magoManager;
+	var animTimeController = magoManager.animationTimeController;
+
+	if (this._lastSamplingUnixTime === undefined)
 	{
-		this._lastSamplingTime = 0;
+		this._lastSamplingUnixTime = animTimeController.getCurrentUnixTimeMilisec();
 	}
 
-	if (diffTimeSec - this._lastSamplingTime < this._itineraryManager._samplingDataIncrementTimeMilisec)
+	var diffTimeMillisec = currUnixTimeMillisec - this._lastSamplingUnixTime;
+
+	if (diffTimeMillisec < this._itineraryManager._samplingDataIncrementTimeMilisec)
 	{
 		return false;
 	}
 	else
 	{
-		this._lastSamplingTime = diffTimeSec;
+		this._lastSamplingUnixTime = currUnixTimeMillisec;
 	}
 
 	// now, store the sampled data.***
@@ -762,17 +765,22 @@ ItineraryLayer.prototype.sampleChemicalContamination = function (currUnixTimeMil
 
 	// calculate the local position respect to "geoLocData = this.vectorMesh.geoLocDataManager.getCurrentGeoLocationData()"
 	var geoLocData = this.vectorMesh.geoLocDataManager.getCurrentGeoLocationData();
-	var posLC = geoLocData.worldCoordToLocalCoord(currPosWC, undefined);
+	this._walkingManCurrPosLC = geoLocData.worldCoordToLocalCoord(currPosWC, undefined);
 
 	if (this._samplingDataObj.posLC_floatArray === undefined)
 	{
 		this._samplingDataObj.posLC_floatArray = [];
 	}
 
-	this._samplingDataObj.posLC_floatArray.push(posLC.x, posLC.y, posLC.z);
+	this._samplingDataObj.posLC_floatArray.push(this._walkingManCurrPosLC.x, this._walkingManCurrPosLC.y, this._walkingManCurrPosLC.z);
 
 	// now, convert pollutionValue to color by legend.***
 	var polutionQuantized = (pollutionValue - pollutionMinMaxValue[0]) / (pollutionMinMaxValue[1] - pollutionMinMaxValue[0]);
+
+	if (polutionQuantized > 0)
+	{
+		var hola = 0;
+	}
 
 	if (this._samplingDataObj.color4_uIntArray === undefined)
 	{
@@ -794,13 +802,14 @@ ItineraryLayer.prototype.sampleChemicalContamination = function (currUnixTimeMil
 		this._samplingDataObj.positionWCArray = [];
 	}
 
-	this._samplingDataObj.timesArray.push(diffTimeSec);
+	this._samplingDataObj.timesArray.push(currUnixTimeMillisec);
 
 	this._samplingDataObj.valuesArray.push(pollutionValue);
 	this._samplingDataObj.positionWCArray.push(currPosWC);
 
 	var hotToCold = false;
-	var color4RGBA = Color.getRainbowColor_byHeight(polutionQuantized,  0.0, 0.08, hotToCold);
+	var pollutionMaxValue = pollutionMinMaxValue[1];
+	var color4RGBA = Color.getRainbowColor_byHeight(polutionQuantized,  0.0, 0.00001, hotToCold);
 
 	this._samplingDataObj.color4_uIntArray.push(Math.floor(color4RGBA.r*255), Math.floor(color4RGBA.g*255), Math.floor(color4RGBA.b*255), Math.floor(color4RGBA.a*255));
 
@@ -826,7 +835,7 @@ ItineraryLayer.prototype.getSampledData = function ()
 	return this._samplingDataObj;
 };
 
-ItineraryLayer.prototype.renderWalkingMan = function ()
+ItineraryLayer.prototype.renderSampledPoints = function ()
 {
 	// render a point & the walkingMan.***
 	// check if is prepared.***
@@ -840,6 +849,11 @@ ItineraryLayer.prototype.renderWalkingMan = function ()
 		return false;
 	}
 
+	if (this._walkingManCurrPosLC === undefined)
+	{
+		return false;
+	}
+
 	var magoManager = this._itineraryManager.magoManager;
 	if (this._animationStartTime === undefined) 
 	{
@@ -848,18 +862,6 @@ ItineraryLayer.prototype.renderWalkingMan = function ()
 
 	
 	var gl = magoManager.getGl();
-
-	// calculate the current position into the itinerary using the currentTime.***
-	//var currTime = magoManager.getCurrentTime();
-	var currTime = magoManager.animationTimeController.getCurrentTimeMilisec();
-	var diffTimeSec = this._getDiffTimeSec(currTime);
-
-	var currWalkingManPosLC = this._getWalkingManPositionLC_forIncreTimeSec(diffTimeSec);
-
-	if (currWalkingManPosLC === undefined)
-	{
-		return false;
-	}
 	
 	// Render a point.************************************************************************************************
 	var sceneState = magoManager.sceneState;
@@ -907,9 +909,9 @@ ItineraryLayer.prototype.renderWalkingMan = function ()
 
 	// set current walkingPositionLC.***
 	var posVboDataArray = new Float32Array(3);
-	posVboDataArray[0] = currWalkingManPosLC.x;
-	posVboDataArray[1] = currWalkingManPosLC.y;
-	posVboDataArray[2] = currWalkingManPosLC.z;
+	posVboDataArray[0] = this._walkingManCurrPosLC.x;
+	posVboDataArray[1] = this._walkingManCurrPosLC.y;
+	posVboDataArray[2] = this._walkingManCurrPosLC.z;
 	
 	var vbo = this._WM_vboKeysContainer.getVboKey(0); // there are only one.***
 	vbo.deleteGlObjects(magoManager.vboMemoryManager);

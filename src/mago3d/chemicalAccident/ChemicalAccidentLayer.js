@@ -941,10 +941,9 @@ ChemicalAccidentLayer.prototype.getContaminationValue = function (posWC, currUni
 	var timeSlice = this._timeSlicesArray[timeSliceIdx];
 	var simulationWidth = this.chemicalAccidentManager._geoJsonIndexFile.width_km * 1000.0;
 	var simulationHeight = this.chemicalAccidentManager._geoJsonIndexFile.height_km * 1000.0;
-	timeSlice.getContaminationValue(posLC, simulationWidth, simulationHeight, gl);
+	var contaminationValue = timeSlice.getContaminationValue(posLC, simulationWidth, simulationHeight, gl);
 
-	var hola = 0;
-
+	return contaminationValue;
 };
 
 ChemicalAccidentLayer.prototype.getMinMaxPollutionValues = function ()

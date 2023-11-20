@@ -282,7 +282,7 @@ ItineraryManager.prototype.render = function ()
 	for (var i=0; i<itisCount; i++)
 	{
 		var itiLayer = this.getItineraryLayer(i);
-		//itiLayer.renderWalkingMan(); // here renders sampling points data.***
+		itiLayer.renderSampledPoints(); // here renders sampling points data.***
 	}
 	
 
