@@ -3201,7 +3201,7 @@ void main(){\n\
     float smplingCount = 0.0;\n\
     float segmentLength = length(rearPosLC - frontPosLC);\n\
     vec3 samplingDirLC = normalize(rearPosLC - frontPosLC);\n\
-    vec3 samplingDirCC = normalize(rearPosCC - frontPosCC);\n\
+    //vec3 samplingDirCC = normalize(rearPosCC - frontPosCC);\n\
     float samplingsCount = 30.0;\n\
     float increLength = segmentLength / samplingsCount;\n\
     if(increLength < u_voxelSizeMeters.x)\n\
@@ -3242,10 +3242,6 @@ void main(){\n\
     samplingsCount = 30.0;\n\
     segmentLength = length(rearPosLC - firstPosLC);\n\
     increLength = segmentLength / samplingsCount;\n\
-    //if(increLength < u_voxelSizeMeters.x)\n\
-    //{\n\
-    //    increLength = u_voxelSizeMeters.x;\n\
-    //}\n\
     \n\
     // Sampling far to near.***\n\
     bool normalLC_calculated = true;\n\

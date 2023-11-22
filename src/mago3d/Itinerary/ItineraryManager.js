@@ -3,7 +3,7 @@
 /**
  * @class ItineraryManager
  */
-var ItineraryManager = function(options) 
+var ItineraryManager = function (options) 
 {
 	 if (!(this instanceof ItineraryManager)) 
 	 {
@@ -14,6 +14,8 @@ var ItineraryManager = function(options)
 	 this._itineraryLayersArray;
 	 this._walkingManAnimatedIcon;
 	 this._walkingManMosaicTexIsPrepared = false;
+	 this._renderThickLine = true;
+	 this._samplePointsSize = 5.0;
 
 	 this._samplingDataIncrementTimeMilisec = 200;
 
@@ -48,6 +50,16 @@ var ItineraryManager = function(options)
 		if (options.samplingDataIncrementTimeMilisec !== undefined)
 		{
 			this._samplingDataIncrementTimeMilisec = options.samplingDataIncrementTimeMilisec;
+		}
+
+		if (options.renderThickLine !== undefined)
+		{
+			this._renderThickLine = options.renderThickLine;
+		}
+
+		if (options.samplePointsSize !== undefined)
+		{
+			this._samplePointsSize = options.samplePointsSize;
 		}
 	 }
 
@@ -178,6 +190,16 @@ ItineraryManager.prototype.sampleWeatherPollution = function (currTime, pollutio
 	return true;
 };
 
+ItineraryManager.prototype.deleteSamplePoints = function ()
+{
+	var itisCount = this.getItineraryLayersCount();
+	for (var i=0; i<itisCount; i++)
+	{
+		var itiLayer = this.getItineraryLayer(i);
+		itiLayer.deleteSamplePoints();
+	}
+};
+
 ItineraryManager.prototype.sampleChemicalContamination = function (currUnixTimeMillisec, chemContaminationLayer)
 {
 	if (this._itineraryLayersArray === undefined)
@@ -212,6 +234,7 @@ ItineraryManager.prototype.render = function ()
 	{
 		return false;
 	}
+
 
 	var magoManager = this.magoManager;
 	var sceneState = magoManager.sceneState;
@@ -251,7 +274,7 @@ ItineraryManager.prototype.render = function ()
 	for (var i=0; i<itisCount; i++)
 	{
 		var itiLayer = this.getItineraryLayer(i);
-		if (!itiLayer.render(thickLineShader))
+		if (!itiLayer.render(thickLineShader, this._renderThickLine))
 		{
 			itineraryLayersPrepared = false;
 		}
@@ -260,6 +283,7 @@ ItineraryManager.prototype.render = function ()
 	// return to the current shader.
 	gl.useProgram(null);
 	gl.disable(gl.BLEND);
+	
 
 	if (!itineraryLayersPrepared)
 	{

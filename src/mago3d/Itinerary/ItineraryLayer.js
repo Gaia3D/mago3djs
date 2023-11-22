@@ -273,27 +273,30 @@ ItineraryLayer.prototype._prepare = function ()
 	return this._isPrepared;
 };
 
-ItineraryLayer.prototype.render = function (thickLineShader)
+ItineraryLayer.prototype.render = function (thickLineShader, bRenderThickLine)
 {
 	// check if is prepared.***
 	if (!this._prepare())
 	{
 		return false;
 	}
-	var magoManager = this._itineraryManager.magoManager;
+	if (bRenderThickLine)
+	{
+		var magoManager = this._itineraryManager.magoManager;
 
-	var gl = magoManager.getGl();
-	var streamLine = this.vectorMesh;
+		var gl = magoManager.getGl();
+		var streamLine = this.vectorMesh;
 
-	gl.uniform4fv(thickLineShader.oneColor4_loc, [0.3, 0.9, 0.5, 1.0]);
-	gl.uniform1i(thickLineShader.colorType_loc, 0);
-	gl.uniform1f(thickLineShader.thickness_loc, streamLine.thickness);
+		gl.uniform4fv(thickLineShader.oneColor4_loc, [0.3, 0.9, 0.5, 1.0]);
+		gl.uniform1i(thickLineShader.colorType_loc, 0);
+		gl.uniform1f(thickLineShader.thickness_loc, streamLine.thickness);
 
-	var renderType = 1;
+		var renderType = 1;
 
-	var geoLocData = streamLine.geoLocDataManager.getCurrentGeoLocationData();
-	geoLocData.bindGeoLocationUniforms(gl, thickLineShader);
-	streamLine.render(magoManager, thickLineShader, renderType);
+		var geoLocData = streamLine.geoLocDataManager.getCurrentGeoLocationData();
+		geoLocData.bindGeoLocationUniforms(gl, thickLineShader);
+		streamLine.render(magoManager, thickLineShader, renderType);
+	}
 	
 	return true;
 };
@@ -700,6 +703,24 @@ ItineraryLayer.prototype.sampleWeatherPollution = function (currTime, pollutionL
 	return true;
 };
 
+ItineraryLayer.prototype.deleteSamplePoints = function ()
+{
+	if (this._samplingData_vboKeysContainer !== undefined)
+	{
+		var magoManager = this._itineraryManager.magoManager;
+		var samplingVbo = this._samplingData_vboKeysContainer.getVboKey(0);
+		samplingVbo.deleteGlObjects(magoManager.vboMemoryManager);
+		this._samplingData_vboKeysContainer = undefined;
+	}
+
+	this._samplingDataObj.posLC_floatArray = undefined;
+	this._samplingDataObj.color4_uIntArray = undefined;
+	this._samplingDataObj.valuesArray = undefined;
+	this._samplingDataObj.timesArray = undefined;
+	this._samplingDataObj.positionWCArray = undefined;
+
+};
+
 ItineraryLayer.prototype.sampleChemicalContamination = function (currUnixTimeMillisec, chemContaminationLayer)
 {
 	if (this.vectorMesh === undefined)
@@ -860,6 +881,9 @@ ItineraryLayer.prototype.renderSampledPoints = function ()
 		this._animationStartTime = 0;
 	}
 
+	var itineraryManager = this._itineraryManager;
+	var samplePointSize = itineraryManager._samplePointsSize;
+
 	
 	var gl = magoManager.getGl();
 	
@@ -877,7 +901,7 @@ ItineraryLayer.prototype.renderSampledPoints = function ()
 	gl.uniform1i(shaderLocal.bPositionCompressed_loc, false);
 	gl.uniform1i(shaderLocal.bUse1Color_loc, true);
 	gl.uniform4fv(shaderLocal.oneColor4_loc, [0.1, 1.0, 0.1, 1.0]); //.
-	gl.uniform1f(shaderLocal.fixPointSize_loc, 10.0);
+	gl.uniform1f(shaderLocal.fixPointSize_loc, samplePointSize);
 	gl.uniform1i(shaderLocal.bUseFixPointSize_loc, 1);
 	gl.uniform1f(shaderLocal.externalAlpha_loc, 1.0);
 
