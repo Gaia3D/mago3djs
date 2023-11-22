@@ -26,7 +26,7 @@ var ItineraryLayer = function(options)
 	 this._WM_vboKeysContainer;
 
 	 // sampling data. position, color, etc.***
-	 this._samplingDataObj;
+	 this._samplingDataObj = {};
 	 this._samplingData_vboKeysContainer;
 	 
 	 this._timeScale = 2000.0; // to simulate fast.***
@@ -713,11 +713,14 @@ ItineraryLayer.prototype.deleteSamplePoints = function ()
 		this._samplingData_vboKeysContainer = undefined;
 	}
 
-	this._samplingDataObj.posLC_floatArray = undefined;
-	this._samplingDataObj.color4_uIntArray = undefined;
-	this._samplingDataObj.valuesArray = undefined;
-	this._samplingDataObj.timesArray = undefined;
-	this._samplingDataObj.positionWCArray = undefined;
+	if(this._samplingDataObj !== undefined)
+	{
+		this._samplingDataObj.posLC_floatArray = undefined;
+		this._samplingDataObj.color4_uIntArray = undefined;
+		this._samplingDataObj.valuesArray = undefined;
+		this._samplingDataObj.timesArray = undefined;
+		this._samplingDataObj.positionWCArray = undefined;
+	}
 	this._lastSamplingTime = undefined;
 	this._lastSamplingUnixTime = undefined;
 
