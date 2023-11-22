@@ -713,7 +713,7 @@ ItineraryLayer.prototype.deleteSamplePoints = function ()
 		this._samplingData_vboKeysContainer = undefined;
 	}
 
-	if(this._samplingDataObj !== undefined)
+	if (this._samplingDataObj !== undefined)
 	{
 		this._samplingDataObj.posLC_floatArray = undefined;
 		this._samplingDataObj.color4_uIntArray = undefined;

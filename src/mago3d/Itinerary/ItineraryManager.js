@@ -207,6 +207,12 @@ ItineraryManager.prototype.sampleChemicalContamination = function (currUnixTimeM
 		return false;
 	}
 
+	var magoManager = this.magoManager;
+	if (magoManager.animationTimeController._animationState === CODE.processState.PAUSED)
+	{
+		return false;
+	}
+
 	var itisCount = this.getItineraryLayersCount();
 	if (itisCount === 0)
 	{

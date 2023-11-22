@@ -2057,7 +2057,7 @@ MagoManager.prototype._renderManagers_transparentPass = function ()
 			this.animationTimeController = new AnimationTimeController();
 		}
 
-		if (this.animationTimeController.getAnimationState() === CODE.processState.STARTED)
+		//if (this.animationTimeController.getAnimationState() === CODE.processState.STARTED)
 		{
 			// render itinerary layers.***
 			this.itineraryManager.render();

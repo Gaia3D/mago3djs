@@ -115,6 +115,11 @@ AnimationTimeController.prototype.incrementCurrentTime = function ()
 	{
 		return;
 	}
+
+	if (this._animationState === CODE.processState.PAUSED)
+	{
+		return;
+	}
 	// var currTime = new Date();
 	// var currUnixTime = currTime.getTime();
 	// var deltaTimeMilisec = currUnixTime - this._currentUnixTimeMilisec;
