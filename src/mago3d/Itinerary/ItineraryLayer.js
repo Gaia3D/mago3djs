@@ -718,6 +718,8 @@ ItineraryLayer.prototype.deleteSamplePoints = function ()
 	this._samplingDataObj.valuesArray = undefined;
 	this._samplingDataObj.timesArray = undefined;
 	this._samplingDataObj.positionWCArray = undefined;
+	this._lastSamplingTime = undefined;
+	this._lastSamplingUnixTime = undefined;
 
 };
 
