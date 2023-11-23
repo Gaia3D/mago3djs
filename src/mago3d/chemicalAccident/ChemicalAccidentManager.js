@@ -177,6 +177,7 @@ ChemicalAccidentManager.prototype._preparePollutionLayers = function (magoManage
 		return false;
 	}
 
+	// Check if exist png's blob arrayBuffers.***
 	if (this._geoJsonIndexFile.pngsBinBlockFileNames !== undefined)
 	{
 		// make map originalPngFileName_
@@ -261,35 +262,11 @@ ChemicalAccidentManager.prototype._preparePollutionLayers = function (magoManage
 		{
 			//var layer = this._geoJsonIndexFile.layers[i];
 			var options = {
-				pollutionVolumeOwner       : this, 
-				mosaicTexMetaDataFileNames : this._geoJsonIndexFile.mosaicTexMetaDataFileNames,
-				metadataFolderPath       		: timeSliceFileFolderPath,
+				pollutionVolumeOwner        : this, 
+				mosaicTexMetaDataJsonsArray : this._geoJsonIndexFile.mosaicTexMetaDataJsonArray,
+				metadataFolderPath        		: timeSliceFileFolderPath,
 			};
 			var chemAccidentLayer = this.newChemAccidentLayer(options);
-
-			// Now, check if the geoJsonIndexFile has timeSlices data embeded.***
-			/*
-			var embededTimeSlicesArray = this._geoJsonIndexFile.layers[i].timeSliceFiles; // embeded timeSlicesFiles.***
-			if (embededTimeSlicesArray !== undefined)
-			{
-				if (chemAccidentLayer._timeSlicesArray === undefined)
-				{
-					chemAccidentLayer._timeSlicesArray = [];
-				}
-
-				var timeSliceFileNamesCount = embededTimeSlicesArray.length;
-				for (var j=0; j<timeSliceFileNamesCount; j++)
-				{
-					var options = {
-					};
-					var timeSlice = new PollutionTimeSlice(options);
-					timeSlice._jsonFile = embededTimeSlicesArray[j];
-					timeSlice._fileileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-					timeSlice._isPrepared = true;
-					pollutionLayer._timeSlicesArray.push(timeSlice);
-				}
-			}
-			*/
 		}
 	}
 

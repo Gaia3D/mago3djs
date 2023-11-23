@@ -1055,19 +1055,20 @@ ChemicalAccidentLayer.prototype._prepareLayer = function ()
 		var date = new Date(year, month, day, hour, minute, second, millisecond);
 		var startUnixTimeMiliseconds = date.getTime();
 
-		var timeSliceFileNamesCount = this._mosaicTexMetaDataFileNamesArray.length;
+		var timeSliceFileNamesCount = geoJsonIndexFile.mosaicTexMetaDataJsonArray.length;
 		for (var i=0; i<timeSliceFileNamesCount; i++)
 		{
 			var timeSliceStartUnixTimeMiliseconds = startUnixTimeMiliseconds + i * timeIncrementMilisecond;
 			var timeSliceEndUnixTimeMiliseconds = timeSliceStartUnixTimeMiliseconds + timeIncrementMilisecond;
-			var filePath = this._metadataFolderPath + "\\" + this._mosaicTexMetaDataFileNamesArray[i];
 			var options = {
-				filePath                 : filePath,
 				owner                    : this,
 				startUnixTimeMiliseconds : timeSliceStartUnixTimeMiliseconds,
 				endUnixTimeMiliseconds   : timeSliceEndUnixTimeMiliseconds
 			};
 			var timeSlice = new ChemicalAccidentTimeSlice(options);
+			timeSlice._jsonFile = geoJsonIndexFile.mosaicTexMetaDataJsonArray[i];
+			timeSlice._fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+
 			this._timeSlicesArray.push(timeSlice);
 		}
 
