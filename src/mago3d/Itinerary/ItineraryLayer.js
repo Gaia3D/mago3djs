@@ -28,6 +28,7 @@ var ItineraryLayer = function(options)
 	 // sampling data. position, color, etc.***
 	 this._samplingDataObj = {};
 	 this._samplingData_vboKeysContainer;
+	 this._bRenderSampledPoints = true;
 	 
 	 this._timeScale = 2000.0; // to simulate fast.***
 	 this._lineThickness = 4.0;
@@ -125,6 +126,11 @@ ItineraryLayer.prototype.deleteObjects = function (vboMemManager)
 		this._thickLineColor = undefined;
 	}
 	
+};
+
+ItineraryLayer.prototype.setRenderSampledPoints = function (bRender)
+{
+	this._bRenderSampledPoints = bRender;
 };
 
 ItineraryLayer.prototype._prepareWalkingManTexture = function ()
@@ -941,6 +947,11 @@ ItineraryLayer.prototype.renderSampledPoints = function ()
 		this._animationStartTime = 0;
 	}
 
+	if (!this._bRenderSampledPoints)
+	{
+		return false;
+	}
+
 	var itineraryManager = this._itineraryManager;
 	var samplePointSize = itineraryManager._samplePointsSize;
 
@@ -1011,7 +1022,7 @@ ItineraryLayer.prototype.renderSampledPoints = function ()
 	// Now, render the pollution sampling data.***
 	// this._samplingDataObj.posLC_floatArray
 	// this._samplingDataObj.color4_uIntArray
-	var renderSmpledData = true;
+	var renderSmpledData = this._bRenderSampledPoints;
 	if (this._samplingDataObj === undefined)
 	{
 		renderSmpledData = false;
