@@ -33,6 +33,9 @@ var ItineraryLayer = function(options)
 	 this._lineThickness = 4.0;
 	 this._thickLineColor;
 
+	 this._walkingManMosaicTexIsPrepared = false;
+	 this._walkingManAnimatedIconFilePath = undefined;
+
 	 if (options !== undefined)
 	 {
 		if (options.filePath)
@@ -56,6 +59,11 @@ var ItineraryLayer = function(options)
 		if (options.thickLineColor)
 		{
 			this._thickLineColor = new Color(options.thickLineColor.r, options.thickLineColor.g, options.thickLineColor.b, options.thickLineColor.a);
+		}
+
+		if (options.animatedIconFilePath)
+		{
+			this._walkingManAnimatedIconFilePath = options.animatedIconFilePath;
 		}
 	 }
 };
@@ -117,6 +125,43 @@ ItineraryLayer.prototype.deleteObjects = function (vboMemManager)
 		this._thickLineColor = undefined;
 	}
 	
+};
+
+ItineraryLayer.prototype._prepareWalkingManTexture = function ()
+{
+	if (this._walkingManMosaicTexIsPrepared)
+	{
+		return true;
+	}
+
+	if (this._walkingManAnimatedIconFilePath === undefined)
+	{
+		return false;
+	}
+
+	// 1rst, check if the texture is loaded.***
+	if (this._walkingManAnimatedIcon === undefined)
+	{
+		this._walkingManAnimatedIcon = new AnimatedIcon();
+		this._walkingManAnimatedIcon._mosaicTexture = new Texture();
+	}
+
+	if (this._walkingManAnimatedIcon._mosaicTexture.fileLoadState === CODE.fileLoadState.READY)
+	{
+		this._walkingManAnimatedIcon._filePath = this._walkingManAnimatedIconFilePath;
+		var flip_y_texCoord = false;
+		TexturesManager.loadTexture(this._walkingManAnimatedIcon._filePath, this._walkingManAnimatedIcon._mosaicTexture, this._itineraryManager.magoManager, flip_y_texCoord);
+
+		return false;
+	}
+
+	if (this._walkingManAnimatedIcon._mosaicTexture.fileLoadState === CODE.fileLoadState.BINDING_FINISHED)
+	{
+		// the mosaic texture is prepared.***
+		this._walkingManMosaicTexIsPrepared = true;
+	}
+
+	return this._walkingManMosaicTexIsPrepared;
 };
 
 ItineraryLayer.prototype._prepare = function ()
@@ -269,6 +314,15 @@ ItineraryLayer.prototype._prepare = function ()
 		var mosaicTexPath = "";
 	}
 
+	// check if exist own walkingMan texture.***
+	if (this._walkingManAnimatedIconFilePath !== undefined)
+	{
+		if (!this._prepareWalkingManTexture())
+		{
+			return false;
+		}
+	}
+
 	this._isPrepared = true;
 	return this._isPrepared;
 };
@@ -280,6 +334,7 @@ ItineraryLayer.prototype.render = function (thickLineShader, bRenderThickLine)
 	{
 		return false;
 	}
+
 	if (bRenderThickLine)
 	{
 		var magoManager = this._itineraryManager.magoManager;

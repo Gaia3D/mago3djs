@@ -389,6 +389,12 @@ ItineraryManager.prototype.render = function ()
 		var itiLayer = this.getItineraryLayer(i);
 		var currentTexture = this._walkingManAnimatedIcon._mosaicTexture;
 
+		// check if itineary has own walkingMan texture.***
+		if (itiLayer._walkingManAnimatedIcon !== undefined)
+		{
+			currentTexture = itiLayer._walkingManAnimatedIcon._mosaicTexture;
+		}
+
 		gl.uniform2fv(shader.scale2d_loc, new Float32Array([1.0, 1.0]));
 		/*
 		if (selectionManager.isObjectSelected(objMarker))
