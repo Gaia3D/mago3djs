@@ -281,6 +281,10 @@ ItineraryManager.prototype.render = function ()
 	for (var i=0; i<itisCount; i++)
 	{
 		var itiLayer = this.getItineraryLayer(i);
+		if (itiLayer._layerShow === false)
+		{
+			continue;
+		}
 		if (!itiLayer.render(thickLineShader, this._renderThickLine))
 		{
 			itineraryLayersPrepared = false;
@@ -313,6 +317,10 @@ ItineraryManager.prototype.render = function ()
 	for (var i=0; i<itisCount; i++)
 	{
 		var itiLayer = this.getItineraryLayer(i);
+		if (itiLayer._layerShow === false)
+		{
+			continue;
+		}
 		itiLayer.renderSampledPoints(); // here renders sampling points data.***
 	}
 	
@@ -387,6 +395,10 @@ ItineraryManager.prototype.render = function ()
 	for (var i=0; i<itisCount; i++)
 	{
 		var itiLayer = this.getItineraryLayer(i);
+		if (itiLayer._layerShow === false)
+		{
+			continue;
+		}
 		var currentTexture = this._walkingManAnimatedIcon._mosaicTexture;
 
 		// check if itineary has own walkingMan texture.***

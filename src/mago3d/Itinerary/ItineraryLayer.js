@@ -25,6 +25,8 @@ var ItineraryLayer = function(options)
 
 	 this._WM_vboKeysContainer;
 
+	 this._layerShow = true;
+
 	 // sampling data. position, color, etc.***
 	 this._samplingDataObj = {};
 	 this._samplingData_vboKeysContainer;
@@ -131,6 +133,11 @@ ItineraryLayer.prototype.deleteObjects = function (vboMemManager)
 ItineraryLayer.prototype.setRenderSampledPoints = function (bRender)
 {
 	this._bRenderSampledPoints = bRender;
+};
+
+ItineraryLayer.prototype.setLayerShow = function (bShow)
+{
+	this._layerShow = bShow;
 };
 
 ItineraryLayer.prototype._prepareWalkingManTexture = function ()
