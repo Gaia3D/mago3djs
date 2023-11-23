@@ -12,6 +12,7 @@ precision highp float;
 
 uniform bool bUseLogarithmicDepth;
 uniform bool bUseMultiRenderTarget;
+uniform bool bUseOutline;
 uniform int uFrustumIdx;
 varying vec4 vColor;
 varying float flogz;
@@ -50,8 +51,16 @@ void main() {
 		{
 			factor = (vOrder - 0.7) / (0.3);
 		}
-		vec4 outLineCol = vec4(0.0, 0.0, 0.0, 1.0);
-		finalCol4 = mix(vColor, outLineCol, factor);
+
+		if(bUseOutline)
+		{
+			vec4 outLineCol = vec4(0.0, 0.0, 0.0, 1.0);
+			finalCol4 = mix(vColor, outLineCol, factor);
+		}
+		else
+		{
+			finalCol4 = vColor;
+		}
 		
 	}
 

@@ -17868,6 +17868,7 @@ ShaderSource.thickLineFS = "precision highp float;\n\
 \n\
 uniform bool bUseLogarithmicDepth;\n\
 uniform bool bUseMultiRenderTarget;\n\
+uniform bool bUseOutline;\n\
 uniform int uFrustumIdx;\n\
 varying vec4 vColor;\n\
 varying float flogz;\n\
@@ -17906,8 +17907,16 @@ void main() {\n\
 		{\n\
 			factor = (vOrder - 0.7) / (0.3);\n\
 		}\n\
-		vec4 outLineCol = vec4(0.0, 0.0, 0.0, 1.0);\n\
-		finalCol4 = mix(vColor, outLineCol, factor);\n\
+\n\
+		if(bUseOutline)\n\
+		{\n\
+			vec4 outLineCol = vec4(0.0, 0.0, 0.0, 1.0);\n\
+			finalCol4 = mix(vColor, outLineCol, factor);\n\
+		}\n\
+		else\n\
+		{\n\
+			finalCol4 = vColor;\n\
+		}\n\
 		\n\
 	}\n\
 \n\
