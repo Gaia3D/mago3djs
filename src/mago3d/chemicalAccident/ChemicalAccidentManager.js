@@ -97,6 +97,26 @@ ChemicalAccidentManager.prototype._loadGeoJsonIndexFile = function ()
 	}
 };
 
+ChemicalAccidentManager.prototype._loadPngsBinaryBlockData = function (pngsBinBlock, folderPath)
+{
+	// var pngsBinBlock = {
+	// 	fileName : pngsBinBlockFileName,
+	// 	dataArraybuffer : undefined,
+	// 	fileLoadState : CODE.fileLoadState.READY
+	// };
+	if (pngsBinBlock.fileLoadState === CODE.fileLoadState.READY)
+	{
+		pngsBinBlock.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+		var that = pngsBinBlock;
+		var filePath = folderPath + "\\" + pngsBinBlock.fileName;
+		loadWithXhr(filePath).done(function(res) 
+		{
+			that.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			that.dataArraybuffer = res;
+		});
+	}
+};
+
 ChemicalAccidentManager.prototype._preparePollutionGeoJsonIndexFile = function ()
 {
 	if (this._geoJsonIndexFileLoadState === CODE.fileLoadState.READY)
@@ -112,11 +132,115 @@ ChemicalAccidentManager.prototype._preparePollutionGeoJsonIndexFile = function (
 	return true;
 };
 
+ChemicalAccidentManager.prototype.getBlobArrayBuffer = function (mosaicFileName)
+{
+	if (this.map_pngOriginalFileName_pngsBinData === undefined)
+	{
+		return undefined;
+	}
+
+
+	var pngsBinData = this.map_pngOriginalFileName_pngsBinData[mosaicFileName];
+	if (pngsBinData === undefined)
+	{
+		return undefined;
+	}
+
+	var pngsBinBlocksCount = this.pngsBinBlocksArray.length;
+	for (var i=0; i<pngsBinBlocksCount; i++)
+	{
+		var pngsBinBlock = this.pngsBinBlocksArray[i];
+		if (pngsBinBlock.fileName === pngsBinData.pngsBinaryBlockDataFileName)
+		{
+			var startIdx = pngsBinData.startByteIndex;
+			var endIdx = pngsBinData.endByteIndex;
+			var pngsBinBlockData = pngsBinBlock.dataArraybuffer;
+			var pngsBinBlockDataCopy = pngsBinBlockData.slice(startIdx, endIdx);
+			return pngsBinBlockDataCopy;
+		}
+	}
+	
+	return undefined;
+	
+};
+
 ChemicalAccidentManager.prototype._preparePollutionLayers = function (magoManager)
 {
 	if (this._allLayersArePrepared === true)
 	{
 		return true;
+	}
+
+	// 1rst, check if exist pngsBinaryBlocks.***
+	if (this._geoJsonIndexFile === undefined)
+	{
+		return false;
+	}
+
+	if (this._geoJsonIndexFile.pngsBinBlockFileNames !== undefined)
+	{
+		// make map originalPngFileName_
+		var pngsBinBlockFileNames = this._geoJsonIndexFile.pngsBinBlockFileNames;
+		var pngsBinBlockFileNamesCount = pngsBinBlockFileNames.length;
+
+		if (this.pngsBinBlocksArray === undefined)
+		{
+			this.pngsBinBlocksArray = [];
+
+			for (var i=0; i<pngsBinBlockFileNamesCount; i++)
+			{
+				var pngsBinBlockFileName = pngsBinBlockFileNames[i];
+				var pngsBinBlock = {
+					fileName        : pngsBinBlockFileName.fileName,
+					dataArraybuffer : undefined,
+					fileLoadState   : CODE.fileLoadState.READY
+				};
+				this.pngsBinBlocksArray.push(pngsBinBlock);
+			}
+
+		}
+
+		// Now, check if all pngsBinBlocks are loaded.***
+		var allPngsBinBlocksLoaded = true;
+		var loadRequestsCount = 0;
+		for (var i=0; i<pngsBinBlockFileNamesCount; i++)
+		{
+			var pngsBinBlock = this.pngsBinBlocksArray[i];
+			if (pngsBinBlock.fileLoadState === CODE.fileLoadState.READY)
+			{
+				this._loadPngsBinaryBlockData(pngsBinBlock, this._geoJsonIndexFileFolderPath);
+				loadRequestsCount += 1;
+			}
+			else if (pngsBinBlock.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
+			{
+				loadRequestsCount += 1;
+				allPngsBinBlocksLoaded = false;
+			}
+
+			if (loadRequestsCount > 0)
+			{
+				return false;
+			}
+		}	
+		
+		if (!allPngsBinBlocksLoaded)
+		{
+			return false;
+		}
+
+		// make a map key = originalPngFileName, value = pngsBinBlock.***
+		if (this.map_pngOriginalFileName_pngsBinData === undefined)
+		{
+			this.map_pngOriginalFileName_pngsBinData = {};
+			var originalPngFileNamesCount = this._geoJsonIndexFile.pngsBinDataArray.length;
+			for (var i=0; i<originalPngFileNamesCount; i++)
+			{
+				var pngsBinData = this._geoJsonIndexFile.pngsBinDataArray[i];
+				this.map_pngOriginalFileName_pngsBinData[pngsBinData.originalPngFileName] = pngsBinData;
+			}
+
+		}
+
 	}
 
 	// Check if layers exist.***
@@ -220,6 +344,8 @@ ChemicalAccidentManager.prototype.prepareVolume = function (magoManager)
 	}
 
 	this.volumePrepared = true;
+
+	this.pngsBinBlocksArray = undefined; // free memory.***
 
 	return false;
 };

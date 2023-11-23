@@ -98,8 +98,9 @@ ChemicalAccidentTimeSlice.loadTexture = function (imagePath, texture, magoManage
 	imageToLoad.src = imagePath;
 };
 
-ChemicalAccidentTimeSlice.prototype._prepare = function ()
+ChemicalAccidentTimeSlice.prototype._prepare = function (chemAccidentLayer)
 {
+	// chemAccidentLayer = owner.***
 	if (this._isPrepared)
 	{
 		return true;
@@ -153,15 +154,56 @@ ChemicalAccidentTimeSlice.prototype._prepare = function ()
 		this._texture2dAux.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 		var that = this;
 		var mosaicTextureFolderPath = this.owner.chemicalAccidentManager._geoJsonIndexFileFolderPath;
-		var mosaicTextureFilePath = mosaicTextureFolderPath + "\\" + this._jsonFile.mosaicTextureFileName;
+		var mosaicTextureFileName = this._jsonFile.mosaicTextureFileName;
+		var mosaicTextureFilePath = mosaicTextureFolderPath + "\\" + mosaicTextureFileName;
 		var flip_y_texCoord = false;
 
 		var byteDataArray = this._jsonFile.byteData; // embeded data.***
 		var mosaicTexWidth = this._jsonFile.width;
 		var mosaicTexHeight = this._jsonFile.height;
 
+		// check if exist blob data.***
+		var chemAccidentManager = chemAccidentLayer.chemicalAccidentManager;
+		var blobArrayBuffer = chemAccidentManager.getBlobArrayBuffer(mosaicTextureFileName);
+		var blob = new Blob([blobArrayBuffer], { type: "image/png" });
+
+		if (blob !== undefined)
+		{
+			var img = new Image();
+			img.src = URL.createObjectURL(blob);
+			var texture = this._texture2dAux;
+			img.onload = function() 
+			{
+				var gl = chemAccidentManager.magoManager.getGl();
+		
+				if (texture.texId !== undefined && texture.texId !== null) 
+				{ 
+					gl.deleteTexture(texture.texId);
+				}
+				
+				if (flip_y_texCoord === undefined)
+				{ flip_y_texCoord = false; }
+				
+				texture.imageWidth = img.width;
+				texture.imageHeight = img.height;
+
+				var texWrap = gl.CLAMP_TO_EDGE;
+				var filter = gl.NEAREST;
+				var bPremultiplyAlphaWebgl = false;
+
+				texture.texId = Texture.createTexture(gl, filter, img, texture.imageWidth, texture.imageHeight, texWrap, bPremultiplyAlphaWebgl);
+				texture.fileLoadState = CODE.fileLoadState.BINDING_FINISHED;
+
+			};
+			
+			img.onerror = function() 
+			{
+				this._texture2dAux.fileLoadState = CODE.fileLoadState.LOAD_FAILED;
+			};
+		}
+
 		// check if exist embeded data.***
-		if (byteDataArray === undefined)
+		else if (byteDataArray === undefined)
 		{
 			// load the mosaicTexture from file.***
 			ChemicalAccidentTimeSlice.loadTexture(mosaicTextureFilePath, this._texture2dAux, this.owner.chemicalAccidentManager.magoManager, flip_y_texCoord);
@@ -1039,7 +1081,7 @@ ChemicalAccidentLayer.prototype._prepareLayer = function ()
 	for (var i=0; i<timeSlicesCount; i++)
 	{
 		var timeSlice = this._timeSlicesArray[i];
-		if (!timeSlice._prepare())
+		if (!timeSlice._prepare(this))
 		{
 			isPrepared = false;
 			counterAux++;
