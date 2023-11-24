@@ -3,7 +3,7 @@
 /**
  * @class ItineraryLayer
  */
-var ItineraryLayer = function(options) 
+var ItineraryLayer = function (options) 
 {
 	 if (!(this instanceof ItineraryLayer)) 
 	 {
@@ -31,10 +31,12 @@ var ItineraryLayer = function(options)
 	 this._samplingDataObj = {};
 	 this._samplingData_vboKeysContainer;
 	 this._bRenderSampledPoints = true;
+	 this._sampledPointsDepthTest = true;
 	 
 	 this._timeScale = 2000.0; // to simulate fast.***
 	 this._lineThickness = 4.0;
 	 this._thickLineColor;
+	 this._thisckLineDepthTest = true;
 
 	 this._walkingManMosaicTexIsPrepared = false;
 	 this._walkingManAnimatedIconFilePath = undefined;
@@ -67,6 +69,16 @@ var ItineraryLayer = function(options)
 		if (options.animatedIconFilePath)
 		{
 			this._walkingManAnimatedIconFilePath = options.animatedIconFilePath;
+		}
+
+		if (options.thickLineDepthTest !== undefined)
+		{
+			this._thisckLineDepthTest = options.thickLineDepthTest;
+		}
+
+		if (options.sampledPointsDepthTest !== undefined)
+		{
+			this._sampledPointsDepthTest = options.sampledPointsDepthTest;
 		}
 	 }
 };
@@ -138,6 +150,31 @@ ItineraryLayer.prototype.setRenderSampledPoints = function (bRender)
 ItineraryLayer.prototype.setLayerShow = function (bShow)
 {
 	this._layerShow = bShow;
+};
+
+ItineraryLayer.prototype.getLayerShow = function ()
+{
+	return this._layerShow;
+};
+
+ItineraryLayer.prototype.setThickLineDepthTest = function (bDepthTest)
+{
+	this._thisckLineDepthTest = bDepthTest;
+};
+
+ItineraryLayer.prototype.setSampledPointsDepthTest = function (bDepthTest)
+{
+	this._sampledPointsDepthTest = bDepthTest;
+};
+
+ItineraryLayer.prototype.getThickLineDepthTest = function ()
+{
+	return this._thisckLineDepthTest;
+};
+
+ItineraryLayer.prototype.getSampledPointsDepthTest = function ()
+{
+	return this._sampledPointsDepthTest;
 };
 
 ItineraryLayer.prototype._prepareWalkingManTexture = function ()
@@ -363,7 +400,16 @@ ItineraryLayer.prototype.render = function (thickLineShader, bRenderThickLine)
 
 		var geoLocData = streamLine.geoLocDataManager.getCurrentGeoLocationData();
 		geoLocData.bindGeoLocationUniforms(gl, thickLineShader);
+		if (this._thisckLineDepthTest)
+		{
+			gl.enable(gl.DEPTH_TEST);
+		}
+		else
+		{
+			gl.disable(gl.DEPTH_TEST);
+		}
 		streamLine.render(magoManager, thickLineShader, renderType);
+		gl.enable(gl.DEPTH_TEST); // return to default.***
 	}
 	
 	return true;
@@ -1062,13 +1108,23 @@ ItineraryLayer.prototype.renderSampledPoints = function ()
 			gl.uniform1i(shaderLocal.bUse1Color_loc, false);
 		}
 
-		gl.depthRange(0.0, 0.1);
+		//gl.depthRange(0.0, 0.1);
+		if (this._sampledPointsDepthTest)
+		{
+			gl.enable(gl.DEPTH_TEST);
+		}
+		else
+		{
+			gl.disable(gl.DEPTH_TEST);
+		}
 
 		gl.drawArrays(gl.POINTS, 0, samplingVbo.vertexCount);
+		gl.enable(gl.DEPTH_TEST); // return to default.***
 	}
 
 	// return gl settings.***
-	gl.depthRange(0.0, 1.0);
+	//gl.depthRange(0.0, 1.0);
+	
 	
 	// return the current shader.
 	//magoManager.postFxShadersManager.useProgram(shader);
