@@ -21,6 +21,10 @@ var AirPollutionTimeSlice = function(options)
 	 this._texture3dCreated = false;
 	 this._texture3d;
 	 this._mosaicTexture; // note : the mosaicTexture is a Texture3D too.***
+	 this._mosaicTexFilePath;
+
+	 this._startUnixTimeMiliseconds;
+	 this._endUnixTimeMiliseconds;
 
 	 if (options !== undefined)
 	 {
@@ -32,6 +36,21 @@ var AirPollutionTimeSlice = function(options)
 		if (options.owner)
 		{
 			this.owner = options.owner;
+		}
+
+		if (options.mosaicTexFilePath)
+		{
+			this._mosaicTexFilePath = options.mosaicTexFilePath;
+		}
+
+		if (options.startUnixTimeMiliseconds !== undefined)
+		{
+			this._startUnixTimeMiliseconds = options.startUnixTimeMiliseconds;
+		}
+
+		if (options.endUnixTimeMiliseconds !== undefined)
+		{
+			this._endUnixTimeMiliseconds = options.endUnixTimeMiliseconds;
 		}
 	 }
 };
@@ -53,7 +72,7 @@ AirPollutionTimeSlice.prototype._prepare = function ()
 	{
 		this._texture.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 		var that = this;
-		TexturesManager.loadTexture(this._filePath, this._texture, this.owner.airPollutionManager.magoManager, false);
+		TexturesManager.loadTexture(this._mosaicTexFilePath, this._texture, this.owner.airPollutionManager.magoManager, false);
 		//loadWithXhr(this._filePath, undefined, undefined, 'json', 'GET').done(function(res) 
 		//{
 		//	that._texture = CODE.fileLoadState.LOADING_FINISHED;
@@ -64,6 +83,29 @@ AirPollutionTimeSlice.prototype._prepare = function ()
 	if (this._texture.fileLoadState !== CODE.fileLoadState.BINDING_FINISHED)
 	{
 		return false;
+	}
+
+	if (this.uMinMaxAltitudeSlices === undefined)
+	{
+		this.uMinMaxAltitudeSlices = new Float32Array(2 * 32); // 32 is the max slices count.***
+
+		// make the minmaxAltitudeSlices.***
+		// hardcoding. there are 7 levels : 0, 10, 20, 30, 60, 100, 200.***
+		this.uMinMaxAltitudeSlices[0] = 0.0; // hardcoding
+		this.uMinMaxAltitudeSlices[1] = 10.0;// hardcoding
+		this.uMinMaxAltitudeSlices[2] = 10.0;// hardcoding
+		this.uMinMaxAltitudeSlices[3] = 20.0;// hardcoding
+		this.uMinMaxAltitudeSlices[4] = 20.0;// hardcoding
+		this.uMinMaxAltitudeSlices[5] = 30.0;// hardcoding
+		this.uMinMaxAltitudeSlices[6] = 30.0;// hardcoding
+		this.uMinMaxAltitudeSlices[7] = 60.0;// hardcoding
+		this.uMinMaxAltitudeSlices[8] = 60.0;// hardcoding
+		this.uMinMaxAltitudeSlices[9] = 100.0;// hardcoding
+		this.uMinMaxAltitudeSlices[10] = 100.0;// hardcoding
+		this.uMinMaxAltitudeSlices[11] = 200.0;// hardcoding
+		this.uMinMaxAltitudeSlices[12] = 200.0;// hardcoding
+		this.uMinMaxAltitudeSlices[13] = 400.0;// hardcoding
+
 	}
 
 	this._isPrepared = true;
@@ -78,20 +120,23 @@ AirPollutionTimeSlice.prototype._makeTextures = function (gl, minmaxPollutionVal
 		this._texture3d = new MagoTexture3D();
 		this._mosaicTexture = new MagoTexture3D();
 
-		var slicesCount = 3; // test hardcoding.***
+		this._mosaicTexture.texturesArray.push(this._texture.texId);
+		this._texture.texId = undefined;
+		this._mosaicTexture.fileLoadState = CODE.fileLoadState.BINDING_FINISHED;
 
-		var texWidth = this.owner.airPollutionManager._geoJsonIndexFile.layers[0].textureWidth;
-		var texHeight = this.owner.airPollutionManager._geoJsonIndexFile.layers[0].textureHeight;
+		var slicesCount = 7; // test hardcoding.***
+		var geoJsonIndexFile = this.owner.airPollutionManager._geoJsonIndexFile;
+		var texWidth = geoJsonIndexFile.layers[0].textureWidth;
+		var texHeight = geoJsonIndexFile.layers[0].textureHeight;
+		var mosaicXCount = geoJsonIndexFile.mosaicColumnsCount;
+		var mosaicYCount = geoJsonIndexFile.mosaicRowsCount;
 
 		// set texture3d params.***
 		this._texture3d.texture3DXSize = texWidth;
 		this._texture3d.texture3DYSize = texHeight;
-		this._texture3d.texture3DZSize = slicesCount; // test HARDCODING.***
+		this._texture3d.texture3DZSize = slicesCount;
 
-		// The 3D texture into a mosaic texture matrix params.***
-		var result = Voxelizer.getMosaicColumnsAndRows(this._texture3d.texture3DXSize, this._texture3d.texture3DYSize, this._texture3d.texture3DZSize);
-		var mosaicXCount = result.numColumns;
-		var mosaicYCount = result.numRows;
+		
 		this._mosaicTexture.mosaicXCount = mosaicXCount;
 		this._mosaicTexture.mosaicYCount = mosaicYCount;
 		this._mosaicTexture.texture3DXSize = texWidth;
@@ -99,43 +144,7 @@ AirPollutionTimeSlice.prototype._makeTextures = function (gl, minmaxPollutionVal
 		this._mosaicTexture.texture3DZSize = slicesCount; // slices count = 1.***
 		this._mosaicTexture.finalTextureXSize = this._mosaicTexture.mosaicXCount * this._texture3d.texture3DXSize;
 		this._mosaicTexture.finalTextureYSize = this._mosaicTexture.mosaicYCount * this._texture3d.texture3DYSize;
-		this._mosaicTexture.createTextures(gl);
 
-		// Now, create the textures using the data of jsonFile.***
-		// Must transform textureData(array) to Uint8Array type data.***
-		//var minValue = this._jsonFile.minValue;
-		//var maxValue = this._jsonFile.maxValue;
-		var minValueTotal = minmaxPollutionValues[0];
-		var maxValueTotal = minmaxPollutionValues[1];
-
-		//var dataLength = this._jsonFile.values.length;
-		//for (var i=0; i<dataLength; i++)
-		//{
-		//	var value = this._jsonFile.values[i];
-		//	var realValue = value * (maxValue - minValue) + minValue;
-		//
-		//	var quantizedValue = (realValue - minValueTotal) / (maxValueTotal - minValueTotal);
-		//	//var encodedRgba = ManagerUtils.packDepth(value);
-		//
-		//	this._jsonFile.values[i] = quantizedValue;
-		//}
-
-		//var textureData = ChemicalAccidentTimeSlice.getUint8ArrayRGBAFromArrayBuffer(this._jsonFile.values);
-
-		
-		// Do hard coding for test.***
-		// test : use "textureData" for all slices.***
-		var texSlicesCount = this._texture3d.texture3DZSize;
-		for (var i=0; i<texSlicesCount; i++)
-		{
-			//this._texture3d.createTexture(gl, i, textureData);
-			this._texture3d.texturesArray.push(this._texture.texId);
-		}
-		//----------------------------------------------------------
-
-		// Now, make the mosaicTexture.***
-		var magoManager = this.owner.airPollutionManager.magoManager;
-		this._mosaicTexture = Voxelizer.prototype.makeMosaicTexture3DFromRealTexture3D(magoManager, this._texture3d, this._mosaicTexture);
 
 		this._texture3dCreated = true;
 	}
@@ -170,6 +179,7 @@ var AirPollutionLayer = function(options)
 	this._totalAnimTime;
 	this._increTime;
 
+	this.timeSeries;
 	this._timeSlicesArray;
 
 	this._isPrepared = false;
@@ -186,6 +196,11 @@ var AirPollutionLayer = function(options)
 		if (options.airPollutionManager)
 		{
 			this.airPollutionManager = options.airPollutionManager;
+		}
+
+		if (options.timeSeries)
+		{
+			this.timeSeries = options.timeSeries;
 		}
 
 		if (options.altitude !== undefined)
@@ -442,6 +457,23 @@ AirPollutionLayer.prototype._renderDepthVolume = function ()
 	*/
 };
 
+AirPollutionLayer.prototype.getTimeSliceIdxByCurrentUnixTimeMiliseconds = function (currUnixTimeMiliseconds)
+{
+	var timeSlicesCount = this._timeSlicesArray.length;
+	var timeSliceIdx = -1;
+	for (var i=0; i<timeSlicesCount; i++)
+	{
+		var timeSlice = this._timeSlicesArray[i];
+		if (currUnixTimeMiliseconds >= timeSlice._startUnixTimeMiliseconds && currUnixTimeMiliseconds <= timeSlice._endUnixTimeMiliseconds)
+		{
+			timeSliceIdx = i;
+			break;
+		}
+	}
+
+	return timeSliceIdx;
+};
+
 AirPollutionLayer.prototype.render = function ()
 {
 	// render the depthBox.***
@@ -451,16 +483,21 @@ AirPollutionLayer.prototype.render = function ()
 	}
 
 	var magoManager = this.airPollutionManager.magoManager;
+	var animTimeController = magoManager.animationTimeController;
+	var gl = magoManager.getGl();
+
+	var texIdxCurr = this.getTimeSliceIdxByCurrentUnixTimeMiliseconds(animTimeController._currentUnixTimeMilisec);
 
 	// animation time control.***
 	var timeSlicesCount = this._timeSlicesArray.length;
-	var totalAnimTime = this.airPollutionManager._totalAnimTime; 
-	var increTime = this.airPollutionManager._increTime;
+	// var totalAnimTime = this.airPollutionManager._totalAnimTime; 
+	// var increTime = this.airPollutionManager._increTime;
 
-	var timeFactor = increTime / totalAnimTime;
-	var f = timeFactor * timeSlicesCount;
-	var ffract = f - Math.floor(f); // this is the interpolation factor between currTex & nexTex.***
-	var texIdxCurr = Math.floor(f);
+	// var timeFactor = increTime / totalAnimTime;
+	// var f = timeFactor * timeSlicesCount;
+	// var ffract = f - Math.floor(f); // this is the interpolation factor between currTex & nexTex.***
+	// var texIdxCurr = Math.floor(f);
+	var ffract = 0.5;
 	var texIdxNext = texIdxCurr + 1;
 	if (texIdxNext >= timeSlicesCount)
 	{
@@ -477,6 +514,8 @@ AirPollutionLayer.prototype.render = function ()
 	}
 
 	this.testCurrIdx = texIdxCurr;
+
+	//this.testCurrIdx = 50;
 
 	//if (texIdxCurr >= timeSlicesCount)
 	////{
@@ -545,7 +584,7 @@ AirPollutionLayer.prototype.render = function ()
 	gl.enable(gl.DEPTH_TEST);
 
 	
-	var testTimeSlice = this._timeSlicesArray[texIdxCurr];
+	var testTimeSlice = this._timeSlicesArray[this.testCurrIdx];
 	var refTex3D = testTimeSlice._mosaicTexture; // a reference texture3D, to take parameters for the shader.***
 
 	// bind uniforms.***
@@ -580,8 +619,7 @@ AirPollutionLayer.prototype.render = function ()
 	var bboxLC = this.simulationBox.getBoundingBoxLC();
 	gl.uniform3fv(shader.u_simulBoxMinPosLC_loc, [bboxLC.minX, bboxLC.minY, bboxLC.minZ]);
 	gl.uniform3fv(shader.u_simulBoxMaxPosLC_loc, [bboxLC.maxX, bboxLC.maxY, bboxLC.maxZ]);// 
-
-	gl.uniform1f(shader.u_interpolationFactor_loc, ffract); // Interpolation factor.***
+	
 	
 	// bind textures.***
 	gl.activeTexture(gl.TEXTURE0);
@@ -592,8 +630,11 @@ AirPollutionLayer.prototype.render = function ()
 	gl.bindTexture(gl.TEXTURE_2D, this.simulBoxDoubleNormalTex); 
 
 	// provisionally take the 1rst timeSlice.***
-	var testTimeSlice = this._timeSlicesArray[texIdxCurr];
+	var testTimeSlice = this._timeSlicesArray[this.testCurrIdx];
 	var timeSliceNext = this._timeSlicesArray[texIdxNext];
+
+	// uMinMaxAltitudeSlices is a vec2 array.***
+	gl.uniform2fv(shader.uMinMaxAltitudeSlices_loc, testTimeSlice.uMinMaxAltitudeSlices);
 
 	// Test rendering only 1 slice.******************************************************
 	//var testTimeSlice = this._timeSlicesArray[8];
@@ -662,14 +703,71 @@ AirPollutionLayer.prototype._prepareLayer = function ()
 
 	if (this._timeSlicesArray.length === 0)
 	{
-		// start to load files.***
-		var timeSliceFileNamesCount = this.timeSliceFileNames.length;
-		for (var i=0; i<timeSliceFileNamesCount; i++)
+		// // start to load files.***
+		// var geoJsonIndexFile = this.chemicalAccidentManager._geoJsonIndexFile;
+		// var year = geoJsonIndexFile.year;
+		// var month = geoJsonIndexFile.month - 1; // month is 0 to 11.***
+		// var day = geoJsonIndexFile.day;
+		// var hour = geoJsonIndexFile.hour;
+		// var minute = geoJsonIndexFile.minute;
+		// var second = geoJsonIndexFile.second;
+		// var millisecond = geoJsonIndexFile.millisecond;
+
+		// var timeIncrementMilisecond = 0;
+		// var timeInterval = geoJsonIndexFile.timeInterval;
+		// var timeIntervalUnits = geoJsonIndexFile.timeIntervalUnits;
+
+		// if (timeIntervalUnits === "minutes" || timeIntervalUnits === "minute")
+		// {
+		// 	timeIncrementMilisecond = timeInterval * 60 * 1000;
+		// }
+
+		// var date = new Date(year, month, day, hour, minute, second, millisecond);
+		// var startUnixTimeMiliseconds = date.getTime();
+
+		// var timeSliceFileNamesCount = geoJsonIndexFile.mosaicTexMetaDataJsonArray.length;
+		// for (var i=0; i<timeSliceFileNamesCount; i++)
+		// {
+		// 	var timeSliceStartUnixTimeMiliseconds = startUnixTimeMiliseconds + i * timeIncrementMilisecond;
+		// 	var timeSliceEndUnixTimeMiliseconds = timeSliceStartUnixTimeMiliseconds + timeIncrementMilisecond;
+		// 	var options = {
+		// 		owner                    : this,
+		// 		startUnixTimeMiliseconds : timeSliceStartUnixTimeMiliseconds,
+		// 		endUnixTimeMiliseconds   : timeSliceEndUnixTimeMiliseconds
+		// 	};
+		// 	var timeSlice = new ChemicalAccidentTimeSlice(options);
+		// 	timeSlice._jsonFile = geoJsonIndexFile.mosaicTexMetaDataJsonArray[i];
+		// 	timeSlice._fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+
+		// 	this._timeSlicesArray.push(timeSlice);
+		// }
+
+		var geoJsonIndexFile = this.airPollutionManager._geoJsonIndexFile;
+		var year = geoJsonIndexFile.year;
+		var month = geoJsonIndexFile.month - 1; // month is 0 to 11.***
+		var day = geoJsonIndexFile.day;
+		var hour = geoJsonIndexFile.hour;
+		var minute = geoJsonIndexFile.minute;
+		var second = geoJsonIndexFile.second;
+		var millisecond = 0;
+
+		var timeIncrementMilisecond = 24 * 60 * 60 * 1000; // 1 day.***
+		var date = new Date(year, month, day, hour, minute, second, millisecond);
+		var startUnixTimeMiliseconds = date.getTime();
+
+
+		var timeSeriesCount = this.timeSeries.length;
+		for (var i=0; i<timeSeriesCount; i++)
 		{
-			var filePath = this.timeSliceFileFolderPath + "\\" + this.timeSliceFileNames[i];
+			var timeSliceStartUnixTimeMiliseconds = startUnixTimeMiliseconds + i * timeIncrementMilisecond;
+		 	var timeSliceEndUnixTimeMiliseconds = timeSliceStartUnixTimeMiliseconds + timeIncrementMilisecond;
+			var timeSerie = this.timeSeries[i];
+			var mosaicTexFilePath = this.timeSliceFileFolderPath + "\\" + timeSerie.mosaicTexFileName;
 			var options = {
-				filePath : filePath,
-				owner    : this
+				mosaicTexFilePath        : mosaicTexFilePath,
+				owner                    : this,
+				startUnixTimeMiliseconds : timeSliceStartUnixTimeMiliseconds,
+				endUnixTimeMiliseconds   : timeSliceEndUnixTimeMiliseconds
 			};
 			var timeSlice = new AirPollutionTimeSlice(options);
 			this._timeSlicesArray.push(timeSlice);

@@ -127,7 +127,6 @@ AirPollutionManager.prototype.createDefaultShaders = function ()
 	shader.simulationBoxDoubleDepthTex_loc = gl.getUniformLocation(shader.program, "simulationBoxDoubleDepthTex");
 	shader.simulationBoxDoubleNormalTex_loc = gl.getUniformLocation(shader.program, "simulationBoxDoubleNormalTex");
 	shader.pollutionMosaicTex_loc = gl.getUniformLocation(shader.program, "pollutionMosaicTex");
-	shader.pollutionMosaicTex_next_loc = gl.getUniformLocation(shader.program, "pollutionMosaicTex_next");
 	shader.sceneDepthTex_loc = gl.getUniformLocation(shader.program, "sceneDepthTex"); // scene depth tex.***
 	shader.sceneNormalTex_loc = gl.getUniformLocation(shader.program, "sceneNormalTex"); // scene normal tex.***
 	//shader.airVelocityTex_loc = gl.getUniformLocation(shader.program, "airVelocityTex");
@@ -154,7 +153,7 @@ AirPollutionManager.prototype.createDefaultShaders = function ()
 	shader.u_simulBoxPosLow_loc = gl.getUniformLocation(shader.program, "u_simulBoxPosLow");
 	shader.u_simulBoxMinPosLC_loc = gl.getUniformLocation(shader.program, "u_simulBoxMinPosLC");
 	shader.u_simulBoxMaxPosLC_loc = gl.getUniformLocation(shader.program, "u_simulBoxMaxPosLC");
-	shader.u_interpolationFactor_loc = gl.getUniformLocation(shader.program, "uInterpolationFactor");
+	shader.uMinMaxAltitudeSlices_loc = gl.getUniformLocation(shader.program, "uMinMaxAltitudeSlices");
 	
 	magoManager.postFxShadersManager.useProgram(shader);
 	gl.uniform1i(shader.simulationBoxDoubleDepthTex_loc, 0);
@@ -290,12 +289,18 @@ AirPollutionManager.prototype._preparePollutionLayers = function (magoManager)
 		for (var i=0; i<layersCount; i++) // usually layersCount = 1.***
 		{
 			var layer = this._geoJsonIndexFile.layers[i];
+			var timeSeriesCount = layer.timeSeries.length;
+			// var options = {
+			// 	pollutionVolumeOwner    : this, 
+			// 	altitude                : layer.altitude,
+			// 	timeInterval_min        : layer.timeInterval_min,
+			// 	timeSlicesCount         : layer.timeSlicesCount,
+			// 	timeSliceFileNames      : layer.timeSliceFileNames,
+			// 	timeSliceFileFolderPath : timeSliceFileFolderPath
+			// };
 			var options = {
 				pollutionVolumeOwner    : this, 
-				altitude                : layer.altitude,
-				timeInterval_min        : layer.timeInterval_min,
-				timeSlicesCount         : layer.timeSlicesCount,
-				timeSliceFileNames      : layer.timeSliceFileNames,
+				timeSeries              : layer.timeSeries,
 				timeSliceFileFolderPath : timeSliceFileFolderPath
 			};
 			var airPollLayer = this.newAirPollutionLayer(options);
