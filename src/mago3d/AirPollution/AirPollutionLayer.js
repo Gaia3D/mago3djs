@@ -291,6 +291,7 @@ AirPollutionLayer.prototype._makeSimulationBox = function ()
 	var timeSlice = this._timeSlicesArray[0];
 	var oneVoxelSizeMeters = this.oneVoxelSizeInMeters[2];
 	var extrusionDist = oneVoxelSizeMeters * (timeSlice._texture3d.texture3DZSize); // z slices count.***
+	extrusionDist = 200.0; // hardcoding.***
 	var extrudeSegmentsCount = 1;
 	var extrusionVector = undefined;
 	var bIncludeBottomCap = undefined;
