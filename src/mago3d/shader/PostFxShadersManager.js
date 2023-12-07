@@ -452,6 +452,46 @@ PostFxShadersManager.prototype._createShader_soundSurface = function ()
 	return shader;
 };
 
+PostFxShadersManager.prototype._createShader_electroMagnetismSurface = function () 
+{
+	// This shader is used to render transparent objects, 
+	//bcos gBuffer-shader cannot render transparents.***
+	var use_linearOrLogarithmicDepth = this._get_useLinearOrLogarithmicDepth_string();
+	var use_multi_render_target = this._get_useMultiRenderTarget_string();
+	var gl = this.gl;
+
+	var shaderName = "electroMagnetismSurface";
+	var ssao_vs_source = ShaderSource.ElectroMagnetismSurfaceVS;
+	var ssao_fs_source = ShaderSource.ElectroMagnetismSurfaceFS;
+	ssao_fs_source = ssao_fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
+	ssao_fs_source = ssao_fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
+	var shader = this.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this.magoManager);
+	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
+	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
+	shader.uFrustumIdx_loc = gl.getUniformLocation(shader.program, "uFrustumIdx");
+	shader.uModelOpacity_loc = gl.getUniformLocation(shader.program, "uModelOpacity");
+	shader.uSelColor4_loc = gl.getUniformLocation(shader.program, "uSelColor4");//
+	shader.uInterpolationFactor_loc = gl.getUniformLocation(shader.program, "uInterpolationFactor");
+	shader.uMinMaxValue_loc = gl.getUniformLocation(shader.program, "uMinMaxValue");
+
+	shader.uLegendColors_loc = gl.getUniformLocation(shader.program, "uLegendColors");
+	shader.uLegendValues_loc = gl.getUniformLocation(shader.program, "uLegendValues");
+
+	// attributtes.***
+	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
+	shader.value_loc = gl.getAttribLocation(shader.program, "value");
+
+	// textures.***
+	shader.texture_0_loc = gl.getUniformLocation(shader.program, "texture_0");
+	shader.texture_1_loc = gl.getUniformLocation(shader.program, "texture_1");
+	this.useProgram(shader);
+	gl.uniform1i(shader.texture_0_loc, 0);
+	gl.uniform1i(shader.texture_1_loc, 1);
+
+	this.shadersMap[shaderName] = shader;
+	return shader;
+};
+
 PostFxShadersManager.prototype._createShader_modelRefDepth = function () 
 {
 	// This shader is used to render depth of selected objects to render silhouette.***
@@ -1249,6 +1289,9 @@ PostFxShadersManager.prototype._createShaderByName = function (shaderName)
 		break;
 	case "soundSurface":
 		this._createShader_soundSurface();
+		break;
+	case "electroMagnetismSurface":
+		this._createShader_electroMagnetismSurface();
 		break;
 	}
 	

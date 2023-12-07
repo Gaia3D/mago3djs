@@ -2008,13 +2008,24 @@ MagoManager.prototype._renderManagers_transparentPass = function ()
 {
 	if (this.otherManagers !== undefined)
 	{
-		// check if exist oceanFluxManager.***
-		if (this.otherManagers.oceanFluxManager !== undefined)
+		for (var key in this.otherManagers)
 		{
-			var oceanFluxManager = this.otherManagers.oceanFluxManager;
-			oceanFluxManager.render();
-			var hola = 0;
+			if (Object.prototype.hasOwnProperty.call(this.otherManagers, key))
+			{
+				var otherManager = this.otherManagers[key];
+				if (otherManager !== undefined)
+				{
+					otherManager.render();
+				}
+			}
 		}
+		// check if exist oceanFluxManager.***
+		// if (this.otherManagers.oceanFluxManager !== undefined)
+		// {
+		// 	var oceanFluxManager = this.otherManagers.oceanFluxManager;
+		// 	oceanFluxManager.render();
+		// 	var hola = 0;
+		// }
 	}
 
 	if (this.waterManager) // TransparentPass.***
