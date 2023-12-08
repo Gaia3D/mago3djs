@@ -840,6 +840,22 @@ ItineraryLayer.prototype.deleteSamplePoints = function ()
 
 };
 
+ItineraryLayer.prototype.resetSampledPoints = function ()
+{
+	this._samplingDataObj.color4_uIntArray = undefined;
+	this._samplingDataObj.valuesArray = undefined;
+	this._samplingDataObj.timesArray = undefined;
+	this._samplingDataObj.positionWCArray = undefined;
+
+	if (this._samplingData_vboKeysContainer)
+	{
+		var magoManager = this._itineraryManager.magoManager;
+		this._samplingData_vboKeysContainer.deleteGlObjects(magoManager.vboMemoryManager.gl, magoManager.vboMemoryManager);
+		this._samplingData_vboKeysContainer = undefined;
+	}
+
+};
+
 ItineraryLayer.prototype.sampleChemicalContamination = function (currUnixTimeMillisec, chemContaminationLayer)
 {
 	if (this.vectorMesh === undefined)

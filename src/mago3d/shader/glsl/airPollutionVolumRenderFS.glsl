@@ -332,6 +332,40 @@ vec2 subTexCoord_to_texCoord(in vec2 subTexCoord, in int col_mosaic, in int row_
     float s = float(col_mosaic) * sRange + subTexCoord.x * sRange;
     float t = float(row_mosaic) * tRange + subTexCoord.y * tRange;
 
+    // must check if the texCoord_tl is boundary in x & y.***************************************************************************
+    float mosaicTexSize_x = float(u_texSize[0] * u_mosaicSize[0]); // for example : 150 pixels * 3 columns = 450 pixels.***
+    float mosaicTexSize_y = float(u_texSize[1] * u_mosaicSize[1]); // for example : 150 pixels * 3 rows = 450 pixels.***
+
+    float currMosaicStart_x = float(col_mosaic * u_texSize[0]);
+    float currMosaicStart_y = float(row_mosaic * u_texSize[1]);
+    float currMosaicEnd_x = currMosaicStart_x + float(u_texSize[0]);
+    float currMosaicEnd_y = currMosaicStart_y + float(u_texSize[1]);
+
+    float pixel_x = s * mosaicTexSize_x;
+    float pixel_y = t * mosaicTexSize_y;
+
+    if(pixel_x < currMosaicStart_x + 1.0)
+    {
+        pixel_x = currMosaicStart_x + 1.0;
+    }
+    else if(pixel_x > currMosaicEnd_x - 1.0)
+    {
+        pixel_x = currMosaicEnd_x - 1.0;
+    }
+
+    if(pixel_y < currMosaicStart_y + 1.0)
+    {
+        pixel_y = currMosaicStart_y + 1.0;
+    }
+    else if(pixel_y > currMosaicEnd_y - 1.0)
+    {
+        pixel_y = currMosaicEnd_y - 1.0;
+    }
+
+    s = pixel_x / mosaicTexSize_x;
+    t = pixel_y / mosaicTexSize_y;
+
+
     vec2 resultTexCoord = vec2(s, t);
 
     return resultTexCoord;
@@ -354,12 +388,22 @@ float _getPollution_triLinearInterpolation(in vec2 subTexCoord2d, in int col_mos
 {
     // This function : given a subTexture2d(real texCoord.xy of a realTex3D), 
     // and the col & row into the mosaic texture, returns a trilinear interpolation of the pressure.***
+
+    //************************************************************************************
+    // u_texSize[3]; // The original texture3D size.***
+    // mosaicSize[3]; // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***
+    //------------------------------------------------------------------------------------
+
     checkTexCoordRange(subTexCoord2d);
     vec3 sim_res3d = vec3(u_texSize[0], u_texSize[1], u_texSize[2]);
     vec2 px = 1.0 / sim_res3d.xy;
     vec2 vc = (floor(subTexCoord2d * sim_res3d.xy)) * px;
     vec2 f = fract(subTexCoord2d * sim_res3d.xy);
     vec2 texCoord_tl = vec2(vc);
+
+    
+    
+
     vec2 texCoord_tr = vec2(vc + vec2(px.x, 0));
     vec2 texCoord_bl = vec2(vc + vec2(0, px.y));
     vec2 texCoord_br = vec2(vc + vec2(px.x, px.y));
@@ -372,9 +416,11 @@ float _getPollution_triLinearInterpolation(in vec2 subTexCoord2d, in int col_mos
     vec2 mosaicTexCoord_tr = subTexCoord_to_texCoord(texCoord_tr, col_mosaic, row_mosaic);
     vec2 mosaicTexCoord_bl = subTexCoord_to_texCoord(texCoord_bl, col_mosaic, row_mosaic);
     vec2 mosaicTexCoord_br = subTexCoord_to_texCoord(texCoord_br, col_mosaic, row_mosaic);
-    //vec2 mosaicTexCoord_tr = mosaicTexCoord_tl + vec2(px.x, 0);
-    //vec2 mosaicTexCoord_bl = mosaicTexCoord_tl + vec2(0, px.y);
-    //vec2 mosaicTexCoord_br = mosaicTexCoord_tl + px;
+
+    // vec2 mosaicTexCoord_tl = subTexCoord_to_texCoord(texCoord_tl, col_mosaic, row_mosaic);
+    // vec2 mosaicTexCoord_tr = vec2(mosaicTexCoord_tl + vec2(px.x, 0));
+    // vec2 mosaicTexCoord_bl = vec2(mosaicTexCoord_tl + vec2(0, px.y));
+    // vec2 mosaicTexCoord_br = vec2(mosaicTexCoord_tl + vec2(px.x, px.y));
 
 
     float ap_tl = getPollution_inMosaicTexture(mosaicTexCoord_tl);
@@ -505,22 +551,7 @@ bool get_pollution_fromTexture3d_triLinearInterpolation_FAST(in vec3 texCoord3d,
     // Here is not important the pollution value. Only need know if the pollution value is zero or not.***
     // this function is called by "findFirstSamplePosition".***
     // tex3d : airPressureMosaicTex
-    // 1rst, check texCoord3d boundary limits.***
-    float error = 0.001;
-    if(texCoord3d.x < 0.0 + error || texCoord3d.x > 1.0 - error)
-    {
-        return false;
-    }
 
-    if(texCoord3d.y < 0.0 + error || texCoord3d.y > 1.0 - error)
-    {
-        return false;
-    }
-
-    if(texCoord3d.z < 0.0 + error || texCoord3d.z > 1.0 - error)
-    {
-        return false;
-    }
     // 1rst, determine the sliceIdx.***
     int currSliceIdx_down = -1;
     int currSliceIdx_up = -1;
@@ -610,20 +641,20 @@ bool get_pollution_fromTexture3d_triLinearInterpolation(in vec3 texCoord3d, in v
     // tex3d : airPressureMosaicTex
     // 1rst, check texCoord3d boundary limits.***
     float error = 0.001;
-    if(texCoord3d.x < 0.0 + error || texCoord3d.x > 1.0 - error)
-    {
-        return false;
-    }
+    // if(texCoord3d.x < 0.0 + error || texCoord3d.x > 1.0 - error)
+    // {
+    //     return false;
+    // }
 
-    if(texCoord3d.y < 0.0 + error || texCoord3d.y > 1.0 - error)
-    {
-        return false;
-    }
+    // if(texCoord3d.y < 0.0 + error || texCoord3d.y > 1.0 - error)
+    // {
+    //     return false;
+    // }
 
-    if(texCoord3d.z < 0.0 + error || texCoord3d.z > 1.0 - error)
-    {
-        return false;
-    }
+    // if(texCoord3d.z < 0.0 + error || texCoord3d.z > 1.0 - error)
+    // {
+    //     return false;
+    // }
     // 1rst, determine the sliceIdx.***
     int currSliceIdx_down = -1;
     int currSliceIdx_up = -1;
@@ -1185,7 +1216,7 @@ bool isSimulationBoxEdge(vec2 screenPos)
     return false;
 }
 
-bool findFirstSamplePosition(in vec3 frontPosLC, in vec3 rearPosLC, in vec3 samplingDirLC, in float increLength, in vec3 simulBoxRange, inout vec3 result_samplePos)
+bool findFirstSamplePosition(in vec3 frontPosLC, in vec3 rearPosLC, in vec3 samplingDirLC, in float increLength, in vec3 simulBoxRange, inout vec3 result_samplePos, inout int iteration)
 {
     // This function finds the first sample position.***
     // Here is not important the pollution value. Only need know if the pollution value is zero or not.***
@@ -1197,6 +1228,7 @@ bool findFirstSamplePosition(in vec3 frontPosLC, in vec3 rearPosLC, in vec3 samp
         // Note : for each smple, must depth check with the scene depthTexure.***
         float dist = float(i) * increLength;
         samplePosLC = frontPosLC + samplingDirLC * dist;
+        iteration = i;
 
         if(i == 0)
         {
@@ -1205,6 +1237,7 @@ bool findFirstSamplePosition(in vec3 frontPosLC, in vec3 rearPosLC, in vec3 samp
 
         contaminationSample = 0.0;
         vec3 sampleTexCoord3d = vec3((samplePosLC.x - u_simulBoxMinPosLC.x)/simulBoxRange.x, (samplePosLC.y - u_simulBoxMinPosLC.y)/simulBoxRange.y, (samplePosLC.z - u_simulBoxMinPosLC.z)/simulBoxRange.z);
+        checkTexCoord3DRange(sampleTexCoord3d);
 
         if(get_pollution_fromTexture3d_triLinearInterpolation_FAST(sampleTexCoord3d, samplePosLC, contaminationSample))
         {
@@ -1338,7 +1371,7 @@ void main(){
 
     float contaminationSample = 0.0;
     float smplingCount = 0.0;
-    float segmentLength = length(rearPosLC - frontPosLC);
+    float segmentLength = distance(rearPosLC, frontPosLC);
     vec3 samplingDirLC = normalize(rearPosLC - frontPosLC);
     //vec3 samplingDirCC = normalize(rearPosCC - frontPosCC);
     float samplingsCount = 30.0;
@@ -1360,27 +1393,139 @@ void main(){
     // u_minMaxPollutionValues
 
     vec3 firstPosLC = vec3(frontPosLC);
-
-    if(!findFirstSamplePosition(frontPosLC, rearPosLC, samplingDirLC, increLength, simulBoxRange, firstPosLC))
+    int iteration = 0;
+    if(!findFirstSamplePosition(frontPosLC, rearPosLC, samplingDirLC, increLength, simulBoxRange, firstPosLC, iteration))
     {
-        /*
-        vec4 colorDiscard = vec4(1.0, 0.0, 0.0, 1.0);
-        gl_FragData[0] = colorDiscard;
+        
+        // vec4 colorDiscard = vec4(0.3, 0.3, 0.3, 1.0);
+        // gl_FragData[0] = colorDiscard;
 
-        #ifdef USE_MULTI_RENDER_TARGET
-            gl_FragData[1] = colorDiscard;
-            gl_FragData[2] = colorDiscard;
-            gl_FragData[3] = colorDiscard;
-        #endif
-        */
+        // #ifdef USE_MULTI_RENDER_TARGET
+        //     gl_FragData[1] = colorDiscard;
+        //     gl_FragData[2] = colorDiscard;
+        //     gl_FragData[3] = colorDiscard;
+        // #endif
+        
         return;
     }
     
 
     // recalculate segmentLength & increLength.***
     samplingsCount = 30.0;
-    segmentLength = length(rearPosLC - firstPosLC);
+    segmentLength = distance(rearPosLC, firstPosLC);
     increLength = segmentLength / samplingsCount;
+
+    vec4 colorTest = vec4(0.0, 0.0, 0.5, 1.0);
+    colorTest = vec4(firstPosLC.x /u_voxelSizeMeters.x, firstPosLC.y /u_voxelSizeMeters.y, firstPosLC.z /u_voxelSizeMeters.z , 1.0);
+
+    // if(iteration == 0)
+    // {
+    //     colorTest = vec4(1.0, 0.0, 0.0, 1.0);
+    //     gl_FragData[0] = colorTest;
+
+    //     #ifdef USE_MULTI_RENDER_TARGET
+    //         gl_FragData[1] = colorTest;
+    //         gl_FragData[2] = colorTest;
+    //         gl_FragData[3] = colorTest;
+    //     #endif
+    //     return;
+    // }
+    // else if(iteration == 1)
+    // {
+    //     colorTest = vec4(0.0, 1.0, 0.0, 1.0);
+    //     gl_FragData[0] = colorTest;
+
+    //     #ifdef USE_MULTI_RENDER_TARGET
+    //         gl_FragData[1] = colorTest;
+    //         gl_FragData[2] = colorTest;
+    //         gl_FragData[3] = colorTest;
+    //     #endif
+    //     return;
+    // }
+    // else if(iteration == 2)
+    // {
+    //     colorTest = vec4(0.0, 0.0, 1.0, 1.0);
+    //     gl_FragData[0] = colorTest;
+
+    //     #ifdef USE_MULTI_RENDER_TARGET
+    //         gl_FragData[1] = colorTest;
+    //         gl_FragData[2] = colorTest;
+    //         gl_FragData[3] = colorTest;
+    //     #endif
+    //     return;
+    // }
+    // else if(iteration == 3)
+    // {
+    //     colorTest = vec4(1.0, 1.0, 0.0, 1.0);
+    //     gl_FragData[0] = colorTest;
+
+    //     #ifdef USE_MULTI_RENDER_TARGET
+    //         gl_FragData[1] = colorTest;
+    //         gl_FragData[2] = colorTest;
+    //         gl_FragData[3] = colorTest;
+    //     #endif
+    //     return;
+    // }
+    // else if(iteration == 4)
+    // {
+    //     colorTest = vec4(1.0, 0.0, 1.0, 1.0);
+    //     gl_FragData[0] = colorTest;
+
+    //     #ifdef USE_MULTI_RENDER_TARGET
+    //         gl_FragData[1] = colorTest;
+    //         gl_FragData[2] = colorTest;
+    //         gl_FragData[3] = colorTest;
+    //     #endif
+    //     return;
+    // }
+    // else if(iteration == 5)
+    // {
+    //     colorTest = vec4(0.0, 1.0, 1.0, 1.0);
+    //     gl_FragData[0] = colorTest;
+
+    //     #ifdef USE_MULTI_RENDER_TARGET
+    //         gl_FragData[1] = colorTest;
+    //         gl_FragData[2] = colorTest;
+    //         gl_FragData[3] = colorTest;
+    //     #endif
+    //     return;
+    // }
+    // else if(iteration == 6)
+    // {
+    //     colorTest = vec4(0.5, 0.0, 0.0, 1.0);
+    //     gl_FragData[0] = colorTest;
+
+    //     #ifdef USE_MULTI_RENDER_TARGET
+    //         gl_FragData[1] = colorTest;
+    //         gl_FragData[2] = colorTest;
+    //         gl_FragData[3] = colorTest;
+    //     #endif
+    //     return;
+    // }
+    // else if(iteration == 7)
+    // {
+    //     colorTest = vec4(0.0, 0.5, 0.0, 1.0);
+    //     gl_FragData[0] = colorTest;
+
+    //     #ifdef USE_MULTI_RENDER_TARGET
+    //         gl_FragData[1] = colorTest;
+    //         gl_FragData[2] = colorTest;
+    //         gl_FragData[3] = colorTest;
+    //     #endif
+    //     return;
+    // }
+    // else if(iteration == 8)
+    // {
+    //     colorTest = vec4(0.0, 0.0, 0.5, 1.0);
+    //     gl_FragData[0] = colorTest;
+
+    //     #ifdef USE_MULTI_RENDER_TARGET
+    //         gl_FragData[1] = colorTest;
+    //         gl_FragData[2] = colorTest;
+    //         gl_FragData[3] = colorTest;
+    //     #endif
+    //     return;
+    // }
     
     // Sampling far to near.***
     bool normalLC_calculated = true;

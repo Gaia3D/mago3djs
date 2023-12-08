@@ -256,13 +256,14 @@ ElectroMagnetismManager.prototype._prepareVectorMeshCables = function ()
 
 			if (this._lineThickness === undefined)
 			{
-				this._lineThickness = 3.5;
+				this._lineThickness = 4.0;
 			}
 			// Provisionally set a random color.***
 			if (this._thickLineColor === undefined)
 			{
 				this._thickLineColor = new Color();
-				Color.getColorPastelRGBRandom(this._thickLineColor);
+				//Color.getColorPastelRGBRandom(this._thickLineColor);
+				this._thickLineColor.setRGBA(0.9, 1.0, 1.0, 1.0); // blue.***
 			}
 			//Color.getColorPastelRGBRandom(this.vectorMesh.color4);
 			if (vectorMesh.color4 === undefined)
@@ -354,11 +355,11 @@ ElectroMagnetismManager.prototype._TEST_setLegendsColors = function ()
 		207/255, 0/255, 0/255, 128/255,    // 11
 		127/255, 0/255, 0/255, 128/255,
 		127/255, 0/255, 0/255, 128/255,   // 13
-		0, 0, 0, 0,   // 14
-		0, 0, 0, 0, ]);  // 15
+		127/255, 0/255, 0/255, 128/255,   // 14
+		127/255, 0/255, 0/255, 128/255 ]);  // 15
 
 	var min = 0.0;
-	var max = 1.3;
+	var max = 1.5;
 	var range = max - min;
 	var legendColorsCount = this._legendColors4.length / 4;
 	var incre = range / (legendColorsCount - 1);

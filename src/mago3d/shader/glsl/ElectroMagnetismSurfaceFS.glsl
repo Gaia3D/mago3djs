@@ -105,6 +105,7 @@ vec4 getRainbowColor_byHeight(in float height, in float minHeight_rainbow, in fl
 	else if (gray<0.0){ gray = 0.0; }
 
     float value = gray * 4.0;
+    value = gray;
     float h = floor(value);
     float f = fract(value);
 

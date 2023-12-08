@@ -334,6 +334,40 @@ vec2 subTexCoord_to_texCoord(in vec2 subTexCoord, in int col_mosaic, in int row_
     float s = float(col_mosaic) * sRange + subTexCoord.x * sRange;\n\
     float t = float(row_mosaic) * tRange + subTexCoord.y * tRange;\n\
 \n\
+    // must check if the texCoord_tl is boundary in x & y.***************************************************************************\n\
+    float mosaicTexSize_x = float(u_texSize[0] * u_mosaicSize[0]); // for example : 150 pixels * 3 columns = 450 pixels.***\n\
+    float mosaicTexSize_y = float(u_texSize[1] * u_mosaicSize[1]); // for example : 150 pixels * 3 rows = 450 pixels.***\n\
+\n\
+    float currMosaicStart_x = float(col_mosaic * u_texSize[0]);\n\
+    float currMosaicStart_y = float(row_mosaic * u_texSize[1]);\n\
+    float currMosaicEnd_x = currMosaicStart_x + float(u_texSize[0]);\n\
+    float currMosaicEnd_y = currMosaicStart_y + float(u_texSize[1]);\n\
+\n\
+    float pixel_x = s * mosaicTexSize_x;\n\
+    float pixel_y = t * mosaicTexSize_y;\n\
+\n\
+    if(pixel_x < currMosaicStart_x + 1.0)\n\
+    {\n\
+        pixel_x = currMosaicStart_x + 1.0;\n\
+    }\n\
+    else if(pixel_x > currMosaicEnd_x - 1.0)\n\
+    {\n\
+        pixel_x = currMosaicEnd_x - 1.0;\n\
+    }\n\
+\n\
+    if(pixel_y < currMosaicStart_y + 1.0)\n\
+    {\n\
+        pixel_y = currMosaicStart_y + 1.0;\n\
+    }\n\
+    else if(pixel_y > currMosaicEnd_y - 1.0)\n\
+    {\n\
+        pixel_y = currMosaicEnd_y - 1.0;\n\
+    }\n\
+\n\
+    s = pixel_x / mosaicTexSize_x;\n\
+    t = pixel_y / mosaicTexSize_y;\n\
+\n\
+\n\
     vec2 resultTexCoord = vec2(s, t);\n\
 \n\
     return resultTexCoord;\n\
@@ -356,12 +390,22 @@ float _getPollution_triLinearInterpolation(in vec2 subTexCoord2d, in int col_mos
 {\n\
     // This function : given a subTexture2d(real texCoord.xy of a realTex3D), \n\
     // and the col & row into the mosaic texture, returns a trilinear interpolation of the pressure.***\n\
+\n\
+    //************************************************************************************\n\
+    // u_texSize[3]; // The original texture3D size.***\n\
+    // mosaicSize[3]; // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***\n\
+    //------------------------------------------------------------------------------------\n\
+\n\
     checkTexCoordRange(subTexCoord2d);\n\
     vec3 sim_res3d = vec3(u_texSize[0], u_texSize[1], u_texSize[2]);\n\
     vec2 px = 1.0 / sim_res3d.xy;\n\
     vec2 vc = (floor(subTexCoord2d * sim_res3d.xy)) * px;\n\
     vec2 f = fract(subTexCoord2d * sim_res3d.xy);\n\
     vec2 texCoord_tl = vec2(vc);\n\
+\n\
+    \n\
+    \n\
+\n\
     vec2 texCoord_tr = vec2(vc + vec2(px.x, 0));\n\
     vec2 texCoord_bl = vec2(vc + vec2(0, px.y));\n\
     vec2 texCoord_br = vec2(vc + vec2(px.x, px.y));\n\
@@ -374,9 +418,11 @@ float _getPollution_triLinearInterpolation(in vec2 subTexCoord2d, in int col_mos
     vec2 mosaicTexCoord_tr = subTexCoord_to_texCoord(texCoord_tr, col_mosaic, row_mosaic);\n\
     vec2 mosaicTexCoord_bl = subTexCoord_to_texCoord(texCoord_bl, col_mosaic, row_mosaic);\n\
     vec2 mosaicTexCoord_br = subTexCoord_to_texCoord(texCoord_br, col_mosaic, row_mosaic);\n\
-    //vec2 mosaicTexCoord_tr = mosaicTexCoord_tl + vec2(px.x, 0);\n\
-    //vec2 mosaicTexCoord_bl = mosaicTexCoord_tl + vec2(0, px.y);\n\
-    //vec2 mosaicTexCoord_br = mosaicTexCoord_tl + px;\n\
+\n\
+    // vec2 mosaicTexCoord_tl = subTexCoord_to_texCoord(texCoord_tl, col_mosaic, row_mosaic);\n\
+    // vec2 mosaicTexCoord_tr = vec2(mosaicTexCoord_tl + vec2(px.x, 0));\n\
+    // vec2 mosaicTexCoord_bl = vec2(mosaicTexCoord_tl + vec2(0, px.y));\n\
+    // vec2 mosaicTexCoord_br = vec2(mosaicTexCoord_tl + vec2(px.x, px.y));\n\
 \n\
 \n\
     float ap_tl = getPollution_inMosaicTexture(mosaicTexCoord_tl);\n\
@@ -507,22 +553,7 @@ bool get_pollution_fromTexture3d_triLinearInterpolation_FAST(in vec3 texCoord3d,
     // Here is not important the pollution value. Only need know if the pollution value is zero or not.***\n\
     // this function is called by \"findFirstSamplePosition\".***\n\
     // tex3d : airPressureMosaicTex\n\
-    // 1rst, check texCoord3d boundary limits.***\n\
-    float error = 0.001;\n\
-    if(texCoord3d.x < 0.0 + error || texCoord3d.x > 1.0 - error)\n\
-    {\n\
-        return false;\n\
-    }\n\
 \n\
-    if(texCoord3d.y < 0.0 + error || texCoord3d.y > 1.0 - error)\n\
-    {\n\
-        return false;\n\
-    }\n\
-\n\
-    if(texCoord3d.z < 0.0 + error || texCoord3d.z > 1.0 - error)\n\
-    {\n\
-        return false;\n\
-    }\n\
     // 1rst, determine the sliceIdx.***\n\
     int currSliceIdx_down = -1;\n\
     int currSliceIdx_up = -1;\n\
@@ -612,20 +643,20 @@ bool get_pollution_fromTexture3d_triLinearInterpolation(in vec3 texCoord3d, in v
     // tex3d : airPressureMosaicTex\n\
     // 1rst, check texCoord3d boundary limits.***\n\
     float error = 0.001;\n\
-    if(texCoord3d.x < 0.0 + error || texCoord3d.x > 1.0 - error)\n\
-    {\n\
-        return false;\n\
-    }\n\
+    // if(texCoord3d.x < 0.0 + error || texCoord3d.x > 1.0 - error)\n\
+    // {\n\
+    //     return false;\n\
+    // }\n\
 \n\
-    if(texCoord3d.y < 0.0 + error || texCoord3d.y > 1.0 - error)\n\
-    {\n\
-        return false;\n\
-    }\n\
+    // if(texCoord3d.y < 0.0 + error || texCoord3d.y > 1.0 - error)\n\
+    // {\n\
+    //     return false;\n\
+    // }\n\
 \n\
-    if(texCoord3d.z < 0.0 + error || texCoord3d.z > 1.0 - error)\n\
-    {\n\
-        return false;\n\
-    }\n\
+    // if(texCoord3d.z < 0.0 + error || texCoord3d.z > 1.0 - error)\n\
+    // {\n\
+    //     return false;\n\
+    // }\n\
     // 1rst, determine the sliceIdx.***\n\
     int currSliceIdx_down = -1;\n\
     int currSliceIdx_up = -1;\n\
@@ -1187,7 +1218,7 @@ bool isSimulationBoxEdge(vec2 screenPos)\n\
     return false;\n\
 }\n\
 \n\
-bool findFirstSamplePosition(in vec3 frontPosLC, in vec3 rearPosLC, in vec3 samplingDirLC, in float increLength, in vec3 simulBoxRange, inout vec3 result_samplePos)\n\
+bool findFirstSamplePosition(in vec3 frontPosLC, in vec3 rearPosLC, in vec3 samplingDirLC, in float increLength, in vec3 simulBoxRange, inout vec3 result_samplePos, inout int iteration)\n\
 {\n\
     // This function finds the first sample position.***\n\
     // Here is not important the pollution value. Only need know if the pollution value is zero or not.***\n\
@@ -1199,6 +1230,7 @@ bool findFirstSamplePosition(in vec3 frontPosLC, in vec3 rearPosLC, in vec3 samp
         // Note : for each smple, must depth check with the scene depthTexure.***\n\
         float dist = float(i) * increLength;\n\
         samplePosLC = frontPosLC + samplingDirLC * dist;\n\
+        iteration = i;\n\
 \n\
         if(i == 0)\n\
         {\n\
@@ -1207,6 +1239,7 @@ bool findFirstSamplePosition(in vec3 frontPosLC, in vec3 rearPosLC, in vec3 samp
 \n\
         contaminationSample = 0.0;\n\
         vec3 sampleTexCoord3d = vec3((samplePosLC.x - u_simulBoxMinPosLC.x)/simulBoxRange.x, (samplePosLC.y - u_simulBoxMinPosLC.y)/simulBoxRange.y, (samplePosLC.z - u_simulBoxMinPosLC.z)/simulBoxRange.z);\n\
+        checkTexCoord3DRange(sampleTexCoord3d);\n\
 \n\
         if(get_pollution_fromTexture3d_triLinearInterpolation_FAST(sampleTexCoord3d, samplePosLC, contaminationSample))\n\
         {\n\
@@ -1340,7 +1373,7 @@ void main(){\n\
 \n\
     float contaminationSample = 0.0;\n\
     float smplingCount = 0.0;\n\
-    float segmentLength = length(rearPosLC - frontPosLC);\n\
+    float segmentLength = distance(rearPosLC, frontPosLC);\n\
     vec3 samplingDirLC = normalize(rearPosLC - frontPosLC);\n\
     //vec3 samplingDirCC = normalize(rearPosCC - frontPosCC);\n\
     float samplingsCount = 30.0;\n\
@@ -1362,27 +1395,139 @@ void main(){\n\
     // u_minMaxPollutionValues\n\
 \n\
     vec3 firstPosLC = vec3(frontPosLC);\n\
-\n\
-    if(!findFirstSamplePosition(frontPosLC, rearPosLC, samplingDirLC, increLength, simulBoxRange, firstPosLC))\n\
+    int iteration = 0;\n\
+    if(!findFirstSamplePosition(frontPosLC, rearPosLC, samplingDirLC, increLength, simulBoxRange, firstPosLC, iteration))\n\
     {\n\
-        /*\n\
-        vec4 colorDiscard = vec4(1.0, 0.0, 0.0, 1.0);\n\
-        gl_FragData[0] = colorDiscard;\n\
+        \n\
+        // vec4 colorDiscard = vec4(0.3, 0.3, 0.3, 1.0);\n\
+        // gl_FragData[0] = colorDiscard;\n\
 \n\
-        #ifdef USE_MULTI_RENDER_TARGET\n\
-            gl_FragData[1] = colorDiscard;\n\
-            gl_FragData[2] = colorDiscard;\n\
-            gl_FragData[3] = colorDiscard;\n\
-        #endif\n\
-        */\n\
+        // #ifdef USE_MULTI_RENDER_TARGET\n\
+        //     gl_FragData[1] = colorDiscard;\n\
+        //     gl_FragData[2] = colorDiscard;\n\
+        //     gl_FragData[3] = colorDiscard;\n\
+        // #endif\n\
+        \n\
         return;\n\
     }\n\
     \n\
 \n\
     // recalculate segmentLength & increLength.***\n\
     samplingsCount = 30.0;\n\
-    segmentLength = length(rearPosLC - firstPosLC);\n\
+    segmentLength = distance(rearPosLC, firstPosLC);\n\
     increLength = segmentLength / samplingsCount;\n\
+\n\
+    vec4 colorTest = vec4(0.0, 0.0, 0.5, 1.0);\n\
+    colorTest = vec4(firstPosLC.x /u_voxelSizeMeters.x, firstPosLC.y /u_voxelSizeMeters.y, firstPosLC.z /u_voxelSizeMeters.z , 1.0);\n\
+\n\
+    // if(iteration == 0)\n\
+    // {\n\
+    //     colorTest = vec4(1.0, 0.0, 0.0, 1.0);\n\
+    //     gl_FragData[0] = colorTest;\n\
+\n\
+    //     #ifdef USE_MULTI_RENDER_TARGET\n\
+    //         gl_FragData[1] = colorTest;\n\
+    //         gl_FragData[2] = colorTest;\n\
+    //         gl_FragData[3] = colorTest;\n\
+    //     #endif\n\
+    //     return;\n\
+    // }\n\
+    // else if(iteration == 1)\n\
+    // {\n\
+    //     colorTest = vec4(0.0, 1.0, 0.0, 1.0);\n\
+    //     gl_FragData[0] = colorTest;\n\
+\n\
+    //     #ifdef USE_MULTI_RENDER_TARGET\n\
+    //         gl_FragData[1] = colorTest;\n\
+    //         gl_FragData[2] = colorTest;\n\
+    //         gl_FragData[3] = colorTest;\n\
+    //     #endif\n\
+    //     return;\n\
+    // }\n\
+    // else if(iteration == 2)\n\
+    // {\n\
+    //     colorTest = vec4(0.0, 0.0, 1.0, 1.0);\n\
+    //     gl_FragData[0] = colorTest;\n\
+\n\
+    //     #ifdef USE_MULTI_RENDER_TARGET\n\
+    //         gl_FragData[1] = colorTest;\n\
+    //         gl_FragData[2] = colorTest;\n\
+    //         gl_FragData[3] = colorTest;\n\
+    //     #endif\n\
+    //     return;\n\
+    // }\n\
+    // else if(iteration == 3)\n\
+    // {\n\
+    //     colorTest = vec4(1.0, 1.0, 0.0, 1.0);\n\
+    //     gl_FragData[0] = colorTest;\n\
+\n\
+    //     #ifdef USE_MULTI_RENDER_TARGET\n\
+    //         gl_FragData[1] = colorTest;\n\
+    //         gl_FragData[2] = colorTest;\n\
+    //         gl_FragData[3] = colorTest;\n\
+    //     #endif\n\
+    //     return;\n\
+    // }\n\
+    // else if(iteration == 4)\n\
+    // {\n\
+    //     colorTest = vec4(1.0, 0.0, 1.0, 1.0);\n\
+    //     gl_FragData[0] = colorTest;\n\
+\n\
+    //     #ifdef USE_MULTI_RENDER_TARGET\n\
+    //         gl_FragData[1] = colorTest;\n\
+    //         gl_FragData[2] = colorTest;\n\
+    //         gl_FragData[3] = colorTest;\n\
+    //     #endif\n\
+    //     return;\n\
+    // }\n\
+    // else if(iteration == 5)\n\
+    // {\n\
+    //     colorTest = vec4(0.0, 1.0, 1.0, 1.0);\n\
+    //     gl_FragData[0] = colorTest;\n\
+\n\
+    //     #ifdef USE_MULTI_RENDER_TARGET\n\
+    //         gl_FragData[1] = colorTest;\n\
+    //         gl_FragData[2] = colorTest;\n\
+    //         gl_FragData[3] = colorTest;\n\
+    //     #endif\n\
+    //     return;\n\
+    // }\n\
+    // else if(iteration == 6)\n\
+    // {\n\
+    //     colorTest = vec4(0.5, 0.0, 0.0, 1.0);\n\
+    //     gl_FragData[0] = colorTest;\n\
+\n\
+    //     #ifdef USE_MULTI_RENDER_TARGET\n\
+    //         gl_FragData[1] = colorTest;\n\
+    //         gl_FragData[2] = colorTest;\n\
+    //         gl_FragData[3] = colorTest;\n\
+    //     #endif\n\
+    //     return;\n\
+    // }\n\
+    // else if(iteration == 7)\n\
+    // {\n\
+    //     colorTest = vec4(0.0, 0.5, 0.0, 1.0);\n\
+    //     gl_FragData[0] = colorTest;\n\
+\n\
+    //     #ifdef USE_MULTI_RENDER_TARGET\n\
+    //         gl_FragData[1] = colorTest;\n\
+    //         gl_FragData[2] = colorTest;\n\
+    //         gl_FragData[3] = colorTest;\n\
+    //     #endif\n\
+    //     return;\n\
+    // }\n\
+    // else if(iteration == 8)\n\
+    // {\n\
+    //     colorTest = vec4(0.0, 0.0, 0.5, 1.0);\n\
+    //     gl_FragData[0] = colorTest;\n\
+\n\
+    //     #ifdef USE_MULTI_RENDER_TARGET\n\
+    //         gl_FragData[1] = colorTest;\n\
+    //         gl_FragData[2] = colorTest;\n\
+    //         gl_FragData[3] = colorTest;\n\
+    //     #endif\n\
+    //     return;\n\
+    // }\n\
     \n\
     // Sampling far to near.***\n\
     bool normalLC_calculated = true;\n\
@@ -5483,6 +5628,7 @@ vec4 getRainbowColor_byHeight(in float height, in float minHeight_rainbow, in fl
 	else if (gray<0.0){ gray = 0.0; }\n\
 \n\
     float value = gray * 4.0;\n\
+    value = gray;\n\
     float h = floor(value);\n\
     float f = fract(value);\n\
 \n\

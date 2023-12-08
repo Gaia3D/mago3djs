@@ -228,6 +228,16 @@ ItineraryManager.prototype.sampleChemicalContamination = function (currUnixTimeM
 	return true;
 };
 
+ItineraryManager.prototype.resetSampledPoints = function ()
+{
+	var itisCount = this.getItineraryLayersCount();
+	for (var i=0; i<itisCount; i++)
+	{
+		var itiLayer = this.getItineraryLayer(i);
+		itiLayer.resetSampledPoints();
+	}
+};
+
 ItineraryManager.prototype.render = function ()
 {
 	if (this._itineraryLayersArray === undefined)
