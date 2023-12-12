@@ -477,6 +477,8 @@ PostFxShadersManager.prototype._createShader_electroMagnetismSurface = function 
 	shader.uLegendColors_loc = gl.getUniformLocation(shader.program, "uLegendColors");
 	shader.uLegendValues_loc = gl.getUniformLocation(shader.program, "uLegendValues");
 
+	shader.uBaseColor4_loc = gl.getUniformLocation(shader.program, "uBaseColor4");
+
 	// attributtes.***
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
 	shader.value_loc = gl.getAttribLocation(shader.program, "value");

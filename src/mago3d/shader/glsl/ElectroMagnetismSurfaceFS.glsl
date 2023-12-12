@@ -42,6 +42,9 @@ uniform float uMinMaxValue[2];
 uniform vec4 uLegendColors[16];
 uniform float uLegendValues[16];
 
+// base color.***
+uniform vec4 uBaseColor4;
+
 varying vec3 vNormal;
 varying vec4 vColor4; // color from attributes
 varying vec2 vTexCoord;   
@@ -238,7 +241,8 @@ void main()
 	else if(colorType == 5)
 	{
 		// use an external legend.***
-		vec4 colorAux = vec4(0.3, 0.3, 0.3, 0.4);
+		//vec4 colorAux = vec4(0.3, 0.3, 0.3, 0.4);
+        vec4 colorAux = uBaseColor4;
 
 		// find legendIdx.***
 		for(int i=0; i<15; i++)
