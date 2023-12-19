@@ -405,19 +405,19 @@ AirPollutionManager.prototype.render = function ()
 		  magoManager.animationTimeController = new AnimationTimeController(options);
 	}
 
-	var totalAnimTime = this._totalAnimTime;
-	var currTime = magoManager.animationTimeController.getCurrentTimeMilisec();
-	this._increTime = (currTime - this._animationStartTime) * this._timeScale;
+	// var totalAnimTime = this._totalAnimTime;
+	// var currTime = magoManager.animationTimeController.getCurrentTimeMilisec();
+	// this._increTime = (currTime - this._animationStartTime) * this._timeScale;
 
-	if (this._increTime >= totalAnimTime)
-	{
-		//this._animationState = CODE.processState.FINISHED;
-		//return true;
-		// Modify the animationStartTime.***
-		var num = Math.floor(currTime / totalAnimTime);
-		this._animationStartTime = num * totalAnimTime;
-		this._increTime = (currTime - this._animationStartTime)* this._timeScale;
-	}
+	// if (this._increTime >= totalAnimTime)
+	// {
+	// 	//this._animationState = CODE.processState.FINISHED;
+	// 	//return true;
+	// 	// Modify the animationStartTime.***
+	// 	var num = Math.floor(currTime / totalAnimTime);
+	// 	this._animationStartTime = num * totalAnimTime;
+	// 	this._increTime = (currTime - this._animationStartTime)* this._timeScale;
+	// }
 	
 	// Render layers.***
 	var pollutionLayersCount = this.airPollutionLayersArray.length;

@@ -3101,10 +3101,11 @@ MagoManager.prototype.startRender = function (isLastFrustum, frustumIdx, numFrus
 		this.dateSC = new Date();
 		this.prevTime = this.currTime;
 		this.currTime = this.dateSC.getTime();
+		var diffTime = this.currTime - this.prevTime;
 
 		if (this.animationTimeController)
 		{
-			this.animationTimeController.incrementCurrentTime();
+			this.animationTimeController.incrementCurrentTime(diffTime);
 		}
 		
 		this.initCounters();

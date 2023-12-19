@@ -20,9 +20,9 @@ var AnimationTimeController = function(options)
 
 	this._animationState = CODE.processState.NO_STARTED;
 	this._animationStartUnixTimeMilisec = 0;
-	this._animationStartTimeMilisec = 0; // old.***
+	//this._animationStartTimeMilisec = 0; // old.***
 	this._currentUnixTimeMilisec = 0;
-	this._currentTimeMilisec = 0; // old.***
+	//this._currentTimeMilisec = 0; // old.***
 	this._timeScale = 1.0;
 	this._date; // a referencial date.***
 
@@ -96,7 +96,7 @@ AnimationTimeController.prototype.reset = function (options)
 
 AnimationTimeController.prototype.getCurrentTimeMilisec = function ()
 {
-	return this._currentTimeMilisec; // old.***
+	return this._currentUnixTimeMilisec; 
 };
 
 AnimationTimeController.prototype.getCurrentUnixTimeMilisec = function ()
@@ -109,7 +109,7 @@ AnimationTimeController.prototype.setCurrentTimeMilisec = function (timeMilisec)
 	this._currentTimeMilisec = timeMilisec;
 };
 
-AnimationTimeController.prototype.incrementCurrentTime = function ()
+AnimationTimeController.prototype.incrementCurrentTime = function (diffTime)
 {
 	if (this._animationState !== CODE.processState.STARTED)
 	{
@@ -120,10 +120,8 @@ AnimationTimeController.prototype.incrementCurrentTime = function ()
 	{
 		return;
 	}
-	// var currTime = new Date();
-	// var currUnixTime = currTime.getTime();
-	// var deltaTimeMilisec = currUnixTime - this._currentUnixTimeMilisec;
-	this._currentTimeMilisec += this._incrementalAddingTimeMilisec; // old.***
+
+	this._incrementalAddingTimeMilisec = diffTime;
 	this._currentUnixTimeMilisec += this._incrementalAddingTimeMilisec * this._timeScale;
 };
 
@@ -140,9 +138,4 @@ AnimationTimeController.prototype.pauseAnimation = function ()
 AnimationTimeController.prototype.getAnimationState = function ()
 {
 	return this._animationState;
-};
-
-AnimationTimeController.prototype.getIncrementTimeMilisec = function ()
-{
-	return this._currentTimeMilisec - this._animationStartTimeMilisec;
 };
