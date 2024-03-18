@@ -83,7 +83,7 @@ AbsClickInteraction.prototype.setActive = function(active)
  * handle event
  * @param {BrowserEvent} browserEvent
  */
-AbsClickInteraction.prototype.handle = function(browserEvent) 
+AbsClickInteraction.prototype.handle = function (browserEvent) 
 {
 	if (this.stop) { return; }
 	

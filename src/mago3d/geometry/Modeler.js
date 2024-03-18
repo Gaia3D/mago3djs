@@ -1000,6 +1000,42 @@ Modeler.getExtrudedMesh = function(profile2d, extrusionDist, extrudeSegmentsCoun
 	return resultMesh;
 };
 
+Modeler.getExtrudedPlane = function(profile2d, extrusionDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, resultMesh) 
+{
+	if (profile2d === undefined || extrusionDist === undefined)
+	{ return undefined; }
+	
+	var vtxProfilesList = new VtxProfilesList();
+	
+	// if want caps in the extruded mesh, must calculate "ConvexFacesIndicesData" of the profile2d before creating vtxProfiles.
+	vtxProfilesList.convexFacesIndicesData = profile2d.getConvexFacesIndicesData(undefined);
+	
+	// create vtxProfiles.
+	// make the base-vtxProfile.
+	var baseVtxProfile = vtxProfilesList.newVtxProfile();
+	baseVtxProfile.makeByProfile2D(profile2d);
+	
+	if (extrusionVector === undefined)
+	{ extrusionVector = new Point3D(0, 0, 1); }
+	
+	var increDist = extrusionDist/extrudeSegmentsCount;
+	for (var i=0; i<extrudeSegmentsCount; i++)
+	{
+		// test with a 1 segment extrusion.
+		var nextVtxProfile = vtxProfilesList.newVtxProfile();
+		nextVtxProfile.copyFrom(baseVtxProfile);
+		nextVtxProfile.translate(0, 0, increDist*(i+1));
+	}
+	
+	// must separate vbo groups by surfaces.
+	var bIncludeBottomCap = false;
+	var bIncludeTopCap = false;
+	resultMesh = vtxProfilesList.getMesh(resultMesh, bIncludeBottomCap, bIncludeTopCap);
+	resultMesh.calculateVerticesNormals();
+	
+	return resultMesh;
+};
+
 /**
  * 
  * @param {GeographicCoordsList} geographicCoordsList 

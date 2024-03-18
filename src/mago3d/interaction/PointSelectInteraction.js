@@ -8,7 +8,7 @@
  * 
  * @param {object} option layer object.
  */
-var PointSelectInteraction = function(option) 
+var PointSelectInteraction = function (option) 
 {
 	if (!(this instanceof PointSelectInteraction)) 
 	{
@@ -263,6 +263,12 @@ PointSelectInteraction.prototype.select = function (screenCoordinate)
 {
 	var manager = this.manager;
 	var selectManager = manager.selectionManager;
+
+	if (selectManager === undefined)
+	{
+		throw new Error('selectionManager is not defined.');
+		return;
+	}
 
 	if (manager.selectionFbo === undefined) 
 	{ manager.getSelectionFBO(); }

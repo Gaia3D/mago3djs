@@ -468,7 +468,11 @@ var ChemicalAccidentLayer = function(options)
 	this.volumeDepthFBO = undefined;
 	this.screenFBO = undefined;
 
-	
+	// params.***
+	this.minMaxPollutionValuesToRender = new Float32Array([0.0, 0.0194]);
+
+	// cutting planes.
+	this.cuttingPlanesArray = [];
 
 	if (options)
 	{
@@ -772,12 +776,97 @@ ChemicalAccidentLayer.prototype.getTimeSliceIdxByCurrentUnixTimeMiliseconds = fu
 	return timeSliceIdx;
 };
 
+ChemicalAccidentLayer.prototype.setMinMaxValuesToRender = function (min, max)
+{
+	this.minMaxPollutionValuesToRender[0] = min;
+	this.minMaxPollutionValuesToRender[1] = max;
+};
+
+ChemicalAccidentLayer.prototype.createCuttingPlaneXZ = function ()
+{
+	// 1. Calculate the rectangle in local coord.***
+	//var magoManager = this.chemicalAccidentManager.magoManager;
+
+	var geoJsonIndexFile = this.chemicalAccidentManager._geoJsonIndexFile;
+	var centerGeoCoord = geoJsonIndexFile.centerGeographicCoord;
+
+	// must find the 4 geoCoords of the rectangle.***
+	var widthMeters = geoJsonIndexFile.width_km * 1000.0;
+	var heightMeters = geoJsonIndexFile.height_km * 1000.0;
+	var semiWidthMeters = widthMeters / 2.0;
+	var semiHeightMeters = heightMeters / 2.0;
+
+	// create the local rectangle.***
+	var pointsLCArray = [];
+
+	// leftDown corner.***
+	var point3d = new Point2D(-semiWidthMeters, -semiHeightMeters);
+	pointsLCArray.push(point3d);
+
+	// rightDown corner.***
+	point3d = new Point2D(semiWidthMeters, -semiHeightMeters);
+	pointsLCArray.push(point3d);
+
+	// // rightUp corner.***
+	// point3d = new Point2D(semiWidthMeters, semiHeightMeters);
+	// pointsLCArray.push(point3d);
+
+	// // leftUp corner.***
+	// point3d = new Point2D(-semiWidthMeters, semiHeightMeters);
+	// pointsLCArray.push(point3d);
+
+	var profile2d = Profile2D.fromPoint2DArray(pointsLCArray);
+
+	// take the 1rst timeSlice:
+	var timeSlice = this._timeSlicesArray[0];
+	var totalMinMaxAltitudes = timeSlice.getTotalMinMaxAltitudes();
+	var extrusionDist = totalMinMaxAltitudes[1] - totalMinMaxAltitudes[0];
+	var extrudeSegmentsCount = 1;
+	var extrusionVector = undefined;
+	var bIncludeBottomCap = false;
+	var bIncludeTopCap = false;
+	var surfIndepMesh = Modeler.getExtrudedPlane(profile2d, extrusionDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, undefined);
+
+	// now make the renderable object of the cutting plane.***
+
+	var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
+	var resultRenderableObject = new RenderableObject();
+	resultRenderableObject.attributes.isMovable = true;
+	resultRenderableObject.attributes.isSelectable = true;
+	resultRenderableObject.setOneColor(0.8, 0.7, 0.2, 0.0);
+	resultRenderableObject.setSelectedColor4(0.8, 0.7, 0.2, 0.1);
+	
+	resultRenderableObject.geoLocDataManager = new GeoLocationDataManager();
+	var geoLocDataRenderableObj = resultRenderableObject.geoLocDataManager.newGeoLocationData();
+	geoLocDataRenderableObj.copyFrom(geoLocData);
+
+	//resultRenderableObject.geographicCoordList = this;
+	resultRenderableObject.objectsArray.push(surfIndepMesh);
+
+	// put into the modeler.***
+	var magoManager = this.chemicalAccidentManager.magoManager;
+	var depth = 5;
+	magoManager.modeler.addObject(resultRenderableObject, depth);
+
+	// finally put into the our cuttingPlanesArray.***
+	this.cuttingPlanesArray.push(resultRenderableObject);
+
+
+	var hola = 0;
+};
+
 ChemicalAccidentLayer.prototype.render = function ()
 {
 	// render the depthBox.***
 	if (this.simulationBox === undefined)
 	{
 		this._makeSimulationBox();
+	}
+
+	if (this.cuttingPlanesArray.length === 0)
+	{
+		// create a default cuttingPlaneXZ.***
+		this.createCuttingPlaneXZ();
 	}
 
 	if (this.renderCounter === undefined)
@@ -887,7 +976,8 @@ ChemicalAccidentLayer.prototype.render = function ()
 	var modelViewMatrixRelToEyeInv = sceneState.getModelViewRelToEyeMatrixInv();
 	gl.uniformMatrix4fv(shader.modelViewMatrixRelToEyeInv_loc, false, modelViewMatrixRelToEyeInv._floatArrays);
 	var minMaxPollutionValues = this.getMinMaxPollutionValues();
-	gl.uniform2fv(shader.u_minMaxPollutionValues_loc, [minMaxPollutionValues[0], minMaxPollutionValues[1]]);
+	gl.uniform2fv(shader.u_minMaxPollutionValues_loc, [minMaxPollutionValues[0], minMaxPollutionValues[1]]);//
+	gl.uniform2fv(shader.u_minMaxPollutionValuesToRender_loc, this.minMaxPollutionValuesToRender);
 	
 	gl.uniform1f(shader.u_airEnvirontmentPressure_loc, 0); // delete this. no necessary.***
 	gl.uniform2fv(shader.u_screenSize_loc, [sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0]]);

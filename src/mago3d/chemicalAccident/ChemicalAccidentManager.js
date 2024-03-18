@@ -506,7 +506,8 @@ ChemicalAccidentManager.prototype.createDefaultShaders = function ()
 	shader.u_minMaxPollutionValues_loc = gl.getUniformLocation(shader.program, "u_minMaxPollutionValues");//
 	shader.u_airEnvirontmentPressure_loc = gl.getUniformLocation(shader.program, "u_airEnvirontmentPressure");
 	shader.u_maxVelocity_loc = gl.getUniformLocation(shader.program, "u_maxVelocity");
-	shader.u_voxelSizeMeters_loc = gl.getUniformLocation(shader.program, "u_voxelSizeMeters");
+	shader.u_voxelSizeMeters_loc = gl.getUniformLocation(shader.program, "u_voxelSizeMeters");//
+	shader.u_minMaxPollutionValuesToRender_loc = gl.getUniformLocation(shader.program, "u_minMaxPollutionValuesToRender");
 
 	shader.u_simulBoxTMat_loc = gl.getUniformLocation(shader.program, "u_simulBoxTMat");
 	shader.u_simulBoxTMatInv_loc = gl.getUniformLocation(shader.program, "u_simulBoxTMatInv");

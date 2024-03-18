@@ -53,6 +53,7 @@ uniform vec3 encodedCameraPositionMCHigh;
 uniform vec3 encodedCameraPositionMCLow;
 
 uniform vec2 u_minMaxPollutionValues;
+uniform vec2 u_minMaxPollutionValuesToRender;
 uniform float u_airEnvirontmentPressure;
 uniform vec2 u_screenSize;
 uniform vec2 uNearFarArray[4];
@@ -993,68 +994,6 @@ vec4 getRainbowColor_byHeight(in float height, in float minHeight_rainbow, in fl
     return resultColor;
 }
 
-vec3 getRainbowColor_byHeight_original(in float height, in float minHeight_rainbow, in float maxHeight_rainbow)
-{
-	float gray = (height - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);
-	if (gray > 1.0){ gray = 1.0; }
-	else if (gray<0.0){ gray = 0.0; }
-	
-	float r, g, b;
-	
-	if(gray < 0.16666)
-	{
-		b = 0.0;
-		g = gray*6.0;
-		r = 1.0;
-	}
-	else if(gray >= 0.16666 && gray < 0.33333)
-	{
-		b = 0.0;
-		g = 1.0;
-		r = 2.0 - gray*6.0;
-	}
-	else if(gray >= 0.33333 && gray < 0.5)
-	{
-		b = -2.0 + gray*6.0;
-		g = 1.0;
-		r = 0.0;
-	}
-	else if(gray >= 0.5 && gray < 0.66666)
-	{
-		b = 1.0;
-		g = 4.0 - gray*6.0;
-		r = 0.0;
-	}
-	else if(gray >= 0.66666 && gray < 0.83333)
-	{
-		b = 1.0;
-		g = 0.0;
-		r = -4.0 + gray*6.0;
-	}
-	else if(gray >= 0.83333)
-	{
-		b = 6.0 - gray*6.0;
-		g = 0.0;
-		r = 1.0;
-	}
-	
-	float aux = r;
-	r = b;
-	b = aux;
-	
-	//b = -gray + 1.0;
-	//if (gray > 0.5)
-	//{
-	//	g = -gray*2.0 + 2.0; 
-	//}
-	//else 
-	//{
-	//	g = gray*2.0;
-	//}
-	//r = gray;
-	vec3 resultColor = vec3(r, g, b);
-    return resultColor;
-} 
 
 // https://www.willusher.io/webgl/2019/01/13/volume-rendering-with-webgl
 // The transfer function specifies what color and opacity value should be assigned for a given value sampled from the volume. 
@@ -1223,6 +1162,8 @@ bool findFirstSamplePosition(in vec3 frontPosLC, in vec3 rearPosLC, in vec3 samp
     float contaminationSample = 0.0;
     vec3 samplePosLC;
     vec3 samplePosLC_prev;
+    float minValToConsidereSample = u_minMaxPollutionValues[0]; // original.***
+    //float minValToConsidereSample = (u_minMaxPollutionValues[1] - u_minMaxPollutionValues[0]) * 0.0001;
     for(int i=0; i<30; i++)
     {
         // Note : for each smple, must depth check with the scene depthTexure.***
@@ -1241,7 +1182,7 @@ bool findFirstSamplePosition(in vec3 frontPosLC, in vec3 rearPosLC, in vec3 samp
 
         if(get_pollution_fromTexture3d_triLinearInterpolation_FAST(sampleTexCoord3d, samplePosLC, contaminationSample))
         {
-            if(contaminationSample > u_minMaxPollutionValues[0])
+            if(contaminationSample > minValToConsidereSample)
             {
                 if(i > 0)
                 {
@@ -1249,7 +1190,7 @@ bool findFirstSamplePosition(in vec3 frontPosLC, in vec3 rearPosLC, in vec3 samp
                     vec3 samplePosLC_semiPrev = samplePosLC - samplingDirLC * increLength * 0.5;
                     if(get_pollution_fromTexture3d_triLinearInterpolation_FAST(sampleTexCoord3d, samplePosLC_semiPrev, contaminationSample))
                     {
-                        if(contaminationSample > u_minMaxPollutionValues[0])
+                        if(contaminationSample > minValToConsidereSample)
                         {
                             result_samplePos = samplePosLC_prev;
                             return true;
@@ -1314,7 +1255,7 @@ void main(){
 
     vec4 normal4rear = getNormal_simulationBox(rearTexCoord);
     vec4 normal4front = getNormal_simulationBox(frontTexCoord);
-	vec3 normal = normal4front.xyz;
+	//vec3 normal = normal4front.xyz;
 
     // 1rst, know the scene depth.***
     vec4 normal4scene = getNormal(v_tex_pos);
@@ -1322,13 +1263,12 @@ void main(){
 	int dataType = -1;// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.
 	int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType); // Note : "dataType" no used in this shader.***
 	vec2 nearFar_scene = getNearFar_byFrustumIdx(currFrustumIdx);
-	float currNear_scene = nearFar_scene.x; // no used in this shader.***
+	//float currNear_scene = nearFar_scene.x; // no used in this shader.***
 	float currFar_scene = nearFar_scene.y;
     float sceneLinearDepth = getDepth(v_tex_pos);
     float distToCam = sceneLinearDepth * currFar_scene;
-    vec3 sceneDepthPosCC = getViewRay(v_tex_pos, distToCam - 1.0);
+    //vec3 sceneDepthPosCC = getViewRay(v_tex_pos, distToCam - 1.0);
 
-    
 
     // Now, calculate the positions with the simulation box, front & rear.***
     // rear.***
@@ -1336,14 +1276,14 @@ void main(){
 	dataType = -1;// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.
 	currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType); // Note : "dataType" no used in this shader.***
 	vec2 nearFar_rear = getNearFar_byFrustumIdx(currFrustumIdx);
-	float currNear_rear = nearFar_rear.x; // no used in this shader.***
+	//float currNear_rear = nearFar_rear.x; // no used in this shader.***
 	float currFar_rear = nearFar_rear.y;
 
     // front.***
     estimatedFrustumIdx = int(floor(normal4front.w * 100.0));
 	currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType); // Note : "dataType" no used in this shader.***
 	vec2 nearFar_front = getNearFar_byFrustumIdx(currFrustumIdx);
-	float currNear_front = nearFar_front.x; // no used in this shader.***
+	//float currNear_front = nearFar_front.x; // no used in this shader.***
 	float currFar_front = nearFar_front.y;
 
     // Now, calculate the rearPosCC & frontPosCC.***
@@ -1351,7 +1291,6 @@ void main(){
     vec3 rearPosCC;
     get_FrontAndRear_posCC(screenPos, currFar_rear, currFar_front, frontPosCC, rearPosCC);
 
-    
     
 
     // Now, calculate frontPosWC & rearPosWC.***
@@ -1381,13 +1320,8 @@ void main(){
         //increLength = u_voxelSizeMeters.x;
     }
 
-    //vec3 camRay = normalize(getViewRay(v_tex_pos, 1.0));
-    vec3 camRay = normalize(sceneDepthPosCC);
-
     vec4 color4Aux = vec4(0.0, 0.0, 0.0, 0.0);
 
-    vec3 currSamplePosLC = vec3(frontPosLC);
-    vec3 step_vector_LC = samplingDirLC * increLength;
     vec4 finalColor4 = vec4(0.0);
     float contaminationAccum = 0.0;
     // u_minMaxPollutionValues
@@ -1396,7 +1330,6 @@ void main(){
     int iteration = 0;
     if(!findFirstSamplePosition(frontPosLC, rearPosLC, samplingDirLC, increLength, simulBoxRange, firstPosLC, iteration))
     {
-        
         // vec4 colorDiscard = vec4(0.3, 0.3, 0.3, 1.0);
         // gl_FragData[0] = colorDiscard;
 
@@ -1409,7 +1342,6 @@ void main(){
         return;
     }
     
-
     // recalculate segmentLength & increLength.***
     samplingsCount = 30.0;
     segmentLength = distance(rearPosLC, firstPosLC);
@@ -1417,121 +1349,13 @@ void main(){
 
     vec4 colorTest = vec4(0.0, 0.0, 0.5, 1.0);
     colorTest = vec4(firstPosLC.x /u_voxelSizeMeters.x, firstPosLC.y /u_voxelSizeMeters.y, firstPosLC.z /u_voxelSizeMeters.z , 1.0);
-
-    // if(iteration == 0)
-    // {
-    //     colorTest = vec4(1.0, 0.0, 0.0, 1.0);
-    //     gl_FragData[0] = colorTest;
-
-    //     #ifdef USE_MULTI_RENDER_TARGET
-    //         gl_FragData[1] = colorTest;
-    //         gl_FragData[2] = colorTest;
-    //         gl_FragData[3] = colorTest;
-    //     #endif
-    //     return;
-    // }
-    // else if(iteration == 1)
-    // {
-    //     colorTest = vec4(0.0, 1.0, 0.0, 1.0);
-    //     gl_FragData[0] = colorTest;
-
-    //     #ifdef USE_MULTI_RENDER_TARGET
-    //         gl_FragData[1] = colorTest;
-    //         gl_FragData[2] = colorTest;
-    //         gl_FragData[3] = colorTest;
-    //     #endif
-    //     return;
-    // }
-    // else if(iteration == 2)
-    // {
-    //     colorTest = vec4(0.0, 0.0, 1.0, 1.0);
-    //     gl_FragData[0] = colorTest;
-
-    //     #ifdef USE_MULTI_RENDER_TARGET
-    //         gl_FragData[1] = colorTest;
-    //         gl_FragData[2] = colorTest;
-    //         gl_FragData[3] = colorTest;
-    //     #endif
-    //     return;
-    // }
-    // else if(iteration == 3)
-    // {
-    //     colorTest = vec4(1.0, 1.0, 0.0, 1.0);
-    //     gl_FragData[0] = colorTest;
-
-    //     #ifdef USE_MULTI_RENDER_TARGET
-    //         gl_FragData[1] = colorTest;
-    //         gl_FragData[2] = colorTest;
-    //         gl_FragData[3] = colorTest;
-    //     #endif
-    //     return;
-    // }
-    // else if(iteration == 4)
-    // {
-    //     colorTest = vec4(1.0, 0.0, 1.0, 1.0);
-    //     gl_FragData[0] = colorTest;
-
-    //     #ifdef USE_MULTI_RENDER_TARGET
-    //         gl_FragData[1] = colorTest;
-    //         gl_FragData[2] = colorTest;
-    //         gl_FragData[3] = colorTest;
-    //     #endif
-    //     return;
-    // }
-    // else if(iteration == 5)
-    // {
-    //     colorTest = vec4(0.0, 1.0, 1.0, 1.0);
-    //     gl_FragData[0] = colorTest;
-
-    //     #ifdef USE_MULTI_RENDER_TARGET
-    //         gl_FragData[1] = colorTest;
-    //         gl_FragData[2] = colorTest;
-    //         gl_FragData[3] = colorTest;
-    //     #endif
-    //     return;
-    // }
-    // else if(iteration == 6)
-    // {
-    //     colorTest = vec4(0.5, 0.0, 0.0, 1.0);
-    //     gl_FragData[0] = colorTest;
-
-    //     #ifdef USE_MULTI_RENDER_TARGET
-    //         gl_FragData[1] = colorTest;
-    //         gl_FragData[2] = colorTest;
-    //         gl_FragData[3] = colorTest;
-    //     #endif
-    //     return;
-    // }
-    // else if(iteration == 7)
-    // {
-    //     colorTest = vec4(0.0, 0.5, 0.0, 1.0);
-    //     gl_FragData[0] = colorTest;
-
-    //     #ifdef USE_MULTI_RENDER_TARGET
-    //         gl_FragData[1] = colorTest;
-    //         gl_FragData[2] = colorTest;
-    //         gl_FragData[3] = colorTest;
-    //     #endif
-    //     return;
-    // }
-    // else if(iteration == 8)
-    // {
-    //     colorTest = vec4(0.0, 0.0, 0.5, 1.0);
-    //     gl_FragData[0] = colorTest;
-
-    //     #ifdef USE_MULTI_RENDER_TARGET
-    //         gl_FragData[1] = colorTest;
-    //         gl_FragData[2] = colorTest;
-    //         gl_FragData[3] = colorTest;
-    //     #endif
-    //     return;
-    // }
     
     // Sampling far to near.***
     bool normalLC_calculated = true;
+    float contaminationSamples[30];
+    int samplesCount = 0;
     for(int i=0; i<30; i++)
     {
-        
         // Note : for each smple, must depth check with the scene depthTexure.***
         vec3 samplePosLC = firstPosLC + samplingDirLC * increLength * float(i);
 
@@ -1547,62 +1371,85 @@ void main(){
 
         if(get_pollution_fromTexture3d_triLinearInterpolation(sampleTexCoord3d, samplePosLC, contaminationSample))
         {
-            vec3 currNormalLC;
-            //if(!normalLC(sampleTexCoord3d, samplePosLC, currNormalLC))
-            //{
-           //     normalLC_calculated = false;
-            //    continue;
-            //}
+            contaminationSamples[i] = contaminationSample;
+            samplesCount += 1;
+            // vec3 currNormalLC;
+            // // if(!normalLC(sampleTexCoord3d, samplePosLC, currNormalLC))
+            // // {
+            // //    normalLC_calculated = false;
+            // //    continue;
+            // // }
 
-            vec4 currColor4 = transfer_fnc(contaminationSample);
-            currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);
-            //vec3 normalizedVelocityLC = normalize(velocityLC);
-            //vec4 velocityWC = u_simulBoxTMat * vec4(velocityLC, 1.0);
-            //vec4 velocityDirCC = modelViewMatrixRelToEye * vec4(velocityWC.xyz, 1.0);
-
-            // Now, calculate alpha by normalCC.***
-            /*
-            vec4 currNormalWC = u_simulBoxTMat * vec4(currNormalLC, 1.0);
-            vec4 currNormalCC = modelViewMatrixRelToEye * vec4(currNormalWC.xyz, 1.0);
-            vec3 normalCC = normalize(currNormalCC.xyz);
-            float dotProd = dot(camRay, normalCC);
-
-            // Now, accumulate the color.***
-            if(dotProd < 0.0)
-            {
-                currColor4.rgb *= abs(dotProd);
-            }
-            */
-            
-
-            //vec4 vecAux = abs(vec4(currColor4.rgb, 1.0));
-            //currColor4.r = sampleTexCoord3d.x;
-            //currColor4.g = sampleTexCoord3d.y;
-            //currColor4.b = sampleTexCoord3d.z;
+            // //vec4 currColor4 = transfer_fnc(contaminationSample);
+            // vec4 currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);
+            // //float unitaryContaminationSample = (contaminationSample - u_minMaxPollutionValues.x) / (u_minMaxPollutionValues.y - u_minMaxPollutionValues.x);
  
-            //if(length(currNormalLC) > 0.0)
-            {
-                // https://www.willusher.io/webgl/2019/01/13/volume-rendering-with-webgl
-                finalColor4.rgb += (1.0 - finalColor4.a) * currColor4.a * currColor4.rgb; // test. render normal color:
-                finalColor4.a += (1.0 - finalColor4.a) * currColor4.a;
-            }
-            
-            smplingCount += 1.0;
+            // //if(length(currNormalLC) > 0.0)
+            // {
+            //     // https://www.willusher.io/webgl/2019/01/13/volume-rendering-with-webgl
+            //     finalColor4.rgb += (1.0 - finalColor4.a) * currColor4.a * currColor4.rgb; 
+            //     finalColor4.a += (1.0 - finalColor4.a) * currColor4.a;
+            // }
 
-            // Optimization: break out of the loop when the color is near opaque
-            if (finalColor4.a >= 0.95) {
-                break;
-            }
+            // smplingCount += 1.0;
 
-            contaminationAccum += contaminationSample;
-            //finalColor4.rgb += vec3(contaminationSample, 0.0, 0.0);
-            //finalColor4.a += contaminationSample;
+            // // Optimization: break out of the loop when the color is near opaque
+            // if (finalColor4.a >= 0.95) {
+            //     break;
+            // }
+
+            // contaminationAccum += contaminationSample;
             
         }
-
-
-        currSamplePosLC += step_vector_LC;
+        else{
+            contaminationSamples[i] = 0.0;
+        }
     }
+
+    int samplesCount2 = 0;
+    for(int i=0; i<30; i++)
+    {
+        contaminationSample = contaminationSamples[i];
+        if(contaminationSample > 0.0)
+        {
+            vec4 currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);
+
+            //float unitaryContaminationSample = (contaminationSample - u_minMaxPollutionValues.x) / (u_minMaxPollutionValuesToRender.y - u_minMaxPollutionValues.x);
+            float unitaryContaminationSample = 0.0;
+            float targetValue = u_minMaxPollutionValuesToRender.y;
+            
+            //targetValue = u_minMaxPollutionValues.y;
+            currColor4.a = contaminationSample / targetValue;
+            if(currColor4.a > 1.0)
+            {
+                currColor4.a = 1.0;
+            }
+
+            //currColor4.a *= smoothstep(0.0, targetValue, contaminationSample);
+            currColor4.a = smoothstep(0.0, targetValue, contaminationSample);
+
+            // https://www.willusher.io/webgl/2019/01/13/volume-rendering-with-webgl
+            finalColor4.rgb += (1.0 - finalColor4.a) * currColor4.a * currColor4.rgb; 
+            finalColor4.a += (1.0 - finalColor4.a) * currColor4.a;
+            samplesCount2 += 1;
+
+            contaminationAccum += contaminationSample;
+        }
+
+        // Optimization: break out of the loop when the color is near opaque
+        if (finalColor4.a >= 0.95) {
+            break;
+        }
+
+        // if(samplesCount2 >= samplesCount)
+        // {
+        //     break;
+        // }
+    }
+
+    // contaminationAccum /= float(samplesCount2);
+    // finalColor4 = getRainbowColor_byHeight(contaminationAccum, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);
+    // finalColor4.a *= 10.0;
 
     if(smplingCount < 1.0)
     {
@@ -1613,39 +1460,7 @@ void main(){
     {
         smplingCount = 1.0;
     }
-    /*
-    if(smplingCount < 10.0)
-    {
-        color4Aux = vec4(1.0, 0.0, 0.0, 0.7);
-    }
-    else if(smplingCount < 20.0)
-    {
-        color4Aux = vec4(0.0, 1.0, 0.0, 0.7);
-    }
-    else if(smplingCount < 30.0)
-    {
-        color4Aux = vec4(0.0, 0.0, 1.0, 0.7);
-    }
-    else if(smplingCount < 40.0)
-    {
-        color4Aux = vec4(1.0, 1.0, 0.0, 0.7);
-    }
-    else
-    {
-        color4Aux = vec4(1.0, 0.0, 1.0, 0.7);
-    }
-    */
 
-    //vec4 rainbowColor = getRainbowColor_byHeight(contaminationAccum/smplingCount, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y, false);
-
-
-    //float finalAlpha = finalColor4.a;
-    //finalAlpha *= 2.0;
-    //if(finalAlpha > 1.0)
-    //{
-    //    finalAlpha = 1.0;
-    //}
-    //finalColor4.a = finalAlpha;
     color4Aux = finalColor4;
 
     if(!normalLC_calculated)
@@ -1661,167 +1476,3 @@ void main(){
         gl_FragData[3] = color4Aux;
     #endif
 }
-
-/*
-uniform sampler3D tex;
-uniform sampler3D normals;
-uniform sampler2D colorMap;
-
-uniform mat4 transform;
-uniform int depthSampleCount;
-uniform float zScale;
-
-uniform vec3 lightPosition;
-
-uniform float brightness;
-
-//uniform vec4 opacitySettings;
-// x: minLevel
-// y: maxLevel
-// z: lowNode
-// w: highNode
-
-in vec2 texCoord;
-
-//in vec4 origin;
-//in vec4 direction;
-
-out vec4 color;
-
-vec3 ambientLight = vec3(0.34, 0.32, 0.32);
-vec3 directionalLight = vec3(0.5, 0.5, 0.5);
-vec3 lightVector = normalize(vec3(-1.0, -1.0, 1.0));
-vec3 specularColor = vec3(0.5, 0.5, 0.5);
-
-vec3 aabb[2] = vec3[2](
-	vec3(0.0, 0.0, 0.0),
-	vec3(1.0, 1.0, 1.0)
-);
-
-struct Ray {
-    vec3 origin;
-    vec3 direction;
-    vec3 inv_direction;
-    int sign[3];
-};
-
-Ray makeRay(vec3 origin, vec3 direction) {
-    vec3 inv_direction = vec3(1.0) / direction;
-    
-    return Ray(
-        origin,
-        direction,
-        inv_direction,
-        int[3](
-			((inv_direction.x < 0.0) ? 1 : 0),
-			((inv_direction.y < 0.0) ? 1 : 0),
-			((inv_direction.z < 0.0) ? 1 : 0)
-		)
-    );
-}
-
-/*
-	From: https://github.com/hpicgs/cgsee/wiki/Ray-Box-Intersection-on-the-GPU
-void intersect(
-    in Ray ray, in vec3 aabb[2],
-    out float tmin, out float tmax
-){
-    float tymin, tymax, tzmin, tzmax;
-    tmin = (aabb[ray.sign[0]].x - ray.origin.x) * ray.inv_direction.x;
-    tmax = (aabb[1-ray.sign[0]].x - ray.origin.x) * ray.inv_direction.x;
-    tymin = (aabb[ray.sign[1]].y - ray.origin.y) * ray.inv_direction.y;
-    tymax = (aabb[1-ray.sign[1]].y - ray.origin.y) * ray.inv_direction.y;
-    tzmin = (aabb[ray.sign[2]].z - ray.origin.z) * ray.inv_direction.z;
-    tzmax = (aabb[1-ray.sign[2]].z - ray.origin.z) * ray.inv_direction.z;
-    tmin = max(max(tmin, tymin), tzmin);
-    tmax = min(min(tmax, tymax), tzmax);
-}
-*/
-
-
-/*
-
-void main(){
-	
-	//transform = inverse(transform);
-	
-	vec4 origin = vec4(0.0, 0.0, 2.0, 1.0);
-	origin = transform * origin;
-	origin = origin / origin.w;
-	origin.z = origin.z / zScale;
-	origin = origin + 0.5;
-
-	vec4 image = vec4(texCoord, 4.0, 1.0);
-	image = transform * image;
-	//image = image / image.w;
-	image.z = image.z / zScale;
-	image = image + 0.5;
-	//vec4 direction = vec4(0.0, 0.0, 1.0, 0.0);
-	vec4 direction = normalize(origin-image);
-	//direction = transform * direction;
-
-	Ray ray = makeRay(origin.xyz, direction.xyz);
-	float tmin = 0.0;
-	float tmax = 0.0;
-	intersect(ray, aabb, tmin, tmax);
-
-	vec4 value = vec4(0.0, 0.0, 0.0, 0.0);
-,
-	if(tmin > tmax){
-		color = value;
-		discard;
-	}
-
-	vec3 start = origin.xyz + tmin*direction.xyz;
-	vec3 end = origin.xyz + tmax*direction.xyz;
-	
-	float length = distance(end, start);
-	int sampleCount = int(float(depthSampleCount)*length);
-	//vec3 increment = (end-start)/float(sampleCount);
-	//vec3 originOffset = mod((start-origin.xyz), increment);
-
-	float s = 0.0;
-	float px = 0.0;
-	vec4 pxColor = vec4(0.0, 0.0, 0.0, 0.0);
-	vec3 texCo = vec3(0.0, 0.0, 0.0);
-	vec3 normal = vec3(0.0, 0.0, 0.0);
-	vec4 zero = vec4(0.0);
-	
-	for(int count = 0; count < sampleCount; count++){
-
-		texCo = mix(start, end, float(count)/float(sampleCount));// - originOffset;
-
-		//texCo = start + increment*float(count);
-		px = texture(tex, texCo).r;
-
-		
-		//px = length(texture(normals, texCo).xyz - 0.5);
-		//px = px * 1.5;
-		
-		pxColor = texture(colorMap, vec2(px, 0.0));
-		
-		normal = normalize(texture(normals, texCo).xyz - 0.5);
-		float directional = clamp(dot(normal, lightVector), 0.0, 1.0);
-
-		//vec3 R = -reflect(lightDirection, surfaceNormal);
-		//return pow(max(0.0, dot(viewDirection, R)), shininess);
-
-		float specular = max(dot(direction.xyz, reflect(lightVector, normal)), 0.0);
-		specular = pow(specular, 3.0);
-
-		pxColor.rgb = ambientLight*pxColor.rgb + directionalLight*directional*pxColor.rgb + pxColor.a*specular*specularColor;
-			
-		
-		//value = mix(value, pxColor, px);
-		//value = (1.0-value.a)*pxColor + value;
-		//value = mix(pxColor, zero, value.a) + value;
-		
-		value = value + pxColor - pxColor*value.a;
-		
-		if(value.a >= 0.95){
-			break;
-		}
-	}
-	color = value*brightness;
-}
-*/

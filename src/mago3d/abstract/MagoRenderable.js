@@ -704,7 +704,24 @@ MagoRenderable.prototype.setOneColor = function(r, g, b, a)
 	{
 		this.setOpaque(true);
 	}
+}; // selectedColor4
+
+/**
+ * Set the unique one color of the box
+ * @param {Number} r
+ * @param {Number} g
+ * @param {Number} b 
+ * @param {Number} a
+ */
+MagoRenderable.prototype.setSelectedColor4 = function(r, g, b, a)
+{
+	// This function sets the selected color of the mesh.***
+	if (this.attributes.selectedColor4 === undefined)
+	{ this.attributes.selectedColor4 = new Color(); }
+	
+	this.attributes.selectedColor4.setRGBA(r, g, b, a);
 };
+
 /**
  * restore color
  */

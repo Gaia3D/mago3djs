@@ -2439,6 +2439,7 @@ uniform vec3 encodedCameraPositionMCHigh;\n\
 uniform vec3 encodedCameraPositionMCLow;\n\
 \n\
 uniform vec2 u_minMaxPollutionValues;\n\
+uniform vec2 u_minMaxPollutionValuesToRender;\n\
 uniform float u_airEnvirontmentPressure;\n\
 uniform vec2 u_screenSize;\n\
 uniform vec2 uNearFarArray[4];\n\
@@ -3297,7 +3298,7 @@ vec4 getRainbowColor_byHeight(in float height, in float minHeight_rainbow, in fl
 	if (gray > 1.0){ gray = 1.0; }\n\
 	else if (gray<0.0){ gray = 0.0; }\n\
 \n\
-    float value = gray * 4.0;\n\
+    float value = gray * 3.99;\n\
     float h = floor(value);\n\
     float f = fract(value);\n\
 \n\
@@ -3379,68 +3380,6 @@ vec4 getRainbowColor_byHeight(in float height, in float minHeight_rainbow, in fl
     return resultColor;\n\
 }\n\
 \n\
-vec3 getRainbowColor_byHeight_original(in float height, in float minHeight_rainbow, in float maxHeight_rainbow)\n\
-{\n\
-	float gray = (height - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);\n\
-	if (gray > 1.0){ gray = 1.0; }\n\
-	else if (gray<0.0){ gray = 0.0; }\n\
-	\n\
-	float r, g, b;\n\
-	\n\
-	if(gray < 0.16666)\n\
-	{\n\
-		b = 0.0;\n\
-		g = gray*6.0;\n\
-		r = 1.0;\n\
-	}\n\
-	else if(gray >= 0.16666 && gray < 0.33333)\n\
-	{\n\
-		b = 0.0;\n\
-		g = 1.0;\n\
-		r = 2.0 - gray*6.0;\n\
-	}\n\
-	else if(gray >= 0.33333 && gray < 0.5)\n\
-	{\n\
-		b = -2.0 + gray*6.0;\n\
-		g = 1.0;\n\
-		r = 0.0;\n\
-	}\n\
-	else if(gray >= 0.5 && gray < 0.66666)\n\
-	{\n\
-		b = 1.0;\n\
-		g = 4.0 - gray*6.0;\n\
-		r = 0.0;\n\
-	}\n\
-	else if(gray >= 0.66666 && gray < 0.83333)\n\
-	{\n\
-		b = 1.0;\n\
-		g = 0.0;\n\
-		r = -4.0 + gray*6.0;\n\
-	}\n\
-	else if(gray >= 0.83333)\n\
-	{\n\
-		b = 6.0 - gray*6.0;\n\
-		g = 0.0;\n\
-		r = 1.0;\n\
-	}\n\
-	\n\
-	float aux = r;\n\
-	r = b;\n\
-	b = aux;\n\
-	\n\
-	//b = -gray + 1.0;\n\
-	//if (gray > 0.5)\n\
-	//{\n\
-	//	g = -gray*2.0 + 2.0; \n\
-	//}\n\
-	//else \n\
-	//{\n\
-	//	g = gray*2.0;\n\
-	//}\n\
-	//r = gray;\n\
-	vec3 resultColor = vec3(r, g, b);\n\
-    return resultColor;\n\
-} \n\
 \n\
 // https://www.willusher.io/webgl/2019/01/13/volume-rendering-with-webgl\n\
 // The transfer function specifies what color and opacity value should be assigned for a given value sampled from the volume. \n\
@@ -3609,6 +3548,8 @@ bool findFirstSamplePosition(in vec3 frontPosLC, in vec3 rearPosLC, in vec3 samp
     float contaminationSample = 0.0;\n\
     vec3 samplePosLC;\n\
     vec3 samplePosLC_prev;\n\
+    float minValToConsidereSample = u_minMaxPollutionValues[0]; // original.***\n\
+    //float minValToConsidereSample = (u_minMaxPollutionValues[1] - u_minMaxPollutionValues[0]) * 0.0001;\n\
     for(int i=0; i<30; i++)\n\
     {\n\
         // Note : for each smple, must depth check with the scene depthTexure.***\n\
@@ -3627,7 +3568,7 @@ bool findFirstSamplePosition(in vec3 frontPosLC, in vec3 rearPosLC, in vec3 samp
 \n\
         if(get_pollution_fromTexture3d_triLinearInterpolation_FAST(sampleTexCoord3d, samplePosLC, contaminationSample))\n\
         {\n\
-            if(contaminationSample > u_minMaxPollutionValues[0])\n\
+            if(contaminationSample > minValToConsidereSample)\n\
             {\n\
                 if(i > 0)\n\
                 {\n\
@@ -3635,7 +3576,7 @@ bool findFirstSamplePosition(in vec3 frontPosLC, in vec3 rearPosLC, in vec3 samp
                     vec3 samplePosLC_semiPrev = samplePosLC - samplingDirLC * increLength * 0.5;\n\
                     if(get_pollution_fromTexture3d_triLinearInterpolation_FAST(sampleTexCoord3d, samplePosLC_semiPrev, contaminationSample))\n\
                     {\n\
-                        if(contaminationSample > u_minMaxPollutionValues[0])\n\
+                        if(contaminationSample > minValToConsidereSample)\n\
                         {\n\
                             result_samplePos = samplePosLC_prev;\n\
                             return true;\n\
@@ -3700,7 +3641,7 @@ void main(){\n\
 \n\
     vec4 normal4rear = getNormal_simulationBox(rearTexCoord);\n\
     vec4 normal4front = getNormal_simulationBox(frontTexCoord);\n\
-	vec3 normal = normal4front.xyz;\n\
+	//vec3 normal = normal4front.xyz;\n\
 \n\
     // 1rst, know the scene depth.***\n\
     vec4 normal4scene = getNormal(v_tex_pos);\n\
@@ -3708,13 +3649,12 @@ void main(){\n\
 	int dataType = -1;// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.\n\
 	int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType); // Note : \"dataType\" no used in this shader.***\n\
 	vec2 nearFar_scene = getNearFar_byFrustumIdx(currFrustumIdx);\n\
-	float currNear_scene = nearFar_scene.x; // no used in this shader.***\n\
+	//float currNear_scene = nearFar_scene.x; // no used in this shader.***\n\
 	float currFar_scene = nearFar_scene.y;\n\
     float sceneLinearDepth = getDepth(v_tex_pos);\n\
     float distToCam = sceneLinearDepth * currFar_scene;\n\
-    vec3 sceneDepthPosCC = getViewRay(v_tex_pos, distToCam - 1.0);\n\
+    //vec3 sceneDepthPosCC = getViewRay(v_tex_pos, distToCam - 1.0);\n\
 \n\
-    \n\
 \n\
     // Now, calculate the positions with the simulation box, front & rear.***\n\
     // rear.***\n\
@@ -3722,14 +3662,14 @@ void main(){\n\
 	dataType = -1;// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.\n\
 	currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType); // Note : \"dataType\" no used in this shader.***\n\
 	vec2 nearFar_rear = getNearFar_byFrustumIdx(currFrustumIdx);\n\
-	float currNear_rear = nearFar_rear.x; // no used in this shader.***\n\
+	//float currNear_rear = nearFar_rear.x; // no used in this shader.***\n\
 	float currFar_rear = nearFar_rear.y;\n\
 \n\
     // front.***\n\
     estimatedFrustumIdx = int(floor(normal4front.w * 100.0));\n\
 	currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType); // Note : \"dataType\" no used in this shader.***\n\
 	vec2 nearFar_front = getNearFar_byFrustumIdx(currFrustumIdx);\n\
-	float currNear_front = nearFar_front.x; // no used in this shader.***\n\
+	//float currNear_front = nearFar_front.x; // no used in this shader.***\n\
 	float currFar_front = nearFar_front.y;\n\
 \n\
     // Now, calculate the rearPosCC & frontPosCC.***\n\
@@ -3737,7 +3677,6 @@ void main(){\n\
     vec3 rearPosCC;\n\
     get_FrontAndRear_posCC(screenPos, currFar_rear, currFar_front, frontPosCC, rearPosCC);\n\
 \n\
-    \n\
     \n\
 \n\
     // Now, calculate frontPosWC & rearPosWC.***\n\
@@ -3767,13 +3706,8 @@ void main(){\n\
         //increLength = u_voxelSizeMeters.x;\n\
     }\n\
 \n\
-    //vec3 camRay = normalize(getViewRay(v_tex_pos, 1.0));\n\
-    vec3 camRay = normalize(sceneDepthPosCC);\n\
-\n\
     vec4 color4Aux = vec4(0.0, 0.0, 0.0, 0.0);\n\
 \n\
-    vec3 currSamplePosLC = vec3(frontPosLC);\n\
-    vec3 step_vector_LC = samplingDirLC * increLength;\n\
     vec4 finalColor4 = vec4(0.0);\n\
     float contaminationAccum = 0.0;\n\
     // u_minMaxPollutionValues\n\
@@ -3782,7 +3716,6 @@ void main(){\n\
     int iteration = 0;\n\
     if(!findFirstSamplePosition(frontPosLC, rearPosLC, samplingDirLC, increLength, simulBoxRange, firstPosLC, iteration))\n\
     {\n\
-        \n\
         // vec4 colorDiscard = vec4(0.3, 0.3, 0.3, 1.0);\n\
         // gl_FragData[0] = colorDiscard;\n\
 \n\
@@ -3795,7 +3728,6 @@ void main(){\n\
         return;\n\
     }\n\
     \n\
-\n\
     // recalculate segmentLength & increLength.***\n\
     samplingsCount = 30.0;\n\
     segmentLength = distance(rearPosLC, firstPosLC);\n\
@@ -3803,121 +3735,13 @@ void main(){\n\
 \n\
     vec4 colorTest = vec4(0.0, 0.0, 0.5, 1.0);\n\
     colorTest = vec4(firstPosLC.x /u_voxelSizeMeters.x, firstPosLC.y /u_voxelSizeMeters.y, firstPosLC.z /u_voxelSizeMeters.z , 1.0);\n\
-\n\
-    // if(iteration == 0)\n\
-    // {\n\
-    //     colorTest = vec4(1.0, 0.0, 0.0, 1.0);\n\
-    //     gl_FragData[0] = colorTest;\n\
-\n\
-    //     #ifdef USE_MULTI_RENDER_TARGET\n\
-    //         gl_FragData[1] = colorTest;\n\
-    //         gl_FragData[2] = colorTest;\n\
-    //         gl_FragData[3] = colorTest;\n\
-    //     #endif\n\
-    //     return;\n\
-    // }\n\
-    // else if(iteration == 1)\n\
-    // {\n\
-    //     colorTest = vec4(0.0, 1.0, 0.0, 1.0);\n\
-    //     gl_FragData[0] = colorTest;\n\
-\n\
-    //     #ifdef USE_MULTI_RENDER_TARGET\n\
-    //         gl_FragData[1] = colorTest;\n\
-    //         gl_FragData[2] = colorTest;\n\
-    //         gl_FragData[3] = colorTest;\n\
-    //     #endif\n\
-    //     return;\n\
-    // }\n\
-    // else if(iteration == 2)\n\
-    // {\n\
-    //     colorTest = vec4(0.0, 0.0, 1.0, 1.0);\n\
-    //     gl_FragData[0] = colorTest;\n\
-\n\
-    //     #ifdef USE_MULTI_RENDER_TARGET\n\
-    //         gl_FragData[1] = colorTest;\n\
-    //         gl_FragData[2] = colorTest;\n\
-    //         gl_FragData[3] = colorTest;\n\
-    //     #endif\n\
-    //     return;\n\
-    // }\n\
-    // else if(iteration == 3)\n\
-    // {\n\
-    //     colorTest = vec4(1.0, 1.0, 0.0, 1.0);\n\
-    //     gl_FragData[0] = colorTest;\n\
-\n\
-    //     #ifdef USE_MULTI_RENDER_TARGET\n\
-    //         gl_FragData[1] = colorTest;\n\
-    //         gl_FragData[2] = colorTest;\n\
-    //         gl_FragData[3] = colorTest;\n\
-    //     #endif\n\
-    //     return;\n\
-    // }\n\
-    // else if(iteration == 4)\n\
-    // {\n\
-    //     colorTest = vec4(1.0, 0.0, 1.0, 1.0);\n\
-    //     gl_FragData[0] = colorTest;\n\
-\n\
-    //     #ifdef USE_MULTI_RENDER_TARGET\n\
-    //         gl_FragData[1] = colorTest;\n\
-    //         gl_FragData[2] = colorTest;\n\
-    //         gl_FragData[3] = colorTest;\n\
-    //     #endif\n\
-    //     return;\n\
-    // }\n\
-    // else if(iteration == 5)\n\
-    // {\n\
-    //     colorTest = vec4(0.0, 1.0, 1.0, 1.0);\n\
-    //     gl_FragData[0] = colorTest;\n\
-\n\
-    //     #ifdef USE_MULTI_RENDER_TARGET\n\
-    //         gl_FragData[1] = colorTest;\n\
-    //         gl_FragData[2] = colorTest;\n\
-    //         gl_FragData[3] = colorTest;\n\
-    //     #endif\n\
-    //     return;\n\
-    // }\n\
-    // else if(iteration == 6)\n\
-    // {\n\
-    //     colorTest = vec4(0.5, 0.0, 0.0, 1.0);\n\
-    //     gl_FragData[0] = colorTest;\n\
-\n\
-    //     #ifdef USE_MULTI_RENDER_TARGET\n\
-    //         gl_FragData[1] = colorTest;\n\
-    //         gl_FragData[2] = colorTest;\n\
-    //         gl_FragData[3] = colorTest;\n\
-    //     #endif\n\
-    //     return;\n\
-    // }\n\
-    // else if(iteration == 7)\n\
-    // {\n\
-    //     colorTest = vec4(0.0, 0.5, 0.0, 1.0);\n\
-    //     gl_FragData[0] = colorTest;\n\
-\n\
-    //     #ifdef USE_MULTI_RENDER_TARGET\n\
-    //         gl_FragData[1] = colorTest;\n\
-    //         gl_FragData[2] = colorTest;\n\
-    //         gl_FragData[3] = colorTest;\n\
-    //     #endif\n\
-    //     return;\n\
-    // }\n\
-    // else if(iteration == 8)\n\
-    // {\n\
-    //     colorTest = vec4(0.0, 0.0, 0.5, 1.0);\n\
-    //     gl_FragData[0] = colorTest;\n\
-\n\
-    //     #ifdef USE_MULTI_RENDER_TARGET\n\
-    //         gl_FragData[1] = colorTest;\n\
-    //         gl_FragData[2] = colorTest;\n\
-    //         gl_FragData[3] = colorTest;\n\
-    //     #endif\n\
-    //     return;\n\
-    // }\n\
     \n\
     // Sampling far to near.***\n\
     bool normalLC_calculated = true;\n\
+    float contaminationSamples[30];\n\
+    int samplesCount = 0;\n\
     for(int i=0; i<30; i++)\n\
     {\n\
-        \n\
         // Note : for each smple, must depth check with the scene depthTexure.***\n\
         vec3 samplePosLC = firstPosLC + samplingDirLC * increLength * float(i);\n\
 \n\
@@ -3933,62 +3757,85 @@ void main(){\n\
 \n\
         if(get_pollution_fromTexture3d_triLinearInterpolation(sampleTexCoord3d, samplePosLC, contaminationSample))\n\
         {\n\
-            vec3 currNormalLC;\n\
-            //if(!normalLC(sampleTexCoord3d, samplePosLC, currNormalLC))\n\
-            //{\n\
-           //     normalLC_calculated = false;\n\
-            //    continue;\n\
-            //}\n\
+            contaminationSamples[i] = contaminationSample;\n\
+            samplesCount += 1;\n\
+            // vec3 currNormalLC;\n\
+            // // if(!normalLC(sampleTexCoord3d, samplePosLC, currNormalLC))\n\
+            // // {\n\
+            // //    normalLC_calculated = false;\n\
+            // //    continue;\n\
+            // // }\n\
 \n\
-            vec4 currColor4 = transfer_fnc(contaminationSample);\n\
-            currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);\n\
-            //vec3 normalizedVelocityLC = normalize(velocityLC);\n\
-            //vec4 velocityWC = u_simulBoxTMat * vec4(velocityLC, 1.0);\n\
-            //vec4 velocityDirCC = modelViewMatrixRelToEye * vec4(velocityWC.xyz, 1.0);\n\
-\n\
-            // Now, calculate alpha by normalCC.***\n\
-            /*\n\
-            vec4 currNormalWC = u_simulBoxTMat * vec4(currNormalLC, 1.0);\n\
-            vec4 currNormalCC = modelViewMatrixRelToEye * vec4(currNormalWC.xyz, 1.0);\n\
-            vec3 normalCC = normalize(currNormalCC.xyz);\n\
-            float dotProd = dot(camRay, normalCC);\n\
-\n\
-            // Now, accumulate the color.***\n\
-            if(dotProd < 0.0)\n\
-            {\n\
-                currColor4.rgb *= abs(dotProd);\n\
-            }\n\
-            */\n\
-            \n\
-\n\
-            //vec4 vecAux = abs(vec4(currColor4.rgb, 1.0));\n\
-            //currColor4.r = sampleTexCoord3d.x;\n\
-            //currColor4.g = sampleTexCoord3d.y;\n\
-            //currColor4.b = sampleTexCoord3d.z;\n\
+            // //vec4 currColor4 = transfer_fnc(contaminationSample);\n\
+            // vec4 currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);\n\
+            // //float unitaryContaminationSample = (contaminationSample - u_minMaxPollutionValues.x) / (u_minMaxPollutionValues.y - u_minMaxPollutionValues.x);\n\
  \n\
-            //if(length(currNormalLC) > 0.0)\n\
-            {\n\
-                // https://www.willusher.io/webgl/2019/01/13/volume-rendering-with-webgl\n\
-                finalColor4.rgb += (1.0 - finalColor4.a) * currColor4.a * currColor4.rgb; // test. render normal color:\n\
-                finalColor4.a += (1.0 - finalColor4.a) * currColor4.a;\n\
-            }\n\
-            \n\
-            smplingCount += 1.0;\n\
+            // //if(length(currNormalLC) > 0.0)\n\
+            // {\n\
+            //     // https://www.willusher.io/webgl/2019/01/13/volume-rendering-with-webgl\n\
+            //     finalColor4.rgb += (1.0 - finalColor4.a) * currColor4.a * currColor4.rgb; \n\
+            //     finalColor4.a += (1.0 - finalColor4.a) * currColor4.a;\n\
+            // }\n\
 \n\
-            // Optimization: break out of the loop when the color is near opaque\n\
-            if (finalColor4.a >= 0.95) {\n\
-                break;\n\
-            }\n\
+            // smplingCount += 1.0;\n\
 \n\
-            contaminationAccum += contaminationSample;\n\
-            //finalColor4.rgb += vec3(contaminationSample, 0.0, 0.0);\n\
-            //finalColor4.a += contaminationSample;\n\
+            // // Optimization: break out of the loop when the color is near opaque\n\
+            // if (finalColor4.a >= 0.95) {\n\
+            //     break;\n\
+            // }\n\
+\n\
+            // contaminationAccum += contaminationSample;\n\
             \n\
         }\n\
-\n\
-\n\
-        currSamplePosLC += step_vector_LC;\n\
+        else{\n\
+            contaminationSamples[i] = 0.0;\n\
+        }\n\
     }\n\
+\n\
+    int samplesCount2 = 0;\n\
+    for(int i=0; i<30; i++)\n\
+    {\n\
+        contaminationSample = contaminationSamples[i];\n\
+        if(contaminationSample > 0.0)\n\
+        {\n\
+            vec4 currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);\n\
+\n\
+            //float unitaryContaminationSample = (contaminationSample - u_minMaxPollutionValues.x) / (u_minMaxPollutionValuesToRender.y - u_minMaxPollutionValues.x);\n\
+            float unitaryContaminationSample = 0.0;\n\
+            float targetValue = u_minMaxPollutionValuesToRender.y;\n\
+            \n\
+            //targetValue = u_minMaxPollutionValues.y;\n\
+            currColor4.a = contaminationSample / targetValue;\n\
+            if(currColor4.a > 1.0)\n\
+            {\n\
+                currColor4.a = 1.0;\n\
+            }\n\
+\n\
+            //currColor4.a *= smoothstep(0.0, targetValue, contaminationSample);\n\
+            currColor4.a = smoothstep(0.0, targetValue, contaminationSample);\n\
+\n\
+            // https://www.willusher.io/webgl/2019/01/13/volume-rendering-with-webgl\n\
+            finalColor4.rgb += (1.0 - finalColor4.a) * currColor4.a * currColor4.rgb; \n\
+            finalColor4.a += (1.0 - finalColor4.a) * currColor4.a;\n\
+            samplesCount2 += 1;\n\
+\n\
+            contaminationAccum += contaminationSample;\n\
+        }\n\
+\n\
+        // Optimization: break out of the loop when the color is near opaque\n\
+        if (finalColor4.a >= 0.95) {\n\
+            break;\n\
+        }\n\
+\n\
+        // if(samplesCount2 >= samplesCount)\n\
+        // {\n\
+        //     break;\n\
+        // }\n\
+    }\n\
+\n\
+    // contaminationAccum /= float(samplesCount2);\n\
+    // finalColor4 = getRainbowColor_byHeight(contaminationAccum, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);\n\
+    // finalColor4.a *= 10.0;\n\
 \n\
     if(smplingCount < 1.0)\n\
     {\n\
@@ -3999,39 +3846,7 @@ void main(){\n\
     {\n\
         smplingCount = 1.0;\n\
     }\n\
-    /*\n\
-    if(smplingCount < 10.0)\n\
-    {\n\
-        color4Aux = vec4(1.0, 0.0, 0.0, 0.7);\n\
-    }\n\
-    else if(smplingCount < 20.0)\n\
-    {\n\
-        color4Aux = vec4(0.0, 1.0, 0.0, 0.7);\n\
-    }\n\
-    else if(smplingCount < 30.0)\n\
-    {\n\
-        color4Aux = vec4(0.0, 0.0, 1.0, 0.7);\n\
-    }\n\
-    else if(smplingCount < 40.0)\n\
-    {\n\
-        color4Aux = vec4(1.0, 1.0, 0.0, 0.7);\n\
-    }\n\
-    else\n\
-    {\n\
-        color4Aux = vec4(1.0, 0.0, 1.0, 0.7);\n\
-    }\n\
-    */\n\
 \n\
-    //vec4 rainbowColor = getRainbowColor_byHeight(contaminationAccum/smplingCount, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y, false);\n\
-\n\
-\n\
-    //float finalAlpha = finalColor4.a;\n\
-    //finalAlpha *= 2.0;\n\
-    //if(finalAlpha > 1.0)\n\
-    //{\n\
-    //    finalAlpha = 1.0;\n\
-    //}\n\
-    //finalColor4.a = finalAlpha;\n\
     color4Aux = finalColor4;\n\
 \n\
     if(!normalLC_calculated)\n\
@@ -4047,170 +3862,6 @@ void main(){\n\
         gl_FragData[3] = color4Aux;\n\
     #endif\n\
 }\n\
-\n\
-/*\n\
-uniform sampler3D tex;\n\
-uniform sampler3D normals;\n\
-uniform sampler2D colorMap;\n\
-\n\
-uniform mat4 transform;\n\
-uniform int depthSampleCount;\n\
-uniform float zScale;\n\
-\n\
-uniform vec3 lightPosition;\n\
-\n\
-uniform float brightness;\n\
-\n\
-//uniform vec4 opacitySettings;\n\
-// x: minLevel\n\
-// y: maxLevel\n\
-// z: lowNode\n\
-// w: highNode\n\
-\n\
-in vec2 texCoord;\n\
-\n\
-//in vec4 origin;\n\
-//in vec4 direction;\n\
-\n\
-out vec4 color;\n\
-\n\
-vec3 ambientLight = vec3(0.34, 0.32, 0.32);\n\
-vec3 directionalLight = vec3(0.5, 0.5, 0.5);\n\
-vec3 lightVector = normalize(vec3(-1.0, -1.0, 1.0));\n\
-vec3 specularColor = vec3(0.5, 0.5, 0.5);\n\
-\n\
-vec3 aabb[2] = vec3[2](\n\
-	vec3(0.0, 0.0, 0.0),\n\
-	vec3(1.0, 1.0, 1.0)\n\
-);\n\
-\n\
-struct Ray {\n\
-    vec3 origin;\n\
-    vec3 direction;\n\
-    vec3 inv_direction;\n\
-    int sign[3];\n\
-};\n\
-\n\
-Ray makeRay(vec3 origin, vec3 direction) {\n\
-    vec3 inv_direction = vec3(1.0) / direction;\n\
-    \n\
-    return Ray(\n\
-        origin,\n\
-        direction,\n\
-        inv_direction,\n\
-        int[3](\n\
-			((inv_direction.x < 0.0) ? 1 : 0),\n\
-			((inv_direction.y < 0.0) ? 1 : 0),\n\
-			((inv_direction.z < 0.0) ? 1 : 0)\n\
-		)\n\
-    );\n\
-}\n\
-\n\
-/*\n\
-	From: https://github.com/hpicgs/cgsee/wiki/Ray-Box-Intersection-on-the-GPU\n\
-void intersect(\n\
-    in Ray ray, in vec3 aabb[2],\n\
-    out float tmin, out float tmax\n\
-){\n\
-    float tymin, tymax, tzmin, tzmax;\n\
-    tmin = (aabb[ray.sign[0]].x - ray.origin.x) * ray.inv_direction.x;\n\
-    tmax = (aabb[1-ray.sign[0]].x - ray.origin.x) * ray.inv_direction.x;\n\
-    tymin = (aabb[ray.sign[1]].y - ray.origin.y) * ray.inv_direction.y;\n\
-    tymax = (aabb[1-ray.sign[1]].y - ray.origin.y) * ray.inv_direction.y;\n\
-    tzmin = (aabb[ray.sign[2]].z - ray.origin.z) * ray.inv_direction.z;\n\
-    tzmax = (aabb[1-ray.sign[2]].z - ray.origin.z) * ray.inv_direction.z;\n\
-    tmin = max(max(tmin, tymin), tzmin);\n\
-    tmax = min(min(tmax, tymax), tzmax);\n\
-}\n\
-*/\n\
-\n\
-\n\
-/*\n\
-\n\
-void main(){\n\
-	\n\
-	//transform = inverse(transform);\n\
-	\n\
-	vec4 origin = vec4(0.0, 0.0, 2.0, 1.0);\n\
-	origin = transform * origin;\n\
-	origin = origin / origin.w;\n\
-	origin.z = origin.z / zScale;\n\
-	origin = origin + 0.5;\n\
-\n\
-	vec4 image = vec4(texCoord, 4.0, 1.0);\n\
-	image = transform * image;\n\
-	//image = image / image.w;\n\
-	image.z = image.z / zScale;\n\
-	image = image + 0.5;\n\
-	//vec4 direction = vec4(0.0, 0.0, 1.0, 0.0);\n\
-	vec4 direction = normalize(origin-image);\n\
-	//direction = transform * direction;\n\
-\n\
-	Ray ray = makeRay(origin.xyz, direction.xyz);\n\
-	float tmin = 0.0;\n\
-	float tmax = 0.0;\n\
-	intersect(ray, aabb, tmin, tmax);\n\
-\n\
-	vec4 value = vec4(0.0, 0.0, 0.0, 0.0);\n\
-,\n\
-	if(tmin > tmax){\n\
-		color = value;\n\
-		discard;\n\
-	}\n\
-\n\
-	vec3 start = origin.xyz + tmin*direction.xyz;\n\
-	vec3 end = origin.xyz + tmax*direction.xyz;\n\
-	\n\
-	float length = distance(end, start);\n\
-	int sampleCount = int(float(depthSampleCount)*length);\n\
-	//vec3 increment = (end-start)/float(sampleCount);\n\
-	//vec3 originOffset = mod((start-origin.xyz), increment);\n\
-\n\
-	float s = 0.0;\n\
-	float px = 0.0;\n\
-	vec4 pxColor = vec4(0.0, 0.0, 0.0, 0.0);\n\
-	vec3 texCo = vec3(0.0, 0.0, 0.0);\n\
-	vec3 normal = vec3(0.0, 0.0, 0.0);\n\
-	vec4 zero = vec4(0.0);\n\
-	\n\
-	for(int count = 0; count < sampleCount; count++){\n\
-\n\
-		texCo = mix(start, end, float(count)/float(sampleCount));// - originOffset;\n\
-\n\
-		//texCo = start + increment*float(count);\n\
-		px = texture(tex, texCo).r;\n\
-\n\
-		\n\
-		//px = length(texture(normals, texCo).xyz - 0.5);\n\
-		//px = px * 1.5;\n\
-		\n\
-		pxColor = texture(colorMap, vec2(px, 0.0));\n\
-		\n\
-		normal = normalize(texture(normals, texCo).xyz - 0.5);\n\
-		float directional = clamp(dot(normal, lightVector), 0.0, 1.0);\n\
-\n\
-		//vec3 R = -reflect(lightDirection, surfaceNormal);\n\
-		//return pow(max(0.0, dot(viewDirection, R)), shininess);\n\
-\n\
-		float specular = max(dot(direction.xyz, reflect(lightVector, normal)), 0.0);\n\
-		specular = pow(specular, 3.0);\n\
-\n\
-		pxColor.rgb = ambientLight*pxColor.rgb + directionalLight*directional*pxColor.rgb + pxColor.a*specular*specularColor;\n\
-			\n\
-		\n\
-		//value = mix(value, pxColor, px);\n\
-		//value = (1.0-value.a)*pxColor + value;\n\
-		//value = mix(pxColor, zero, value.a) + value;\n\
-		\n\
-		value = value + pxColor - pxColor*value.a;\n\
-		\n\
-		if(value.a >= 0.95){\n\
-			break;\n\
-		}\n\
-	}\n\
-	color = value*brightness;\n\
-}\n\
-*/\n\
 ";
 ShaderSource.depthBufferUtils = "\n\
 vec4 packDepth( float v ) {\n\

@@ -251,7 +251,7 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 		// Only exist 1 vtxProfile, so, create a surfaceMesh.
 		options.name = "surface";
 		topVtxProfile = this.getVtxProfile(0);
-		resultSurface = resultMesh.newSurface(options);
+		var resultSurface = resultMesh.newSurface(options);
 		resultSurface = VtxProfilesList.getTransversalSurface(topVtxProfile, this.convexFacesIndicesData, resultSurface);
 		return resultMesh; // process finished.***
 	}

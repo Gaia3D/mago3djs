@@ -337,6 +337,13 @@ var MagoManager = function (config)
 	this.defaultTranslateInteraction = new TranslateInteraction();
 	this.interactionCollection.add(this.defaultTranslateInteraction);
 	this.interactionCollection.add(this.defaultSelectInteraction);
+
+	// // to selesct & move native objects.*************************************
+	// this.defaultSelectInteraction.setActive(true); // test son 20240318
+	// this.defaultSelectInteraction.setTargetType(DataType.NATIVE);
+
+	// this.defaultTranslateInteraction.setActive(true);
+	// this.defaultTranslateInteraction.setTargetType(DataType.NATIVE);
 	
 
 	/**
@@ -548,7 +555,7 @@ MagoManager.prototype.isCesiumGlobe = function()
  * handle browser event
  * @param {BrowserEvent} browserEvent 
  */
-MagoManager.prototype.handleBrowserEvent = function(browserEvent) 
+MagoManager.prototype.handleBrowserEvent = function (browserEvent) 
 {
 	this.emit(browserEvent.type, browserEvent);
 	var interactionArray = this.interactionCollection.array;
@@ -1483,6 +1490,11 @@ MagoManager.prototype.getSelectionFBO = function()
 	{ 
 		var texturesManager = this.getTexturesManager();
 		var gl = this.getGl();
+		if (gl === undefined)
+		{ 
+			throw new Error("MagoManager.getSelectionFBO: gl is undefined");
+			return; 
+		}
 		this.selectionFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); 
 		this.selectionFbo.colorBuffer = texturesManager.texturesMergerFbo.colorBuffersArray[3];
 	}
@@ -1665,6 +1677,12 @@ MagoManager.prototype.getTexturesManager = function ()
 	if (!this.texturesManager)
 	{
 		var gl = this.getGl();
+
+		if (gl === undefined)
+		{
+			throw new Error("MagoManager.getTexturesManager: gl is undefined");
+			return;
+		}
 
 		var bufferWidth = this.sceneState.drawingBufferWidth[0];
 		var bufferHeight = this.sceneState.drawingBufferHeight[0];
@@ -5325,7 +5343,7 @@ MagoManager.prototype.mouseActionRightUp = function(mouseX, mouseY)
  * 
  * @private
  */
-MagoManager.prototype.mouseActionMove = function(newPixel, oldPixel) 
+MagoManager.prototype.mouseActionMove = function (newPixel, oldPixel) 
 {
 	if (this.mouseLeftDown) 
 	{
