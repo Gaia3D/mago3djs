@@ -478,6 +478,32 @@
 	function light(){
 		var f4dController = MAGO3D_INSTANCE.getF4dController();
 		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+
+	// 	"year": 2023,
+	// "month": 4,
+	// "day": 10,
+	// "hour": 12,
+	// "minute": 0,
+	// "second": 0,
+	// "millisecond": 0,
+
+		var options = {
+				timeScale : 2000,
+				year : 2023,
+				month : 4, // 0 to 11
+				day : 10,
+				hour : 12,
+				minute : 0,
+				second : 0
+			};
+
+			if(magoManager.animationTimeController === undefined)
+			{
+				magoManager.animationTimeController = new Mago3D.AnimationTimeController(options);
+			}
+
+			magoManager.animationTimeController.reset(options);
+			magoManager.animationTimeController.startAnimation();
 		
 		// test camera laser.
 		//magoManager.TEST__cameraLaser();
@@ -1196,6 +1222,17 @@
 	function Chemical_Accident_Test (){ // 
 		var magoManager = MAGO3D_INSTANCE.getMagoManager();
 
+		// // to selesct & move native objects.*************************************
+		// this.defaultSelectInteraction.setActive(true); // test son 20240318
+		// this.defaultSelectInteraction.setTargetType(DataType.NATIVE);
+
+		// this.defaultTranslateInteraction.setActive(true);
+		// this.defaultTranslateInteraction.setTargetType(DataType.NATIVE);
+		magoManager.interactionCollection.array[0].setActive(true);
+		magoManager.interactionCollection.array[0].setTargetType(Mago3D.DataType.NATIVE);
+		magoManager.interactionCollection.array[1].setActive(true);
+		magoManager.interactionCollection.array[1].setTargetType(Mago3D.DataType.NATIVE);
+
 		// create chemicalAccidentManager, if no exist.***
 		if(!magoManager.chemicalAccidentManager)
 		{
@@ -1208,6 +1245,26 @@
 			// set the geoJsonIndexFilePath.***
 			var geoJsonIndexFilePath = "\\f4d\\chemicalAccident\\output_chemicalAccident\\JsonIndex.json"; 
 			magoManager.chemicalAccidentManager.load_chemicalAccidentIndexFile(geoJsonIndexFilePath);
+
+			magoManager.chemicalAccidentManager._animationState = Mago3D.CODE.processState.STARTED;
+
+			var options = {
+				timeScale : 2000,
+				year : 2023,
+				month : 4, // 0 to 11
+				day : 10,
+				hour : 12,
+				minute : 0,
+				second : 0
+			};
+
+			if(magoManager.animationTimeController === undefined)
+			{
+				magoManager.animationTimeController = new Mago3D.AnimationTimeController(options);
+			}
+
+			magoManager.animationTimeController.reset(options);
+			magoManager.animationTimeController.startAnimation();
 		}
 
 		var hola = 0;
@@ -1235,7 +1292,7 @@
 
 	function Test3DTiles (){ // 
 		var magoManager = MAGO3D_INSTANCE.getMagoManager();
-		magoManager.TEST_3DTiles();
+		//magoManager.TEST_3DTiles();
 		var hola = 0;
 	}
 

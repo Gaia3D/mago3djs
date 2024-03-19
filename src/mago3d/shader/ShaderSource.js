@@ -3805,7 +3805,7 @@ void main(){\n\
             float targetValue = u_minMaxPollutionValuesToRender.y;\n\
             \n\
             //targetValue = u_minMaxPollutionValues.y;\n\
-            currColor4.a = contaminationSample / targetValue;\n\
+            //currColor4.a = contaminationSample / targetValue;\n\
             if(currColor4.a > 1.0)\n\
             {\n\
                 currColor4.a = 1.0;\n\

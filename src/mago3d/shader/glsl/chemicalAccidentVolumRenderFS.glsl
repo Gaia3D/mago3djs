@@ -1419,7 +1419,7 @@ void main(){
             float targetValue = u_minMaxPollutionValuesToRender.y;
             
             //targetValue = u_minMaxPollutionValues.y;
-            currColor4.a = contaminationSample / targetValue;
+            //currColor4.a = contaminationSample / targetValue;
             if(currColor4.a > 1.0)
             {
                 currColor4.a = 1.0;

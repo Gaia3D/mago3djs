@@ -338,6 +338,7 @@ ChemicalAccidentManager.prototype.render = function ()
 	
 	if (!this.prepareVolume(magoManager))
 	{ return false; }
+
 	
 	if (this._animationState === CODE.processState.FINISHED || this._animationState === CODE.processState.NO_STARTED)
 	{
