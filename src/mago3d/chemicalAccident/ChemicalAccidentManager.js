@@ -491,8 +491,8 @@ ChemicalAccidentManager.prototype.createDefaultShaders = function ()
 	shader.pollutionMosaicTex_loc = gl.getUniformLocation(shader.program, "pollutionMosaicTex");
 	shader.sceneDepthTex_loc = gl.getUniformLocation(shader.program, "sceneDepthTex"); // scene depth tex.***
 	shader.sceneNormalTex_loc = gl.getUniformLocation(shader.program, "sceneNormalTex"); // scene normal tex.***
-	//shader.airVelocityTex_loc = gl.getUniformLocation(shader.program, "airVelocityTex");
-	//shader.maxPressureMosaicTex_loc = gl.getUniformLocation(shader.program, "maxPressureMosaicTex");
+	shader.cuttingPlaneDepthTex_loc = gl.getUniformLocation(shader.program, "cuttingPlaneDepthTex");
+	shader.cuttingPlaneNormalTex_loc = gl.getUniformLocation(shader.program, "cuttingPlaneNormalTex");
 
 	shader.a_pos_loc = gl.getAttribLocation(shader.program, "a_pos");
 	shader.u_screenSize_loc = gl.getUniformLocation(shader.program, "u_screenSize");
@@ -509,6 +509,9 @@ ChemicalAccidentManager.prototype.createDefaultShaders = function ()
 	shader.u_maxVelocity_loc = gl.getUniformLocation(shader.program, "u_maxVelocity");
 	shader.u_voxelSizeMeters_loc = gl.getUniformLocation(shader.program, "u_voxelSizeMeters");//
 	shader.u_minMaxPollutionValuesToRender_loc = gl.getUniformLocation(shader.program, "u_minMaxPollutionValuesToRender");
+	shader.u_useCuttingPlane_loc = gl.getUniformLocation(shader.program, "u_useCuttingPlane");//
+	shader.u_useMinMaxValuesToRender_loc = gl.getUniformLocation(shader.program, "u_useMinMaxValuesToRender");//
+	shader.u_cuttingPlanePosLC_loc = gl.getUniformLocation(shader.program, "u_cuttingPlanePosLC");
 
 	shader.u_simulBoxTMat_loc = gl.getUniformLocation(shader.program, "u_simulBoxTMat");
 	shader.u_simulBoxTMatInv_loc = gl.getUniformLocation(shader.program, "u_simulBoxTMatInv");
@@ -524,8 +527,8 @@ ChemicalAccidentManager.prototype.createDefaultShaders = function ()
 	gl.uniform1i(shader.pollutionMosaicTex_loc, 2);
 	gl.uniform1i(shader.sceneDepthTex_loc, 3);
 	gl.uniform1i(shader.sceneNormalTex_loc, 4);
-	//gl.uniform1i(shader.airVelocityTex_loc, 5);
-	//gl.uniform1i(shader.maxPressureMosaicTex_loc, 6);
+	gl.uniform1i(shader.cuttingPlaneDepthTex_loc, 5);
+	gl.uniform1i(shader.cuttingPlaneNormalTex_loc, 6);
 
 	magoManager.postFxShadersManager.useProgram(null);
 };

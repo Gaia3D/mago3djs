@@ -469,10 +469,13 @@ var ChemicalAccidentLayer = function(options)
 	this.screenFBO = undefined;
 
 	// params.***
+	this.useMinMaxValuesToRender = 0;
 	this.minMaxPollutionValuesToRender = new Float32Array([0.0, 0.0194]);
+	//this.minMaxPollutionValuesToRender = new Float32Array([0.0, 0.0]);
 
 	// cutting planes.
 	this.cuttingPlanesArray = [];
+	this.currentActiveCuttingPlaneIdx = 0;
 
 	if (options)
 	{
@@ -597,6 +600,28 @@ ChemicalAccidentLayer.prototype._makeSimulationBox = function ()
 	var hola = 0;
 };
 
+ChemicalAccidentLayer.prototype._getCuttingPlaneDepthFBO = function()
+{
+	//      +-----------+
+	//      |           |
+	//      |   tex_0   |
+	//      |           |
+	//      +-----------+
+	// Note : the width of fbo must be the same of the screen width.***
+	if (!this.cuttingPlaneDepthFBO)
+	{
+		var magoManager = this.chemicalAccidentManager.magoManager;
+		var gl = magoManager.getGl();
+		var sceneState = magoManager.sceneState;
+		var bufferWidth = sceneState.drawingBufferWidth[0]; // same of the screen width.***
+		var bufferHeight = sceneState.drawingBufferHeight[0];
+		var bUseMultiRenderTarget = magoManager.postFxShadersManager.bUseMultiRenderTarget;
+		this.cuttingPlaneDepthFBO = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 4}); 
+	}
+
+	return this.cuttingPlaneDepthFBO;
+};
+
 ChemicalAccidentLayer.prototype._getVolumeDepthFBO = function()
 {
 	//      +-----------+-----------+
@@ -633,6 +658,93 @@ ChemicalAccidentLayer.prototype._getScreenFBO = function(magoManager)
 	}
 
 	return this.screenFBO;
+};
+
+ChemicalAccidentLayer.prototype._renderDepthCuttingPlane = function ()
+{
+	if (this.cuttingPlanesArray.length === 0)
+	{
+		return;
+	}
+
+	// render the front faces.
+	//-------------------------------
+	var magoManager = this.chemicalAccidentManager.magoManager;
+	var sceneState = magoManager.sceneState;
+	var gl = magoManager.getGl();
+	var extbuffers = magoManager.extbuffers;
+
+	// Now, render the windPlane.
+	if (!this.visibleObjControler)
+	{
+		this.visibleObjControler = new VisibleObjectsController();
+	}
+
+	var cuttingPlane = this.cuttingPlanesArray[0]; // provisionally take the 1rst cuttingPlane.***
+
+	if (cuttingPlane)
+	{ this.visibleObjControler.currentVisibleNativeObjects.opaquesArray[0] = cuttingPlane; }
+
+	// Bind FBO.***
+	//      +-----------------+----------------+
+	//      |                 |                | 
+	//      |   front depth   |   rear depth   |
+	//      |                 |                |
+	//      +-----------------+----------------+
+	// Note : the width of fbo must be the double of the screen width.***
+
+	// Front Face.***************************************************************************************************************************
+	var cuttingPlaneFBO = this._getCuttingPlaneDepthFBO(magoManager);
+
+	this.cuttingPlaneDepthTex = cuttingPlaneFBO.colorBuffersArray[1];
+	this.cuttingPlaneNormalTex = cuttingPlaneFBO.colorBuffersArray[2];
+
+	//var currentShader = magoManager.postFxShadersManager.getShader("gBuffer"); 
+	//magoManager.postFxShadersManager.useProgram(currentShader);
+	//gl.uniform1i(currentShader.clippingType_loc, 0);
+
+	cuttingPlaneFBO.bind();
+	gl.viewport(0, 0, cuttingPlaneFBO.width[0], cuttingPlaneFBO.height[0]);
+
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, cuttingPlaneFBO.colorBuffersArray[0], 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, cuttingPlaneFBO.colorBuffersArray[1], 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, cuttingPlaneFBO.colorBuffersArray[2], 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, cuttingPlaneFBO.colorBuffersArray[3], 0);
+
+	extbuffers.drawBuffersWEBGL([
+		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
+		extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - depthTex (front).
+		extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - normalTex
+		extbuffers.COLOR_ATTACHMENT3_WEBGL // gl_FragData[3] - albedoTex
+	  ]);
+
+	//if (magoManager.isFarestFrustum())// === 2)
+	if (magoManager.currentFrustumIdx === 2)
+	{
+		gl.clearColor(0, 0, 0, 0);
+		gl.clearDepth(1);
+		gl.clear(gl.COLOR_BUFFER_BIT);
+		gl.clearColor(0, 0, 0, 1);
+	}
+
+	gl.clear(gl.DEPTH_BUFFER_BIT);
+
+	var renderType = 1;
+	gl.frontFace(gl.CCW);
+	magoManager.renderer.renderGeometryBuffer(gl, renderType, this.visibleObjControler);
+
+	// End front face.---------------------------------------------------------------------------------------------------------------------------
+
+	// unbind fbo.***
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, null, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0);
+	cuttingPlaneFBO.unbind();
+
+	// Return to main framebuffer.************************
+	// return default values:
+	gl.frontFace(gl.CCW);
 };
 
 ChemicalAccidentLayer.prototype._renderDepthVolume = function ()
@@ -776,6 +888,16 @@ ChemicalAccidentLayer.prototype.getTimeSliceIdxByCurrentUnixTimeMiliseconds = fu
 	return timeSliceIdx;
 };
 
+ChemicalAccidentLayer.prototype.setUseMinMaxValuesToRender = function (useMinMaxValues)
+{
+	this.useMinMaxValuesToRender = useMinMaxValues;
+};
+
+ChemicalAccidentLayer.prototype.setCurrentCuttingPlaneIdx = function (idx)
+{
+	this.currentActiveCuttingPlaneIdx = idx;
+};
+
 ChemicalAccidentLayer.prototype.setMinMaxValuesToRender = function (min, max)
 {
 	this.minMaxPollutionValuesToRender[0] = min;
@@ -800,11 +922,11 @@ ChemicalAccidentLayer.prototype.createCuttingPlaneXZ = function ()
 	var pointsLCArray = [];
 
 	// leftDown corner.***
-	var point3d = new Point2D(-semiWidthMeters, -semiHeightMeters);
+	var point3d = new Point2D(-semiWidthMeters, 0.0);
 	pointsLCArray.push(point3d);
 
 	// rightDown corner.***
-	point3d = new Point2D(semiWidthMeters, -semiHeightMeters);
+	point3d = new Point2D(semiWidthMeters, 0.0);
 	pointsLCArray.push(point3d);
 
 	// // rightUp corner.***
@@ -833,6 +955,7 @@ ChemicalAccidentLayer.prototype.createCuttingPlaneXZ = function ()
 	var resultRenderableObject = new RenderableObject();
 	resultRenderableObject.attributes.isMovable = true;
 	resultRenderableObject.attributes.isSelectable = true;
+	resultRenderableObject.attributes.movementInAxisY = true;
 	resultRenderableObject.setOneColor(0.8, 0.7, 0.2, 0.0);
 	resultRenderableObject.setSelectedColor4(0.8, 0.7, 0.2, 0.1);
 	
@@ -908,6 +1031,10 @@ ChemicalAccidentLayer.prototype.render = function ()
 	}
 
 	this._renderDepthVolume();
+	if (this.cuttingPlanesArray.length > 0)
+	{
+		this._renderDepthCuttingPlane();
+	}
 	
 	// Now, do volumetric render with the mosaic textures 3d.***
 	
@@ -998,6 +1125,48 @@ ChemicalAccidentLayer.prototype.render = function ()
 
 	// uMinMaxAltitudeSlices is a vec2 array.***
 	gl.uniform2fv(shader.uMinMaxAltitudeSlices_loc, testTimeSlice.uMinMaxAltitudeSlices);
+	gl.uniform1i(shader.u_useMinMaxValuesToRender_loc, this.useMinMaxValuesToRender);
+
+	var useCuttingPlane = false;
+	if (this.currentActiveCuttingPlaneIdx >= 0 && this.currentActiveCuttingPlaneIdx < this.cuttingPlanesArray.length)
+	{
+		useCuttingPlane = true;
+
+		// calculate the posLC(respect to SimulationBox) of the cuttingPlane.***
+		var cuttingPlane = this.cuttingPlanesArray[this.currentActiveCuttingPlaneIdx];
+		var geoLocData = cuttingPlane.geoLocDataManager.getCurrentGeoLocationData();
+		var posWC = geoLocData.position;
+
+		var simulBoxGeoLocData = this.simulationBox.geoLocDataManager.getCurrentGeoLocationData();
+		var posLC = simulBoxGeoLocData.worldCoordToLocalCoord(posWC, undefined);
+
+		var hola = 0;
+		var cuttingPlaneIdx = 0.0;
+		if (this.currentActiveCuttingPlaneIdx === 0)
+		{
+			cuttingPlaneIdx = 0.1;
+		}
+		else if (this.currentActiveCuttingPlaneIdx === 1)
+		{
+			cuttingPlaneIdx = 0.2;
+		}
+		else if (this.currentActiveCuttingPlaneIdx === 2)
+		{
+			cuttingPlaneIdx = 0.3;
+		}
+
+		gl.uniform4fv(shader.u_cuttingPlanePosLC_loc, [posLC.x, posLC.y, posLC.z, cuttingPlaneIdx]);
+	}
+
+	if (useCuttingPlane)
+	{
+		gl.uniform1i(shader.u_useCuttingPlane_loc, 1);
+	}
+	else 
+	{
+		gl.uniform1i(shader.u_useCuttingPlane_loc, 0);
+	
+	}
 
 	
 	// bind textures.***
@@ -1021,6 +1190,15 @@ ChemicalAccidentLayer.prototype.render = function ()
 
 	gl.activeTexture(gl.TEXTURE4);
 	gl.bindTexture(gl.TEXTURE_2D, magoManager.normalTex); 
+
+	if (useCuttingPlane)
+	{
+		gl.activeTexture(gl.TEXTURE5);
+		gl.bindTexture(gl.TEXTURE_2D, this.cuttingPlaneDepthTex); 
+
+		gl.activeTexture(gl.TEXTURE6);
+		gl.bindTexture(gl.TEXTURE_2D, this.cuttingPlaneNormalTex);
+	}
 
 	// Draw screenQuad:
 	gl.drawArrays(gl.TRIANGLES, 0, 6);

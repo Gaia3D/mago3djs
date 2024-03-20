@@ -40,6 +40,8 @@ uniform sampler2D simulationBoxDoubleNormalTex; // used to calculate the current
 uniform sampler2D pollutionMosaicTex; // pollutionTex. (from chemical accident).***
 uniform sampler2D sceneDepthTex; // scene depth texture.***
 uniform sampler2D sceneNormalTex; // scene normal texture.***
+uniform sampler2D cuttingPlaneDepthTex;
+uniform sampler2D cuttingPlaneNormalTex;
 
 uniform int u_texSize[3]; // The original texture3D size.***
 uniform int u_mosaicSize[3]; // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***
@@ -60,6 +62,9 @@ uniform vec2 uNearFarArray[4];
 uniform float tangentOfHalfFovy;
 uniform float aspectRatio;
 uniform vec2 uMinMaxAltitudeSlices[32]; // limited to 32 slices.***
+uniform int u_useCuttingPlane;
+uniform int u_useMinMaxValuesToRender;
+uniform vec4 u_cuttingPlanePosLC;
 
 uniform mat4 u_simulBoxTMat;
 uniform mat4 u_simulBoxTMatInv;
@@ -112,6 +117,24 @@ float getDepth_simulationBox(vec2 coord)
 	//}
 }
 
+float getDepth_cuttingPlane(vec2 coord)
+{
+	//if(bUseLogarithmicDepth)
+	//{
+	//	float linearDepth = unpackDepth(texture2D(depthTex, coord.xy));
+	//	// gl_FragDepthEXT = linearDepth = log2(flogz) * Fcoef_half;
+	//	// flogz = 1.0 + gl_Position.z*0.0001;
+    //    float Fcoef_half = uFCoef_logDepth/2.0;
+	//	float flogzAux = pow(2.0, linearDepth/Fcoef_half);
+	//	float z = (flogzAux - 1.0);
+	//	linearDepth = z/(far);
+	//	return linearDepth;
+	//}
+	//else{
+		return unpackDepth(texture2D(cuttingPlaneDepthTex, coord.xy));
+	//}
+}
+
 vec4 decodeNormal(in vec4 normal)
 {
 	return vec4(normal.xyz * 2.0 - 1.0, normal.w);
@@ -127,6 +150,12 @@ vec4 getNormal(in vec2 texCoord)
 vec4 getNormal_simulationBox(in vec2 texCoord)
 {
     vec4 encodedNormal = texture2D(simulationBoxDoubleNormalTex, texCoord);
+    return decodeNormal(encodedNormal);
+}
+
+vec4 getNormal_cuttingPlane(in vec2 texCoord)
+{
+    vec4 encodedNormal = texture2D(cuttingPlaneNormalTex, texCoord);
     return decodeNormal(encodedNormal);
 }
 
@@ -241,7 +270,6 @@ void get_FrontAndRear_posCC(in vec2 screenPos, in float currFar_rear, in float c
         float front_zDist = frontLinearDepth * currFar_front; 
         frontPosCC = getViewRay(screenPos, front_zDist);
     }
-    
 
     // Rear posCC.***
     float rearLinearDepth = getDepth_simulationBox(rearTexCoord);
@@ -254,8 +282,22 @@ void get_FrontAndRear_posCC(in vec2 screenPos, in float currFar_rear, in float c
         float rear_zDist = rearLinearDepth * currFar_rear; 
         rearPosCC = getViewRay(screenPos, rear_zDist);
     }
-    
+}
 
+void get_cuttingPlane_posCC(in vec2 screenPos, in float currFar, inout vec3 posCC)
+{
+
+    // posCC.***
+    float frontLinearDepth = getDepth_cuttingPlane(screenPos);
+    if(frontLinearDepth < 1e-8)
+    {
+        posCC = vec3(0.0);
+    }
+    else
+    {
+        float front_zDist = frontLinearDepth * currFar; 
+        posCC = getViewRay(screenPos, front_zDist);
+    }
 }
 
 void posWCRelToEye_to_posLC(in vec4 posWC_relToEye, in mat4 local_mat4Inv, in vec3 localPosHIGH, in vec3 localPosLOW, inout vec3 posLC)
@@ -1291,7 +1333,48 @@ void main(){
     vec3 rearPosCC;
     get_FrontAndRear_posCC(screenPos, currFar_rear, currFar_front, frontPosCC, rearPosCC);
 
-    
+    // Now check cutting plane if exist.***
+    // u_cuttingPlanePosLC
+    // uniform mat4 modelViewMatrixRelToEyeInv;
+    // uniform vec3 encodedCameraPositionMCHigh;
+    // uniform vec3 encodedCameraPositionMCLow;
+    // u_simulBoxTMatInv
+    vec4 camPosRelToSimBox;
+    vec3 cuttingPosCC;
+    vec3 frontPosLCKeep;
+    if(u_useCuttingPlane == 1)
+    {
+        vec4 encodedNormal4cuttingPlane = texture2D(cuttingPlaneNormalTex, v_tex_pos);
+        if(length(encodedNormal4cuttingPlane.xyz) > 0.1)
+        {
+            vec4 normal4cuttingPlane = getNormal_cuttingPlane(v_tex_pos);
+            estimatedFrustumIdx = int(floor(normal4cuttingPlane.w * 100.0));
+            currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType); // Note : "dataType" no used in this shader.***
+            vec2 nearFar_cuttingPlane = getNearFar_byFrustumIdx(currFrustumIdx);
+            float currFar_cuttingPlane = nearFar_cuttingPlane.y;
+            
+            get_cuttingPlane_posCC(screenPos, currFar_cuttingPlane, cuttingPosCC);
+
+            // before to change the frontPosCC, must calculate the camPosRelToSimBox.***
+            vec4 frontPosWCRelToEyeKeep = modelViewMatrixRelToEyeInv * vec4(frontPosCC.xyz, 1.0);
+            posWCRelToEye_to_posLC(frontPosWCRelToEyeKeep, u_simulBoxTMatInv, u_simulBoxPosHigh, u_simulBoxPosLow, frontPosLCKeep);
+
+            // now change the frontPosCC.***
+            frontPosCC = cuttingPosCC;
+
+            if(cuttingPosCC.z < rearPosCC.z)
+            {
+                // if cutting plane moves entirely inside of the simulBox, then never enter here.***
+                discard;
+            }
+        }
+
+        // now, calculate camPosRelToSimBox.***
+        vec3 highDiff = encodedCameraPositionMCHigh - u_simulBoxPosHigh;
+        vec3 lowDiff = encodedCameraPositionMCLow - u_simulBoxPosLow;
+        vec3 camPosWC = highDiff + lowDiff;
+        camPosRelToSimBox = u_simulBoxTMatInv * vec4(camPosWC, 1.0);
+    }
 
     // Now, calculate frontPosWC & rearPosWC.***
     vec4 frontPosWCRelToEye = modelViewMatrixRelToEyeInv * vec4(frontPosCC.xyz, 1.0);
@@ -1304,6 +1387,45 @@ void main(){
     //vec3 scenePosLC;
     posWCRelToEye_to_posLC(frontPosWCRelToEye, u_simulBoxTMatInv, u_simulBoxPosHigh, u_simulBoxPosLow, frontPosLC);
     posWCRelToEye_to_posLC(rearPosWCRelToEye, u_simulBoxTMatInv, u_simulBoxPosHigh, u_simulBoxPosLow, rearPosLC);
+
+    if(u_useCuttingPlane == 1)
+    {
+        float error = 10.0;
+        if(camPosRelToSimBox.y >= u_cuttingPlanePosLC.y)
+        {
+            if(frontPosLC.y - error > u_cuttingPlanePosLC.y)// || rearPosLC.y < u_cuttingPlanePosLC.y)
+            {
+                // vec4 colorDiscard = vec4(1.0, 0.3, 0.3, 1.0);
+                // gl_FragData[0] = colorDiscard;
+
+                // #ifdef USE_MULTI_RENDER_TARGET
+                //     gl_FragData[1] = colorDiscard;
+                //     gl_FragData[2] = colorDiscard;
+                //     gl_FragData[3] = colorDiscard;
+                // #endif
+                // return;
+                discard;
+            }
+        }
+        else
+        {
+            if(frontPosLC.y + error < u_cuttingPlanePosLC.y)// || rearPosLC.y < u_cuttingPlanePosLC.y)
+            {
+                // vec4 colorDiscard = vec4(0.3, 1.0, 0.3, 1.0);
+                // gl_FragData[0] = colorDiscard;
+
+                // #ifdef USE_MULTI_RENDER_TARGET
+                //     gl_FragData[1] = colorDiscard;
+                //     gl_FragData[2] = colorDiscard;
+                //     gl_FragData[3] = colorDiscard;
+                // #endif
+                // return;
+                discard;
+            }
+        }
+
+        
+    }
 
     // Now, with "frontPosLC" & "rearPosLC", calculate the frontTexCoord3d & rearTexCoord3d.***
     vec3 simulBoxRange = vec3(u_simulBoxMaxPosLC.x - u_simulBoxMinPosLC.x, u_simulBoxMaxPosLC.y - u_simulBoxMinPosLC.y, u_simulBoxMaxPosLC.z - u_simulBoxMinPosLC.z);
@@ -1414,19 +1536,20 @@ void main(){
         {
             vec4 currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);
 
-            //float unitaryContaminationSample = (contaminationSample - u_minMaxPollutionValues.x) / (u_minMaxPollutionValuesToRender.y - u_minMaxPollutionValues.x);
-            float unitaryContaminationSample = 0.0;
-            float targetValue = u_minMaxPollutionValuesToRender.y;
-            
-            //targetValue = u_minMaxPollutionValues.y;
-            //currColor4.a = contaminationSample / targetValue;
-            if(currColor4.a > 1.0)
+            if(u_useMinMaxValuesToRender == 1)
             {
-                currColor4.a = 1.0;
-            }
+                float targetValue = u_minMaxPollutionValuesToRender.y;
+                
+                //targetValue = u_minMaxPollutionValues.y;
+                //currColor4.a = contaminationSample / targetValue;
+                if(currColor4.a > 1.0)
+                {
+                    currColor4.a = 1.0;
+                }
 
-            //currColor4.a *= smoothstep(0.0, targetValue, contaminationSample);
-            currColor4.a = smoothstep(0.0, targetValue, contaminationSample);
+                //currColor4.a *= smoothstep(0.0, targetValue, contaminationSample);
+                currColor4.a = smoothstep(0.0, targetValue, contaminationSample);
+            }
 
             // https://www.willusher.io/webgl/2019/01/13/volume-rendering-with-webgl
             finalColor4.rgb += (1.0 - finalColor4.a) * currColor4.a * currColor4.rgb; 

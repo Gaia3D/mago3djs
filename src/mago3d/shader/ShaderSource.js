@@ -2426,6 +2426,8 @@ uniform sampler2D simulationBoxDoubleNormalTex; // used to calculate the current
 uniform sampler2D pollutionMosaicTex; // pollutionTex. (from chemical accident).***\n\
 uniform sampler2D sceneDepthTex; // scene depth texture.***\n\
 uniform sampler2D sceneNormalTex; // scene normal texture.***\n\
+uniform sampler2D cuttingPlaneDepthTex;\n\
+uniform sampler2D cuttingPlaneNormalTex;\n\
 \n\
 uniform int u_texSize[3]; // The original texture3D size.***\n\
 uniform int u_mosaicSize[3]; // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***\n\
@@ -2446,6 +2448,9 @@ uniform vec2 uNearFarArray[4];\n\
 uniform float tangentOfHalfFovy;\n\
 uniform float aspectRatio;\n\
 uniform vec2 uMinMaxAltitudeSlices[32]; // limited to 32 slices.***\n\
+uniform int u_useCuttingPlane;\n\
+uniform int u_useMinMaxValuesToRender;\n\
+uniform vec4 u_cuttingPlanePosLC;\n\
 \n\
 uniform mat4 u_simulBoxTMat;\n\
 uniform mat4 u_simulBoxTMatInv;\n\
@@ -2498,6 +2503,24 @@ float getDepth_simulationBox(vec2 coord)\n\
 	//}\n\
 }\n\
 \n\
+float getDepth_cuttingPlane(vec2 coord)\n\
+{\n\
+	//if(bUseLogarithmicDepth)\n\
+	//{\n\
+	//	float linearDepth = unpackDepth(texture2D(depthTex, coord.xy));\n\
+	//	// gl_FragDepthEXT = linearDepth = log2(flogz) * Fcoef_half;\n\
+	//	// flogz = 1.0 + gl_Position.z*0.0001;\n\
+    //    float Fcoef_half = uFCoef_logDepth/2.0;\n\
+	//	float flogzAux = pow(2.0, linearDepth/Fcoef_half);\n\
+	//	float z = (flogzAux - 1.0);\n\
+	//	linearDepth = z/(far);\n\
+	//	return linearDepth;\n\
+	//}\n\
+	//else{\n\
+		return unpackDepth(texture2D(cuttingPlaneDepthTex, coord.xy));\n\
+	//}\n\
+}\n\
+\n\
 vec4 decodeNormal(in vec4 normal)\n\
 {\n\
 	return vec4(normal.xyz * 2.0 - 1.0, normal.w);\n\
@@ -2513,6 +2536,12 @@ vec4 getNormal(in vec2 texCoord)\n\
 vec4 getNormal_simulationBox(in vec2 texCoord)\n\
 {\n\
     vec4 encodedNormal = texture2D(simulationBoxDoubleNormalTex, texCoord);\n\
+    return decodeNormal(encodedNormal);\n\
+}\n\
+\n\
+vec4 getNormal_cuttingPlane(in vec2 texCoord)\n\
+{\n\
+    vec4 encodedNormal = texture2D(cuttingPlaneNormalTex, texCoord);\n\
     return decodeNormal(encodedNormal);\n\
 }\n\
 \n\
@@ -2627,7 +2656,6 @@ void get_FrontAndRear_posCC(in vec2 screenPos, in float currFar_rear, in float c
         float front_zDist = frontLinearDepth * currFar_front; \n\
         frontPosCC = getViewRay(screenPos, front_zDist);\n\
     }\n\
-    \n\
 \n\
     // Rear posCC.***\n\
     float rearLinearDepth = getDepth_simulationBox(rearTexCoord);\n\
@@ -2640,8 +2668,22 @@ void get_FrontAndRear_posCC(in vec2 screenPos, in float currFar_rear, in float c
         float rear_zDist = rearLinearDepth * currFar_rear; \n\
         rearPosCC = getViewRay(screenPos, rear_zDist);\n\
     }\n\
-    \n\
+}\n\
 \n\
+void get_cuttingPlane_posCC(in vec2 screenPos, in float currFar, inout vec3 posCC)\n\
+{\n\
+\n\
+    // posCC.***\n\
+    float frontLinearDepth = getDepth_cuttingPlane(screenPos);\n\
+    if(frontLinearDepth < 1e-8)\n\
+    {\n\
+        posCC = vec3(0.0);\n\
+    }\n\
+    else\n\
+    {\n\
+        float front_zDist = frontLinearDepth * currFar; \n\
+        posCC = getViewRay(screenPos, front_zDist);\n\
+    }\n\
 }\n\
 \n\
 void posWCRelToEye_to_posLC(in vec4 posWC_relToEye, in mat4 local_mat4Inv, in vec3 localPosHIGH, in vec3 localPosLOW, inout vec3 posLC)\n\
@@ -3677,7 +3719,48 @@ void main(){\n\
     vec3 rearPosCC;\n\
     get_FrontAndRear_posCC(screenPos, currFar_rear, currFar_front, frontPosCC, rearPosCC);\n\
 \n\
-    \n\
+    // Now check cutting plane if exist.***\n\
+    // u_cuttingPlanePosLC\n\
+    // uniform mat4 modelViewMatrixRelToEyeInv;\n\
+    // uniform vec3 encodedCameraPositionMCHigh;\n\
+    // uniform vec3 encodedCameraPositionMCLow;\n\
+    // u_simulBoxTMatInv\n\
+    vec4 camPosRelToSimBox;\n\
+    vec3 cuttingPosCC;\n\
+    vec3 frontPosLCKeep;\n\
+    if(u_useCuttingPlane == 1)\n\
+    {\n\
+        vec4 encodedNormal4cuttingPlane = texture2D(cuttingPlaneNormalTex, v_tex_pos);\n\
+        if(length(encodedNormal4cuttingPlane.xyz) > 0.1)\n\
+        {\n\
+            vec4 normal4cuttingPlane = getNormal_cuttingPlane(v_tex_pos);\n\
+            estimatedFrustumIdx = int(floor(normal4cuttingPlane.w * 100.0));\n\
+            currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType); // Note : \"dataType\" no used in this shader.***\n\
+            vec2 nearFar_cuttingPlane = getNearFar_byFrustumIdx(currFrustumIdx);\n\
+            float currFar_cuttingPlane = nearFar_cuttingPlane.y;\n\
+            \n\
+            get_cuttingPlane_posCC(screenPos, currFar_cuttingPlane, cuttingPosCC);\n\
+\n\
+            // before to change the frontPosCC, must calculate the camPosRelToSimBox.***\n\
+            vec4 frontPosWCRelToEyeKeep = modelViewMatrixRelToEyeInv * vec4(frontPosCC.xyz, 1.0);\n\
+            posWCRelToEye_to_posLC(frontPosWCRelToEyeKeep, u_simulBoxTMatInv, u_simulBoxPosHigh, u_simulBoxPosLow, frontPosLCKeep);\n\
+\n\
+            // now change the frontPosCC.***\n\
+            frontPosCC = cuttingPosCC;\n\
+\n\
+            if(cuttingPosCC.z < rearPosCC.z)\n\
+            {\n\
+                // if cutting plane moves entirely inside of the simulBox, then never enter here.***\n\
+                discard;\n\
+            }\n\
+        }\n\
+\n\
+        // now, calculate camPosRelToSimBox.***\n\
+        vec3 highDiff = encodedCameraPositionMCHigh - u_simulBoxPosHigh;\n\
+        vec3 lowDiff = encodedCameraPositionMCLow - u_simulBoxPosLow;\n\
+        vec3 camPosWC = highDiff + lowDiff;\n\
+        camPosRelToSimBox = u_simulBoxTMatInv * vec4(camPosWC, 1.0);\n\
+    }\n\
 \n\
     // Now, calculate frontPosWC & rearPosWC.***\n\
     vec4 frontPosWCRelToEye = modelViewMatrixRelToEyeInv * vec4(frontPosCC.xyz, 1.0);\n\
@@ -3690,6 +3773,45 @@ void main(){\n\
     //vec3 scenePosLC;\n\
     posWCRelToEye_to_posLC(frontPosWCRelToEye, u_simulBoxTMatInv, u_simulBoxPosHigh, u_simulBoxPosLow, frontPosLC);\n\
     posWCRelToEye_to_posLC(rearPosWCRelToEye, u_simulBoxTMatInv, u_simulBoxPosHigh, u_simulBoxPosLow, rearPosLC);\n\
+\n\
+    if(u_useCuttingPlane == 1)\n\
+    {\n\
+        float error = 10.0;\n\
+        if(camPosRelToSimBox.y >= u_cuttingPlanePosLC.y)\n\
+        {\n\
+            if(frontPosLC.y - error > u_cuttingPlanePosLC.y)// || rearPosLC.y < u_cuttingPlanePosLC.y)\n\
+            {\n\
+                // vec4 colorDiscard = vec4(1.0, 0.3, 0.3, 1.0);\n\
+                // gl_FragData[0] = colorDiscard;\n\
+\n\
+                // #ifdef USE_MULTI_RENDER_TARGET\n\
+                //     gl_FragData[1] = colorDiscard;\n\
+                //     gl_FragData[2] = colorDiscard;\n\
+                //     gl_FragData[3] = colorDiscard;\n\
+                // #endif\n\
+                // return;\n\
+                discard;\n\
+            }\n\
+        }\n\
+        else\n\
+        {\n\
+            if(frontPosLC.y + error < u_cuttingPlanePosLC.y)// || rearPosLC.y < u_cuttingPlanePosLC.y)\n\
+            {\n\
+                // vec4 colorDiscard = vec4(0.3, 1.0, 0.3, 1.0);\n\
+                // gl_FragData[0] = colorDiscard;\n\
+\n\
+                // #ifdef USE_MULTI_RENDER_TARGET\n\
+                //     gl_FragData[1] = colorDiscard;\n\
+                //     gl_FragData[2] = colorDiscard;\n\
+                //     gl_FragData[3] = colorDiscard;\n\
+                // #endif\n\
+                // return;\n\
+                discard;\n\
+            }\n\
+        }\n\
+\n\
+        \n\
+    }\n\
 \n\
     // Now, with \"frontPosLC\" & \"rearPosLC\", calculate the frontTexCoord3d & rearTexCoord3d.***\n\
     vec3 simulBoxRange = vec3(u_simulBoxMaxPosLC.x - u_simulBoxMinPosLC.x, u_simulBoxMaxPosLC.y - u_simulBoxMinPosLC.y, u_simulBoxMaxPosLC.z - u_simulBoxMinPosLC.z);\n\
@@ -3800,19 +3922,20 @@ void main(){\n\
         {\n\
             vec4 currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);\n\
 \n\
-            //float unitaryContaminationSample = (contaminationSample - u_minMaxPollutionValues.x) / (u_minMaxPollutionValuesToRender.y - u_minMaxPollutionValues.x);\n\
-            float unitaryContaminationSample = 0.0;\n\
-            float targetValue = u_minMaxPollutionValuesToRender.y;\n\
-            \n\
-            //targetValue = u_minMaxPollutionValues.y;\n\
-            //currColor4.a = contaminationSample / targetValue;\n\
-            if(currColor4.a > 1.0)\n\
+            if(u_useMinMaxValuesToRender == 1)\n\
             {\n\
-                currColor4.a = 1.0;\n\
-            }\n\
+                float targetValue = u_minMaxPollutionValuesToRender.y;\n\
+                \n\
+                //targetValue = u_minMaxPollutionValues.y;\n\
+                //currColor4.a = contaminationSample / targetValue;\n\
+                if(currColor4.a > 1.0)\n\
+                {\n\
+                    currColor4.a = 1.0;\n\
+                }\n\
 \n\
-            //currColor4.a *= smoothstep(0.0, targetValue, contaminationSample);\n\
-            currColor4.a = smoothstep(0.0, targetValue, contaminationSample);\n\
+                //currColor4.a *= smoothstep(0.0, targetValue, contaminationSample);\n\
+                currColor4.a = smoothstep(0.0, targetValue, contaminationSample);\n\
+            }\n\
 \n\
             // https://www.willusher.io/webgl/2019/01/13/volume-rendering-with-webgl\n\
             finalColor4.rgb += (1.0 - finalColor4.a) * currColor4.a * currColor4.rgb; \n\

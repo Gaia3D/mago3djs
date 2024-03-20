@@ -88,6 +88,18 @@ AnimationTimeController.prototype.calculateAnimationStartUnixTimeMilisec = funct
 	this._currentUnixTimeMilisec = this._animationStartUnixTimeMilisec;
 };
 
+AnimationTimeController.prototype.switchPlayPause = function ()
+{
+	if (this._animationState === CODE.processState.STARTED)
+	{
+		this._animationState = CODE.processState.PAUSED;
+	}
+	else if (this._animationState === CODE.processState.PAUSED)
+	{
+		this._animationState = CODE.processState.STARTED;
+	}
+};
+
 AnimationTimeController.prototype.reset = function (options)
 {
 	this._animationState = CODE.processState.NO_STARTED;

@@ -198,7 +198,7 @@ TranslateInteraction.prototype.handleF4dDrag = function (browserEvent)
         
 		if (attributes.movementInAxisZ)
 		{
-			// movement in plane XZ.
+			// movement in z-axis.
 			var globeYaxisWC = new Point3D(geoLocMatrix._floatArrays[4], geoLocMatrix._floatArrays[5], geoLocMatrix._floatArrays[6]);
 			var globeYaxisCC = mvMatRelToEye.transformPoint3D(globeYaxisWC, undefined);
 			this.selObjMovePlaneCC.setPointAndNormal(pixelPosCC.x, pixelPosCC.y, pixelPosCC.z,    globeYaxisCC.x, globeYaxisCC.y, globeYaxisCC.z); 
@@ -237,6 +237,11 @@ TranslateInteraction.prototype.handleF4dDrag = function (browserEvent)
 	{
 		//geoLocationData = ManagerUtils.calculateGeoLocationData(undefined, undefined, newAltitude, undefined, undefined, undefined, geoLocationData, this);
 		manager.changeLocationAndRotationNode(this.target, undefined, undefined, difZ, undefined, undefined, undefined);
+	}
+	else if (attributes.movementInAxisY)
+	{
+		//geoLocationData = ManagerUtils.calculateGeoLocationData(undefined, undefined, newAltitude, undefined, undefined, undefined, geoLocationData, this);
+		manager.changeLocationAndRotationNode(this.target, difY, undefined, undefined, undefined, undefined, undefined);
 	}
 	else 
 	{
@@ -450,6 +455,14 @@ TranslateInteraction.prototype.handleNativeDrag = function (browserEvent)
 	if (attributes.movementInAxisZ)
 	{
 		geoLocationData = ManagerUtils.calculateGeoLocationData(undefined, undefined, difZ, undefined, undefined, undefined, geoLocationData, this);
+	}
+	else if (attributes.movementInAxisY)
+	{
+		geoLocationData = ManagerUtils.calculateGeoLocationData(undefined, difY, undefined, undefined, undefined, undefined, geoLocationData, this);
+	}
+	else if (attributes.movementInAxisX)
+	{
+		geoLocationData = ManagerUtils.calculateGeoLocationData(difX, undefined, undefined, undefined, undefined, undefined, geoLocationData, this);
 	}
 	else 
 	{
