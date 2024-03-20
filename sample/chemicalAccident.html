@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width">
+	<title>Cesium</title>
+	<link rel="stylesheet" href="./demo.css" />
+	<link rel="stylesheet" href="../src/engine/cesium/Widgets/widgets.css" />
+	<link rel="stylesheet" href="../externlib/jquery-ui/jquery-ui.css" />
+	<script type="text/javascript" src="../externlib/jquery/jquery.js"></script>
+	
+	<script type="text/javascript" src="../externlib/polyfill/decodeTextAlternative/encoding-indexes.js"></script>
+	<script type="text/javascript" src="../externlib/polyfill/decodeTextAlternative/encoding.js"></script>
+</head>
+
+<body>
+	<input type="hidden" id="now_latitude" name="now_latitude" value="" />
+	<input type="hidden" id="now_longitude" name="now_longitude" value=""  />
+<ul class="nav i18n">
+	<li id="homeMenu" class="home">
+		<img src="/images/ko/homepage/home-icon.png" style="width: 35px; height: 35px; padding-right: 2px;" title="Home" />
+	</li>
+	
+	<li onclick="Chemical_Accident_Test();">
+		Chemical Accident Test
+	</li>
+	<li onclick="Start();">
+		ReStart animation
+	</li>
+	<li onclick="useCuttingPlaneXY();">
+		Use cutting plane XY
+	</li>
+	<li onclick="useCuttingPlaneXZ();">
+		Use cutting plane XZ
+	</li>
+	<li onclick="useCuttingPlaneYZ();">
+		Use cutting plane YZ
+	</li>
+	<li onclick="noUseCuttingPlane();">
+		No use cutting plane
+	</li>
+	<li onclick="useMinMaxValuesToRender();">
+		Use minMax values to render
+	</li>
+	<li onclick="playPause();">
+		play / pause
+	</li>
+
+
+</ul>
+<div id="magoContainer" class="mapWrap"></div>
+
+
+<script type="text/javascript" src="../src/engine/cesium/Cesium.js"></script>
+<script type="text/javascript" src="../build/mago3d/mago3d.js"></script>
+<!--<script type="text/javascript" src="../test/extrusion.js"></script> <!--  상암에 extrusion buildings 불러오기-->-->
+<script>
+	var message = new Mago3D.Message(i18next);
+	
+	//f4d path, default data array, 
+	var dataInfo = {
+		baseUrl : '/f4d',
+		dataArrat : []
+	}
+
+	function changeLang(lang) 
+	{
+		if(i18next === undefined)
+		{
+			return;
+		}
+		
+		var language = lang || i18next.language;
+		var namespace = i18next.options.ns[0];
+
+		$.ajax({
+			url: "/locales/"+namespace+"/"+language+".json",
+			type: "GET",
+			dataType: "json",
+			success: function(data){
+				i18next.addResourceBundle(language, namespace, data, true, true);
+				i18next.changeLanguage(language);
+			},
+			error: function(e){
+				alert(e.responseText);
+			}
+		});
+	}
+	
+	message.init(function (){
+		i18next = message.getHandle();
+		i18next.on('languageChanged', function (lang) {
+			$('.i18n').localize();
+		});
+		//jqueryI18next.init(i18next, $);
+		//changeLang();
+	});
+
+	var osmLayer;
+	var MAGO3D_INSTANCE;
+	var imagePath = "/images/ko";
+	var dataInformationUrl = "/sample/persistence/json/";
+	magoStart(null, "magoContainer", imagePath);
+
+    // mago3d 시작, 정책 데이터 파일을 로딩
+	function magoStart(viewer, renderDivId, imagePath) {
+		$.ajax({
+			url: dataInformationUrl + "geopolicy.json",
+			type: "GET",
+			dataType: "json",
+			success: function(serverPolicy){
+				var cesiumViewerOption = {};
+				cesiumViewerOption.infoBox = false;
+				cesiumViewerOption.navigationHelpButton = false;
+				cesiumViewerOption.selectionIndicator = false;
+				cesiumViewerOption.homeButton = false;
+				cesiumViewerOption.fullscreenButton = false;
+				cesiumViewerOption.geocoder = false;
+				cesiumViewerOption.baseLayerPicker = false;
+				cesiumViewerOption.sceneModePicker = false;
+
+				serverPolicy.basicGlobe = 'cesium';
+				//serverPolicy.terrainType = 'cesium-customer'; //serverPolicy.terrainType = 'cesium-default';
+				serverPolicy.terrainType = 'cesium-default';
+				//serverPolicy.terrainValue = 'http://192.168.10.11:8887/tilesets/sejong/';
+				//serverPolicy.terrainValue = 'http://192.168.10.182:9998/tilesets/terrain/';
+				//serverPolicy.terrainValue = 'https://mago3d.net/tilesets/terrain/';
+
+
+				//serverPolicy.terrainType = 'cesium-customer';
+				serverPolicy.terrainValue = '../f4d/terrain_ws2_sangam/terrain_ws2_sangam/';
+
+
+				serverPolicy.initLatitude = 37.58195;
+				serverPolicy.initLongitude = 126.60657;
+				serverPolicy.initAltitude = 3000;
+				MAGO3D_INSTANCE = new Mago3D.Mago3d(renderDivId, serverPolicy, {loadend : loadend}, cesiumViewerOption);
+
+				// Active this code for tile inspector.**************************************************************************************
+				MAGO3D_INSTANCE.getViewer().extend(Cesium.viewerCesium3DTilesInspectorMixin);
+        		const inspectorViewModel = MAGO3D_INSTANCE.getViewer().cesium3DTilesInspector.viewModel;
+				// Active this code for tile inspector.**************************************************************************************
+				
+				
+				//MAGO3D_INSTANCE.getViewer().scene.globe.translucency.enabled = true;
+				//MAGO3D_INSTANCE.getViewer().scene.globe.translucency.frontFaceAlphaByDistance = new Cesium.NearFarScalar(300.0, 0.0, 3000.0, 1.0);
+
+			},
+			error: function(e){
+				alert(e.responseText);
+			}
+		});
+	}
+	function loadend(e) {
+		console.info('Complete construct mago3d instance. Enjoy!');
+		
+		var magoInstance = e;
+		console.info(magoInstance)
+		magoInstance.getViewer().scene.globe.depthTestAgainstTerrain = true;
+		magoInstance.setBaseUrl(dataInfo.baseUrl);
+
+
+		osmLayer = new Cesium.ImageryLayer(new Cesium.OpenStreetMapImageryProvider({
+			url : 'https://a.tile.openstreetmap.org/'
+		}));
+
+		magoInstance.getViewer().imageryLayers.add(osmLayer, 1);	
+		
+		var magoManager = magoInstance.getMagoManager();
+
+		const pinBuilder = new Cesium.PinBuilder();
+		const position = Cesium.Cartesian3.fromDegrees(127, 37.5);
+
+		const billboard = {
+
+			image: pinBuilder.fromText('손성도', Cesium.Color.RED, 128).toDataURL(),
+
+			verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+
+
+		};
+
+
+		var r = Math.random() * 0.5 + 0.5;
+		var g = Math.random() * 0.5 + 0.5;
+		var b = Math.random() * 0.5 + 0.5;
+
+		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.CLICK, function(e){
+			console.info(e);
+
+			
+		});
+	}
+
+	function Start(){
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+
+		if(magoManager.animationTimeController === undefined)
+			{
+				magoManager.animationTimeController = new Mago3D.AnimationTimeController(options);
+			}
+			var options = {
+				timeScale : 2000,
+				year : 2023,
+				month : 4, // 0 to 11
+				day : 10,
+				hour : 12,
+				minute : 0,
+				second : 0
+			};
+
+			magoManager.animationTimeController.reset(options);
+			magoManager.animationTimeController.startAnimation();
+		
+	}
+
+	function playPause(){
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+
+		if(magoManager.animationTimeController !== undefined)
+		{
+			magoManager.animationTimeController.switchPlayPause();
+		}
+	}
+
+
+	function useCuttingPlaneXY()
+	{
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+		if(magoManager.chemicalAccidentManager !== undefined)
+		{
+			if(magoManager.chemicalAccidentManager.getChemicalAccidentLayersCount() > 0)
+			{
+				var chemicalAccidentLayer = magoManager.chemicalAccidentManager.getChemicalAccidentLayer(0);
+				var idx = 2;
+				chemicalAccidentLayer.setCurrentCuttingPlaneIdx(idx);
+			}
+		}
+	}
+
+	function useCuttingPlaneXZ()
+	{
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+		if(magoManager.chemicalAccidentManager !== undefined)
+		{
+			if(magoManager.chemicalAccidentManager.getChemicalAccidentLayersCount() > 0)
+			{
+				var chemicalAccidentLayer = magoManager.chemicalAccidentManager.getChemicalAccidentLayer(0);
+				var idx = 0;
+				chemicalAccidentLayer.setCurrentCuttingPlaneIdx(idx);
+			}
+		}
+	}
+	function useCuttingPlaneYZ()
+	{
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+		if(magoManager.chemicalAccidentManager !== undefined)
+		{
+			if(magoManager.chemicalAccidentManager.getChemicalAccidentLayersCount() > 0)
+			{
+				var chemicalAccidentLayer = magoManager.chemicalAccidentManager.getChemicalAccidentLayer(0);
+				var idx = 1;
+				chemicalAccidentLayer.setCurrentCuttingPlaneIdx(idx);
+			}
+		}
+	}//
+
+	function noUseCuttingPlane()
+	{
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+		if(magoManager.chemicalAccidentManager !== undefined)
+		{
+			if(magoManager.chemicalAccidentManager.getChemicalAccidentLayersCount() > 0)
+			{
+				var chemicalAccidentLayer = magoManager.chemicalAccidentManager.getChemicalAccidentLayer(0);
+				var idx = -1;
+				chemicalAccidentLayer.setCurrentCuttingPlaneIdx(idx);
+
+				var cuttingPlanesCount = chemicalAccidentLayer.cuttingPlanesArray.length;
+				for (var i=0; i<cuttingPlanesCount; i++)
+				{
+					var cuttingPlane = chemicalAccidentLayer.cuttingPlanesArray[i];
+					if (cuttingPlane === undefined)
+					{ continue; }
+
+					cuttingPlane.attributes.isVisible = false;
+				}
+			}
+		}
+	}//
+
+	function useMinMaxValuesToRender()
+	{
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+		if(magoManager.chemicalAccidentManager !== undefined)
+		{
+			if(magoManager.chemicalAccidentManager.getChemicalAccidentLayersCount() > 0)
+			{
+				var chemicalAccidentLayer = magoManager.chemicalAccidentManager.getChemicalAccidentLayer(0);
+				if(chemicalAccidentLayer.useMinMaxValuesToRender === 1)
+				{
+					chemicalAccidentLayer.setUseMinMaxValuesToRender(0);
+				}
+				else if(chemicalAccidentLayer.useMinMaxValuesToRender === 0)
+				{
+					chemicalAccidentLayer.setUseMinMaxValuesToRender(1);
+				}
+			}
+		}
+	}
+	
+
+	function Chemical_Accident_Test (){ // 
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+
+		// // to selesct & move native objects.*************************************
+		// this.defaultSelectInteraction.setActive(true); // test son 20240318
+		// this.defaultSelectInteraction.setTargetType(DataType.NATIVE);
+
+		// this.defaultTranslateInteraction.setActive(true);
+		// this.defaultTranslateInteraction.setTargetType(DataType.NATIVE);
+		magoManager.interactionCollection.array[0].setActive(true);
+		magoManager.interactionCollection.array[0].setTargetType(Mago3D.DataType.NATIVE);
+		magoManager.interactionCollection.array[1].setActive(true);
+		magoManager.interactionCollection.array[1].setTargetType(Mago3D.DataType.NATIVE);
+
+		// create chemicalAccidentManager, if no exist.***
+		if(!magoManager.chemicalAccidentManager)
+		{
+			var options = {
+				magoManager : magoManager,
+				geoJsonIndexFileFolderPath : "\\f4d\\chemicalAccident\\output_chemicalAccident"
+			};
+			magoManager.chemicalAccidentManager = new Mago3D.ChemicalAccidentManager(options);
+
+			//magoManager.chemicalAccidentManager.setMinMaxValuesToRender(0.0, 0.0);
+
+			// set the geoJsonIndexFilePath.***
+			var geoJsonIndexFilePath = "\\f4d\\chemicalAccident\\output_chemicalAccident\\JsonIndex.json"; 
+			magoManager.chemicalAccidentManager.load_chemicalAccidentIndexFile(geoJsonIndexFilePath);
+
+			magoManager.chemicalAccidentManager._animationState = Mago3D.CODE.processState.STARTED;
+
+			var options = {
+				timeScale : 2000,
+				year : 2023,
+				month : 4, // 0 to 11
+				day : 10,
+				hour : 12,
+				minute : 0,
+				second : 0
+			};
+
+			if(magoManager.animationTimeController === undefined)
+			{
+				magoManager.animationTimeController = new Mago3D.AnimationTimeController(options);
+			}
+
+			magoManager.animationTimeController.reset(options);
+			magoManager.animationTimeController.startAnimation();
+		}
+
+		var hola = 0;
+	}
+
+	
+	
+
+	const ArchInfoController = function (archInfoList, magoManager) {
+		this.hash = {};
+		this.magoManager = magoManager;
+	}
+
+	ArchInfoController.prototype.getArchInfoById = function(id) {
+		return this.hash[id];
+	}
+
+	ArchInfoController.createMockData = function(magoManager) {
+		
+		let getUrl = function(name) {
+			return `https://mago3d.net/buildings/${name}/15/`;
+		}
+
+		let archInfoList = [];
+		const info = [
+			{name : '강원', format : 'pbf', option:{show:true}},
+			{name : '세종', format : 'pbf', option:{show:true}},
+			{name : '경기', format : 'geojson', option:{show:true}},
+			{name : '경남', format : 'geojson', option:{show:true}},
+			{name : '경북', format : 'geojson', option:{show:true}},
+			{name : '광주', format : 'geojson', option:{show:true}},
+			{name : '대구', format : 'geojson', option:{show:true}},
+			{name : '대전', format : 'geojson', option:{show:true}},
+			{name : '부산', format : 'geojson', option:{show:true}},
+			{name : '서울', format : 'geojson', option:{show:true}},
+			{name : '울산', format : 'geojson', option:{show:true}},
+			{name : '인천', format : 'geojson', option:{show:true}},
+			{name : '전남', format : 'geojson', option:{show:true}},
+			{name : '전북', format : 'geojson', option:{show:true}},
+			{name : '제주', format : 'geojson', option:{show:true}},
+			{name : '충남', format : 'geojson', option:{show:true}},
+			{name : '충북', format : 'geojson', option:{show:true}}
+		]
+		
+		for(let i in info) {
+			let archInfo = info[i];
+			archInfo.url = getUrl(archInfo.name);
+			archInfo.option.color = new Mago3D.Color(200/255, 200/255, 200/255 ,1);
+			archInfoList.push(new ArchInfo(archInfo, magoManager));
+		}
+		
+		return archInfoList;
+		
+	}
+
+	
+
+	const ArchInfo = function(contructionOption, magoManager) {
+		this.name = contructionOption.name;
+		this.buildingMaster = magoManager.addKoreaBuildingMaster(contructionOption.url, contructionOption.format, contructionOption.option);
+	}
+
+	
+
+	Object.defineProperties(ArchInfo.prototype, {
+		show : {
+			get : function() {
+				return this.buildingMaster.show;
+			},
+			set : function(show) {
+				this.buildingMaster.show = show;
+			}
+		},
+		color : {
+			get : function() {
+				return this.buildingMaster.color;
+			},
+			set : function(color) {
+				this.buildingMaster.color = color;
+			}
+		}
+	});
+	
+
+</script>
+</body>
+</html>

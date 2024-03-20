@@ -3728,7 +3728,7 @@ void main(){\n\
     vec4 camPosRelToSimBox;\n\
     vec3 cuttingPosCC;\n\
     vec3 frontPosLCKeep;\n\
-    if(u_cuttingPlaneIdx == 0 || u_cuttingPlaneIdx == 1)\n\
+    if(u_cuttingPlaneIdx == 0 || u_cuttingPlaneIdx == 1 || u_cuttingPlaneIdx == 2)\n\
     {\n\
         vec4 encodedNormal4cuttingPlane = texture2D(cuttingPlaneNormalTex, v_tex_pos);\n\
         if(length(encodedNormal4cuttingPlane.xyz) > 0.1)\n\
@@ -3779,14 +3779,6 @@ void main(){\n\
         {\n\
             if(frontPosLC.x - error > u_cuttingPlanePosLC.x)// || rearPosLC.y > u_cuttingPlanePosLC.y)\n\
             {\n\
-                // vec4 colorDiscard = vec4(1.0, 0.3, 0.3, 1.0);\n\
-                // gl_FragData[0] = colorDiscard;\n\
-                // #ifdef USE_MULTI_RENDER_TARGET\n\
-                //     gl_FragData[1] = colorDiscard;\n\
-                //     gl_FragData[2] = colorDiscard;\n\
-                //     gl_FragData[3] = colorDiscard;\n\
-                // #endif\n\
-                // return;\n\
                 discard;\n\
             }\n\
         }\n\
@@ -3794,14 +3786,6 @@ void main(){\n\
         {\n\
             if(frontPosLC.x + error < u_cuttingPlanePosLC.x)// || rearPosLC.y < u_cuttingPlanePosLC.y)\n\
             {\n\
-                // vec4 colorDiscard = vec4(0.3, 1.0, 0.3, 1.0);\n\
-                // gl_FragData[0] = colorDiscard;\n\
-                // #ifdef USE_MULTI_RENDER_TARGET\n\
-                //     gl_FragData[1] = colorDiscard;\n\
-                //     gl_FragData[2] = colorDiscard;\n\
-                //     gl_FragData[3] = colorDiscard;\n\
-                // #endif\n\
-                // return;\n\
                 discard;\n\
             }\n\
         }\n\
@@ -3820,6 +3804,40 @@ void main(){\n\
         {\n\
             if(frontPosLC.y + error < u_cuttingPlanePosLC.y)// || rearPosLC.y < u_cuttingPlanePosLC.y)\n\
             {\n\
+                discard;\n\
+            }\n\
+        }\n\
+    }\n\
+    else if(u_cuttingPlaneIdx == 2) // z-axis\n\
+    {\n\
+        float error = 10.0;\n\
+        if(camPosRelToSimBox.z >= u_cuttingPlanePosLC.z)\n\
+        {\n\
+            if(frontPosLC.z - error > u_cuttingPlanePosLC.z)// || rearPosLC.y > u_cuttingPlanePosLC.y)\n\
+            {\n\
+                // vec4 colorDiscard = vec4(1.0, 0.3, 0.3, 1.0);\n\
+                // gl_FragData[0] = colorDiscard;\n\
+                // #ifdef USE_MULTI_RENDER_TARGET\n\
+                //     gl_FragData[1] = colorDiscard;\n\
+                //     gl_FragData[2] = colorDiscard;\n\
+                //     gl_FragData[3] = colorDiscard;\n\
+                // #endif\n\
+                // return;\n\
+                discard;\n\
+            }\n\
+        }\n\
+        else\n\
+        {\n\
+            if(frontPosLC.z + error < u_cuttingPlanePosLC.z)// || rearPosLC.y < u_cuttingPlanePosLC.y)\n\
+            {\n\
+                // vec4 colorDiscard = vec4(0.3, 1.0, 0.3, 1.0);\n\
+                // gl_FragData[0] = colorDiscard;\n\
+                // #ifdef USE_MULTI_RENDER_TARGET\n\
+                //     gl_FragData[1] = colorDiscard;\n\
+                //     gl_FragData[2] = colorDiscard;\n\
+                //     gl_FragData[3] = colorDiscard;\n\
+                // #endif\n\
+                // return;\n\
                 discard;\n\
             }\n\
         }\n\
@@ -3871,6 +3889,7 @@ void main(){\n\
     \n\
     // Sampling far to near.***\n\
     bool normalLC_calculated = true;\n\
+\n\
     float contaminationSamples[30];\n\
     int samplesCount = 0;\n\
     for(int i=0; i<30; i++)\n\

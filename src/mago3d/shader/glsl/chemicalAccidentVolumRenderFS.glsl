@@ -1342,7 +1342,7 @@ void main(){
     vec4 camPosRelToSimBox;
     vec3 cuttingPosCC;
     vec3 frontPosLCKeep;
-    if(u_cuttingPlaneIdx == 0 || u_cuttingPlaneIdx == 1)
+    if(u_cuttingPlaneIdx == 0 || u_cuttingPlaneIdx == 1 || u_cuttingPlaneIdx == 2)
     {
         vec4 encodedNormal4cuttingPlane = texture2D(cuttingPlaneNormalTex, v_tex_pos);
         if(length(encodedNormal4cuttingPlane.xyz) > 0.1)
@@ -1422,6 +1422,40 @@ void main(){
             }
         }
     }
+    else if(u_cuttingPlaneIdx == 2) // z-axis
+    {
+        float error = 10.0;
+        if(camPosRelToSimBox.z >= u_cuttingPlanePosLC.z)
+        {
+            if(frontPosLC.z - error > u_cuttingPlanePosLC.z)// || rearPosLC.y > u_cuttingPlanePosLC.y)
+            {
+                // vec4 colorDiscard = vec4(1.0, 0.3, 0.3, 1.0);
+                // gl_FragData[0] = colorDiscard;
+                // #ifdef USE_MULTI_RENDER_TARGET
+                //     gl_FragData[1] = colorDiscard;
+                //     gl_FragData[2] = colorDiscard;
+                //     gl_FragData[3] = colorDiscard;
+                // #endif
+                // return;
+                discard;
+            }
+        }
+        else
+        {
+            if(frontPosLC.z + error < u_cuttingPlanePosLC.z)// || rearPosLC.y < u_cuttingPlanePosLC.y)
+            {
+                // vec4 colorDiscard = vec4(0.3, 1.0, 0.3, 1.0);
+                // gl_FragData[0] = colorDiscard;
+                // #ifdef USE_MULTI_RENDER_TARGET
+                //     gl_FragData[1] = colorDiscard;
+                //     gl_FragData[2] = colorDiscard;
+                //     gl_FragData[3] = colorDiscard;
+                // #endif
+                // return;
+                discard;
+            }
+        }
+    }
 
     // Now, with "frontPosLC" & "rearPosLC", calculate the frontTexCoord3d & rearTexCoord3d.***
     vec3 simulBoxRange = vec3(u_simulBoxMaxPosLC.x - u_simulBoxMinPosLC.x, u_simulBoxMaxPosLC.y - u_simulBoxMinPosLC.y, u_simulBoxMaxPosLC.z - u_simulBoxMinPosLC.z);
@@ -1469,6 +1503,7 @@ void main(){
     
     // Sampling far to near.***
     bool normalLC_calculated = true;
+
     float contaminationSamples[30];
     int samplesCount = 0;
     for(int i=0; i<30; i++)
