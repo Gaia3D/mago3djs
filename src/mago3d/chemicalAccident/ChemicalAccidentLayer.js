@@ -680,7 +680,13 @@ ChemicalAccidentLayer.prototype._renderDepthCuttingPlane = function ()
 		this.visibleObjControler = new VisibleObjectsController();
 	}
 
-	var cuttingPlane = this.cuttingPlanesArray[0]; // provisionally take the 1rst cuttingPlane.***
+	var cuttingPlaneIdx = this.currentActiveCuttingPlaneIdx;
+	if (cuttingPlaneIdx < 0)
+	{
+		return;
+	}
+	
+	var cuttingPlane = this.cuttingPlanesArray[cuttingPlaneIdx]; 
 
 	if (cuttingPlane)
 	{ this.visibleObjControler.currentVisibleNativeObjects.opaquesArray[0] = cuttingPlane; }
@@ -888,9 +894,19 @@ ChemicalAccidentLayer.prototype.getTimeSliceIdxByCurrentUnixTimeMiliseconds = fu
 	return timeSliceIdx;
 };
 
+ChemicalAccidentLayer.prototype.getCuttingPlanesCount = function ()
+{
+	return this.cuttingPlanesArray.length;
+};
+
 ChemicalAccidentLayer.prototype.setUseMinMaxValuesToRender = function (useMinMaxValues)
 {
 	this.useMinMaxValuesToRender = useMinMaxValues;
+};
+
+ChemicalAccidentLayer.prototype.getCurrentCuttingPlaneIdx = function ()
+{
+	return this.currentActiveCuttingPlaneIdx;
 };
 
 ChemicalAccidentLayer.prototype.setCurrentCuttingPlaneIdx = function (idx)
@@ -973,9 +989,77 @@ ChemicalAccidentLayer.prototype.createCuttingPlaneXZ = function ()
 
 	// finally put into the our cuttingPlanesArray.***
 	this.cuttingPlanesArray.push(resultRenderableObject);
+};
 
+ChemicalAccidentLayer.prototype.createCuttingPlaneYZ = function ()
+{
+	// 1. Calculate the rectangle in local coord.***
+	//var magoManager = this.chemicalAccidentManager.magoManager;
 
-	var hola = 0;
+	var geoJsonIndexFile = this.chemicalAccidentManager._geoJsonIndexFile;
+	var centerGeoCoord = geoJsonIndexFile.centerGeographicCoord;
+
+	// must find the 4 geoCoords of the rectangle.***
+	var widthMeters = geoJsonIndexFile.width_km * 1000.0;
+	var heightMeters = geoJsonIndexFile.height_km * 1000.0;
+	var semiWidthMeters = widthMeters / 2.0;
+	var semiHeightMeters = heightMeters / 2.0;
+
+	// create the local rectangle.***
+	var pointsLCArray = [];
+
+	// down.***
+	var point3d = new Point2D(0.0, -semiHeightMeters);
+	pointsLCArray.push(point3d);
+
+	// up.***
+	point3d = new Point2D(0.0, semiHeightMeters);
+	pointsLCArray.push(point3d);
+
+	// // rightUp corner.***
+	// point3d = new Point2D(semiWidthMeters, semiHeightMeters);
+	// pointsLCArray.push(point3d);
+
+	// // leftUp corner.***
+	// point3d = new Point2D(-semiWidthMeters, semiHeightMeters);
+	// pointsLCArray.push(point3d);
+
+	var profile2d = Profile2D.fromPoint2DArray(pointsLCArray);
+
+	// take the 1rst timeSlice:
+	var timeSlice = this._timeSlicesArray[0];
+	var totalMinMaxAltitudes = timeSlice.getTotalMinMaxAltitudes();
+	var extrusionDist = totalMinMaxAltitudes[1] - totalMinMaxAltitudes[0];
+	var extrudeSegmentsCount = 1;
+	var extrusionVector = undefined;
+	var bIncludeBottomCap = false;
+	var bIncludeTopCap = false;
+	var surfIndepMesh = Modeler.getExtrudedPlane(profile2d, extrusionDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, undefined);
+
+	// now make the renderable object of the cutting plane.***
+
+	var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
+	var resultRenderableObject = new RenderableObject();
+	resultRenderableObject.attributes.isMovable = true;
+	resultRenderableObject.attributes.isSelectable = true;
+	resultRenderableObject.attributes.movementInAxisX = true;
+	resultRenderableObject.setOneColor(0.8, 0.7, 0.2, 0.0);
+	resultRenderableObject.setSelectedColor4(0.8, 0.7, 0.2, 0.1);
+	
+	resultRenderableObject.geoLocDataManager = new GeoLocationDataManager();
+	var geoLocDataRenderableObj = resultRenderableObject.geoLocDataManager.newGeoLocationData();
+	geoLocDataRenderableObj.copyFrom(geoLocData);
+
+	//resultRenderableObject.geographicCoordList = this;
+	resultRenderableObject.objectsArray.push(surfIndepMesh);
+
+	// put into the modeler.***
+	var magoManager = this.chemicalAccidentManager.magoManager;
+	var depth = 5;
+	magoManager.modeler.addObject(resultRenderableObject, depth);
+
+	// finally put into the our cuttingPlanesArray.***
+	this.cuttingPlanesArray.push(resultRenderableObject);
 };
 
 ChemicalAccidentLayer.prototype.render = function ()
@@ -989,6 +1073,7 @@ ChemicalAccidentLayer.prototype.render = function ()
 	if (this.cuttingPlanesArray.length === 0)
 	{
 		// create a default cuttingPlaneXZ.***
+		this.createCuttingPlaneYZ();
 		this.createCuttingPlaneXZ();
 	}
 
@@ -1140,6 +1225,19 @@ ChemicalAccidentLayer.prototype.render = function ()
 		var simulBoxGeoLocData = this.simulationBox.geoLocDataManager.getCurrentGeoLocationData();
 		var posLC = simulBoxGeoLocData.worldCoordToLocalCoord(posWC, undefined);
 
+		var cuttingPlanesCount = this.cuttingPlanesArray.length;
+		for (var i=0; i<cuttingPlanesCount; i++)
+		{
+			var cuttingPlane = this.cuttingPlanesArray[i];
+			if (cuttingPlane === undefined)
+			{ continue; }
+
+			cuttingPlane.attributes.isVisible = false;
+			//cuttingPlane.attributes.isSelectable = false;
+		}
+
+		this.cuttingPlanesArray[this.currentActiveCuttingPlaneIdx].attributes.isVisible = true;
+
 		var hola = 0;
 		var cuttingPlaneIdx = 0.0;
 		if (this.currentActiveCuttingPlaneIdx === 0)
@@ -1158,15 +1256,7 @@ ChemicalAccidentLayer.prototype.render = function ()
 		gl.uniform4fv(shader.u_cuttingPlanePosLC_loc, [posLC.x, posLC.y, posLC.z, cuttingPlaneIdx]);
 	}
 
-	if (useCuttingPlane)
-	{
-		gl.uniform1i(shader.u_useCuttingPlane_loc, 1);
-	}
-	else 
-	{
-		gl.uniform1i(shader.u_useCuttingPlane_loc, 0);
-	
-	}
+	gl.uniform1i(shader.u_cuttingPlaneIdx_loc, this.currentActiveCuttingPlaneIdx);
 
 	
 	// bind textures.***

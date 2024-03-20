@@ -62,7 +62,7 @@ uniform vec2 uNearFarArray[4];
 uniform float tangentOfHalfFovy;
 uniform float aspectRatio;
 uniform vec2 uMinMaxAltitudeSlices[32]; // limited to 32 slices.***
-uniform int u_useCuttingPlane;
+uniform int u_cuttingPlaneIdx;
 uniform int u_useMinMaxValuesToRender;
 uniform vec4 u_cuttingPlanePosLC;
 
@@ -1342,7 +1342,7 @@ void main(){
     vec4 camPosRelToSimBox;
     vec3 cuttingPosCC;
     vec3 frontPosLCKeep;
-    if(u_useCuttingPlane == 1)
+    if(u_cuttingPlaneIdx == 0 || u_cuttingPlaneIdx == 1)
     {
         vec4 encodedNormal4cuttingPlane = texture2D(cuttingPlaneNormalTex, v_tex_pos);
         if(length(encodedNormal4cuttingPlane.xyz) > 0.1)
@@ -1379,31 +1379,38 @@ void main(){
     // Now, calculate frontPosWC & rearPosWC.***
     vec4 frontPosWCRelToEye = modelViewMatrixRelToEyeInv * vec4(frontPosCC.xyz, 1.0);
     vec4 rearPosWCRelToEye = modelViewMatrixRelToEyeInv * vec4(rearPosCC.xyz, 1.0);
-    //vec4 scenePosWCRelToEye = modelViewMatrixRelToEyeInv * vec4(sceneDepthPosCC.xyz, 1.0);
 
     // Now, calculate frontPosLC & rearPosLC.***
     vec3 frontPosLC;
     vec3 rearPosLC;
-    //vec3 scenePosLC;
     posWCRelToEye_to_posLC(frontPosWCRelToEye, u_simulBoxTMatInv, u_simulBoxPosHigh, u_simulBoxPosLow, frontPosLC);
     posWCRelToEye_to_posLC(rearPosWCRelToEye, u_simulBoxTMatInv, u_simulBoxPosHigh, u_simulBoxPosLow, rearPosLC);
 
-    if(u_useCuttingPlane == 1)
+    if(u_cuttingPlaneIdx == 0) // x-axis
+    {
+        float error = 10.0;
+        if(camPosRelToSimBox.x >= u_cuttingPlanePosLC.x)
+        {
+            if(frontPosLC.x - error > u_cuttingPlanePosLC.x)// || rearPosLC.y > u_cuttingPlanePosLC.y)
+            {
+                discard;
+            }
+        }
+        else
+        {
+            if(frontPosLC.x + error < u_cuttingPlanePosLC.x)// || rearPosLC.y < u_cuttingPlanePosLC.y)
+            {
+                discard;
+            }
+        }
+    }
+    else if(u_cuttingPlaneIdx == 1) // y-axis
     {
         float error = 10.0;
         if(camPosRelToSimBox.y >= u_cuttingPlanePosLC.y)
         {
-            if(frontPosLC.y - error > u_cuttingPlanePosLC.y)// || rearPosLC.y < u_cuttingPlanePosLC.y)
+            if(frontPosLC.y - error > u_cuttingPlanePosLC.y)// || rearPosLC.y > u_cuttingPlanePosLC.y)
             {
-                // vec4 colorDiscard = vec4(1.0, 0.3, 0.3, 1.0);
-                // gl_FragData[0] = colorDiscard;
-
-                // #ifdef USE_MULTI_RENDER_TARGET
-                //     gl_FragData[1] = colorDiscard;
-                //     gl_FragData[2] = colorDiscard;
-                //     gl_FragData[3] = colorDiscard;
-                // #endif
-                // return;
                 discard;
             }
         }
@@ -1411,20 +1418,9 @@ void main(){
         {
             if(frontPosLC.y + error < u_cuttingPlanePosLC.y)// || rearPosLC.y < u_cuttingPlanePosLC.y)
             {
-                // vec4 colorDiscard = vec4(0.3, 1.0, 0.3, 1.0);
-                // gl_FragData[0] = colorDiscard;
-
-                // #ifdef USE_MULTI_RENDER_TARGET
-                //     gl_FragData[1] = colorDiscard;
-                //     gl_FragData[2] = colorDiscard;
-                //     gl_FragData[3] = colorDiscard;
-                // #endif
-                // return;
                 discard;
             }
         }
-
-        
     }
 
     // Now, with "frontPosLC" & "rearPosLC", calculate the frontTexCoord3d & rearTexCoord3d.***
@@ -1454,7 +1450,6 @@ void main(){
     {
         // vec4 colorDiscard = vec4(0.3, 0.3, 0.3, 1.0);
         // gl_FragData[0] = colorDiscard;
-
         // #ifdef USE_MULTI_RENDER_TARGET
         //     gl_FragData[1] = colorDiscard;
         //     gl_FragData[2] = colorDiscard;

@@ -64,6 +64,31 @@ ChemicalAccidentManager.prototype.init = function ()
 	this.test_started = false;
 };
 
+ChemicalAccidentManager.prototype.getChemicalAccidentLayersCount = function ()
+{
+	if (this.chemAccidentLayersArray === undefined)
+	{
+		return 0;
+	}
+
+	return this.chemAccidentLayersArray.length;
+};
+
+ChemicalAccidentManager.prototype.getChemicalAccidentLayer = function (idx)
+{
+	if (this.chemAccidentLayersArray === undefined)
+	{
+		return undefined;
+	}
+	else if (idx < 0 || idx >= this.chemAccidentLayersArray.length)
+	{
+		return undefined;
+	
+	}
+
+	return this.chemAccidentLayersArray[idx];
+};
+
 ChemicalAccidentManager.prototype.newChemAccidentLayer = function (options)
 {
 	if (!this.chemAccidentLayersArray)
@@ -509,7 +534,7 @@ ChemicalAccidentManager.prototype.createDefaultShaders = function ()
 	shader.u_maxVelocity_loc = gl.getUniformLocation(shader.program, "u_maxVelocity");
 	shader.u_voxelSizeMeters_loc = gl.getUniformLocation(shader.program, "u_voxelSizeMeters");//
 	shader.u_minMaxPollutionValuesToRender_loc = gl.getUniformLocation(shader.program, "u_minMaxPollutionValuesToRender");
-	shader.u_useCuttingPlane_loc = gl.getUniformLocation(shader.program, "u_useCuttingPlane");//
+	shader.u_cuttingPlaneIdx_loc = gl.getUniformLocation(shader.program, "u_cuttingPlaneIdx");//
 	shader.u_useMinMaxValuesToRender_loc = gl.getUniformLocation(shader.program, "u_useMinMaxValuesToRender");//
 	shader.u_cuttingPlanePosLC_loc = gl.getUniformLocation(shader.program, "u_cuttingPlanePosLC");
 
