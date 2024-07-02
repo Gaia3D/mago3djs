@@ -82,7 +82,7 @@ QuantizedMeshManager.prototype.excavate = function()
 {
 	var terrainProvider = this.magoManager.scene.terrainProvider;
 
-	if (!(terrainProvider instanceof Cesium.EditableCesiumTerrainProvider)) { return false; }
+	/*if (!(terrainProvider instanceof Cesium.EditableCesiumTerrainProvider)) { return false; }*/
 	//this.excavating = false;
 
 	//var tilesMap = terrainProvider.target.tilesMap;
@@ -94,7 +94,7 @@ QuantizedMeshManager.prototype.applyQuantizedMeshExcavation = function()
 {
 	var scene = this.magoManager.scene;
 	var terrainProvider = scene.terrainProvider;
-	if (terrainProvider instanceof Cesium.EditableCesiumTerrainProvider) 
+	/*if (terrainProvider instanceof Cesium.EditableCesiumTerrainProvider)
 	{
 		var tilesMap = this.tilesMap = this.quantizedMeshExcavationSet.getIntersectedTiles();
 		var excavationAltitude = this.quantizedMeshExcavationSet.excavationAltitude;
@@ -113,14 +113,14 @@ QuantizedMeshManager.prototype.applyQuantizedMeshExcavation = function()
 		};
 
 		this.excavatedTilesMap = {};
-	}
+	}*/
 };
 
 QuantizedMeshManager.prototype.stopQuantizedMeshExcavation = function()
 {
 	var terrainProvider = this.magoManager.scene.terrainProvider;
 
-	if (!(terrainProvider instanceof Cesium.EditableCesiumTerrainProvider)) { return false; }
+	/*if (!(terrainProvider instanceof Cesium.EditableCesiumTerrainProvider)) { return false; }*/
 	if (!terrainProvider.target) { return false; }
 
 	//this.excavating = false;

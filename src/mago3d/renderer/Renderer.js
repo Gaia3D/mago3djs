@@ -2072,7 +2072,10 @@ Renderer.prototype.renderTerrainCopy = function ()
 
 	var bUseMultiRenderTarget = magoManager.postFxShadersManager.bUseMultiRenderTarget;
 
-	magoManager.czm_globeDepthText = magoManager.scene._context._us.globeDepthTexture._texture; 
+	if (magoManager.scene.view.globeDepth.framebuffer)
+	{
+		magoManager.czm_globeDepthText = magoManager.scene.view.globeDepth.framebuffer._colorTextures[0]._texture;
+	}
 
 	if (!magoManager.czm_globeDepthText)
 	{ return; }
@@ -2798,9 +2801,9 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 		
 	}
 	
-	if (magoManager.scene && magoManager.scene._context._us.globeDepthTexture._texture)
+	if (magoManager.scene && magoManager.scene.view.globeDepth.framebuffer._texture)
 	{
-		//texture = magoManager.scene._context._us.globeDepthTexture._texture;
+		//texture = magoManager.scene.view.globeDepth.framebuffer._texture;
 	}
 
 	if (magoManager.screenSpaceFBO)

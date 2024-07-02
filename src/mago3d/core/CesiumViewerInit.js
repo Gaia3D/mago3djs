@@ -120,7 +120,8 @@ CesiumViewerInit.makeTerrainProvider = function(type, value, policy, layerName, 
 		break;
 	}
 	case CODE.cesiumTerrainType.CESIUM_CUSTOMER :{
-		var TerrainProviderInstance = Cesium.EditableCesiumTerrainProvider ? Cesium.EditableCesiumTerrainProvider : Cesium.CesiumTerrainProvider;
+		//var TerrainProviderInstance = Cesium.EditableCesiumTerrainProvider ? Cesium.EditableCesiumTerrainProvider : Cesium.CesiumTerrainProvider;
+		var TerrainProviderInstance = Cesium.CesiumTerrainProvider;
 		terrainProvider = new TerrainProviderInstance({
 			url: value
 		});
@@ -370,10 +371,10 @@ CesiumViewerInit.prototype.initMagoManager = function()
 	this.viewer.scene.logarithmicDepthBuffer = false; //do not use logarithmic buffer
 	this.viewer.scene.highDynamicRange = false; //do not use high dynamic range
 
-	if (this.viewer.terrainProvider instanceof Cesium.EditableCesiumTerrainProvider) 
+	/*if (this.viewer.terrainProvider instanceof Cesium.EditableCesiumTerrainProvider)
 	{
 		this.viewer.terrainProvider.magoManager = magoManager;
-	}
+	}*/
 
 	scene.globe.terrainProviderChanged.addEventListener(function(e)
 	{

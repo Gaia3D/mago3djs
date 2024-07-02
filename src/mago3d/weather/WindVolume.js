@@ -1723,9 +1723,10 @@ WindVolume.prototype.renderMode3DThickLines_oneLayer = function(magoManager)
 		}
 	}
 
-	
+	var scene = magoManager.scene;
 	var extbuffers = magoManager.extbuffers;
-	magoManager.scene._context._currentFramebuffer._bind();
+	scene.view.globeDepth.framebuffer._bind();
+
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, magoManager.depthTex, 0);
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, magoManager.normalTex, 0);
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, magoManager.albedoTex, 0);

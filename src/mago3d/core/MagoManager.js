@@ -1167,9 +1167,13 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 		resultCamera.position.set(camPosX, camPosY, camPosZ);
 		resultCamera.direction.set(camDirX, camDirY, camDirZ);
 		resultCamera.up.set(camUpX, camUpY, camUpZ);
-		
-		var aspectRatio = frustum.aspectRatio[0];
-		var fovy = frustum.fovyRad[0];	
+		var aspectRatio = 1.0;
+		var fovy = 1.0;
+		if (frustum) 
+		{
+			aspectRatio = frustum.aspectRatio[0];
+			fovy = frustum.fovyRad[0];
+		}
 		
 		frustum = resultCamera.getFrustum(frustumIdx);
 		resultCamera.frustum.near[0] = currentFrustumNear;
@@ -1665,7 +1669,8 @@ MagoManager.prototype.TEST__cameraLaser = function()
  */
 MagoManager.prototype.bindMainFramebuffer = function() 
 {
-	this.scene._context._currentFramebuffer._bind();
+	var scene = this.scene;
+	scene.view.globeDepth.framebuffer._bind();
 };
 
 /**
@@ -1800,7 +1805,8 @@ MagoManager.prototype.doRenderORT = function (frustumVolumenObject)
 
 		// Test to copy terrain.******************************************************************************************
 		// Take cesium colorBuffer.**********************
-		scene._context._currentFramebuffer._bind();
+		scene.view.globeDepth.framebuffer._bind();
+
 		this.cesiumColorBuffer = gl.getFramebufferAttachmentParameter(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.FRAMEBUFFER_ATTACHMENT_OBJECT_NAME);
 		// End taking cesium colorBuffer.-------------------
 
@@ -1989,7 +1995,7 @@ MagoManager.prototype.doRenderORT = function (frustumVolumenObject)
 	/*
 	if (this.currentFrustumIdx === 0) 
 	{
-		if (scene && scene._context && scene._context._currentFramebuffer) 
+		if (scene && scene._context && scene.view.globeDepth.framebuffer)
 		{
 			this.bindMainFramebuffer();
 		}
@@ -2282,14 +2288,16 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		{ this.extbuffers = gl.getExtension("WEBGL_draw_buffers"); }
 
 		// Take cesium colorBuffer.**********************
-		scene._context._currentFramebuffer._bind();
+		scene.view.globeDepth.framebuffer._bind();
 		this.cesiumColorBuffer = gl.getFramebufferAttachmentParameter(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.FRAMEBUFFER_ATTACHMENT_OBJECT_NAME);
 		// End taking cesium colorBuffer.-------------------
 
 		// Note : in "renderTerrainCopy()" does NO copy the albedo (only copies depth & normal). The albedo is copied when frustumIdx = 0, at final of this function.
-		this.renderer.renderTerrainCopy(); 
+		this.renderer.renderTerrainCopy();
 
-		if (scene && scene._context && scene._context._currentFramebuffer) 
+		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+		if (scene && scene._context && scene.view.globeDepth.framebuffer)
 		{
 			this.bindMainFramebuffer();
 			// MRT on cesium.**************************************************
@@ -2486,7 +2494,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		var bTexFlipYAxis = true;
 		var bTexFlipXAxis = true;
 		this.renderer.copyTexture(this.cesiumColorBuffer, this.albedoTex, bTexFlipXAxis, bTexFlipYAxis);
-		//// this.renderer.copyTexture(this.scene._context._us.globeDepthTexture._texture, this.debugTex, bTexFlipXAxis, bTexFlipYAxis);
+		//// this.renderer.copyTexture(this.scene.view.globeDepth.framebuffer._texture, this.debugTex, bTexFlipXAxis, bTexFlipYAxis);
 
 		// Render the lightBuffer.*****************************************
 		if (sceneState.applyLightsShadows)
@@ -2939,7 +2947,7 @@ MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject)
 
 			//if (this.isCesiumGlobe())
 			{
-				//scene._context._currentFramebuffer._bind();
+				//scene.view.globeDepth.framebuffer._bind();
 				// unbind mago colorTextures:
 				
 				//gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // depthTex.
@@ -3007,7 +3015,7 @@ MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject)
 	{
 		//if (this.isCesiumGlobe())
 		{
-			//scene._context._currentFramebuffer._bind();
+			//scene.view.globeDepth.framebuffer._bind();
 			// unbind mago colorTextures:
 			
 			gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // depthTex.
