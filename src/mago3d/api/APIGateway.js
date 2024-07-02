@@ -1,6 +1,8 @@
 /* eslint-env jquery */
 'use strict';
 
+WebGL2RenderingContext = undefined;
+
 /**
  * 
  * @class APIGateway
