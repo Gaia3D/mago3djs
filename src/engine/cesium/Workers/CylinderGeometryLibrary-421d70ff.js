@@ -1,2 +1,0 @@
-define(["exports","./ComponentDatatype-dc3af6a4"],(function(t,r){"use strict";var a={computePositions:function(t,a,e,n,o){var i,s=.5*t,c=-s,u=n+n,f=new Float64Array(3*(o?2*u:u)),y=0,m=0,p=o?3*u:0,d=o?3*(u+n):3*n;for(i=0;i<n;i++){var h=i/n*r.CesiumMath.TWO_PI,v=Math.cos(h),C=Math.sin(h),M=v*e,l=C*e,P=v*a,b=C*a;f[m+p]=M,f[m+p+1]=l,f[m+p+2]=c,f[m+d]=P,f[m+d+1]=b,f[m+d+2]=s,m+=3,o&&(f[y++]=M,f[y++]=l,f[y++]=c,f[y++]=P,f[y++]=b,f[y++]=s)}return f}};t.CylinderGeometryLibrary=a}));
-//# sourceMappingURL=CylinderGeometryLibrary-421d70ff.js.map

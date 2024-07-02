@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width" name="viewport">
+    <title>Cesium</title>
+    <!--<link href="./demo.css" rel="stylesheet"/>-->
+    <link href="../src/engine/cesium/Widgets/widgets.css" rel="stylesheet"/>
+    <link href="../externlib/jquery-ui/jquery-ui.css" rel="stylesheet"/>
+    <script src="../externlib/jquery/jquery.js" type="text/javascript"></script>
+<!--    <script src="../externlib/polyfill/decodeTextAlternative/encoding-indexes.js" type="text/javascript"></script>
+    <script src="../externlib/polyfill/decodeTextAlternative/encoding.js" type="text/javascript"></script>-->
+    <script src="../src/engine/cesium/Cesium.js" type="text/javascript"></script>
+    <script src="../build/mago3d/mago3d.js" type="text/javascript"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        .mapWrap {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    <div class="mapWrap" id="magoContainer"></div>
+    <script>
+        let message = new Mago3D.Message(i18next);
+        let dataInfo = {
+            baseUrl   : '/f4d',
+            dataArrat : []
+        };
+
+        message.init(function () {
+            i18next = message.getHandle();
+            i18next.on('languageChanged', function (lang)
+            {
+                $('.i18n').localize();
+            });
+            //jqueryI18next.init(i18next, $);
+            //changeLang();
+        });
+
+        let osmLayer;
+        let MAGO3D_INSTANCE;
+        let imagePath = "/images/ko";
+        let dataInformationUrl = "/sample/persistence/json/";
+        magoStart(null, "magoContainer", imagePath);
+
+        // mago3d 시작, 정책 데이터 파일을 로딩
+        function magoStart(viewer, renderDivId, imagePath) {
+			let cesiumViewerOption = {};
+			cesiumViewerOption.infoBox = false;
+			cesiumViewerOption.navigationHelpButton = false;
+			cesiumViewerOption.selectionIndicator = false;
+			cesiumViewerOption.homeButton = false;
+			cesiumViewerOption.fullscreenButton = false;
+			cesiumViewerOption.geocoder = false;
+			cesiumViewerOption.baseLayerPicker = false;
+			cesiumViewerOption.sceneModePicker = false;
+
+			cesiumViewerOption.defaultControl = false;
+			cesiumViewerOption.defaultControl = {};
+			cesiumViewerOption.defaultControl.zoom = false;
+			cesiumViewerOption.defaultControl.initCamera = false;
+			cesiumViewerOption.defaultControl.fullScreen = false;
+			cesiumViewerOption.defaultControl.measure = false;
+			cesiumViewerOption.defaultControl.tools = false;
+			cesiumViewerOption.defaultControl.attribution = false;
+			cesiumViewerOption.defaultControl.overviewMap = false;
+
+			let serverPolicy = {};
+			serverPolicy.basicGlobe = 'cesium';
+			serverPolicy.terrainType = 'cesium-default';
+			serverPolicy.terrainValue = 'http://211.106.171.246:49998/tilesets/terrain_sj/'; // from Kim Jin Ho 20220420 (to test terrain excavation bugs).***
+			serverPolicy.initLatitude = 37.58195;
+			serverPolicy.initLongitude = 126.60657;
+			serverPolicy.initAltitude = 3000;
+			serverPolicy.initDuration = 1.0;
+			MAGO3D_INSTANCE = new Mago3D.Mago3d(renderDivId, serverPolicy, {loadend : loadend}, cesiumViewerOption);
+
+		}
+
+        function loadend(e) {
+            console.info('Complete construct mago3d instance. Enjoy!');
+
+            let magoInstance = e;
+            console.info(magoInstance);
+            magoInstance.getViewer().scene.globe.depthTestAgainstTerrain = true;
+            magoInstance.setBaseUrl(dataInfo.baseUrl);
+
+            osmLayer = new Cesium.ImageryLayer(new Cesium.OpenStreetMapImageryProvider({
+                url : 'https://a.tile.openstreetmap.org/'
+            }));
+
+            magoInstance.getViewer().imageryLayers.add(osmLayer, 1);
+
+            let magoManager = magoInstance.getMagoManager();
+
+        }
+    </script>
+</body>
+</html>
