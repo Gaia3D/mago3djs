@@ -33,9 +33,9 @@ Attribution.prototype.setControl = function(magoManager)
 
 	if (this.magoManager.isCesiumGlobe())
 	{
-		var creditDisplay = this.magoManager.scene.frameState.creditDisplay;
-		var mago3d_credit = new Cesium.Credit('<a href="http://www.mago3d.com/" target="_blank"><img class="mago3d_logo" src="/images/logo_mago3d.png" title="Mago3D" alt="Mago3D" /></a>', true);
-		creditDisplay.addDefaultCredit(mago3d_credit);
+		//var creditDisplay = this.magoManager.scene.frameState.creditDisplay;
+		//var mago3d_credit = new Cesium.Credit('<a href="http://www.mago3d.com/" target="_blank"><img class="mago3d_logo" src="/images/logo_mago3d.png" title="Mago3D" alt="Mago3D" /></a>', true);
+		//creditDisplay.addDefaultCredit(mago3d_credit);
 	}
 	else 
 	{

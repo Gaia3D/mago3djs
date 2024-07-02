@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width">
+	<title>Cesium</title>
+	<link rel="stylesheet" href="../demo.css" />
+	<link rel="stylesheet" href="../src/engine/cesium/Widgets/widgets.css" />
+	<link rel="stylesheet" href="../../externlib/jquery-ui/jquery-ui.css" />
+	<script type="text/javascript" src="../../externlib/jquery/jquery.js"></script>
+	
+	<script type="text/javascript" src="../../externlib/polyfill/decodeTextAlternative/encoding-indexes.js"></script>
+	<script type="text/javascript" src="../../externlib/polyfill/decodeTextAlternative/encoding.js"></script>
+</head>
+
+<body>
+	<input type="hidden" id="now_latitude" name="now_latitude" value="" />
+	<input type="hidden" id="now_longitude" name="now_longitude" value=""  />
+<ul class="nav i18n">
+	<li id="homeMenu" class="home">
+		<img src="/images/ko/homepage/home-icon.png" style="width: 35px; height: 35px; padding-right: 2px;" title="Home" />
+	</li>
+	<li onclick="doTest();">
+		test
+	</li>
+	<li onclick="dark();">
+		dark
+	</li>
+	<li onclick="light();">
+		light
+	</li>
+	<li onclick="doTest4();">
+		test4
+	</li>
+	<li onclick="testWeather();">
+		test weather
+	</li>
+	<li onclick="playPause();">
+		Play-Pause
+	</li>
+	<li onclick="particlesGeneratorSwitch();">
+		particlesGenSwitch
+	</li>
+	<li onclick="deleteDustVolume();">
+		deleteDustVolume
+	</li>
+	<li onclick="bSplineTest();">
+		bSplineTest
+	</li>
+	<li onclick="WaterTest();">
+		WaterTest
+	</li>
+	<li onclick="StartWater();">
+		StartWater
+	</li>
+	<li onclick="Excavation();">
+		Excavation
+	</li>
+	<li onclick="LandSlide();">
+		LandSlide
+	</li>
+	<li onclick="SwapTerrainTex();">
+		SwapTerrainTex
+	</li>
+	<li onclick="SoundTest();">
+		SoundTest
+	</li>
+	<li onclick="OsmToggle();">
+		osm toggle
+	</li>
+</ul>
+<div id="magoContainer" class="mapWrap"></div>
+
+
+<script type="text/javascript" src="../src/engine/cesium/Cesium.js"></script>
+<script type="text/javascript" src="../../build/mago3d/mago3d.js"></script>
+<script>
+	var message = new Mago3D.Message(i18next);
+	
+	//f4d path, default data array, 
+	var dataInfo = {
+		baseUrl : '/f4d',
+		dataArrat : []
+	}
+
+	function changeLang(lang) 
+	{
+		if(i18next === undefined)
+		{
+			return;
+		}
+		
+		var language = lang || i18next.language;
+		var namespace = i18next.options.ns[0];
+
+		$.ajax({
+			url: "/locales/"+namespace+"/"+language+".json",
+			type: "GET",
+			dataType: "json",
+			success: function(data){
+				i18next.addResourceBundle(language, namespace, data, true, true);
+				i18next.changeLanguage(language);
+			},
+			error: function(e){
+				alert(e.responseText);
+			}
+		});
+	}
+	
+	message.init(function (){
+		i18next = message.getHandle();
+		i18next.on('languageChanged', function (lang) {
+			$('.i18n').localize();
+		});
+		//jqueryI18next.init(i18next, $);
+		//changeLang();
+	});
+
+	var osmLayer;
+	var MAGO3D_INSTANCE;
+	var imagePath = "/images/ko";
+	var dataInformationUrl = "/sample/persistence/json/";
+	magoStart(null, "magoContainer", imagePath);
+
+    // mago3d 시작, 정책 데이터 파일을 로딩
+	function magoStart(viewer, renderDivId, imagePath) {
+		$.ajax({
+			url: dataInformationUrl + "geopolicy.json",
+			type: "GET",
+			dataType: "json",
+			success: function(serverPolicy){
+				var cesiumViewerOption = {};
+				cesiumViewerOption.infoBox = false;
+				cesiumViewerOption.navigationHelpButton = false;
+				cesiumViewerOption.selectionIndicator = false;
+				cesiumViewerOption.homeButton = false;
+				cesiumViewerOption.fullscreenButton = false;
+				cesiumViewerOption.geocoder = false;
+				cesiumViewerOption.baseLayerPicker = false;
+				cesiumViewerOption.sceneModePicker = false;
+
+				serverPolicy.basicGlobe = 'cesium';
+				//serverPolicy.terrainType = 'cesium-customer'; //serverPolicy.terrainType = 'cesium-default';
+				serverPolicy.terrainType = 'cesium-default';
+				//serverPolicy.terrainValue = 'http://192.168.10.11:8887/tilesets/sejong/';
+				//serverPolicy.terrainValue = 'http://192.168.10.182:9998/tilesets/terrain/';
+				//serverPolicy.terrainValue = 'https://mago3d.net/tilesets/terrain/';
+
+
+				//serverPolicy.terrainType = 'cesium-customer';
+				//serverPolicy.terrainValue = 'https://terrain.cdn.ntruss.com/tilesets/ws2/';
+				serverPolicy.terrainValue = 'http://211.106.171.246:49998/tilesets/terrain_sj/'; // from Kim Jin Ho 20220420 (to test terrain excavation bugs).***
+
+				//cesiumViewerOption.terrainProvider = new Cesium.EditableCesiumTerrainProvider({
+				//										url: 'http://211.106.171.246:49998/tilesets/terrain_sj/'
+				//										});
+				
+				
+
+				serverPolicy.initLatitude = 37.58195;
+				serverPolicy.initLongitude = 126.60657;
+				serverPolicy.initAltitude = 3000;
+				MAGO3D_INSTANCE = new Mago3D.Mago3d(renderDivId, serverPolicy, {loadend : loadend}, cesiumViewerOption);
+
+			},
+			error: function(e){
+				alert(e.responseText);
+			}
+		});
+	}
+	function loadend(e) {
+		console.info('Complete construct mago3d instance. Enjoy!');
+		
+		var magoInstance = e;
+		console.info(magoInstance)
+		magoInstance.getViewer().scene.globe.depthTestAgainstTerrain = true;
+		magoInstance.setBaseUrl(dataInfo.baseUrl);
+
+
+		osmLayer = new Cesium.ImageryLayer(new Cesium.OpenStreetMapImageryProvider({
+			url : 'https://a.tile.openstreetmap.org/'
+		}));
+
+		magoInstance.getViewer().imageryLayers.add(osmLayer, 1);	
+		
+		var magoManager = magoInstance.getMagoManager();
+
+		//let json = JSON.parse("{\"attributes\":{\"isPhysical\":false,\"nodeType\":\"root\",\"projectType\":\"workshop\",\"specularLighting\":true},\"children\":[{\"attributes\":{\"isPhysical\":true,\"nodeType\":\"workshop\",\"propertyFilter\":true},\"children\":[],\"data_key\":\"SOCIALROOM\",\"data_name\":\"SOCIALROOM\",\"mapping_type\":\"origin\",\"latitude\":37.52633678124275,\"longitude\":126.9286322593689,\"height\":100,\"heading\":0,\"pitch\":0,\"roll\":0},{\"attributes\":{\"isPhysical\":true,\"nodeType\":\"workshop\",\"propertyFilter\":false},\"children\":[],\"data_key\":\"STUDENTROOM\",\"data_name\":\"STUDENTROOM\",\"mapping_type\":\"origin\",\"latitude\":37.52633678124275,\"longitude\":126.9286322593689,\"height\":100,\"heading\":0,\"pitch\":0,\"roll\":0},{\"attributes\":{\"isPhysical\":true,\"nodeType\":\"workshop\",\"propertyFilter\":false},\"children\":[],\"data_key\":\"Tile_1\",\"data_name\":\"Tile_1\",\"mapping_type\":\"origin\",\"latitude\":37.52633678124275,\"longitude\":126.9286322593689,\"height\":50,\"heading\":0,\"pitch\":0,\"roll\":0}],\"parent\":0,\"depth\":1,\"view_order\":2,\"data_key\":\"sample\",\"data_name\":\"sample\",\"mapping_type\":\"origin\"}")
+		//magoInstance.getF4dController().addF4dGroup(json);
+
+		//************************************************************************************
+		//************************************************************************************
+		const pinBuilder = new Cesium.PinBuilder();
+		const position = Cesium.Cartesian3.fromDegrees(127, 37.5);
+
+		const billboard = {
+
+			image: pinBuilder.fromText('손성도', Cesium.Color.RED, 128).toDataURL(),
+
+			verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+
+
+		};
+		magoInstance.getViewer().entities.add({
+			position,
+			billboard
+		})
+
+		var r = Math.random() * 0.5 + 0.5;
+		var g = Math.random() * 0.5 + 0.5;
+		var b = Math.random() * 0.5 + 0.5;
+		magoManager.gjMaster = magoManager.addKoreaBuildingMaster('https://dtdata.cdn.ntruss.com/buildingmaster/gwangju/15/', 'geojson', {
+			show : true,
+			/* color : new self.Mago3D.Color(241/255, 231/255, 200/255 ,1) */
+			color : new self.Mago3D.Color(r, g, b ,1)
+		});
+
+		//===================================================================================
+		//===================================================================================
+		
+		
+		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.CLICK, function(e){
+			console.info(e);
+
+		
+			
+			// Do a test. Create a geoCoord and render it.
+			
+			var screenX = e.point.screenCoordinate.x;
+			var screenY = e.point.screenCoordinate.y;
+			var options = {
+				highPrecision : false
+			};
+			
+			var posWC = Mago3D.ManagerUtils.screenCoordToWorldCoordUseDepthCheck(screenX, screenY, magoManager, options);
+			var geoCoord = Mago3D.ManagerUtils.pointToGeographicCoord(posWC, undefined);
+
+			geoCoord.altitude += 4.0; //
+
+			geoCoord.makeDefaultGeoLocationData();
+			var geoCoordsList = magoManager.modeler.getGeographicCoordsList();
+			geoCoordsList.addGeoCoord(geoCoord);
+			var hola = 0;
+			
+			
+			// End test.----------------------------------
+			/*
+			// Do a cone creating test.
+			var falloffDeg = 90;
+			var falloffDistance = 40;
+			var angRad = falloffDeg * Math.PI/180;
+			var radius = falloffDistance * Math.sin(angRad);
+			var height = falloffDistance * Math.cos(angRad);
+			var color = new Mago3D.Color(0.95, 0.95, 0.95, 0.4);
+			var options = {
+					baseType : 2, // 0= NONE. 1= PLANE. 2= SPHERICAL.
+					color : color,
+					originType : 1 // 0= ATBASE, 1= ATVERTEX
+			};
+			var cone = new Mago3D.Cone(radius, height, options);
+			cone.setGeographicPosition(geoCoord, undefined, undefined, undefined);
+			magoManager.modeler.addObject(cone);
+			*/
+			// End cone test.------------------------------
+
+			// Do a spotLightTest.****************************
+			/*
+			// Small opening.***
+			var options = {
+				hotspotDeg : 35.0,
+				falloffDeg : 50.0,
+				hotDistance : 50.0,
+				falloffDistance : 60.0
+			};
+
+			// Medium opening.***
+			var options = {
+				hotspotDeg : 55.0,
+				falloffDeg : 75.0,
+				hotDistance : 50.0,
+				falloffDistance : 60.0
+			};
+
+			var spotLight = new Mago3D.SpotLight(options);
+			spotLight.setGeographicPosition(geoCoord, undefined, undefined, undefined);
+			magoManager.modeler.addObject(spotLight);
+			*/
+			// End spotlightTest.-----------------------------
+			
+		});
+	}
+	// 3ds, pointsCloud, sihung_campus, sihung_las, suseong, IncheonGayang, IncheonGyeyang_2, project_blackCityGml, blackBuildings
+	// sejong-bldg-apartment, testF4dKwon, sejong-5-2
+	// testDebug : gy_sketch, gs_F4Ds, realisticTest, HanamGyoSan_f4d_son, namYangJu_wangJu_f4d, hakjunTest_20210504, Test_Tree
+	// subterran : ResultF4D_heatingPipe, Glb_F4D_Projects
+	// mg : MgBufferProjects
+	function doTest(){
+		var f4dController = MAGO3D_INSTANCE.getF4dController();
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+		/*
+		f4dController.addSmartTileGroup({
+            dataGroupId : 10000,
+            dataGroupKey : 'glb_F4D_projects', // the name of f4d folder name
+            dataGroupName : '테스트 건물들',
+            dataGroupPath : 'smartTile_Glb_F4d_Projects/',
+            //smartTileIndexPath: "smartTile_f4d_indexFile",
+			tilePath : "smartTile_Glb_F4d_Projects",
+			tiling: true
+		});
+		*/
+		
+
+		//magoManager.modeler.__TEST__extrusionBuildings();
+		
+		
+		$.ajax({
+			url: dataInformationUrl + "3ds.json",
+			type: "GET",
+			dataType: "json",
+			success: function(f4dObject){
+				f4dController.addF4dGroup(f4dObject);
+			},
+			error: function(e){
+				alert(e.responseText);
+			}
+		});
+		
+	
+		// Test create cesium entities.****************************************
+		var cesiumViewer = MAGO3D_INSTANCE.getViewer();
+		var blueBox = cesiumViewer.entities.add({
+		name: "Blue box",
+		position: Cesium.Cartesian3.fromDegrees(-114.0, 40.0, 300000.0),
+		box: {
+			dimensions: new Cesium.Cartesian3(400000.0, 300000.0, 500000.0),
+			material: Cesium.Color.BLUE,
+		},
+		});
+
+		var redBox = cesiumViewer.entities.add({
+		name: "Red box with black outline",
+		position: Cesium.Cartesian3.fromDegrees(-107.0, 40.0, 300000.0),
+		box: {
+			dimensions: new Cesium.Cartesian3(400000.0, 300000.0, 500000.0),
+			material: Cesium.Color.RED.withAlpha(0.5),
+			outline: true,
+			outlineColor: Cesium.Color.BLACK,
+		},
+		});
+		//----------------------------------------------------------------
+		
+	}
+
+	function OsmToggle() {
+		osmLayer.show = !osmLayer.show;
+	}
+	function dark(){
+		var f4dController = MAGO3D_INSTANCE.getF4dController();
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+		
+		// test camera laser.
+		//magoManager.TEST__cameraLaser();
+		
+		var sunSystem = magoManager.sceneState.sunSystem;
+		var currHours = sunSystem.date.getHours();
+		var date = new Date();
+		date.setMonth(5);
+		date.setHours(currHours+1);
+		date.setMinutes(0);
+
+		sunSystem.setDate(date);
+		
+		/*
+
+		if(magoManager.waterManager)
+		{
+			var waterManager = magoManager.waterManager;
+			if(waterManager.waterLayersArray && waterManager.waterLayersArray.length > 0)
+			{
+				var waterLayer = magoManager.waterManager.waterLayersArray[0];
+				waterLayer.simulationTimeStep -= 0.02;
+
+				var cellSize_x = waterLayer.tileSizeMeters_x / waterManager.simulationTextureSize[0];
+				var cellSize_y = waterLayer.tileSizeMeters_y / waterManager.simulationTextureSize[1];
+				var cellArea = cellSize_x * cellSize_y;
+				var hola = 0;
+			}
+
+			magoManager.waterManager.resetSimulation();
+		}
+		*/
+
+		// Test brightness & contrast.
+		//magoManager.sceneState.brightnessContrastSaturation[2] -= 0.02;
+		//magoManager.sceneState.brightnessContrastSaturation[2] -= 0.05;
+	}
+
+	function light(){
+		var f4dController = MAGO3D_INSTANCE.getF4dController();
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+		
+		// test camera laser.
+		//magoManager.TEST__cameraLaser();
+		
+		var sunSystem = magoManager.sceneState.sunSystem;
+		var currHours = sunSystem.date.getHours();
+		var date = new Date();
+		date.setMonth(5);
+		date.setHours(currHours-1);
+		date.setMinutes(0);
+
+		sunSystem.setDate(date);
+		//magoManager
+		if(magoManager.waterManager)
+		{
+			var waterManager = magoManager.waterManager;
+			if(waterManager.waterLayersArray && waterManager.waterLayersArray.length > 0)
+			{
+				var waterLayer = magoManager.waterManager.waterLayersArray[0];
+				waterLayer.simulationTimeStep += 0.02;
+
+				var cellSize_x = waterLayer.tileSizeMeters_x / waterManager.simulationTextureSize[0];
+				var cellSize_y = waterLayer.tileSizeMeters_y / waterManager.simulationTextureSize[1];
+				var cellArea = cellSize_x * cellSize_y;
+				var hola = 0;
+			}
+			// simulationTimeStep
+		}
+		
+		// Test brightness & contrast.
+		//magoManager.sceneState.brightnessContrastSaturation[2] += 0.05;
+	}
+
+	function doTest4(){
+		var f4dController = MAGO3D_INSTANCE.getF4dController();
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+		
+		// Sound & voxelization test.***
+		magoManager.soundManager = new Mago3D.SoundManager(magoManager);
+
+
+		/*
+		// excavation test.
+		function excavate(depth) {
+			const quantizedMeshManager = magoManager.quantizedMeshManager;
+
+			// good case
+			//let array = [[127.23549314807751,36.51170871389257],[127.23533951554495,36.511039585104655],[127.23651910940207,36.51098067144054],[127.23651497651854,36.51169375525705],[127.23549314807751,36.51170871389257]];
+
+			// bad case
+			let array = [[127.23582829477431,36.51155941930476],[127.23583033107829,36.511375920386314],[127.23600525531623,36.51139813828419],[127.23604468555075,36.511551079347164],[127.23582829477431,36.51155941930476]];
+
+			var geoCoordsList = magoManager.modeler.getGeographicCoordsList();
+
+			let geoCoordsArray = array.map(function(item) {
+			return new Mago3D.GeographicCoord(item[0], item[1], 0);
+			});
+
+			let excavationSet = quantizedMeshManager.newExcavationSet(geoCoordsList.geographicCoordsArray, depth);
+
+			var tiles = excavationSet.getIntersectedTiles();
+			quantizedMeshManager.quantizedMeshExcavationSet = excavationSet;
+			quantizedMeshManager.excavatedTilesMap = tiles;
+			//quantizedMeshManager.excavate();
+			quantizedMeshManager.applyQuantizedMeshExcavation();
+		}
+
+		excavate(-10);
+		*/
+		
+		// ClippingBox test: Take the 1rst 2 geoCoords if exist & make a clippingBox:
+		/*
+		if ( magoManager.modeler.geoCoordsList.getGeoCoordsCount() > 1)
+		{
+			var geoCoord1 = magoManager.modeler.geoCoordsList.getGeoCoord(0);
+			var geoCoord2 = magoManager.modeler.geoCoordsList.getGeoCoord(1);
+			var altitude = 30.0;
+			var extrudeQuantity = 40.0;
+			magoManager.modeler.newClippingBox_by2geographicCoords(geoCoord1, geoCoord2, altitude, extrudeQuantity);
+		}
+		*/
+		
+		/*
+		
+		var selectionManager = magoManager.selectionManager;
+		var nodeSelected = selectionManager.getSelectedF4dNode();
+		*/
+		/*
+		// test f4d transparent.
+		if(nodeSelected)
+		{
+			nodeSelected.data.attributes.opacity = 0.6;
+			var hola = 0;
+		}
+		
+		// test deleting a object for water simulation.***
+		var nativeSel = selectionManager.getSelectedGeneral();
+		if(nativeSel)
+		{
+			var modeler = magoManager.modeler;
+			modeler.removeObject(nativeSel);
+
+			// now, if exsist waterManager, then notity it.***
+			var waterManager = magoManager.waterManager;
+			waterManager.objectDeleted(nativeSel._guid);
+		}
+		*/
+		// Test brightness & contrast.
+		//magoManager.sceneState.brightnessContrastSaturation[1] -= 0.05;
+		/*
+		if(!magoManager.sceneState.applyBloomEffect)
+		{
+			magoManager.sceneState.applyBloomEffect = true;
+		}
+		else
+		{
+			magoManager.sceneState.applyBloomEffect = false;
+		}
+		*/
+	}
+
+	function testWeather (){
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+		
+		// windDisplayMode = "NORMAL"; // "NORMAL", "OVERTERRAIN"
+		if (magoManager.weatherStation === undefined)
+		{ 
+			var options = {};
+			options.windDisplayMode = "NORMAL";
+			magoManager.weatherStation = new Mago3D.WeatherStation(magoManager, options); 
+		}
+		else
+		{
+			magoManager.weatherStation.windDisplayMode = "NORMAL";
+		}
+
+		//magoManager.weatherStation.windDisplayMode = "OVERTERRAIN";
+		//magoManager.weatherStation.windDisplayMode = "NORMAL";
+
+		magoManager.weatherStation.windDefaultAnimationSpeed = 10;
+		magoManager.weatherStation.WIND_MAXPARTICLES_INSCREEN = 1500;
+		magoManager.weatherStation.WIND_STREAMLINES_NUMPOINTS = 250;
+
+		//magoManager.weatherStation.TEST_SIHEUNG(magoManager);
+
+		// Paralelament, fem un altre test.
+		//var windGeoJsonFilePath = "\\f4d\\wind_yeonHwa\\windAndDust_sample\\GC_after_e\\wind\\wind.json";
+		//var windGeoJsonFilePath = "\\f4d\\wind_yeonHwa\\windAndDust_sample\\GC_before_e\\wind\\wind.json";
+		//var windGeoJsonFilePath = "\\f4d\\wind_yeonHwa_20210701\\OBS-QWM_2019090809.json";
+		//var windGeoJsonFilePath = "\\f4d\\infra\\wind\\2019\\09\\OBS-QWM_2019100700.json";
+		//var windGeoJsonFilePath = "\\f4d\\wind_yeonhwa_20210713\\colorRamp15\\OBS-QWM_2019090700.json";//D:\f4dData\f4d\wind_yeonhwa_20210713
+		//var windGeoJsonFilePath = "\\f4d\\wind_yeonhwa_20210713\\OBS-QWM_2019110700.json";
+		//var windGeoJsonFilePath = "\\f4d\\wind_kyongHeeDe\\2017_M05_D02_0000(UTC+0900)_L01_1HR.json";
+		//var windGeoJsonFilePath = "\\f4d\\wind_yeonhwa_20211215\\AlphaMet_OBS_Wind.2019072006.json";
+		//var windGeoJsonFilePath = "\\f4d\\wind_yeonhwa_20220517\\after_n\\wind.json";
+		//magoManager.weatherStation.loadWindGeoJson(windGeoJsonFilePath);
+
+		// Load dust geoJson.***
+		//var dustGeoJsonFilePath = "\\f4d\\wind_yeonHwa\\windAndDust_sample\\GC_after_e\\pm2.5\\pm2.5.json";
+		//var dustGeoJsonFilePath = "\\f4d\\wind_yeonHwa\\windAndDust_sample\\GC_before_e\\pm2.5\\pm2.5.json";
+		//var dustGeoJsonFilePath = "\\f4d\\wind_yeonHwa\\pm2.5_aaa\\after_sw\\pm2.5.json";
+		//var dustGeoJsonFilePath = "\\f4d\\wind_yeonHwa\\request_sample_data\\GC_after_e\\pm2.5\\pm2.5.json"; // new dust data 20210208_1440
+		//magoManager.weatherStation.loadDustGeoJson(dustGeoJsonFilePath);
+
+		// Load PollutionTest geoJson.***
+		//var geoJsonIndexFilePath = "\\f4d\\result_json\\JsonIndex.json"; // new dust data 20210208_1440
+		//magoManager.weatherStation.loadPollutionTestGeoJsonIndexFile(geoJsonIndexFilePath);
+
+		// Load SoundSurface geoJson.***
+		var geoJsonIndexFilePath = "\\f4d\\result_soundJson\\JsonIndex.json"; // new dust data 20210208_1440
+		magoManager.weatherStation.loadSoundSurfaceGeoJsonIndexFile(geoJsonIndexFilePath);
+		
+
+		// Test brightness & contrast.
+		//magoManager.sceneState.brightnessContrastSaturation[1] += 0.05;
+
+	}
+
+	function playPause(){
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+		
+		if (magoManager.weatherStation === undefined)
+		{ magoManager.weatherStation = new Mago3D.WeatherStation(magoManager); }
+
+		if(magoManager.weatherStation.windVolumesArray && magoManager.weatherStation.windVolumesArray.length > 0)
+		{
+			var windVolume = magoManager.weatherStation.windVolumesArray[0];
+			windVolume.switchAnimationState();
+		}
+	}
+
+	function particlesGeneratorSwitch(){
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+		
+		if (magoManager.weatherStation === undefined)
+		{ magoManager.weatherStation = new Mago3D.WeatherStation(magoManager); }
+
+		if(magoManager.weatherStation.windVolumesArray && magoManager.weatherStation.windVolumesArray.length > 0)
+		{
+			var windVolume = magoManager.weatherStation.windVolumesArray[0];
+			if(windVolume._particesGenerationType === 1)
+			windVolume._particesGenerationType = 2;
+			else if(windVolume._particesGenerationType === 2)
+			windVolume._particesGenerationType = 3;
+			else if(windVolume._particesGenerationType === 3)
+			windVolume._particesGenerationType = 1;
+		}
+	}
+
+	function deleteDustVolume(){
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+		
+		if (magoManager.weatherStation)
+		{ 
+			magoManager.weatherStation.deleteDustVolumes();
+			magoManager.weatherStation.deleteWindVolumes();
+		}
+	}
+
+	function bSplineTest(){
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+		
+		if (magoManager.modeler)
+		{ 
+			magoManager.modeler.__TEST__bSpline();
+		}
+	}
+
+	function WaterTest (){ 
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+
+		// Test creating a waterManager.***
+		
+		if(!magoManager.waterManager)
+		{
+			
+			var waterOptions = {};
+			//this.scene.globe.terrainProvider
+			var terrainDemSourceType = "QUANTIZEDMESH";//
+			//var terrainDemSourceType = "HIGHMAP";// when works with HIGHMAPs, do not need terrainProvider.
+			var terrainProvider = magoManager.scene.globe.terrainProvider;
+
+			// very small region.***
+			var minLon = 127.28989;
+			var maxLon = 127.29974;
+			var minLat = 36.50500;
+			var maxLat = 36.51211;
+
+			// try to augment region.
+			var increAux = 0.005; // error
+			increAux = 0.008; // correct
+			/*
+			minLon -= increAux;
+			maxLon += increAux;
+			minLat -= increAux;
+			maxLat += increAux;
+			*/
+
+			/*
+			// small region.***
+			var minLon = 127.23534;
+			var maxLon = 127.28970;
+			var minLat = 36.48331;
+			var maxLat = 36.52817;
+			*/
+
+			
+			// big region.***
+			var minLon = 127.23534;
+			var maxLon = 127.33815;
+			var minLat = 36.45798;
+			var maxLat = 36.52817;
+
+			// 2:1 aspect rectangle.
+			//var minLon = 127.23534;
+			//var maxLon = 127.33815;
+			//var minLat = 36.45798;
+			//var maxLat = 36.52817 - (36.52817 - 36.45798) / 2;
+
+			// Sihung:::
+			var minLon = 126.82956;
+			var maxLon = 126.96281;
+			var minLat = 37.29476;
+			var maxLat = 37.36637;
+
+			// left of sihung.***
+			var minLon = 126.76;
+			var maxLon = 126.810;
+			var minLat = 37.35;
+			var maxLat = 37.382;
+
+			var degToRad = Math.PI/180.0;
+
+			MAGO3D_INSTANCE.getViewer().entities.add({
+				rectangle : {
+					coordinates : new Cesium.Rectangle(minLon * degToRad, minLat * degToRad, maxLon * degToRad, maxLat * degToRad),
+					material : Cesium.Color.DODGERBLUE.withAlpha(0.1)
+				}
+			});
+			
+
+			var geoExtent = new Mago3D.GeographicExtent(minLon, minLat, 0, maxLon, maxLat, 0);
+			waterOptions.terrainDemSourceType = terrainDemSourceType;
+			waterOptions.terrainProvider = terrainProvider;
+			waterOptions.simulationGeographicExtent = geoExtent;
+			waterOptions.renderParticles = true; // default is true.
+			waterOptions.rainType = 0; // -1 = NO rain. 0= rain by a value (mm/h). 1= rain by a texture.***
+			waterOptions.rainValue_mmHour = 300.0;
+			waterOptions.maxSimulationSize = 1500;
+			waterOptions.terrainHeightEncodingBytes = 1; // 1, 2 or 4.***
+			waterOptions.waterSourceUrl = '/images/en/black.png';
+			waterOptions.waterSourceRainUrl = '/images/en/waterSourceTexTest_rain.png'; // NO necessary if rainType == 0.***
+			waterOptions.DEMHighMapUrl = '/images/en/demSampleTest.png'; // NO necessary if terrainDemSourceType == "QUANTIZEDMESH".***
+			magoManager.waterManager = new Mago3D.WaterManager(magoManager, waterOptions);
+			magoManager.waterManager.bSsimulateWater = true;
+
+			magoManager.waterManager.test__createContaminationBox_sejong(magoManager);
+			magoManager.modeler.__TEST__extrusionBuildings_sejongForWaterSimulation();
+		}
+		
+		/*
+		if(!magoManager.waterManager)
+		{
+			var waterOptions = {};
+			magoManager.waterManager = new Mago3D.WaterManager(magoManager, waterOptions);
+		}
+
+		if(!magoManager.waterManager.testStarted)
+		{
+			magoManager.modeler.__TEST__extrusionBuildings_son();//__TEST__extrusionBuildings_sejongForWaterSimulation
+			magoManager.waterManager._test_water();
+			magoManager.waterManager.test__createContaminationBox(magoManager);
+		}
+		*/
+	}
+
+	function StartWater(){ 
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+
+		// Test creating a waterManager.***
+		if(!magoManager.waterManager)
+		{
+			magoManager.waterManager = new Mago3D.WaterManager(magoManager);
+		}
+
+		if(!magoManager.quantizedMeshManager)
+		{
+			magoManager.quantizedMeshManager = new Mago3D.QuantizedMeshManager(magoManager);
+		}
+
+		if(magoManager.waterManager.bSsimulateWater)
+		{
+			magoManager.waterManager.bSsimulateWater = false;
+		}
+		else{
+			magoManager.waterManager.bSsimulateWater = true;
+		}
+	}
+
+	function Excavation(){ // 
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+
+		// Test creating a waterManager.***
+		if(!magoManager.waterManager)
+		{
+			magoManager.waterManager = new Mago3D.WaterManager(magoManager);
+		}
+
+		if(!magoManager.waterManager.excavationTestStarted)
+		{
+			magoManager.waterManager.setExistPendentExcavation(true);
+			magoManager.waterManager.excavationTestStarted = true;
+		}
+	}
+
+	function LandSlide(){ // 
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+
+		// Test creating a waterManager.***
+		if(!magoManager.waterManager)
+		{
+			magoManager.waterManager = new Mago3D.WaterManager(magoManager);
+		}
+
+		if(!magoManager.waterManager.landSlideTestStarted)
+		{
+			magoManager.waterManager.setDoLandSlideSimulation(true);
+			magoManager.waterManager.landSlideTestStarted = true;
+		}
+	}
+
+	function SwapTerrainTex(){ // 
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+
+		// Test creating a waterManager.***
+		if(!magoManager.waterManager)
+		{
+			magoManager.waterManager = new Mago3D.WaterManager(magoManager);
+		}
+		magoManager.waterManager.setTrrainDiffuseTextureIdx(1);
+	}//SoundTest
+
+	function SoundTest(){ // 
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+
+		// Test creating a waterManager.***
+		if(!magoManager.soundManager)
+		{
+			magoManager.soundManager = new Mago3D.SoundManager(magoManager);
+		}
+		magoManager.soundManager._test_sound();
+
+		// Aditionally do a smartTile test.***
+		//var sceneState = magoManager.sceneState;
+		//var camera = sceneState.camera;
+		//var camPos = camera.position; //var camAltitude = camera.getCameraElevation();
+
+		//var resultIntersectedTilesNamesMap = {};
+		//var frustumVolume = magoManager.myCameraSCX.bigFrustum;
+		//var maxDepth = 15;
+		//resultIntersectedTilesNamesMap = Mago3D.SmartTile.getFrustumIntersectedTilesNames(frustumVolume, maxDepth, camPos, magoManager, resultIntersectedTilesNamesMap);
+		var hola = 0;
+	}//
+
+	const ArchInfoController = function(archInfoList, magoManager) {
+		this.hash = {};
+		this.magoManager = magoManager;
+	}
+
+	ArchInfoController.prototype.getArchInfoById = function(id) {
+		return this.hash[id];
+	}
+
+	ArchInfoController.createMockData = function(magoManager) {
+		
+		let getUrl = function(name) {
+			return `https://mago3d.net/buildings/${name}/15/`;
+		}
+
+		let archInfoList = [];
+		const info = [
+			{name : '강원', format : 'pbf', option:{show:true}},
+			{name : '세종', format : 'pbf', option:{show:true}},
+			{name : '경기', format : 'geojson', option:{show:true}},
+			{name : '경남', format : 'geojson', option:{show:true}},
+			{name : '경북', format : 'geojson', option:{show:true}},
+			{name : '광주', format : 'geojson', option:{show:true}},
+			{name : '대구', format : 'geojson', option:{show:true}},
+			{name : '대전', format : 'geojson', option:{show:true}},
+			{name : '부산', format : 'geojson', option:{show:true}},
+			{name : '서울', format : 'geojson', option:{show:true}},
+			{name : '울산', format : 'geojson', option:{show:true}},
+			{name : '인천', format : 'geojson', option:{show:true}},
+			{name : '전남', format : 'geojson', option:{show:true}},
+			{name : '전북', format : 'geojson', option:{show:true}},
+			{name : '제주', format : 'geojson', option:{show:true}},
+			{name : '충남', format : 'geojson', option:{show:true}},
+			{name : '충북', format : 'geojson', option:{show:true}}
+		]
+		
+		for(let i in info) {
+			let archInfo = info[i];
+			archInfo.url = getUrl(archInfo.name);
+			archInfo.option.color = new Mago3D.Color(200/255, 200/255, 200/255 ,1);
+			archInfoList.push(new ArchInfo(archInfo, magoManager));
+		}
+		
+		return archInfoList;
+		
+	}
+
+	
+
+	const ArchInfo = function(contructionOption, magoManager) {
+		this.name = contructionOption.name;
+		this.buildingMaster = magoManager.addKoreaBuildingMaster(contructionOption.url, contructionOption.format, contructionOption.option);
+	}
+
+	
+
+	Object.defineProperties(ArchInfo.prototype, {
+		show : {
+			get : function() {
+				return this.buildingMaster.show;
+			},
+			set : function(show) {
+				this.buildingMaster.show = show;
+			}
+		},
+		color : {
+			get : function() {
+				return this.buildingMaster.color;
+			},
+			set : function(color) {
+				this.buildingMaster.color = color;
+			}
+		}
+	});
+	
+
+</script>
+</body>
+</html>

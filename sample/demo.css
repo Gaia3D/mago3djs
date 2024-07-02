@@ -27,21 +27,25 @@ ul, li {margin:0; padding:0; }
 .nav {
 	position: absolute;
 	float: left;
-	width: 65px;
+	width: 120px;
 	height: 100%;
-	background-color: #393946;
+	background-color: #22222d;
 	z-index: 9999;
+	padding: 0px 10px;
 }
 .nav li {
 	margin-left: 3px;
 	padding: 10px 0;
+	font-size: 12px;
 	color: #fff;
 	text-align: center;
-	/* 	text-indent: -999em; */
 	border: none;
 	cursor: pointer;
-	border-top: 1px solid #484854;
-	border-bottom: 1px solid #27272f;
+	border-top: 1px solid #33333b;
+	line-height: 16px;
+	width: calc(100% - 5px);
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 .nav li.on {
 	color: #67aef7 !important;

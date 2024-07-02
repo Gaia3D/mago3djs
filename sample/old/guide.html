@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width">
+	<title>Cesium</title>
+	<link rel="stylesheet" href="../demo.css" />
+	<link rel="stylesheet" href="../src/engine/cesium/Widgets/widgets.css" />
+	<link rel="stylesheet" href="../../externlib/jquery-ui/jquery-ui.css" />
+	<script type="text/javascript" src="../../externlib/jquery/jquery.js"></script>
+	<script type="text/javascript" src="../../externlib/jquery-i18next/jquery-i18next.min.js"></script>
+	<script type="text/javascript" src="../../externlib/polyfill/decodeTextAlternative/encoding-indexes.js"></script>
+	<script type="text/javascript" src="../../externlib/polyfill/decodeTextAlternative/encoding.js"></script>
+</head>
+
+<body>
+	<input type="hidden" id="now_latitude" name="now_latitude" value="" />
+	<input type="hidden" id="now_longitude" name="now_longitude" value=""  />
+<ul class="nav i18n">
+	<li id="homeMenu" class="home">
+		<img src="/images/ko/homepage/home-icon.png" style="width: 35px; height: 35px; padding-right: 2px;" title="Home" />
+	</li>
+	<li onclick="gotopage();">
+		Guide
+	</li>
+</ul>
+<div id="magoContainer" class="mapWrap"></div>
+<canvas id="objectLabel"></canvas>
+
+<script type="text/javascript" src="../src/engine/cesium/Cesium.js"></script>
+<script type="text/javascript" src="../../build/mago3d/mago3d.js"></script>
+<script>
+
+	var MAGO3D_INSTANCE;
+	var imagePath = "/images/ko";
+	var dataInformationUrl = "/sample/persistence/json/";
+	magoStart(null, "magoContainer", imagePath);
+
+    // mago3d 시작, 정책 데이터 파일을 로딩
+	function magoStart(viewer, renderDivId, imagePath) {
+		$.ajax({
+			url: dataInformationUrl + "geopolicy.json",
+			type: "GET",
+			dataType: "json",
+			success: function(serverPolicy){
+				serverPolicy.basicGlobe = 'cesium';
+
+				var cesiumViewerOption = {};
+				cesiumViewerOption.infoBox = false;
+				cesiumViewerOption.navigationHelpButton = false;
+				cesiumViewerOption.selectionIndicator = false;
+				cesiumViewerOption.homeButton = false;
+				cesiumViewerOption.fullscreenButton = false;
+				cesiumViewerOption.geocoder = false;
+				cesiumViewerOption.baseLayerPicker = false;
+				cesiumViewerOption.sceneModePicker = false;
+
+				MAGO3D_INSTANCE = new Mago3D.Mago3d(renderDivId, serverPolicy, {loadend : loadend}, cesiumViewerOption);
+			},
+			error: function(e){
+				alert(e.responseText);
+			}
+		});
+	}
+	function loadend(e) {
+		console.info('Complete construct mago3d instance. Enjoy!');
+		
+		var magoInstance = e;
+		
+		var viewer = magoInstance.getViewer();
+		viewer.scene.globe.depthTestAgainstTerrain = true;
+		var magoManager = magoInstance.getMagoManager();
+		var f4dController = magoInstance.getF4dController();
+
+		var f4dGroup = {
+			"metainfo": {
+				"isPhysical": false
+			},
+			"dataGroupId":1,
+			"dataGroupKey":"guide",
+			"dataGroupName":"가이드 데이터 그룹",
+			"dataGroupPath":"guide",
+			"datas": []
+		};
+
+		var socialRoomObject = {
+			"metainfo": {
+				"isPhysical": true,
+				"flipYTexCoords": true
+			},
+			"dataId" : 1,
+			"dataGroupId" : 1,
+			"dataKey": "SOCIALROOM",
+			"dataName": "SOCIALROOM",
+			"mappingType":"boundingboxcenter",
+			"longitude": 128.917656,
+			"latitude": 35.139482,
+			"altitude": 14.177629,
+			"heading": 0.000000,
+			"pitch": 0.000000,
+			"roll": 0.000000
+		};
+		f4dGroup.datas.push(socialRoomObject);
+		f4dController.addF4dGroup(f4dGroup);
+
+		magoManager.once(Mago3D.MagoManager.EVENT_TYPE.SELECTEDF4D, function(e) {
+			console.log('selected f4d event once trigger');
+			var studentRoomObject= {
+				"metainfo": {
+					"isPhysical": true,
+					"flipYTexCoords": true
+				},
+				"dataId" : 1,
+				"dataGroupId" : 1,
+				"children": [],
+				"dataKey": "STUDENTROOM",
+				"dataName": "STUDENTROOM",
+				"mappingType":"origin",
+				"longitude": 128.919656,
+				"latitude": 35.138482,
+				"altitude": 14.177629,
+				"heading": 0.000000,
+				"pitch": 0.000000,
+				"roll": 0.000000
+			}
+			f4dController.addF4dMember(1, studentRoomObject);		
+		});
+		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.F4DLOADEND, function(e){
+			console.info(e.f4d.length + '개의 데이터가 로드되었습니다.');
+		});
+	}
+
+	function gotopage() {
+		window.open(
+			'https://gaia3d.atlassian.net/wiki/spaces/education/pages/79429666/mago3D+JS',
+			'_blank'
+		);
+	}
+</script>
+</body>
+</html>

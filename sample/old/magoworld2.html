@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width">
+	<title>MagoWorld</title>
+	<link rel="stylesheet" href="../demo.css" />
+	<link rel="stylesheet" href="../src/engine/cesium/Widgets/widgets.css" />
+	<script type="text/javascript" src="../../externlib/jquery/jquery.js"></script>
+	<script type="text/javascript" src="../src/engine/cesium/Cesium.js"></script>
+	<script type="text/javascript" src="../../build/mago3d/mago3d.js"></script>
+	<style>
+		body{ background-color:black; }
+	</style>
+</head>
+
+<body>
+<ul class="nav">
+	<li id="homeMenu" class="home">
+		<img src="/images/ko/homepage/home-icon.png" style="width: 35px; height: 35px; padding-right: 2px;" title="Home" />
+	</li>
+	<li onclick="doTest();">
+		test
+	</li>
+	<li onclick="doTest2();">
+		dark
+	</li>
+	<li onclick="doTest3();">
+		light
+	</li>
+	<li onclick="doTest4();">
+		test4
+	</li>
+	<li onclick="testWeather();">
+		test weather
+	</li>
+	<li onclick="playPause();">
+		Play-Pause
+	</li>
+	<li onclick="particlesGeneratorSwitch();">
+		particlesGenSwitch
+	</li>
+	<li onclick="deleteDustVolume();">
+		deleteDustVolume
+	</li>
+	<li onclick="bSplineTest();">
+		bSplineTest
+	</li>
+</ul>
+
+<div id="magoContainer" style="position: absolute; width:100%; height:100%; margin-top:0; padding:0; overflow:hidden;">
+	<canvas id="objectLabel"></canvas>
+</div>
+
+<script>
+	var managerFactory = null;
+	var dataInformationUrl = "/sample/persistence/json/";
+
+	var tt;
+	var ttt;
+	var tttt;
+	var baseMap;
+
+	magoStart('magoContainer');
+    // mago3d start, policy loading
+	function magoStart(renderDivId) {
+		$.ajax({
+			url: dataInformationUrl + "geopolicyMW.json",
+			type: "GET",
+			dataType: "json",
+			success: function(serverPolicy){
+
+				var osmStreetLayer = new Mago3D.XYZLayer({
+					urlFunction : function(coordinate) {
+						var url = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+						return url.replace('{z}',coordinate.z)
+						.replace('{y}',coordinate.y)
+						.replace('{x}',coordinate.x);
+					}
+				});
+
+				var osmCycleLayer = new Mago3D.XYZLayer({
+					urlFunction : function(coordinate) {
+						var url = 'https://{a-c}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png';
+						return url.replace('{a-c}',getDomainSharding())
+						.replace('{z}',coordinate.z)
+						.replace('{y}',coordinate.y)
+						.replace('{x}',coordinate.x);
+						
+						function getDomainSharding() {
+							var shardingList = ['a','b','c'];
+							var randomIndex = Math.floor( (Math.random() * (3)));
+							
+							return shardingList[randomIndex];
+						}
+					}
+				});
+				
+				//var bathymetryFilter = {
+				//	type: Mago3D.CODE.imageFilter.BATHYMETRY,
+				//	properties : {
+				//		minAltitude: -2796,
+				//		maxAltitude: 1840,
+				//		stepGradient : [0, -40,-80,-120,-400,-800, -1000, -2000, -2796],[0, -100, -300, -1000, -2000, -2796]
+				//		caustics: true
+				//	}
+				//};
+
+				var bathymetryFilter = {
+					type: Mago3D.CODE.imageFilter.BATHYMETRY,
+					properties : {
+						minAltitude: -2796,
+						maxAltitude: 1840,
+						stepGradient : [0, -40,-80,-120,-400,-800, -1000, -2000, -2796],
+						caustics: true
+					}
+				};
+				
+
+
+				
+				baseMap = new Mago3D.XYZLayer({url: 'https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'});
+				//baseMap = new Mago3D.XYZLayer({url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'});
+
+				tt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/gwc/service/wms', show: true, filter: bathymetryFilter, param: {layers: 'mago3d:susim_5m', tiled: true}}); // new version.
+				//tt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/wms', show: true, filter: bathymetryFilter, param: {layers: 'mago3d:susim_5m', tiled: true}}); // new version.
+				//ttt = new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: false,   param: {layers: 'ndtp:sk_sdo', tiled: true}});
+				//tt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/gwc/service/wms', show: true, opacity: 0.5, param: {layers: 'mago3d:15m_susim', tiled: true}});
+				//ttt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/wms', show: true, minZoom:10,   param: {layers: 'mago3d:mj1m', tiled: true}});
+
+
+				
+				/*
+				managerFactory = new Mago3D.Mago3d(renderDivId,serverPolicy,undefined,{
+					layers : [
+						baseMap,
+						tt,
+						//new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'sk_emd', tiled: true}}),
+						//new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'basemap', tiled: true}}),
+						//new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'echodelta_25m', tiled: true}}),
+						//new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'gangseogu_4326', tiled: true}}),
+						//new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'land_block', tiled: true}}),
+						//new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'sk_sdo', tiled: true}}),
+						//new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'sk_sgg', tiled: true}}),
+						//new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'utmk_lsmd_cont_ldreg', tiled: true}}),
+						//new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'dem', tiled: true}})
+					]
+				});
+				*/
+				
+				
+				
+				
+				managerFactory = new Mago3D.Mago3d(renderDivId,serverPolicy,undefined,{
+					layers : [
+						baseMap//, tt//, ttt
+						//new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'sk_emd', tiled: true}}),
+					]
+				});
+				
+				
+
+				var magoManager = managerFactory.getMagoManager();
+				var f4dController = managerFactory.getF4dController();
+
+				//magoManager.addLayer(tt);
+				////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+								magoManager.on(Mago3D.MagoManager.EVENT_TYPE.CLICK, function(e){
+								console.info(e);
+								
+								
+								// Do a test. Create a geoCoord and render it.*******************************************************************
+								var screenX = e.clickCoordinate.screenCoordinate.x;
+								var screenY = e.clickCoordinate.screenCoordinate.y;
+								var options = {
+									highPrecision : false
+								};
+								
+								var posWC = Mago3D.ManagerUtils.screenCoordToWorldCoordUseDepthCheck(screenX, screenY, magoManager, options);
+								var geoCoord = Mago3D.ManagerUtils.pointToGeographicCoord(posWC, undefined);
+
+								geoCoord.altitude += 4.0; //
+
+								geoCoord.makeDefaultGeoLocationData();
+								
+								var geoCoordsList = magoManager.modeler.getGeographicCoordsList();
+								geoCoordsList.addGeoCoord(geoCoord);
+								//var hola = 0;
+								// End test.----------------------------------------------------------------------------------------------------
+								
+
+								/*
+								// Do a code creating test.
+								var falloffDeg = 75.0;
+								var falloffDistance = 60;
+								var angRad = falloffDeg * Math.PI/180;
+								var radius = falloffDistance * Math.sin(angRad);
+								var height = falloffDistance * Math.cos(angRad);
+								var color = new Mago3D.Color(0.95, 0.95, 0.95, 0.4);
+								var options = {
+										baseType : 2, // 0= NONE. 1= PLANE. 2= SPHERICAL.
+										color : color,
+										originType : 1 // 0= ATBASE, 1= ATVERTEX
+								};
+								var cone = new Mago3D.Cone(radius, height, options);
+								cone.setGeographicPosition(geoCoord, undefined, undefined, undefined);
+								magoManager.modeler.addObject(cone);
+								*/
+								// End cone test.------------------------------
+
+								// Do a spotLightTest.****************************
+								
+								// Small opening.***
+								var options = {
+									hotspotDeg : 35.0,
+									falloffDeg : 50.0,
+									hotDistance : 50.0,
+									falloffDistance : 60.0
+								};
+
+								// Medium opening.***
+								var options = {
+									hotspotDeg : 55.0,
+									falloffDeg : 75.0,
+									hotDistance : 50.0,
+									falloffDistance : 60.0
+								};
+								/*
+								// Big opening.***
+								var options = {
+									hotspotDeg : 75.0,
+									falloffDeg : 90.0,
+									hotDistance : 50.0,
+									falloffDistance : 60.0
+								};
+								*/
+
+								var spotLight = new Mago3D.SpotLight(options);
+								spotLight.setGeographicPosition(geoCoord, undefined, undefined, undefined);
+								magoManager.modeler.addObject(spotLight);
+								
+								// End spotlightTest.-----------------------------
+								
+							});
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							
+			},
+			error: function(e){
+				alert(e.responseText);
+			}
+		});
+	}
+	// 3ds, pointsCloud, sihung_campus, sihung_las, IncheonGyeyang_2
+
+	
+	
+	function doTest(){
+		var f4dController = managerFactory.getF4dController();
+
+		f4dController.addSmartTileGroup({
+            dataGroupId : 10000,
+            dataGroupKey : 'gs_F4Ds',
+            dataGroupName : '테스트 건물들',
+            dataGroupPath : 'gs_F4Ds/',
+            smartTileIndexPath: "smartTiles_gs"
+		});
+
+		f4dController.addSmartTileGroup({
+            dataGroupId : 10000,
+            dataGroupKey : '3ds',
+            dataGroupName : '테스트 건물들',
+            dataGroupPath : '3ds/',
+            smartTileIndexPath: "smartTiles_3ds"
+		});
+
+		// hyemi smartTiles
+		f4dController.addSmartTileGroup({
+            dataGroupId : 10000,
+            dataGroupKey : 'GA',
+            dataGroupName : 'sihung_campus',
+            dataGroupPath : 'smartTile_Gwanak_f4ds/GA/'
+        });
+		f4dController.addSmartTileGroup({
+            dataGroupId : 10001,
+            dataGroupKey : 'EP',
+            dataGroupName : 'sihung_campus',
+            dataGroupPath : 'smartTile_Gwanak_f4ds/EP/',
+            smartTileIndexPath: "smstOutput3_Gwanak"
+		});
+		
+		/*
+		$.ajax({
+			url: dataInformationUrl + "3ds.json",
+			type: "GET",
+			dataType: "json",
+			success: function(f4dObject){
+				console.info(f4dObject);
+				f4dController.addF4dGroup(f4dObject);
+			},
+			error: function(e){
+				alert(e.responseText);
+			}
+		});
+		*/
+
+		var magoManager = managerFactory.getMagoManager();
+		magoManager.modeler.__TEST__extrusionBuildings();
+	}
+
+	function doTest2(){
+		var f4dController = managerFactory.getF4dController();
+		var magoManager = managerFactory.getMagoManager();
+		
+		// test camera laser.
+		//magoManager.TEST__cameraLaser();
+		var sunSystem = magoManager.sceneState.sunSystem;
+		var currHours = sunSystem.date.getHours();
+		var date = new Date();
+		date.setMonth(5);
+		date.setHours(currHours+1);
+		date.setMinutes(0);
+
+		sunSystem.setDate(date);
+		
+	}
+
+	function doTest3(){
+		var f4dController = managerFactory.getF4dController();
+		var magoManager = managerFactory.getMagoManager();
+		
+		// test camera laser.
+		//magoManager.TEST__cameraLaser();
+		var sunSystem = magoManager.sceneState.sunSystem;
+		var currHours = sunSystem.date.getHours();
+		var date = new Date();
+		date.setMonth(5);
+		date.setHours(currHours-1);
+		date.setMinutes(0);
+
+		sunSystem.setDate(date);
+		
+	}
+	
+
+</script>
+</body>
+</html>

@@ -5,10 +5,11 @@
 	<meta name="viewport" content="width=device-width">
 	<title>Cesium</title>
 	<link rel="stylesheet" href="./demo.css" />
-	<link rel="stylesheet" href="../src/engine/cesium/Widgets/widgets.css" />
 	<link rel="stylesheet" href="../externlib/jquery-ui/jquery-ui.css" />
+	<link rel="stylesheet" href="../src/engine/cesium/Widgets/widgets.css" />
+	<script type="text/javascript" src="../src/engine/cesium/Cesium.js"></script>
+	<script type="text/javascript" src="../build/mago3d/mago3d.js"></script>
 	<script type="text/javascript" src="../externlib/jquery/jquery.js"></script>
-	
 	<script type="text/javascript" src="../externlib/polyfill/decodeTextAlternative/encoding-indexes.js"></script>
 	<script type="text/javascript" src="../externlib/polyfill/decodeTextAlternative/encoding.js"></script>
 </head>
@@ -18,7 +19,7 @@
 	<input type="hidden" id="now_longitude" name="now_longitude" value=""  />
 <ul class="nav i18n">
 	<li id="homeMenu" class="home">
-		<img src="/images/ko/homepage/home-icon.png" style="width: 35px; height: 35px; padding-right: 2px;" title="Home" />
+		<img src="/images/mago-logo.png" style="width: 90px; height: 30px; padding: 30px 5px; filter: invert(96%) sepia(0%) saturate(0%) hue-rotate(179deg) brightness(105%) contrast(101%);" title="Home" />
 	</li>
 	<li onclick="doTest();">
 		test
@@ -83,12 +84,8 @@
 
 </ul>
 <div id="magoContainer" class="mapWrap"></div>
-
-
-<script type="text/javascript" src="../src/engine/cesium/Cesium.js"></script>
-<script type="text/javascript" src="../build/mago3d/mago3d.js"></script>
-<!--<script type="text/javascript" src="../test/extrusion.js"></script> <!--  상암에 extrusion buildings 불러오기-->-->
 <script>
+	var magoManager;
 	var message = new Mago3D.Message(i18next);
 	
 	//f4d path, default data array, 
@@ -153,6 +150,16 @@
 				cesiumViewerOption.baseLayerPicker = false;
 				cesiumViewerOption.sceneModePicker = false;
 
+				cesiumViewerOption.defaultControl = false;
+				cesiumViewerOption.defaultControl = {};
+				cesiumViewerOption.defaultControl.zoom = false;
+				cesiumViewerOption.defaultControl.initCamera = false;
+				cesiumViewerOption.defaultControl.fullScreen = false;
+				cesiumViewerOption.defaultControl.measure = false;
+				cesiumViewerOption.defaultControl.tools = false;
+				cesiumViewerOption.defaultControl.attribution = false;
+				cesiumViewerOption.defaultControl.overviewMap = false;
+
 				serverPolicy.basicGlobe = 'cesium';
 				//serverPolicy.terrainType = 'cesium-customer'; //serverPolicy.terrainType = 'cesium-default';
 				serverPolicy.terrainType = 'cesium-default';
@@ -175,12 +182,11 @@
 														url: '../f4d/terrain_ws2_sangam/terrain_ws2_sangam/'
 														//url: 'http://localhost:8000/tilesets/terrain_ws2_nearest'
 														});*/
-				
-				
 
-				serverPolicy.initLatitude = 37.58195;
-				serverPolicy.initLongitude = 126.60657;
-				serverPolicy.initAltitude = 3000;
+
+				serverPolicy.initLatitude = 37.6168;
+				serverPolicy.initLongitude = 127.1823;
+				serverPolicy.initAltitude = 4000;
 				MAGO3D_INSTANCE = new Mago3D.Mago3d(renderDivId, serverPolicy, {loadend : loadend}, cesiumViewerOption);
 
 				// Active this code for tile inspector.**************************************************************************************
@@ -198,7 +204,7 @@
 			}
 		});
 	}
-	function loadend(e) {
+	async function loadend(e) {
 		console.info('Complete construct mago3d instance. Enjoy!');
 		
 		var magoInstance = e;
@@ -207,13 +213,20 @@
 		magoInstance.setBaseUrl(dataInfo.baseUrl);
 
 
-		osmLayer = new Cesium.ImageryLayer(new Cesium.OpenStreetMapImageryProvider({
+		/*osmLayer = new Cesium.ImageryLayer(new Cesium.OpenStreetMapImageryProvider({
 			url : 'https://a.tile.openstreetmap.org/'
 		}));
+		magoInstance.getViewer().imageryLayers.add(osmLayer, 1);
+		*/
 
-		magoInstance.getViewer().imageryLayers.add(osmLayer, 1);	
+
+		osmLayer = await new Cesium.ImageryLayer(new Cesium.OpenStreetMapImageryProvider({
+			url : 'https://tile.openstreetmap.org/'
+		}));
+		magoInstance.getViewer().imageryLayers.add(osmLayer);
+
 		
-		var magoManager = magoInstance.getMagoManager();
+		magoManager = magoInstance.getMagoManager();
 
 		//let json = JSON.parse("{\"attributes\":{\"isPhysical\":false,\"nodeType\":\"root\",\"projectType\":\"workshop\",\"specularLighting\":true},\"children\":[{\"attributes\":{\"isPhysical\":true,\"nodeType\":\"workshop\",\"propertyFilter\":true},\"children\":[],\"data_key\":\"SOCIALROOM\",\"data_name\":\"SOCIALROOM\",\"mapping_type\":\"origin\",\"latitude\":37.52633678124275,\"longitude\":126.9286322593689,\"height\":100,\"heading\":0,\"pitch\":0,\"roll\":0},{\"attributes\":{\"isPhysical\":true,\"nodeType\":\"workshop\",\"propertyFilter\":false},\"children\":[],\"data_key\":\"STUDENTROOM\",\"data_name\":\"STUDENTROOM\",\"mapping_type\":\"origin\",\"latitude\":37.52633678124275,\"longitude\":126.9286322593689,\"height\":100,\"heading\":0,\"pitch\":0,\"roll\":0},{\"attributes\":{\"isPhysical\":true,\"nodeType\":\"workshop\",\"propertyFilter\":false},\"children\":[],\"data_key\":\"Tile_1\",\"data_name\":\"Tile_1\",\"mapping_type\":\"origin\",\"latitude\":37.52633678124275,\"longitude\":126.9286322593689,\"height\":50,\"heading\":0,\"pitch\":0,\"roll\":0}],\"parent\":0,\"depth\":1,\"view_order\":2,\"data_key\":\"sample\",\"data_name\":\"sample\",\"mapping_type\":\"origin\"}")
 		//magoInstance.getF4dController().addF4dGroup(json);
