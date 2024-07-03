@@ -2627,7 +2627,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 			if (chemAccLayer.cuttingPlaneNormalTex)
 			{
-				texture = chemAccLayer.cuttingPlaneNormalTex;
+				//texture = chemAccLayer.cuttingPlaneNormalTex;
 			}
 
 			if (chemAccLayer.simulBoxdoubleDepthTex)
