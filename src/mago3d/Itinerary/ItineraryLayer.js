@@ -331,19 +331,7 @@ ItineraryLayer.prototype._prepare = function ()
 				endPosLC            : posNext
 			};
 
-			if (diffTimeSeconds < 0.0)
-			{
-				var hola = 0;
-			}
-
 			this._totalItineraryTimeSec += diffTimeSeconds;
-
-			if (this._totalItineraryTimeSec < 0.0)
-			{
-				var hola = 0;
-			}
-
-			var hola = 0;
 		}
 
 		// The process finished.***
@@ -1137,13 +1125,4 @@ ItineraryLayer.prototype.renderSampledPoints = function ()
 		gl.drawArrays(gl.POINTS, 0, samplingVbo.vertexCount);
 		gl.enable(gl.DEPTH_TEST); // return to default.***
 	}
-
-	// return gl settings.***
-	//gl.depthRange(0.0, 1.0);
-	
-	
-	// return the current shader.
-	//magoManager.postFxShadersManager.useProgram(shader);
-
-	var hola = 0;
 };

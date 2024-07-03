@@ -48,7 +48,6 @@ var MagoManager = function (config)
 	 * @private
 	 */
 	this.postFxShadersManager = new PostFxShadersManager(this);
-
 	this.configInformation = this.config.getPolicy();
 	/**
 	 * Manages the request & loading files.
@@ -75,7 +74,7 @@ var MagoManager = function (config)
 	 * 
 	 * @private
 	 */
-	this.animationManager; 
+	this.animationManager = undefined;
 	
 	/**
 	 * Manages & controls all the textures.
@@ -131,7 +130,7 @@ var MagoManager = function (config)
 	 * 
 	 * @private
 	 */
-	this.depthFboNeo;
+	this.depthFboNeo = undefined;
 	
 	/**
 	 * Depth framebuffer object for auxiliary and test use.
@@ -140,7 +139,7 @@ var MagoManager = function (config)
 	 * 
 	 * @private
 	 */
-	this.depthFboAux;
+	this.depthFboAux = undefined;
 	
 	/**
 	 * Framebuffer object used for color coding selection.
@@ -149,7 +148,7 @@ var MagoManager = function (config)
 	 * 
 	 * @private
 	 */
-	this.selectionFbo; 
+	this.selectionFbo = undefined;
 	
 	/**
 	 * Current x position of the mouse in screen coordinates.
@@ -168,22 +167,20 @@ var MagoManager = function (config)
 	 * @private
 	 */
 	this.mouse_y = 0;
-	
-	
+
 	this.mouseLeftDown = false;
 	this.mouseMiddleDown = false;
 	this.mouseDragging = false;
-	this.selObjMovePlane;
 
-	this.objectSelected;
-	this.buildingSelected;
-	this.octreeSelected;
-	this.nodeSelected;
+	this.selObjMovePlane = undefined;
+	this.objectSelected = undefined;
+	this.buildingSelected = undefined;
+	this.octreeSelected = undefined;
+	this.nodeSelected = undefined;
 
 	this.mustCheckIfDragging = true;
 	this.thereAreStartMovePoint = false;
 	this.startMovPoint = new Point3D();
-	
 	
 	this.cameraFPV = new FirstPersonView();
 	this.myCameraSCX;
@@ -222,22 +219,16 @@ var MagoManager = function (config)
 	
 	this.frustumVolumeControl = new FrustumVolumeControl();
 	
-	this.boundingSphere_Aux; 
-	this.radiusAprox_aux;
-
-	this.lastCamPos = new Point3D();
-	this.squareDistUmbral = 22.0;
-
-	this.lowestOctreeArray = [];
+	this.boundingSphere_Aux = undefined;
+	this.radiusAprox_aux = undefined;
 
 	this.backGround_fileReadings_count = 0; // this can be as max = 9.***
 	this.backGround_imageReadings_count = 0;
-	this.isCameraMoving = false; 
-	this.isCameraInsideNeoBuilding = false;
+	this.isCameraMoving = false;
 	this.renderingFase = 0;
 
 	this.bPicking = false;
-	this.scene;
+	this.scene = undefined;
 
 	this.numFrustums;
 	this.isLastFrustum = false;
@@ -246,14 +237,10 @@ var MagoManager = function (config)
 	this.thereAreUrgentOctrees = false;
 	
 	this.hierarchyManager = new HierarchyManager();
-	
-	// small object size.
+
 	this.smallObjectSize = 0.153;
-	
-	// sqrtTable.
-	
 	this.sqrtTable = new Float32Array(11);
-	// make 100 values.
+
 	var increValue = 0.1;
 	for (var i=0; i<11; i++)
 	{
@@ -264,31 +251,19 @@ var MagoManager = function (config)
 
 	this.frustumVolumeControl = new FrustumVolumeControl();
 
-	// CURRENTS.********************************************************************
-	this.currentSelectedObj_idx = -1;
-	this.currentByteColorPicked = new Uint8Array(4);
-	this.currentShader;
-
-	// SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.***
 	this.pointSC= new Point3D();
-	this.pointSC_2= new Point3D();
 	this.arrayAuxSC = [];
 
 	this.currentTimeSC;
 	this.dateSC = new Date();
 	this.startTimeSC;
-	this.maxMilisecondsForRender = 10;
-
-	this.terranTileSC;
 
 	this.resultRaySC = new Float32Array(3);
 	this.matrix4SC = new Matrix4();
 	this.axisXYZ = new AxisXYZ();
 
-	this.demoBlocksLoaded = false;
-
 	this.objMarkerManager = new ObjectMarkerManager(this);
-	
+
 	// renderWithTopology === 0 -> render only CityGML.***
 	// renderWithTopology === 1 -> render only IndoorGML.***
 	// renderWithTopology === 2 -> render both.***
@@ -304,34 +279,16 @@ var MagoManager = function (config)
 	 */
 	this._settings = new Settings();
 	
-	this.tinTerrainManager;
-	
-	/**
-	 * Modeler
-	 * @type {Modeler}
-	 */
+	this.tinTerrainManager = undefined;
+
 	this.modeler = new Modeler(this);
 	this.materialsManager = new MaterialsManager(this);
-	this.idManager = new IdentifierManager();
+	//this.idManager = new IdentifierManager();
 	this.processCounterManager = new ProcessCounterManager();
-
-	
 	this.f4dController = new F4dController(this);
 	this.effectsManager = new EffectsManager();
-	
-	//CODE.magoCurrentProcess = {
-	//"Unknown"  : 0,
-	//"DepthRendering"  : 1,
-	//"ColorRendering" : 2,
-	//"ColorCodeRendering" : 3,
-	//"DepthShadowRendering" : 4
-
 	this.currentProcess = CODE.magoCurrentProcess.Unknown;
 
-	/**
-	 * Interaction collection.
-	 * @type {InteractionCollection}
-	 */
 	this.interactionCollection = new InteractionCollection(this);
 	this.defaultSelectInteraction = new PointSelectInteraction();
 	this.defaultTranslateInteraction = new TranslateInteraction();
@@ -344,7 +301,6 @@ var MagoManager = function (config)
 
 	// this.defaultTranslateInteraction.setActive(true);
 	// this.defaultTranslateInteraction.setTargetType(DataType.NATIVE);
-	
 
 	/**
      * Control collection.
@@ -414,69 +370,15 @@ MagoManager.EVENT_TYPE = {
 	'ANIMATIONING'            : 'animationing',
 	'VALIDHEIGHTEND'          : 'validHeightEnd'
 };
-MagoManager.prototype.testExcavation = function() 
-{
-	var array = [
-		[
-			127.18867778778076,
-			37.615659186587635
-		],
-		[
-			127.18434333801268,
-			37.612055711412815
-		],
-		[
-			127.18932151794434,
-			37.608758038672185
-		],
-		[
-			127.19541549682617,
-			37.60865604646256
-		],
-		[
-			127.19653129577637,
-			37.613109575992404
-		],
-		[
-			127.19537258148193,
-			37.61613510421666
-		],
-		[
-			127.19357013702391,
-			37.617324884962706
-		],
-		[
-			127.1918535232544,
-			37.61766481882189
-		],
-		[
-			127.18867778778076,
-			37.615659186587635
-		]
-	];
-	var geoCoordsArray = array.map(function(item){ return new GeographicCoord(item[0], item[1], 0); });
-
-	this.quantizedMeshManager.setQuantizedMeshExcavationSet(geoCoordsArray, -20);
-	
-};
 /**
  * object 를 그리는 두가지 종류의 function을 호출
  * @private
  */
 MagoManager.prototype.init = function(gl) 
 {
+	console.debug("[MagoJs] Initialize MagoJs");
+
 	this.bInit = true;
-	
-	/*
-	var canvas = this.scene.canvas;
-	var glAttrs = {antialias          : true, 
-		stencil            : true,
-		premultipliedAlpha : false};
-	var gl = canvas.getContext("webgl", glAttrs);
-	if (!gl)
-	{ gl = canvas.getContext("experimental-webgl", glAttrs); }
-	*/
-	
 	if (this.sceneState.gl === undefined)
 	{ this.sceneState.gl = gl; }
 	if (this.vboMemoryManager.gl === undefined)
@@ -496,21 +398,34 @@ MagoManager.prototype.init = function(gl)
  * 
  * @private
  */
-MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums) 
+MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums)
 {
-	// Calculate FPS.
-	//var start = new Date().getTime();
-	// this is cesium version.***
-	// mago3d 활성화가 아니면 화면을 그리지 않음
-	if (!this.magoPolicy.getMagoEnable()) { return; }
-	
-	var isLastFrustum = false;
+	if (!this.magoPolicy.getMagoEnable())
+	{
+		return;
+	}
+
+	if (scene === undefined)
+	{
+		console.debug("[MagoJs] scene is undefined.");
+		return;
+	}
+	else if (frustumIdx === undefined)
+	{
+		console.debug("[MagoJs] frustumIdx is undefined.");
+		return;
+	}
+	else if (numFrustums === undefined)
+	{
+		console.debug("[MagoJs] numFrustums is undefined.");
+		return;
+	}
+
 	this.numFrustums = numFrustums;
 	this.currentFrustumIdx = this.numFrustums-frustumIdx-1;
 	
 	if (this.currentFrustumIdx === numFrustums-1) 
 	{
-		isLastFrustum = true;
 		this.isLastFrustum = true;
 	}
 
@@ -519,18 +434,18 @@ MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums)
 		this.configInformation = this.config.getPolicy();
 	}
 
-
 	if (!this.bInit)
-	{ 
+	{
 		var gl = scene ? scene.context._gl : this.sceneState.gl;
 		gl.getExtension("EXT_frag_depth");
-		this.init(gl); 
-
+		this.init(gl);
 		if (gl.isContextLost())
-		{ return; }
+		{
+			return;
+		}
 	}
 
-	this.startRender(isLastFrustum, this.currentFrustumIdx, numFrustums);
+	this.startRender(this.isLastFrustum, this.currentFrustumIdx, numFrustums);
 };
 /**
  * changed container size. call this method.
@@ -541,10 +456,8 @@ MagoManager.prototype.updateSize = function()
 	var canvas = sceneState.canvas;
 	canvas.width = canvas.offsetWidth;
 	canvas.height = canvas.offsetHeight;
-
 	sceneState.setDrawingBufferSize(canvas.offsetWidth, canvas.offsetHeight);
 };
-
 
 MagoManager.prototype.isCesiumGlobe = function() 
 {
@@ -1245,7 +1158,6 @@ MagoManager.prototype.getSecondsPerFrame = function()
 {
 	var currTime = this.getCurrentTime();
 	var prevTime = this.prevTime;
-
 	return (currTime - prevTime)/1000.0;
 };
 
@@ -1255,9 +1167,10 @@ MagoManager.prototype.getSecondsPerFrame = function()
  */
 MagoManager.prototype.getGl = function() 
 {
-	if (this.sceneState === undefined)
-	{ return undefined; }
-	
+	if (this.sceneState === undefined) 
+	{
+		return undefined;
+	}
 	return this.sceneState.gl;
 };
 
@@ -1303,7 +1216,7 @@ MagoManager.prototype.loadAndPrepareData = function ()
 
 	// Lod0 transparents.***
 	nodesCount = this.visibleObjControlerNodes.currentVisibles0Transparents.length;
-	for (var i=0; i<nodesCount; i++) 
+	for (var i= 0; i < nodesCount; i++)
 	{
 		node = this.visibleObjControlerNodes.currentVisibles0Transparents[i];
 		var attributes = node.data.attributes;
@@ -1326,12 +1239,12 @@ MagoManager.prototype.loadAndPrepareData = function ()
 	this.prepareVisibleOctreesSortedByDistanceLOD2(gl, this.visibleObjControlerOctrees.currentVisibles2); 
 	
 	// lod 2.
-	// TODO : maxRequest count to settings
+	// maxRequest count to settings
 	if (this.readerWriter.referencesList_requested < 5)
 	{
 		// Opaques.***
 		nodesCount = this.visibleObjControlerNodes.currentVisibles2.length;
-		for (var i=0; i<nodesCount; i++) 
+		for (var i= 0; i < nodesCount; i++)
 		{
 			node = this.visibleObjControlerNodes.currentVisibles2[i];
 			var attributes = node.data.attributes;
@@ -1390,10 +1303,8 @@ MagoManager.prototype.loadAndPrepareData = function ()
 		}
 		this.visibleObjControlerOctrees.currentVisibles0 = pt10Octrees;
 		this.prepareVisibleOctreesSortedByDistance(gl, this.visibleObjControlerOctrees); 
-		//this.prepareVisibleOctreesSortedByDistanceLOD2(gl, this.visibleObjControlerOctrees.currentVisibles0); 
 	}
 
-	// TinTerrain.*******************************************************************************************************************************
 	if (this.isFarestFrustum())
 	{
 		var camera = this.sceneState.camera;
@@ -1494,18 +1405,11 @@ MagoManager.prototype.getSelectionFBO = function()
 	{ 
 		var texturesManager = this.getTexturesManager();
 		var gl = this.getGl();
-		if (gl === undefined)
-		{ 
-			throw new Error("MagoManager.getSelectionFBO: gl is undefined");
-			return; 
-		}
 		this.selectionFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); 
 		this.selectionFbo.colorBuffer = texturesManager.texturesMergerFbo.colorBuffersArray[3];
 	}
-
 	return this.selectionFbo;
 };
-
 
 /**
  * Manages the selection process.
@@ -1534,8 +1438,7 @@ MagoManager.prototype.managePickingProcess = function ()
 			
 			var auxBuildingSelected = this.arrayAuxSC[0];
 			var auxOctreeSelected = this.arrayAuxSC[1];
-			var auxNodeSelected = this.arrayAuxSC[3]; 
-
+			var auxNodeSelected = this.arrayAuxSC[3];
 			var mode = this.magoPolicy.getObjectMoveMode();
 
 			if (mode === CODE.moveMode.ALL) 
@@ -1577,22 +1480,21 @@ MagoManager.prototype.managePickingProcess = function ()
 			this.buildingSelected = auxBuildingSelected;
 			this.octreeSelected = auxOctreeSelected;
 			this.nodeSelected = auxNodeSelected;
+
 			if (this.nodeSelected)
-			{ this.rootNodeSelected = this.nodeSelected.getRoot(); }
+			{
+				this.rootNodeSelected = this.nodeSelected.getRoot();
+			}
 			else
-			{ this.rootNodeSelected = undefined; }
+			{
+				this.rootNodeSelected = undefined;
+			}
 				
 			this.arrayAuxSC.length = 0;
 			if (this.buildingSelected !== undefined) 
 			{
 				this.displayLocationAndRotation(this.buildingSelected);
 				this.selectedObjectNotice(this.buildingSelected);
-			}
-			if (this.objectSelected !== undefined) 
-			{
-				//this.displayLocationAndRotation(currentSelectedBuilding);
-				//this.selectedObjectNotice(currentSelectedBuilding);
-				//console.log("objectId = " + selectedObject.objectId);
 			}
 
 			if (selectionManager.currentGeneralObjectSelected) 
@@ -1610,10 +1512,8 @@ MagoManager.prototype.managePickingProcess = function ()
 				});
 			}
 		}
-		
 		this.selectionColor.init(); // selection colors manager.***
 	}
-	
 	selectionFbo.unbind();
 	gl.enable(gl.CULL_FACE);
 };
@@ -1638,35 +1538,6 @@ MagoManager.prototype.getSilhouetteDepthFbo = function()
  * Main rendering function.
  * @private
  */
-MagoManager.prototype.TEST__cameraLaser = function() 
-{
-	// this function tests camera laser.
-	var geoCoordsList = this.modeler.getGeographicCoordsList();
-	var geoCoordsCount = geoCoordsList.getGeoCoordsCount();
-	if (geoCoordsCount < 2)
-	{ return; }
-
-	//var geoCoord_start = new GeographicCoord(126.75740, 37.54302, 29.133160613985577);
-	//var geoCoord_end = new GeographicCoord(126.75719736534053, 37.54493737467032, 44.055231264041986);
-
-	var geoCoord_start = geoCoordsList.getGeoCoord(geoCoordsCount - 2);
-	var geoCoord_end = geoCoordsList.getGeoCoord(geoCoordsCount - 1);
-
-	var posWC = Camera.intersectPointByLaser(geoCoord_start, geoCoord_end, undefined, undefined, this, undefined) ;
-
-	if (posWC)
-	{
-		var geoCoord = Mago3D.ManagerUtils.pointToGeographicCoord(posWC, undefined);
-		geoCoord.makeDefaultGeoLocationData();
-		var geoCoordsList = this.modeler.getGeographicCoordsList();
-		geoCoordsList.addGeoCoord(geoCoord);
-	}
-};
-
-/**
- * Main rendering function.
- * @private
- */
 MagoManager.prototype.bindMainFramebuffer = function() 
 {
 	var scene = this.scene;
@@ -1682,13 +1553,6 @@ MagoManager.prototype.getTexturesManager = function ()
 	if (!this.texturesManager)
 	{
 		var gl = this.getGl();
-
-		if (gl === undefined)
-		{
-			throw new Error("MagoManager.getTexturesManager: gl is undefined");
-			return;
-		}
-
 		var bufferWidth = this.sceneState.drawingBufferWidth[0];
 		var bufferHeight = this.sceneState.drawingBufferHeight[0];
 
@@ -1704,7 +1568,6 @@ MagoManager.prototype.getTexturesManager = function ()
 		this.normalTex = this.texturesManager.texturesMergerFbo.colorBuffersArray[1];
 		this.albedoTex = this.texturesManager.texturesMergerFbo.colorBuffersArray[2];
 		this.selColorTex = this.texturesManager.texturesMergerFbo.colorBuffersArray[3];
-		// MagoEarthShadedColTex = this.texturesManager.texturesMergerFbo.colorBuffersArray[4];
 		this.brightColorTex = this.texturesManager.texturesMergerFbo.colorBuffersArray[5]; // For bloom effect, if exist.***
 		this.debugTex = this.texturesManager.texturesMergerFbo.colorBuffersArray[6]; // For debug gpu process.***
 	}
@@ -1712,323 +1575,7 @@ MagoManager.prototype.getTexturesManager = function ()
 	return this.texturesManager;
 };
 
-MagoManager.prototype.doRenderORT = function (frustumVolumenObject) 
-{
-	// This function render in ORT (one rendering target), for android devices.
-	var gl = this.getGl();
-	
-	// 1) The depth render.**********************************************************************************************************************
-	var renderType = 0; // 0= depth. 1= color.***
-	this.renderType = 0;
-	var sceneState = this.sceneState;
-
-	// 1.1) render sunDepth.
-	if (sceneState.applySunShadows && !this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
-	{
-		this.renderer.renderDepthSunSystem(this.visibleObjControlerNodes);
-		this.swapRenderingFase();
-	}
-	
-	var lightsArray = this.visibleObjControlerNodes.currentVisibleNativeObjects.lightSourcesArray;
-	var lightCount = lightsArray.length;
-	var currentTime = this.getCurrentTime();
-	if (lightCount > 0 && sceneState.applyLightsShadows && !this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
-	{
-		// for each visible lightSources, make cubeMap depthTextures if no exist.
-		var visiblesArray = this.visibleObjControlerNodes.getAllVisibles();
-		var nativeVisiblesArray = this.visibleObjControlerNodes.getAllNatives();
-		var lightCullingsCount = 0;
-		for (var i=0; i<lightCount; i++)
-		{
-			var light = lightsArray[i];
-
-			if (!light.cullingUpdatedTime)
-			{ light.cullingUpdatedTime = 0; }
-			
-			if (currentTime !== light.cullingUpdatedTime) 
-			{
-				var timeDiffSec = (currentTime - light.cullingUpdatedTime)/1000.0;
-				if (timeDiffSec < 3)
-				{ continue; }
-
-				light.clearIntersectedObjects();
-			}
-
-			// In one frame, do only one intersectionCulling for lights.
-			if (light.doIntersectedObjectsCulling(visiblesArray, nativeVisiblesArray))
-			{
-				light.cullingUpdatedTime = currentTime;
-				lightCullingsCount ++;
-			}
-
-			/* if (lightCullingsCount > 0)
-			{ break; } */
-		}
-	}
-	
-
-	// 1.2) render selected silhouetteDepth.
-	var selectionManager = this.selectionManager;
-	if (selectionManager.existSelectedObjects())
-	{
-		// Render into "silhouetteDepthFbo".***
-		this.renderer.renderSilhouetteDepth(); 
-	}
-	
-	// Take the depFrameBufferObject of the current frustumVolume.***
-	// Create a simpleFramebufferAux.***
-	if (this.framebufferAux === undefined) { this.framebufferAux = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
-	if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
-	if (this.shadedColorFbo === undefined) { this.shadedColorFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
-	
-	
-	var texturesManager = this.getTexturesManager();
-	this.depthFboNeo = texturesManager.texturesMergerFbo;
-
-	this.depthTex = this.depthFboNeo.colorBuffersArray[0];
-	this.normalTex = this.depthFboNeo.colorBuffersArray[1];
-	this.albedoTex = this.depthFboNeo.colorBuffersArray[2];
-	this.selColorTex = this.depthFboNeo.colorBuffersArray[3];
-
-	var selFBO = this.getSelectionFBO();
-
-	// prev 2) ready to color frame buffer
-	this.postFxShadersManager.useProgram(null); // init current bind shader.***
-
-	var bApplyShadow = false;
-	if (this.sceneState.sunSystem !== undefined && this.sceneState.applySunShadows)
-	{ bApplyShadow = true; }
-
-	if (this.isCesiumGlobe())
-	{
-		var scene = this.scene;
-
-		// Test to copy terrain.******************************************************************************************
-		// Take cesium colorBuffer.**********************
-		scene.view.globeDepth.framebuffer._bind();
-
-		this.cesiumColorBuffer = gl.getFramebufferAttachmentParameter(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.FRAMEBUFFER_ATTACHMENT_OBJECT_NAME);
-		// End taking cesium colorBuffer.-------------------
-
-		this.renderer.renderTerrainCopy(); // Here renders Depth, Normal & Albedo (renders 3 times).***
-	}
-	
-	
-	// 2) gBuffer render.*****************************************************************************************************************
-	renderType = 1;
-	this.renderType = 1;
-	gl.frontFace(gl.CCW);
-	this.renderer.renderGeometryBufferORT(gl, renderType, this.visibleObjControlerNodes);
-
-	if (this.weatherStation)
-	{
-		this.weatherStation.renderWeatherORT(this);
-	}
-
-	//if (this.waterManager) // OpaquesPass.***
-	//{
-	// Render terrain.***
-	//this.waterManager.renderTerrain();
-	//this.waterManager._TEST_renderQMesh();
-	//}
-
-	
-	// Render transparents.****************************************************************************************************************
-	if (this.isCesiumGlobe())
-	{
-		this.bindMainFramebuffer();
-	}
-	
-	renderType = 1;
-	this.renderType = 1;
-	this.renderer.renderGeometryBufferTransparents(gl, renderType, this.visibleObjControlerNodes);
-
-	if (this.weatherStation)
-	{
-		this.weatherStation.renderWeatherTransparentsORT(this);
-	}
-
-	if (this.waterManager) // TransparentPass.***
-	{
-		// 1rst, do objects intersection culling.
-		var visiblesArray = this.visibleObjControlerNodes.getAllVisibles();
-		var nativeVisiblesArray = this.visibleObjControlerNodes.getAllNatives();
-		this.waterManager.doIntersectedObjectsCulling(visiblesArray, nativeVisiblesArray);
-		this.waterManager.render();
-	}
-
-	if (this.soundManager) // TransparentPass.***
-	{
-		// do sound simulation.
-		//this.soundManager.render();
-	};
-
-	// check if must render boundingBoxes.
-	if (this.magoPolicy.getShowBoundingBox())
-	{
-		var bRenderLines = true;
-		//var currentVisiblesArray = visibleObjControlerNodes.currentVisibles0.concat(visibleObjControlerNodes.currentVisibles2,);
-		var visibles0 = this.visibleObjControlerNodes.getOpaquesTransparentsByLod(0);
-		var visibles2 = this.visibleObjControlerNodes.getOpaquesTransparentsByLod(2);
-		var visibles3 = this.visibleObjControlerNodes.getOpaquesTransparentsByLod(3);
-		this.renderer.renderBoundingBoxesNodes(visibles0, undefined, bRenderLines);
-		this.renderer.renderBoundingBoxesNodes(visibles2, undefined, bRenderLines);
-		this.renderer.renderBoundingBoxesNodes(visibles3, undefined, bRenderLines);
-		this.renderer.renderBoundingBoxesNodes(this.visibleObjControlerNodes.currentVisiblesAux, undefined, bRenderLines);
-	}
-
-	// Once all frustums was rendered, then set the camera moved = false.*****************************
-	if (this.currentFrustumIdx === 0)
-	{
-		this.isCameraMoved = false;
-	}
-	//------------------------------------------------------------------------------------------------
-
-	// Finally do screenSpaceObjects render.
-	//this.renderer.renderScreenSpaceObjects(gl);
-
-	if (this.isCesiumGlobe())
-	{
-		this.bindMainFramebuffer();
-
-	}
-
-	// DEBUG.Render fisically lights sources.*************************************************************************
-	//this.renderer.renderNativeLightSources(renderType, this.visibleObjControlerNodes) ; // debug component.
-	//------------------------------------------------------------------------------------------------------
-	// End rendering transparents.----------------------------------------------------------------------------------------------------------
-
-	if (sceneState.applyLightsShadows)
-	{
-		// if exist lightSources, the store all lightSources of all frustums.
-		var lightSourcesArray = this.visibleObjControlerNodes.currentVisibleNativeObjects.lightSourcesArray;
-		if (!this.lightSourcesMap)
-		{ this.lightSourcesMap = {}; }
-
-		var lightCount = lightSourcesArray.length;
-		for (var i=0; i<lightCount; i++)
-		{
-			var light = lightSourcesArray[i];
-			var lightGuid = light._guid;
-			this.lightSourcesMap[lightGuid] = light;
-		}
-
-		if (this.currentFrustumIdx === 0) 
-		{
-			// now, make the lightSourcesArray.
-			if (!this.lightSourcesArray)
-			{ this.lightSourcesArray = []; }
-
-			// 1rst, init the array.
-			this.lightSourcesArray.length = 0;
-
-			for (var key in this.lightSourcesMap)
-			{
-				if (this.lightSourcesMap.hasOwnProperty(key))
-				{
-					this.lightSourcesArray.push(this.lightSourcesMap[key]);
-				}
-			}
-
-			// finally init the lightSourcesMap.
-			this.lightSourcesMap = {};
-		}
-	}
-	
-	// 1.1) ssao and other effects from depthBuffer render.*****************************************************************************
-	if (this.currentFrustumIdx === 0) 
-	{
-		// Render the lightBuffer.*****************************************
-		if (sceneState.applyLightsShadows)
-		{
-			// Create lightBufferFBO if no exist.
-			if (!this.texturesManager.lBuffer)
-			{
-				// create a lBuffer with 2 colorTextures : diffuseLighting & specularLighting.
-				var bufferWidth = this.sceneState.drawingBufferWidth[0];
-				var bufferHeight = this.sceneState.drawingBufferHeight[0];
-				var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
-				this.texturesManager.lBuffer = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 3}); 
-			}
-
-			this.lBuffer = this.texturesManager.lBuffer;
-			this.diffuseLightTex = this.lBuffer.colorBuffersArray[0];
-			this.specularLightTex = this.lBuffer.colorBuffersArray[1];
-			this.LightFogTex = this.lBuffer.colorBuffersArray[2];
-			
-			// Render the lightBuffer.
-			this.renderer.renderLightDepthCubeMaps(this.lightSourcesArray); // active this code for shadows.
-			this.renderer.renderLightBuffer(this.lightSourcesArray);
-			// End rendering lightBuffer.--------------------------------------------
-		}
-
-		// In ORT, must copy cesiumColorBuffer into this.albedoTex.***
-		var bTexFlipYAxis = true;
-		var bTexFlipXAxis = true;
-		this.renderer.copyTexture(this.cesiumColorBuffer, this.albedoTex, bTexFlipXAxis, bTexFlipYAxis);
-
-		// Do ssaoFromDepth render. Renders in ssaoFrameBuffer.***
-		this.renderer.renderSsaoFromDepth(gl);
-
-		// Final render output.**************************************************************
-		this.renderer.renderScreenQuad(gl); // 1rst screenQuad. (ssao, lighting, shadows) // this must be rendered in a framebuffer.***
-
-		if (this.isCesiumGlobe()) 
-		{
-			this.bindMainFramebuffer();
-		}
-		this.renderer.renderScreenQuad2(gl); // 2nd screenQuad. (lightFog)
-
-		this.renderCluster();
-
-		if (this.selectionManager)
-		{
-			if (this.selectionManager.existSelectedObjects())
-			{
-				this.renderer.renderSilhouette();
-			}
-		}
-
-	} 
-	
-	// Debug component.******************************************
-	/*
-	if (this.currentFrustumIdx === 0) 
-	{
-		if (scene && scene._context && scene.view.globeDepth.framebuffer)
-		{
-			this.bindMainFramebuffer();
-		}
-			
-		var lightAux;
-		if (lightsArray)
-		{
-			var lightsCount = lightsArray.length;
-			lightAux = lightsArray[lightsCount - 1];
-		}
-		var options = {
-			lightSource: lightAux
-		};
-			
-		this.renderer.renderScreenRectangle(gl, options); // debug component.
-	}
-	*/
-	//-----------------------------------------------------------
-
-	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
-		
-	this.swapRenderingFase();
-	/*
-	// Delete after test!!!!!!!!!!!!!!
-	if(!this.test_speechBubble)
-	{
-		this.objMarkerManager.TEST__ObjectMarker_toNeoReference();
-		this.test_speechBubble = true;
-	}
-	*/
-};
-
-MagoManager.prototype._renderManagers_transparentPass = function () 
+MagoManager.prototype.renderManagersTransparentPass = function ()
 {
 	if (this.otherManagers !== undefined)
 	{
@@ -2043,16 +1590,9 @@ MagoManager.prototype._renderManagers_transparentPass = function ()
 				}
 			}
 		}
-		// check if exist oceanFluxManager.***
-		// if (this.otherManagers.oceanFluxManager !== undefined)
-		// {
-		// 	var oceanFluxManager = this.otherManagers.oceanFluxManager;
-		// 	oceanFluxManager.render();
-		// 	var hola = 0;
-		// }
 	}
 
-	if (this.waterManager) // TransparentPass.***
+	if (this.waterManager)
 	{
 		// 1rst, do objects intersection culling.
 		var visiblesArray = this.visibleObjControlerNodes.getAllVisibles();
@@ -2061,27 +1601,24 @@ MagoManager.prototype._renderManagers_transparentPass = function ()
 		this.waterManager.render();
 	}
 
-	if (this.soundManager) // TransparentPass.***
+	if (this.soundManager)
 	{
-		// do sound simulation.
-		// Note : This is different to water simulation. Here, do not IntersectedObjectsCulling if the simulation was started. TODO.***
+		// Note : This is different to water simulation. Here, do not IntersectedObjectsCulling if the simulation was started.
 		var visiblesArray = this.visibleObjControlerNodes.getAllVisibles();
 		var nativeVisiblesArray = this.visibleObjControlerNodes.getAllNatives();
 		this.soundManager.doIntersectedObjectsCulling(visiblesArray, nativeVisiblesArray);
 		this.soundManager.render();
-	};
+	}
 
-	if (this.chemicalAccidentManager) // TransparentPass.***
+	// process to render chemical accident (texture 3d)
+	if (this.chemicalAccidentManager)
 	{
-		// Note : the chemAccManager's rendering is added in screenQuad2 render.***
-		// process to render chemical accident (texture 3d).***
 		this.chemicalAccidentManager.render();
 	}
 
-	if (this.airPollutionManager) // TransparentPass.***
+	// process to render airPollutionManager(texture 3d)
+	if (this.airPollutionManager)
 	{
-		// Note : the airPollutionManager's rendering is added in screenQuad2 render.***
-		// process to render chemical accident (texture 3d).***
 		this.airPollutionManager.render();
 	}
 
@@ -2092,52 +1629,47 @@ MagoManager.prototype._renderManagers_transparentPass = function ()
 			this.animationTimeController = new AnimationTimeController();
 		}
 
-		//if (this.animationTimeController.getAnimationState() === CODE.processState.STARTED)
-		{
-			// render itinerary layers.***
-			this.itineraryManager.render();
+		// render itinerary layers.***
+		this.itineraryManager.render();
 
-			// If exist weatherStation, then sample weather for the current 
-			// position of the walkingMan of itineraries.***
-			// sample weather = sample pollution, or sample temperature, or sample wind, etc.
-			if (this.isFarestFrustum())
+		// If exist weatherStation, then sample weather for the current
+		// position of the walkingMan of itineraries.***
+		// sample weather = sample pollution, or sample temperature, or sample wind, etc.
+		if (this.isFarestFrustum())
+		{
+			if (this.weatherStation !== undefined)
 			{
-				if (this.weatherStation !== undefined)
+				// provisional.***
+				// sample weather condition for the itinearies at the current time.***
+				var weatherStation = this.weatherStation;
+				if (weatherStation.pollutionVolumesArray !== undefined && weatherStation.pollutionVolumesArray.length > 0)
 				{
-					// provisional.***
-					// sample weather condition for the itinearies at the current time.***
-					var weatherStation = this.weatherStation;
-					if (weatherStation.pollutionVolumesArray !== undefined && weatherStation.pollutionVolumesArray.length > 0)
+					var pollutionVolume = weatherStation.pollutionVolumesArray[0]; // provisional.***
+					var pollutionLayersCount = pollutionVolume.getPollutionLayersCount();
+					if (pollutionLayersCount > 0)
 					{
-						var pollutionVolume = weatherStation.pollutionVolumesArray[0]; // provisional.***
-						var pollutionLayersCount = pollutionVolume.getPollutionLayersCount();
-						if (pollutionLayersCount > 0)
-						{
-							var currTime = this.animationTimeController.getCurrentTimeMilisec();
-							var pollutionLayer = pollutionVolume._pollutionLayersArray[0]; // provisional.***
-							this.itineraryManager.sampleWeatherPollution(currTime, pollutionLayer);
-						}
+						var currTime = this.animationTimeController.getCurrentTimeMilisec();
+						var pollutionLayer = pollutionVolume._pollutionLayersArray[0]; // provisional.***
+						this.itineraryManager.sampleWeatherPollution(currTime, pollutionLayer);
 					}
 				}
+			}
 
-				// sample chemical contamination.***
-				if (this.chemicalAccidentManager !== undefined)
+			// sample chemical contamination.***
+			if (this.chemicalAccidentManager !== undefined)
+			{
+				var chemicalAccidentManager = this.chemicalAccidentManager;
+				if (chemicalAccidentManager.chemAccidentLayersArray !== undefined && chemicalAccidentManager.chemAccidentLayersArray.length > 0)
 				{
-					var chemicalAccidentManager = this.chemicalAccidentManager;
-					if (chemicalAccidentManager.chemAccidentLayersArray !== undefined && chemicalAccidentManager.chemAccidentLayersArray.length > 0)
-					{
-						var chemicalLayer = chemicalAccidentManager.chemAccidentLayersArray[0]; // usually there are only one chemical layer.***
-						//var currTime = this.animationTimeController.getCurrentTimeMilisec();
-						var currUnixTimeMillisec = this.animationTimeController.getCurrentUnixTimeMilisec();
-						this.itineraryManager.sampleChemicalContamination(currUnixTimeMillisec, chemicalLayer);
-						
-					}
+					var chemicalLayer = chemicalAccidentManager.chemAccidentLayersArray[0]; // usually there are only one chemical layer.***
+					//var currTime = this.animationTimeController.getCurrentTimeMilisec();
+					var currUnixTimeMillisec = this.animationTimeController.getCurrentUnixTimeMilisec();
+					this.itineraryManager.sampleChemicalContamination(currUnixTimeMillisec, chemicalLayer);
+
 				}
 			}
 		}
 	}
-
-	
 };
 
 /**
@@ -2147,23 +1679,23 @@ MagoManager.prototype._renderManagers_transparentPass = function ()
 MagoManager.prototype.doRender = function (frustumVolumenObject) 
 {
 	var gl = this.getGl();
-
-	if (!this.isCesiumGlobe())
+	if (gl === undefined)
 	{
-		this.doRenderMagoWorld(frustumVolumenObject);
+		console.error("[MagoJs] gl is undefined.");
+		return;
+	}
+	else if (!this.postFxShadersManager.bUseMultiRenderTarget)
+	{
+		console.error("[MagoJs] This render mode does not support ORT(One Rendering Target) render mode.");
+		return;
+	}
+	else if (!this.isCesiumGlobe())
+	{
+		console.error("[MagoJs] Can't found Cesium Globe.");
 		return;
 	}
 
-	var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
-	if (!bUseMultiRenderTarget)
-	{
-		this.doRenderORT(frustumVolumenObject);
-		return;
-	}
-
-	// Keep some cesium gl settings.***************************************
 	var keepClearColor = this.scene._context._clearColor;
-	//---------------------------------------------------------------------
 	
 	// 1) The depth render.**********************************************************************************************************************
 	var renderType = 0; // 0= depth. 1= color.***
@@ -2208,24 +1740,23 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 				light.cullingUpdatedTime = currentTime;
 				lightCullingsCount ++;
 			}
-
-			/* if (lightCullingsCount > 0)
-			{ break; } */
 		}
 	}
-	
 
 	// 1.2) render selected silhouetteDepth.
 	var selectionManager = this.selectionManager;
 	if (selectionManager.existSelectedObjects())
 	{
-		// Render into "silhouetteDepthFbo".***
 		this.renderer.renderSilhouetteDepth(); 
 	}
 	
 	// Take the depFrameBufferObject of the current frustumVolume.***
 	// Create a simpleFramebufferAux.***
-	if (this.framebufferAux === undefined) { this.framebufferAux = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
+	if (this.framebufferAux === undefined)
+	{
+		this.framebufferAux = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true});
+	}
+
 	if (this.ssaoFromDepthFbo === undefined) 
 	{
 		this.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize : true,
@@ -2233,10 +1764,12 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 			widthScale      : 1,
 			heightScale     : 1}); 
 	}
-	if (this.shadedColorFbo === undefined) { this.shadedColorFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
 
-	
-	
+	if (this.shadedColorFbo === undefined)
+	{
+		this.shadedColorFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true});
+	}
+
 	var texturesManager = this.getTexturesManager();
 	this.depthFboNeo = texturesManager.texturesMergerFbo;
 
@@ -2267,17 +1800,15 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		this.brightColorTex_B = texturesManager.bloomBufferFBO.colorBuffersArray[0];
 	}
 
-
-	//var selFBO = this.getSelectionFBO();
-
 	// prev 2) ready to color frame buffer
 	this.postFxShadersManager.useProgram(null); // init current bind shader.***
 
 	var bApplyShadow = false;
 	if (this.sceneState.sunSystem !== undefined && this.sceneState.applySunShadows)
-	{ bApplyShadow = true; }
+	{
+		bApplyShadow = true;
+	}
 
-	
 
 	if (this.isCesiumGlobe())
 	{
@@ -2350,28 +1881,11 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 	if (this.weatherStation)
 	{
 		this.weatherStation.renderWeather(this);
-		
 	}
 
-	if (this.waterManager) // OpaquesPass.***
-	{
-		// Render terrain.***
-		//this.waterManager.renderTerrain();
-		//this.waterManager._TEST_renderQMesh();
-	}
-
-	// Test qMesh terrain excavation.***
-	//if (this.quantizedMeshManager)
-	//{
-	//	this.quantizedMeshManager.test__doQuantizedSurfaceExcavation(this);
-	//}
-	
-	
-	// Render transparents.****************************************************************************************************************
 	if (this.isCesiumGlobe())
 	{
 		this.bindMainFramebuffer();
-		// Deactive depth & normals for transparent pass.
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // depthTex.
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT5_WEBGL, gl.TEXTURE_2D, null, 0); // debugTex.
@@ -2390,19 +1904,12 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 	this.renderType = 1;
 	this.renderer.renderGeometryBufferTransparents(gl, renderType, this.visibleObjControlerNodes);
 	
-	this._renderManagers_transparentPass(); // TransparentPass.***
-
-	//if (this.weatherStation)
-	//{
-	// Note : the transparent foe weatherStation is not prepared yet.***
-	//	this.weatherStation.renderWeatherTransparents(this);
-	//}
+	this.renderManagersTransparentPass();
 
 	// check if must render boundingBoxes.
 	if (this.magoPolicy.getShowBoundingBox())
 	{
 		var bRenderLines = true;
-		//var currentVisiblesArray = visibleObjControlerNodes.currentVisibles0.concat(visibleObjControlerNodes.currentVisibles2,);
 		var visibles0 = this.visibleObjControlerNodes.getOpaquesTransparentsByLod(0);
 		var visibles2 = this.visibleObjControlerNodes.getOpaquesTransparentsByLod(2);
 		var visibles3 = this.visibleObjControlerNodes.getOpaquesTransparentsByLod(3);
@@ -2412,16 +1919,11 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		this.renderer.renderBoundingBoxesNodes(this.visibleObjControlerNodes.currentVisiblesAux, undefined, bRenderLines);
 	}
 
-	
-
-	// Once all frustums was rendered, then set the camera moved = false.*****************************
 	if (this.currentFrustumIdx === 0)
 	{
 		this.isCameraMoved = false;
 	}
-	//------------------------------------------------------------------------------------------------
-	
-	// Finally do screenSpaceObjects render.
+
 	this.renderer.renderScreenSpaceObjects(gl);
 
 	if (this.isCesiumGlobe())
@@ -2433,30 +1935,24 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // albedoTex.
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT4_WEBGL, gl.TEXTURE_2D, null, 0); // selColor4.
 		this.extbuffers.drawBuffersWEBGL([
-			this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
-			this.extbuffers.NONE, // gl_FragData[1]
-			this.extbuffers.NONE, // gl_FragData[2]
-			this.extbuffers.NONE, // gl_FragData[3]
-			this.extbuffers.NONE, // gl_FragData[4]
+			this.extbuffers.COLOR_ATTACHMENT0_WEBGL,
+			this.extbuffers.NONE,
+			this.extbuffers.NONE,
+			this.extbuffers.NONE,
+			this.extbuffers.NONE,
 		]);
 	}
 
-	
-
-	// DEBUG.Render fisically lights sources.*************************************************************************
-	//this.renderer.renderNativeLightSources(renderType, this.visibleObjControlerNodes) ; // debug component.
-	//------------------------------------------------------------------------------------------------------
-	// End rendering transparents.----------------------------------------------------------------------------------------------------------
-
 	if (sceneState.applyLightsShadows) // LightShadows in MRT.***
 	{
-		// if exist lightSources, the store all lightSources of all frustums.
 		var lightSourcesArray = this.visibleObjControlerNodes.currentVisibleNativeObjects.lightSourcesArray;
 		if (!this.lightSourcesMap)
-		{ this.lightSourcesMap = {}; }
+		{
+			this.lightSourcesMap = {};
+		}
 
 		var lightCount = lightSourcesArray.length;
-		for (var i=0; i<lightCount; i++)
+		for (var i= 0; i < lightCount; i++)
 		{
 			var light = lightSourcesArray[i];
 			var lightGuid = light._guid;
@@ -2465,11 +1961,9 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 
 		if (this.currentFrustumIdx === 0) 
 		{
-			// now, make the lightSourcesArray.
 			if (!this.lightSourcesArray)
 			{ this.lightSourcesArray = []; }
 
-			// 1rst, init the array.
 			this.lightSourcesArray.length = 0;
 
 			for (var key in this.lightSourcesMap)
@@ -2479,13 +1973,9 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 					this.lightSourcesArray.push(this.lightSourcesMap[key]);
 				}
 			}
-
-			// finally init the lightSourcesMap.
 			this.lightSourcesMap = {};
 		}
 	}
-
-	
 
 	// 1.1) ssao and other effects from depthBuffer render.*****************************************************************************
 	if (this.currentFrustumIdx === 0) 
@@ -2494,7 +1984,6 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		var bTexFlipYAxis = true;
 		var bTexFlipXAxis = true;
 		this.renderer.copyTexture(this.cesiumColorBuffer, this.albedoTex, bTexFlipXAxis, bTexFlipYAxis);
-		//// this.renderer.copyTexture(this.scene.view.globeDepth.framebuffer._texture, this.debugTex, bTexFlipXAxis, bTexFlipYAxis);
 
 		// Render the lightBuffer.*****************************************
 		if (sceneState.applyLightsShadows)
@@ -2519,14 +2008,9 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 			// End rendering lightBuffer.--------------------------------------------
 		}
 
-		// Do ssaoFromDepth render. Renders in ssaoFrameBuffer.***
 		this.renderer.renderSsaoFromDepth(gl);
-		//this.renderer.renderScreenQuadBlur_ssaoTex(gl); // Expensive.***
+		this.renderer.renderScreenQuad(gl);
 
-		// Final render output.**************************************************************
-		this.renderer.renderScreenQuad(gl); // 1rst screenQuad. (ssao, lighting, shadows) // this must be rendered in "shadedColorFbo" framebuffer.***
-
-		// Gaussian blur for the brightColorTexture (used to bloom effect).***
 		if (sceneState.applyBloomEffect)
 		{
 			this.renderer.renderScreenQuadGaussianBlur(gl);
@@ -2535,12 +2019,9 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		if (this.isCesiumGlobe()) 
 		{
 			this.bindMainFramebuffer();
-			////gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.cesiumColorBuffer, 0); 
 		}
 
-		// In renderScreenQuad2, adds the volumetric renders (sound3d volumetric render, chemAccident volumetric render, etc.).***
-		this.renderer.renderScreenQuad2(gl); // 2nd screenQuad. (lightFog)
-
+		this.renderer.renderScreenQuad2(gl);
 		this.renderCluster();
 
 		if (this.selectionManager)
@@ -2550,140 +2031,10 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 				this.renderer.renderSilhouette();
 			}
 		}
-
-		// Debug component.******************************************
-		//this.modeler.__TEST();
-		/*
-		var lightAux;
-		if (lightsArray)
-		{
-			var lightsCount = lightsArray.length;
-			lightAux = lightsArray[lightsCount - 1];
-		}
-		var options = {
-			lightSource: lightAux
-		};
-		this.renderer.renderScreenRectangle(gl, options); // debug component.
-		//this.renderer.renderScreenRectangleMosaic(gl, options); // debug component.
-		*/
-		//-----------------------------------------------------------
-
-	} 
-
+	}
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
-		
 	this.swapRenderingFase();
-	/*
-	// Delete after test!!!!!!!!!!!!!!
-	if(!this.test_speechBubble)
-	{
-		this.objMarkerManager.TEST__ObjectMarker_toNeoReference();
-		this.test_speechBubble = true;
-	}
-	*/
-
-	// Restore cesium gl settings.**************************************************************************
 	gl.clearColor(keepClearColor.red, keepClearColor.green, keepClearColor.blue, keepClearColor.alpha);
-	//------------------------------------------------------------------------------------------------------
-};
-
-/**
- * Binds the magoWorld frameBuffer.
- * @private
- */
-MagoManager.prototype.TEST_3DTiles = function () 
-{
-	// Function called from "map.html".***
-	// Function called from "map.html".***
-	if (this._glb_test === undefined)
-	{
-		this._glb_test = true;
-
-		
-
-		// // complicated.******************************************************************
-		// var url = "";
-		// var bShowBox = true;
-		// url        = '../f4d/3dtiles/nKorea51/tileset.json';
-		// const tileset_delete2 = this.scene.primitives.add(new Cesium.Cesium3DTileset({
-		// 	url                     : url,
-		// 	debugShowBoundingVolume : bShowBox
-		// }));
-
-
-		// // complicated.******************************************************************
-		// var url = "";
-		// var bShowBox = true;
-		// url        = '../f4d/3dtiles/3dTiles_complicatedModels/tileset.json';
-		// const tileset_delete = this.scene.primitives.add(new Cesium.Cesium3DTileset({
-		// 	url                     : url,
-		// 	debugShowBoundingVolume : bShowBox
-		// }));
-
-
-		// // HanamKyosan.******************************************************************
-		// var url = "";
-		// var bShowBox = true;
-		// //url        = '../f4d/3dtiles/temp_mgSets_HanamKyosan_Mode1_48/tileset.json';
-		// url        = '../f4d/3dtiles/3d-tiles-gs2/tileset.json';
-		// //url        = '../f4d/3dtiles/temp_mgSets_HanamKyosan_12B/tileset.json';
-		// const tileset = this.scene.primitives.add(new Cesium.Cesium3DTileset({
-		// 	url                     : url,
-		// 	debugShowBoundingVolume : bShowBox
-		// }));
-
-		// WangSuk.******************************************************************
-		//url        = '../f4d/3dtiles/temp_mgSets_WangSuk_12B/tileset.json';
-		//url        = '../f4d/3dtiles/ion-ws2/tileset.json';
-		//url        = '../f4d/3dtiles/smallTestData_3Dtile/tileset.json';
-		//url        = '../f4d/3dtiles/temp_mgSets_WangSuk_Mode1_48/tileset.json';
-		//url        = '../f4d/3dtiles/temp_mgSets_WangSuk_Mode1_48_kml/tileset.json';
-		//url        = '../f4d/3dtiles/Test3dData_WangSuk_3Dtile/tileset.json';
-		//url        = '../f4d/3dtiles/bldg_wangSuk_kml/tileset.json'; // recently made. 20230628
-		//url        = '../f4d/3dtiles/3d-tiles-ws2/tileset.json'; // recently made. 20230628 // 
-		// url        = '../f4d/3dtiles/3dTiles_ws2_fromKml/tileset.json';
-		// const tileset2 = this.scene.primitives.add(new Cesium.Cesium3DTileset({
-		// 	url                     : url,
-		// 	debugShowBoundingVolume : bShowBox,
-		// 	debugShowUrl            : false
-		// }));
-
-		// url        = '../f4d/3dtiles/3d-tiles-ws1_3Dtile/tileset.json'; // recently made. 20230628
-		// const tileset21 = this.scene.primitives.add(new Cesium.Cesium3DTileset({
-		// 	url                     : url,
-		// 	debugShowBoundingVolume : bShowBox,
-		// 	debugShowUrl            : false
-		// }));
-
-		// // IncheonKyeYang.******************************************************************
-		// //url        = '../f4d/3dtiles/temp_mgSets_InCheonKyeYang_12B/tileset.json';//
-		// //url        = '../f4d/3dtiles/temp_mgSets_IncheonKyeYang_Mode1_48/tileset.json';
-		// url        = '../f4d/3dtiles/3d-tiles-gy/tileset.json';
-		// const tileset3 = this.scene.primitives.add(new Cesium.Cesium3DTileset({
-		// 	url                     : url,
-		// 	debugShowBoundingVolume : bShowBox
-		// }));
-
-		// // Youido.*******************************************************************
-		// url        = '../f4d/3dtiles/temp_mgSets_Youido_Mode1_48/tileset.json';
-		// //url        = '../f4d/3dtiles/temp_mgSets_Youido_Mode1_48_small/tileset.json';
-		// //url        = '../f4d/3dtiles/temp_mgSets_Youido_Mode1_48_small_1building/tileset.json';
-		// const tileset4 = this.scene.primitives.add(new Cesium.Cesium3DTileset({
-		// 	url                     : url,
-		// 	lightColor              : new Cesium.Cartesian3(30.0, 30.0, 30.0),
-		// 	debugShowBoundingVolume : bShowBox
-		// }));
-
-		// // I3DM.**********************************************************************
-		// // trees.***
-		// url        = '../f4d/3dtiles/treesInstances_3Dtile/tileset.json';
-		// const tileset5 = this.scene.primitives.add(new Cesium.Cesium3DTileset({
-		// 	url                     : url,
-		// 	lightColor              : new Cesium.Cartesian3(30.0, 30.0, 30.0),
-		// 	debugShowBoundingVolume : bShowBox
-		// }));
-
-	}
 };
 
 /**
@@ -2703,36 +2054,12 @@ MagoManager.prototype.bindMagoFbo = function ()
 	this.selColorTex = this.depthFboNeo.colorBuffersArray[3];
 
 	var selFBO = this.getSelectionFBO();
-
-	
 	texturesManager.texturesMergerFbo.bind();
-	
-	// MRT on mago.**************************************************
+
 	if (!this.extbuffers)
-	{ this.extbuffers = gl.getExtension("WEBGL_draw_buffers"); }
-	/*
-	if(!this.aqwse)
 	{
-		// Do this if screenSize changes.***
-		gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffersArray[0]);  
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, bufferWidth, bufferHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
-
-		gl.bindTexture(gl.TEXTURE_2D, this.depthTex);  
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, bufferWidth, bufferHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
-
-		gl.bindTexture(gl.TEXTURE_2D, this.normalTex);  
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, bufferWidth, bufferHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
-
-		gl.bindTexture(gl.TEXTURE_2D, this.albedoTex);  
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, bufferWidth, bufferHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
-
-		gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffersArray[4]);  
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, bufferWidth, bufferHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
-
-		gl.bindTexture(gl.TEXTURE_2D, null);  
-		this.aqwse = true;
+		this.extbuffers = gl.getExtension("WEBGL_draw_buffers");
 	}
-	*/
 
 	// Bind mago colorTextures:
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.depthFboNeo.colorBuffersArray[4], 0);
@@ -2751,298 +2078,6 @@ MagoManager.prototype.bindMagoFbo = function ()
 };
 
 /**
- * Main rendering function.
- * @private
- */
-MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject) 
-{
-	var gl = this.getGl();
-	var renderType = 0; // 0= depth. 1= color.***
-	this.renderType = 0;
-	var sceneState = this.sceneState;
-	
-
-	// 1.1) render sunDepth.
-	if (sceneState.applySunShadows && !this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
-	{
-		this.renderer.renderDepthSunSystem(this.visibleObjControlerNodes);
-		this.swapRenderingFase();
-	}
-	
-	var lightsArray = this.visibleObjControlerNodes.currentVisibleNativeObjects.lightSourcesArray;
-	var lightCount = lightsArray.length;
-	if (lightCount > 0 && sceneState.applyLightsShadows && !this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
-	{
-		// for each visible lightSources, make cubeMap depthTextures if no exist.
-		var visiblesArray = this.visibleObjControlerNodes.getAllVisibles();
-		var nativeVisiblesArray = this.visibleObjControlerNodes.getAllNatives();
-		
-		for (var i=0; i<lightCount; i++)
-		{
-			var light = lightsArray[i];
-			light.doIntersectedObjectsCulling(visiblesArray, nativeVisiblesArray);
-		}
-	}
-
-	// 1.2) render selected silhouetteDepth.
-	var selectionManager = this.selectionManager;
-	if (selectionManager.existSelectedObjects())
-	{
-		this.renderer.renderSilhouetteDepth(); 
-	}
-	
-	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
-
-	this.bindMagoFbo();
-	var extbuffers = this.extbuffers;
-
-	gl.clearColor(0, 0, 0, 1);
-	gl.clearDepth(1);
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	//gl.clearStencil(0); // provisionally here.***
-
-	// 1rst, render atmosphere & the earth.
-	// TinTerrain.**************************************************************************
-	if (this.tinTerrainManager !== undefined)
-	{
-		// Atmosphere.**************************************************
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.albedoTex, 0);
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0);
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0);
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0);
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT4_WEBGL, gl.TEXTURE_2D, null, 0);
-		extbuffers.drawBuffersWEBGL([
-			extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
-			extbuffers.NONE, // gl_FragData[1] - depthTex
-			extbuffers.NONE, // gl_FragData[2] - normalTex
-			extbuffers.NONE, // gl_FragData[3] - albedoTex
-			extbuffers.NONE // gl_FragData[4] - selColorTex
-		]);
-		this.renderer.renderAtmosphere(gl, renderType);
-
-		// Terrain.*****************************************************
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.depthFboNeo.colorBuffersArray[4], 0);
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.depthTex, 0);
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, this.normalTex, 0);
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, this.albedoTex, 0);
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT4_WEBGL, gl.TEXTURE_2D, this.selColorTex, 0);
-		extbuffers.drawBuffersWEBGL([
-			extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
-			extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - depthTex
-			extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - normalTex
-			extbuffers.COLOR_ATTACHMENT3_WEBGL, // gl_FragData[3] - albedoTex
-			extbuffers.COLOR_ATTACHMENT4_WEBGL // gl_FragData[4] - selColorTex
-		]);
-		var bDepthRender = false; // magoManager is no depth render.***
-		var renderType = 1;
-		this.tinTerrainManager.render(this, bDepthRender, renderType);
-	}
-	
-
-	// 2) gBuffer render.*****************************************************************************************************************
-	renderType = 1;
-	this.renderType = 1;
-	gl.frontFace(gl.CCW);
-	this.renderer.renderGeometryBuffer(gl, renderType, this.visibleObjControlerNodes);
-	
-	
-	// Render transparents.****************************************************************************************************************
-	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // depthTex.
-	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
-	//gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // albedoTex.
-	extbuffers.drawBuffersWEBGL([
-		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
-		extbuffers.NONE, // gl_FragData[1]
-		extbuffers.NONE, // gl_FragData[2]
-		extbuffers.COLOR_ATTACHMENT3_WEBGL, // gl_FragData[3] - albedoTex
-		extbuffers.COLOR_ATTACHMENT4_WEBGL // gl_FragData[4] - selColor4
-	]);
-
-	renderType = 1;
-	this.renderType = 1;
-	this.renderer.renderGeometryBufferTransparents(gl, renderType, this.visibleObjControlerNodes);
-	// End rendering transparents.----------------------------------------------------------------------------------------------------------
-		
-	// check if must render boundingBoxes.
-	if (this.magoPolicy.getShowBoundingBox())
-	{
-		var bRenderLines = true;
-		//var currentVisiblesArray = visibleObjControlerNodes.currentVisibles0.concat(visibleObjControlerNodes.currentVisibles2,);
-		this.renderer.renderBoundingBoxesNodes(this.visibleObjControlerNodes.currentVisibles0, undefined, bRenderLines);
-		this.renderer.renderBoundingBoxesNodes(this.visibleObjControlerNodes.currentVisibles2, undefined, bRenderLines);
-		this.renderer.renderBoundingBoxesNodes(this.visibleObjControlerNodes.currentVisibles3, undefined, bRenderLines);
-		this.renderer.renderBoundingBoxesNodes(this.visibleObjControlerNodes.currentVisiblesAux, undefined, bRenderLines);
-	}
-
-	if (sceneState.applyLightsShadows)
-	{
-		// if exist lightSources, the store all lightSources of all frustums.
-		var lightSourcesArray = this.visibleObjControlerNodes.currentVisibleNativeObjects.lightSourcesArray;
-		if (!this.lightSourcesMap)
-		{ this.lightSourcesMap = {}; }
-
-		var lightCount = lightSourcesArray.length;
-		for (var i=0; i<lightCount; i++)
-		{
-			var light = lightSourcesArray[i];
-			var lightGuid = light._guid;
-			this.lightSourcesMap[lightGuid] = light;
-		}
-
-		if (this.currentFrustumIdx === 0) 
-		{
-			// now, make the lightSourcesArray.
-			if (!this.lightSourcesArray)
-			{ this.lightSourcesArray = []; }
-
-			// 1rst, init the array.
-			this.lightSourcesArray.length = 0;
-
-			for (var key in this.lightSourcesMap)
-			{
-				if (this.lightSourcesMap.hasOwnProperty(key))
-				{
-					this.lightSourcesArray.push(this.lightSourcesMap[key]);
-				}
-			}
-
-			// finally init the lightSourcesMap.
-			this.lightSourcesMap = {};
-		}
-	}
-	
-	// 1.1) ssao and other effects from depthBuffer render.*****************************************************************************
-	if (this.currentFrustumIdx === 0) 
-	{
-		// Render the lightBuffer.*****************************************
-		if (sceneState.applyLightsShadows)
-		{
-			// Create lightBufferFBO if no exist.
-			if (!this.texturesManager.lBuffer)
-			{
-				// create a lBuffer with 2 colorTextures : diffuseLighting & specularLighting.
-				var bufferWidth = this.sceneState.drawingBufferWidth[0];
-				var bufferHeight = this.sceneState.drawingBufferHeight[0];
-				var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
-				this.texturesManager.lBuffer = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 3}); 
-			}
-			this.lBuffer = this.texturesManager.lBuffer;
-			this.diffuseLightTex = this.lBuffer.colorBuffersArray[0];
-			this.specularLightTex = this.lBuffer.colorBuffersArray[1];
-			this.LightFogTex = this.lBuffer.colorBuffersArray[2];
-			
-			// Render the lightBuffer.
-			this.renderer.renderLightDepthCubeMaps(this.lightSourcesArray); // active this code for shadows.
-			this.renderer.renderLightBuffer(this.lightSourcesArray);
-
-			//gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, null, 0);
-			//gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0);
-			//gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0);
-
-			//extbuffers.drawBuffersWEBGL([
-			//	this.extbuffers.NONE, // gl_FragData[0] - diffuseLighting
-			//	this.extbuffers.NONE, // gl_FragData[1] - specularLighting
-			//	this.extbuffers.NONE, // gl_FragData[2] - lightFog
-			//]);
-
-			//if (this.isCesiumGlobe())
-			{
-				//scene.view.globeDepth.framebuffer._bind();
-				// unbind mago colorTextures:
-				
-				//gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // depthTex.
-				//gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
-				//gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // albedoTex.
-				//this.extbuffers.drawBuffersWEBGL([
-				//	this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
-				//	this.extbuffers.NONE, // gl_FragData[1]
-				//	this.extbuffers.NONE, // gl_FragData[2]
-				//	this.extbuffers.NONE, // gl_FragData[3]
-				//	]);
-					
-			}
-
-			// End rendering lightBuffer.--------------------------------------------
-		}
-		if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
-		this.renderer.renderSsaoFromDepth(gl);
-
-		// Final render output.
-		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-
-
-		this.renderer.renderScreenQuad(gl);
-		//this.renderer.renderScreenQuad2(gl);
-		//this.renderCluster();
-
-		
-		/*
-		if (this.selectionManager)
-		{
-			if(this.selectionManager.existSelectedObjects())
-			{
-				this.renderer.renderSilhouette();
-			}
-		}
-		*/
-
-		// Debug component.******************************************
-		/*
-		var lightAux;
-		if(lightsArray)
-		{
-			var lightsCount = lightsArray.length;
-			lightAux = lightsArray[lightsCount - 1];
-		}
-		var options = {
-			lightSource : lightAux
-		};
-		gl.disable(gl.BLEND);
-		this.renderer.renderScreenRectangle(gl, options); // debug component.
-		*/
-		//-----------------------------------------------------------
-
-	}
-
-	// DEBUG.Render lights sources.*************************************************************************
-	//this.renderer.renderNativeLightSources(renderType, this.visibleObjControlerNodes) ; // debug component.
-	//------------------------------------------------------------------------------------------------------
-
-	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-	
-	/*
-	if (this.weatherStation)
-	{
-		//if (this.isCesiumGlobe())
-		{
-			//scene.view.globeDepth.framebuffer._bind();
-			// unbind mago colorTextures:
-			
-			gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // depthTex.
-			gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
-			gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // albedoTex.
-			this.extbuffers.drawBuffersWEBGL([
-				this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
-				this.extbuffers.NONE, // gl_FragData[1]
-				this.extbuffers.NONE, // gl_FragData[2]
-				this.extbuffers.NONE, // gl_FragData[3]
-				]);
-				
-		}
-
-		//this.weatherStation.renderWindMultiLayers(this);
-		//this.weatherStation.test_renderWindLayer(this);
-		//this.weatherStation.test_renderTemperatureLayer(this);
-		//this.weatherStation.test_renderCuttingPlanes(this, renderType);
-		this.weatherStation.renderWeather(this);
-	}
-	*/
-	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
-		
-	this.swapRenderingFase();
-};
-
-/**
  * cluster 데이터 설정
  * @param {Cluster} cluster 
  */
@@ -3052,7 +2087,6 @@ MagoManager.prototype.addCluster = function(cluster)
 	{
 		throw new Error('cluster is required.');
 	}
-	
 	this.cluster = cluster;
 };
 
@@ -3101,24 +2135,14 @@ MagoManager.prototype.initCounters = function()
  * @param {Boolean} isLastFrustum Indicates if this is the last frustum in the render pipe-line.
  * @param {Number} frustumIdx Current frustum indice.
  * @param {Number} numFrustums Total frustums count in current rendering pipe-line.
- * 
  * @private
  */
 MagoManager.prototype.startRender = function (isLastFrustum, frustumIdx, numFrustums) 
 {
-	// Update the current frame's frustums count.
 	this.numFrustums = numFrustums;
 	this.isLastFrustum = isLastFrustum;
 	var camera = this.sceneState.camera;
-	
 	var gl = this.getGl();
-
-	//var colorMask = gl.getParameter(gl.COLOR_WRITEMASK);
-	//var depthMask = gl.getParameter(gl.DEPTH_WRITEMASK);
-	//var arrayBufferBinding = gl.getParameter(gl.ARRAY_BUFFER_BINDING);
-	//var blend = gl.getParameter(gl.BLEND);
-	//var cullFace = gl.getParameter(gl.CULL_FACE);
-	//var frontFace = gl.getParameter(gl.FRONT_FACE);
 
 	this.upDateSceneStateMatrices(this.sceneState);
 	
@@ -7022,7 +6046,6 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function (intersectedLo
 					continue;
 				}
 
-				// now, create a geoLocDataManager for node if no exist.
 				if (nodeRoot.data.geoLocDataManager === undefined)
 				{
 					geoLoc = node.calculateGeoLocData(this);
@@ -7037,10 +6060,8 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function (intersectedLo
 				data.currentLod = magoPolicy.getLod(data.distToCam);
 				
 				
-				if (distToCamera > frustumFar)// || distToCamera > 1500)
-				{ 
-					// put this node to delete into queue.***
-					//this.processQueue.putNodeToDelete(node, 0);
+				if (distToCamera > frustumFar)
+				{
 					continue; 
 				}
 				
@@ -7051,15 +6072,10 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function (intersectedLo
 					// intersect with Frustum
 					if (frustumCull === Constant.INTERSECTION_OUTSIDE) 
 					{
-						// put this node to delete into queue.***
-						////this.processQueue.putNodeToDeleteModelReferences(node, 0);
-						//this.processQueue.putNodeToDeleteLessThanLod3(node, 0);
 						continue;
 					}
 				}
-				//-------------------------------------------------------------------------------------------
-				
-				// provisionally fork versions.***
+
 				var version = neoBuilding.getHeaderVersion();
 				if (version === undefined)
 				{ continue; }
@@ -7172,8 +6188,7 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function (intersectedLo
 				currVisibleNativeObjects.lightSourcesArray.push(native);
 			}
 		}
-		
-		// MgSets.***
+
 		var mgSetsArray = lowestTile.mgSetArray;
 		if (mgSetsArray)
 		{
@@ -7199,15 +6214,7 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function (intersectedLo
 				seed.load();
 				continue;
 			}
-
-			if (seed.status === KoreaBuildingSeed.STATUS.LOADEND) 
-			{
-				//remove
-				continue;
-			}
 		}
-		
-
 		
 		if (lowestTile.isNeededToCreateGeometriesFromSeeds())
 		{
@@ -7216,9 +6223,6 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function (intersectedLo
 	}
 };
 
-/**
- * @private
- */
 MagoManager.prototype.flyToTopology = function(worldPoint3d, duration) 
 {
 	if (this.isCesiumGlobe()) 
@@ -7231,19 +6235,6 @@ MagoManager.prototype.flyToTopology = function(worldPoint3d, duration)
 			duration: parseInt(duration)
 		});
 	}
-	/*
-	else if (MagoConfig.getPolicy().basicGlobe === Constant.WORLDWIND)
-	{
-		this.wwd.goToAnimator.travelTime = duration * 1000;
-		this.wwd.goTo(new WorldWind.Position(parseFloat(latitude), parseFloat(longitude), parseFloat(altitude) + 50));
-	}
-	else if (MagoConfig.getPolicy().basicGlobe === Constant.MAGOWORLD)
-	{
-		this.magoWorld.goto(parseFloat(longitude),
-			parseFloat(latitude),
-			parseFloat(altitude) + 10);
-	}
-	*/
 };
 
 /**
@@ -7262,13 +6253,6 @@ MagoManager.prototype.flyTo = function(longitude, latitude, altitude, duration)
 				parseFloat(altitude)),
 			duration: parseInt(duration)
 		});
-	}
-	else/* if (MagoConfig.getPolicy().basicGlobe === Constant.MAGOWORLD)*/
-	{
-		this.magoWorld.goto(parseFloat(longitude),
-			parseFloat(latitude),
-			parseFloat(altitude),
-			parseInt(duration));
 	}
 };
 /**
@@ -7345,7 +6329,6 @@ MagoManager.prototype.flyToBuilding = function(apiName, projectId, dataKey)
 
 MagoManager.prototype.displayLocationAndRotation = function(neoBuilding) 
 {
-	//var node = this.hierarchyManager.getNodeByDataName(projectId, dataName, dataNameValue); // original.***
 	var node = neoBuilding.nodeOwner;
 	var geoLocDatamanager = node.getNodeGeoLocDataManager();
 	if (geoLocDatamanager === undefined)
@@ -7367,7 +6350,9 @@ MagoManager.prototype.displayLocationAndRotation = function(neoBuilding)
 MagoManager.prototype.selectedObjectNotice = function (neoBuilding) 
 {
 	if (neoBuilding === undefined)
-	{ return; }
+	{
+		return;
+	}
 	
 	var node = neoBuilding.nodeOwner;
 	var geoLocDatamanager = node.getNodeGeoLocDataManager();
@@ -7453,8 +6438,6 @@ MagoManager.prototype.changeLocationAndRotationNode = function (node, latitude, 
 	}
 	
 	var neoBuilding = node.data.neoBuilding;
-	
-	//this.selectedObjectNotice(neoBuilding);
 };
 
 /**
@@ -7500,19 +6483,19 @@ MagoManager.prototype.getObjectIndexFileForData = function (projectId, f4dObject
 	{
 		for (var i=0, len=f4dObject.length;i<len;i++) 
 		{
-			addChildrend(children, newDataKeys, f4dObject[i]);
+			addChildren(children, newDataKeys, f4dObject[i]);
 		}
 	}
 	else 
 	{
-		addChildrend(children, newDataKeys, f4dObject);
+		addChildren(children, newDataKeys, f4dObject);
 	}
 	
 	var geometrySubDataPath = groupDataFolder;
 	var fileName = this.readerWriter.geometryDataPath + "/" + geometrySubDataPath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + this.config.getPolicy().content_cache_version;
 	this.readerWriter.getObjectIndexFileForData(fileName, this, projectId, newDataKeys, f4dObject);
 
-	function addChildrend(childrenArray, dataKeyArray, child) 
+	function addChildren(childrenArray, dataKeyArray, child)
 	{
 		var metaInfo = child.metainfo;
 		if (metaInfo && typeof metaInfo !== 'object')
@@ -7823,26 +6806,6 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 				}
 			}
 		}
-		else 
-		{
-			/* static model 사용은 API를 통해서만... 
-			attributes.projectId = projectId;
-			this.addStaticModel(attributes);
-			if (children !== undefined)
-			{
-				childrenCount = children.length;
-				for (var i=0; i<childrenCount; i++)
-				{
-					var childrenObj = children[i];
-					if (!defined(childrenObj.projectId))
-					{
-						childrenObj.projectId = projectId;
-					}
-					this.instantiateStaticModel(childrenObj);
-				}
-			}
-			*/
-		}
 	}
 	return node;
 };
@@ -7995,18 +6958,6 @@ MagoManager.prototype.makeSmartTile = function (buildingSeedMap, projectId, f4dO
 	// now, read all hierarchyJason and make the hierarchy tree.
 	var physicalNodesArray = []; // put here the nodes that has geometry data.
 	// make a buildingSeedMap.
-	/*var buildingSeedMap = seedMap || {};
-	var buildingSeedMapLength = Object.keys(buildingSeedMap).length;
-	if (buildingSeedMapLength === 0) 
-	{
-		var buildingSeedsCount = buildingSeedList.buildingSeedArray.length;
-		for (var i=0; i<buildingSeedsCount; i++)
-		{
-			buildingSeed = buildingSeedList.buildingSeedArray[i];
-			buildingId = buildingSeed.buildingId;
-			buildingSeedMap[buildingId] = buildingSeed;
-		}
-	}*/
 	
 	var projectFolderName = getProjectFolderName(realTimeLocBlocksList);
 	if (!Array.isArray(realTimeLocBlocksList)) 
@@ -8052,12 +7003,6 @@ MagoManager.prototype.makeSmartTile = function (buildingSeedMap, projectId, f4dO
 		}
 	}
 
-	//var targetDepth = 15;
-	//this.smartTileManager.makeTreeByDepth(targetDepth, physicalNodesArray, this);
-
-	////this.buildingSeedList.buildingSeedArray.length = 0; // init.
-
-	
 	this.emit(MagoManager.EVENT_TYPE.F4DLOADEND, {
 		type      : MagoManager.EVENT_TYPE.F4DLOADEND,
 		f4d       : auxNodesArray,
@@ -8088,7 +7033,6 @@ MagoManager.prototype.makeSmartTile = function (buildingSeedMap, projectId, f4dO
 		return folderName;
 	}
 };
-
 
 /**
  * instantiate static model
@@ -8142,9 +7086,6 @@ MagoManager.prototype.instantiateStaticModel = function(attributes)
 	
 	attributes.objectType = "basicF4d";
 
-	//var nodesMap = this.hierarchyManager.getNodesMap(projectId, undefined);
-	//var existentNodesCount = Object.keys(nodesMap).length;
-	//var instanceId = defaultValue(attributes.instanceId, projectId + "_" + existentNodesCount.toString());
 	var projectId = attributes.projectId;
 	var instanceId = attributes.instanceId;
 	
@@ -8371,7 +7312,6 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "changefrustumFarDistance") 
 	{
-		// frustum culling 가시 거리
 		this.magoPolicy.setFrustumFarSquaredDistance(api.getFrustumFarDistance() * api.getFrustumFarDistance());
 	}
 	else if (apiName === "changeLocationAndRotation") 
@@ -8393,12 +7333,6 @@ MagoManager.prototype.callAPI = function(api)
 		}
 		
 		this.magoPolicy.setObjectMoveMode(objectMoveMode);
-	}
-	else if (apiName === "saveObjectMove") 
-	{
-	//		var changeHistory = new ChangeHistory();
-	//		changeHistory.setObjectMoveMode(api.getObjectMoveMode());
-	//		MagoConfig.saveMovingHistory(api.getProjectId(), api.getDataKey(), api.getObjectIndexOrder(), changeHistory);
 	}
 	else if (apiName === "deleteAllObjectMove") 
 	{
@@ -8501,21 +7435,6 @@ MagoManager.prototype.callAPI = function(api)
 								{ continue; }
 
 								neoBuilding.deleteChangeColor(this, objectId);
-								/*
-								var refObjectArray = neoBuilding.getReferenceObjectsArrayByObjectId(objectId);
-								if (refObjectArray === undefined)
-								{ continue; }
-								
-								var refObjectsCount = refObjectArray.length;
-								for (var i=0; i<refObjectsCount; i++)
-								{
-									var refObject = refObjectArray[i];
-									if (refObject)
-									{
-										refObject.deleteChangeColor();
-									}
-								}
-								*/
 							}
 						}	
 					}
@@ -8706,7 +7625,7 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "getDataInfoByDataKey")
 	{
-		var projectId = api.getProjectId(); // for example : 3ds, collada, ifc, etc.***
+		var projectId = api.getProjectId();
 		var dataKey = api.getDataKey();
 		
 		var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
@@ -8757,12 +7676,6 @@ MagoManager.prototype.callAPI = function(api)
 	else if (apiName === "gotoProject")
 	{
 		var projectId = api.getProjectId();
-		//if (!this.hierarchyManager.existProject(projectId))
-		//{
-		//	var projectDataFolder = api.getProjectDataFolder();
-		//	this.getObjectIndexFile(projectId, projectDataFolder);
-		//}
-		
 		var nodeMap = this.hierarchyManager.getNodesMap(projectId);
 		if (Object.keys(nodeMap).length === 0)
 		{
@@ -8783,8 +7696,7 @@ MagoManager.prototype.callAPI = function(api)
 		}
 		
 		this.flyTo(api.getLongitude(), api.getLatitude(), api.getElevation(), api.getDuration());
-		
-		// pin을 그림
+
 		if (api.getIssueId() !== null && api.getIssueType() !== undefined) 
 		{
 			DrawAPI.drawInsertIssueImage(api, this);
@@ -9067,11 +7979,6 @@ MagoManager.prototype.callAPI = function(api)
 		}
 
 		this.magoPolicy.setObjectMoveMode(CODE.moveMode.ALL);
-
-		//this.nodeSelected = node;
-		//this.buildingSelected = node.data.neoBuilding;
-		//this.rootNodeSelected = this.nodeSelected.getRoot();
-
 		this.selectionManager.selectF4d(node);
 	}
 };
@@ -9127,8 +8034,6 @@ MagoManager.prototype.deleteAll = function ()
 MagoManager.prototype.checkCollision = function (position, direction)
 {
 	var gl = this.sceneState.gl;
-	if (gl === undefined)	{ return; }
-
 	var posX = this.sceneState.drawingBufferWidth * 0.5;
 	var posY = this.sceneState.drawingBufferHeight * 0.5;
 	
@@ -9144,8 +8049,6 @@ MagoManager.prototype.checkCollision = function (position, direction)
 	this.swapRenderingFase();
 	ManagerUtils.calculatePixelPositionWorldCoord(gl, posX, this.sceneState.drawingBufferHeight, undefined, undefined, undefined, this);
 
-	//this.buildingSelected = current_building;
-	//selectedBuilding = this.selectionManager.currentBuildingSelected;
 	var distance = collisionPosition.squareDistTo(position.x, position.y, position.z);
 	this.swapRenderingFase();
 
@@ -9173,22 +8076,5 @@ MagoManager.prototype.checkCollision = function (position, direction)
 
 		return false; 
 	}
-
 	return true;
-};
-
-
-/**
- * 건축통합정보 마스터 가시화 추가
- * @param {string} url 
- * @param {string} format 
- * 
- * @return {KoreaBuildingMaster}
- */
-MagoManager.prototype.addKoreaBuildingMaster = function(url, format, option) 
-{
-	var master = new KoreaBuildingMaster(url, format, option, this);
-	this.koreaBuildingMaster[master.guid] = master;
-
-	return master;
 };

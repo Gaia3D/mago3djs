@@ -566,7 +566,5 @@ ItineraryManager.prototype.createDefaultShaders = function ()
 	shader.uSubImageIdx_loc = gl.getUniformLocation(shader.program, "uSubImageIdx");
 	shader.uFrustumIdx_loc = gl.getUniformLocation(shader.program, "uFrustumIdx");
 	shader.uNearFarArray_loc = gl.getUniformLocation(shader.program, "uNearFarArray");
-
-	var hola = 0;
 };
 

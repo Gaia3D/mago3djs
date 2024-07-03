@@ -12,15 +12,11 @@ var Selection = function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
 	this.drawing_height;
 	this.drawing_width;
 	this.GAIA_selectFrameBuffer;
 	this.GAIA_selectRenderBuffer;
 	this.GAIA_selectRttTexture;
-	
-	this.currentByteColorPicked = new Uint8Array(4);
-	this.currentSelectedObj_idx = -1;
 };
 
 /**

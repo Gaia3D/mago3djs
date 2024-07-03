@@ -12,6 +12,7 @@
 	<script type="text/javascript" src="../externlib/jquery/jquery.js"></script>
 	<script type="text/javascript" src="../externlib/polyfill/decodeTextAlternative/encoding-indexes.js"></script>
 	<script type="text/javascript" src="../externlib/polyfill/decodeTextAlternative/encoding.js"></script>
+	<script src="./soundSimulation.js" type="text/javascript"></script>
 </head>
 
 <body>
@@ -80,6 +81,9 @@
 	</li>
 	<li onclick="TestOceanFlux();">
 		Test oceanFlux
+	</li>
+	<li onclick="TestNoiseSimulation();">
+		NoiseSimulation(Surface)
 	</li>
 
 </ul>
@@ -1319,8 +1323,19 @@
 
 		var oceanFluxGeoJsonFilePath = "\\f4d\\oceanFlux\\project1\\ocean1.json";
 		oceanFluxManager.newOceanFluxLayer(oceanFluxGeoJsonFilePath);
-		
+
 		var hola = 0;
+	}
+
+	function TestNoiseSimulation() {
+		var noise = new SoundSimulation(MAGO3D_INSTANCE, {
+			geoJsonIndexFilePath : '/f4d/soundSimulation/JsonIndex.json',
+			geoJsonIndexFileFolderPath : '/f4d/soundSimulation/',
+			minValue : 0.0,
+			maxValue : 100.0,
+			alphaValue : 0.5,
+			types : ["plain"]
+		});
 	}
 
 	const ArchInfoController = function (archInfoList, magoManager) {

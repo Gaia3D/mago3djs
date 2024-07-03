@@ -91,8 +91,6 @@ ClippingBox.prototype.create_byExtrude = function(pointsArray, extrudeDirection,
 	clippingPlane.setPosition(point1.x, point1.y, point1.z);
 	clippingPlane.setNormal(normal.x, normal.y, normal.z);
 	this.clippingPlanesArray.push(clippingPlane);
-
-	var hola = 0;
 };
 
 ClippingBox.prototype.getPlanesCount = function ()

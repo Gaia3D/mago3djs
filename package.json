@@ -4,6 +4,7 @@
   "description": "Generated with Eclipse npm Tools",
   "main": "mago3d.js",
   "scripts": {
+    "serve": "gulp && node server.js",
     "test": "jasmine",
     "start": "node server.js",
     "build": "gulp",

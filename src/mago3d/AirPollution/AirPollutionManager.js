@@ -181,9 +181,6 @@ AirPollutionManager.prototype.load_airPollutionIndexFile = function (geoJsonInde
 
 	// set the "this._geoJsonIndexFilePath".***
 	this._geoJsonIndexFilePath = geoJsonIndexFilePath;
-
-
-	var hola = 0;
 };
 
 AirPollutionManager.prototype._loadGeoJsonIndexFile = function ()
@@ -404,20 +401,6 @@ AirPollutionManager.prototype.render = function ()
 		  };
 		  magoManager.animationTimeController = new AnimationTimeController(options);
 	}
-
-	// var totalAnimTime = this._totalAnimTime;
-	// var currTime = magoManager.animationTimeController.getCurrentTimeMilisec();
-	// this._increTime = (currTime - this._animationStartTime) * this._timeScale;
-
-	// if (this._increTime >= totalAnimTime)
-	// {
-	// 	//this._animationState = CODE.processState.FINISHED;
-	// 	//return true;
-	// 	// Modify the animationStartTime.***
-	// 	var num = Math.floor(currTime / totalAnimTime);
-	// 	this._animationStartTime = num * totalAnimTime;
-	// 	this._increTime = (currTime - this._animationStartTime)* this._timeScale;
-	// }
 	
 	// Render layers.***
 	var pollutionLayersCount = this.airPollutionLayersArray.length;
@@ -426,14 +409,9 @@ AirPollutionManager.prototype.render = function ()
 		var pollLayer = this.airPollutionLayersArray[i];
 		pollLayer.render(magoManager);
 	}
-
-	// ************.MAIN-FRAMEBUFFER.************************************.MAIN-FRAMEBUFFER.************************
-	// Once finished simulation, bind the current framebuffer. 
 	
 	var gl = magoManager.getGl();
 	var sceneState = magoManager.sceneState;
 	magoManager.bindMainFramebuffer();
 	gl.viewport(0, 0, sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0]);
-	
-	var hola = 0;
 };

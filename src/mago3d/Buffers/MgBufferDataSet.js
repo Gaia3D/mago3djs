@@ -124,12 +124,8 @@ MgBufferDataSet.makeMgBufferDataSetFromMgBufferViewSetArray = function (mgBuffer
 			mgBufferViewTotal.setMgBuffer(mgBuffer);
 			mgBufferViewTotal.setByteOffset(0);
 			mgBufferViewTotal.setByteLength(dataLegth * byteSize);
-
-			var hola = 0;
 		}
 	}
-
-	var hola = 0;
 	return resultMgBufferDataSet;
 };
 
@@ -170,10 +166,7 @@ MgBufferDataSet.prototype.bindBuffers = function (gl, shader)
 				var dataStride;
 				var dataOffSet;
 				MgBuffer.bindBuffer(gl, dataTarget, mgBuffer.glBuffer, attribLocation, dataDimensions, dataGlType, bNormalized, dataStride, dataOffSet);
-				var hola = 0;
 			}
-
-			
 		}
 	}
 

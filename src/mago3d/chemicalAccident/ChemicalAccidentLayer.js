@@ -388,16 +388,8 @@ ChemicalAccidentTimeSlice.prototype.getContaminationValue = function (posLC, sim
 	gl.readPixels(pixelPos_x, pixelPos_y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
 	this.fboValuesTex.unbind();
 
-	if (pixel[0] !== 0 || pixel[1] !== 0 || pixel[2] !== 0 || pixel[3] !== 0)
-	{
-		var hola = 0;
-	}
-
 	var currMinValue = this._jsonFile.minValue;
 	var currMaxValue = this._jsonFile.maxValue;
-
-	// var nextMinValue = timeSliceNext._jsonFile.minValue;
-	// var nextMaxValue = timeSliceNext._jsonFile.maxValue;
 
 	var pixelFloats = [pixel[0] / 255.0, pixel[1] / 255.0, pixel[2] / 255.0, pixel[3] / 255.0];
 	var decodedCurr = ManagerUtils.unpackDepth(pixelFloats);
@@ -597,7 +589,6 @@ ChemicalAccidentLayer.prototype._makeSimulationBox = function ()
 	geoLocDataOfBox.copyFrom(geoLocData);
 
 	this.simulationBox.objectsArray.push(surfIndepMesh);
-	var hola = 0;
 };
 
 ChemicalAccidentLayer.prototype._getCuttingPlaneDepthFBO = function()

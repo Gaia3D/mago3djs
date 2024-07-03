@@ -203,13 +203,11 @@ MgBuffer.makeMgBufferFromMgBufferViewsArray = function (mgBufferViewsArray, resu
 			var recalculatedIndices = MgBuffer.newTypedArray(dataLength, glType);
 			
 			if (i > 0)
-			{ posOffset += elemsCountsArray[i-1]; }
+			{
+				posOffset += elemsCountsArray[i-1];
+			}
 			for (var j=0; j<dataLength; j++)
 			{
-				if (dataArray[j] + posOffset >= 65535)
-				{
-					var hola = 0;
-				}
 				recalculatedIndices[j] = dataArray[j] + posOffset;
 			}
 			newArray.set(recalculatedIndices, currentLength);

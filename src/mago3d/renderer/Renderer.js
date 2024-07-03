@@ -1928,11 +1928,6 @@ Renderer.prototype.renderSsaoFromDepth = function (gl)
 	currentShader.bindUniformGenerals();
 
 	gl.viewport(0, 0, bufferWidth, bufferHeight);
-	
-	if (magoManager.isCesiumGlobe())
-	{
-		//gl.uniform1f(currentShader.frustumFar_loc, 40000.0); // only in cesium.***
-	}
 
 	var bApplySsao = true;
 	gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
@@ -1968,7 +1963,6 @@ Renderer.prototype.renderSsaoFromDepth = function (gl)
 	var screenQuad = this.getScreenQuad();
 	screenQuad.render(magoManager, currentShader);
 
-	// unbind the ssaoFromDepthBuffer.***
 	ssaoFromDepthFbo.unbind(); 
 
 	gl.activeTexture(gl.TEXTURE0);
@@ -1990,7 +1984,6 @@ Renderer.prototype.copyTexture = function (webGlTextureOriginal, webGlTextureDes
 	// this function copies the textureOriginal to textureDest.
 	var currentShader;
 	var magoManager = this.magoManager;
-	var sceneState = magoManager.sceneState;
 	var gl = magoManager.getGl();
 
 	currentShader = magoManager.postFxShadersManager.getShader("textureCopy"); 
@@ -2021,9 +2014,6 @@ Renderer.prototype.copyTexture = function (webGlTextureOriginal, webGlTextureDes
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0);
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0);
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT4_WEBGL, gl.TEXTURE_2D, null, 0);
-
-	// If we are in ORT (one rendering target), then must set the "u_textureTypeToCopy" uniform.***
-	//gl.uniform1i(currentShader.u_textureTypeToCopy_loc, i); // if MRT, then this var has NO effect.
 
 	if (extbuffers)
 	{
@@ -2109,98 +2099,47 @@ Renderer.prototype.renderTerrainCopy = function ()
 		}
 	}
 
-	if (bUseMultiRenderTarget)
+	// Bind the frameBuffer.*******************************************************************************
+	// Must know if MRT.***
+	var extbuffers = magoManager.extbuffers;
+	magoManager.texturesManager.texturesMergerFbo.bind();
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, magoManager.depthTex, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, magoManager.normalTex, 0);
+	//gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, magoManager.albedoTex, 0); // original.***
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // NO copy albedo here.***
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, magoManager.selColorTex, 0);
+
+	if (magoManager.isCameraMoved || magoManager.bPicking)
 	{
-		// Bind the frameBuffer.*******************************************************************************
-		// Must know if MRT.***
-		var extbuffers = magoManager.extbuffers;
-		magoManager.texturesManager.texturesMergerFbo.bind();
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, magoManager.depthTex, 0);
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, magoManager.normalTex, 0);
-		//gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, magoManager.albedoTex, 0); // original.***
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // NO copy albedo here.***
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, magoManager.selColorTex, 0);
-
-		if (magoManager.isCameraMoved || magoManager.bPicking)
-		{
-			extbuffers.drawBuffersWEBGL([
-				extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - depth
-				extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - normal
-				extbuffers.NONE, // gl_FragData[2] - albedo
-				extbuffers.COLOR_ATTACHMENT3_WEBGL,  // gl_FragData[3] - selColor4
-			]);	
-		}
-		else
-		{
-			extbuffers.drawBuffersWEBGL([
-				extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - depth
-				extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - normal
-				extbuffers.NONE, // gl_FragData[2] - albedo
-				extbuffers.NONE,  // gl_FragData[3] - selColor4
-			]);
-		}
-
-		if (magoManager.isFarestFrustum())
-		{
-			gl.clearColor(1.0, 1.0, 1.0, 1.0);
-			gl.clearDepth(1.0);
-			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-		}
-		else
-		{
-			gl.clear(gl.DEPTH_BUFFER_BIT);
-		}
-		// End binding frameBuffer.----------------------------------------------------------------------------
-
-		// Now render.***
-		screenQuad.render(magoManager, currentShader);
+		extbuffers.drawBuffersWEBGL([
+			extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - depth
+			extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - normal
+			extbuffers.NONE, // gl_FragData[2] - albedo
+			extbuffers.COLOR_ATTACHMENT3_WEBGL,  // gl_FragData[3] - selColor4
+		]);
 	}
 	else
 	{
-		// we are in ORT (one rendering target).*********************************************************************************
-		magoManager.texturesManager.texturesMergerFbo.bind();
-		// Render depth, normal & albedo separately.***
-		for (var i=0; i<2; i++)
-		{
-			if (i === 0)
-			{
-				// depth.***
-				gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, magoManager.depthTex, 0);
-			}
-			else if (i === 1)
-			{
-				// normal.***
-				gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, magoManager.normalTex, 0);
-			}
-			//else if (i === 2) // No necessary copy cesium albedo, bcos this is copied in finalPass(frustumIdx = 0).
-			//{
-			//	// albedo.***
-			//	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, magoManager.albedoTex, 0);
-			//}
-			//else if (i === 3) // In terrain Copy mode, there are NO selection objects.***
-			//{ 
-			//	// selColorTex.***
-			//	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, magoManager.selColorTex, 0);
-			//}
-
-			// If we are in ORT (one rendering target), then must set the "u_textureTypeToCopy" uniform.***
-			gl.uniform1i(currentShader.u_textureTypeToCopy_loc, i); // if MRT, then this var has NO effect.
-			
-			if (magoManager.isFarestFrustum())
-			{
-				gl.clearColor(1.0, 1.0, 1.0, 1.0);
-				gl.clearDepth(1.0);
-				gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-			}
-			else
-			{
-				gl.clear(gl.DEPTH_BUFFER_BIT);
-			}
-
-			// Now render.***
-			screenQuad.render(magoManager, currentShader);
-		}
+		extbuffers.drawBuffersWEBGL([
+			extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - depth
+			extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - normal
+			extbuffers.NONE, // gl_FragData[2] - albedo
+			extbuffers.NONE,  // gl_FragData[3] - selColor4
+		]);
 	}
+
+	if (magoManager.isFarestFrustum())
+	{
+		gl.clearColor(1.0, 1.0, 1.0, 1.0);
+		gl.clearDepth(1.0);
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	}
+	else
+	{
+		gl.clear(gl.DEPTH_BUFFER_BIT);
+	}
+
+	screenQuad.render(magoManager, currentShader);
 
 	magoManager.texturesManager.texturesMergerFbo.unbind();
 
@@ -2241,8 +2180,6 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 		//var texCoords = new Float32Array([0, 0,   0.5, 0,   0, 0.5,       0, 0.5,   0.5, 0,   0.5, 0.5]); // rightUp screen.
 		this.texCoordBuffer = FBO.createBuffer(gl, texCoords);
 
-		// now, create normalBuffer for use with cubeMaps.
-		// zNegative face = 5.
 		var normal_3 = new Point3D(1, -1, -1);
 		normal_3.unitary();
 		var normal_2 = new Point3D(-1, -1, -1);
@@ -2251,9 +2188,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 		normal_1.unitary();
 		var normal_0 = new Point3D(1, 1, -1);
 		normal_0.unitary();
-		//--------------------------------------------
 
-		// yPositive face = 2.
 		normal_3 = new Point3D(1, 1, 1);
 		normal_3.unitary();
 		normal_2 = new Point3D(-1, 1, 1);
@@ -2262,19 +2197,6 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 		normal_1.unitary();
 		normal_0 = new Point3D(1, 1, -1);
 		normal_0.unitary();
-		//------------------------------------------
-		/*
-		// yNegative face = 3.
-		normal_3 = new Point3D(1, 1, 1);
-		normal_3.unitary();
-		normal_2 = new Point3D(-1, 1, 1);
-		normal_2.unitary();
-		normal_1 = new Point3D(-1, 1, -1);
-		normal_1.unitary();
-		normal_0 = new Point3D(1, 1, -1);
-		normal_0.unitary();
-		*/
-		//------------------------------------------
 
 		var nor = new Float32Array([normal_0.x, normal_0.y, normal_0.z,   normal_1.x, normal_1.y, normal_1.z,   normal_3.x, normal_3.y, normal_3.z,
 			normal_3.x, normal_3.y, normal_3.z,   normal_1.x, normal_1.y, normal_1.z,   normal_2.x, normal_2.y, normal_2.z]);
@@ -2306,25 +2228,13 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 	gl.enableVertexAttribArray(shader.texCoord2_loc);
 	FBO.bindAttribute(gl, this.texCoordBuffer, shader.texCoord2_loc, 2);
 
-	// If you want to see selectionBuffer.
-	//var texture = magoManager.selectionFbo.colorBuffer; // framebuffer for color selection.***
-
-	// If you want to see silhouetteDepthBuffer.
 	var silhouetteDepthFbo = magoManager.getSilhouetteDepthFbo();
 	var texture = silhouetteDepthFbo.colorBuffer;
-
-	//if(magoManager.laserCamera)
-	//{
-	//	var options = {};
-	//	var laserCamDepthFBO = magoManager.laserCamera.getDepthBufferFBO(magoManager, options);
-	//	texture = laserCamDepthFBO.colorBuffer;
-	//}
 
 	gl.uniform1i(shader.uTextureType_loc, 0);
 
 	if (magoManager.depthTex)
 	{
-		//texture = magoManager.depthTex;
 		texture = magoManager.scene._context.defaultNormalTexture._texture;
 	}
 
@@ -2450,7 +2360,6 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 		
 	}
 
-	// soundManager.*** soundManager.*** soundManager.***soundManager.*** soundManager.*** soundManager.***soundManager.*** soundManager.*** soundManager.***
 	if (magoManager.soundManager)
 	{
 		if (this.lastIdx === undefined)

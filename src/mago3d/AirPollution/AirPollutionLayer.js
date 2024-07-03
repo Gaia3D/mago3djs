@@ -310,7 +310,6 @@ AirPollutionLayer.prototype._makeSimulationBox = function ()
 	geoLocDataOfBox.copyFrom(geoLocData);
 
 	this.simulationBox.objectsArray.push(surfIndepMesh);
-	var hola = 0;
 };
 
 AirPollutionLayer.prototype._getScreenFBO = function(magoManager)
