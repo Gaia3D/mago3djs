@@ -2072,9 +2072,9 @@ Renderer.prototype.renderTerrainCopy = function ()
 
 	var bUseMultiRenderTarget = magoManager.postFxShadersManager.bUseMultiRenderTarget;
 
-	if (magoManager.scene.view.globeDepth.framebuffer)
+	if (magoManager.scene.view.globeDepth._copyDepthFramebuffer.framebuffer)
 	{
-		magoManager.czm_globeDepthText = magoManager.scene.view.globeDepth.framebuffer._colorTextures[0]._texture;
+		magoManager.czm_globeDepthText = magoManager.scene.view.globeDepth._copyDepthFramebuffer.framebuffer._colorTextures[0]._texture;
 	}
 
 	if (!magoManager.czm_globeDepthText)
