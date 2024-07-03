@@ -20,7 +20,7 @@ ul, li {margin:0; padding:0; }
 	height: 100%;
 	background-color: #eee;
 	float: right;
-    width: calc(100% - 60px);
+    width: calc(100%);
 }
 
 /* NAV */
@@ -32,6 +32,7 @@ ul, li {margin:0; padding:0; }
 	background-color: #22222d;
 	z-index: 9999;
 	padding: 0px 10px;
+	opacity: 0.9;
 }
 .nav li {
 	margin-left: 3px;
