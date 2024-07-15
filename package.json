@@ -1,6 +1,6 @@
 {
   "name": "mago3djs",
-  "version": "2.0.0",
+  "version": "4.0.0",
   "description": "Generated with Eclipse npm Tools",
   "main": "mago3d.js",
   "scripts": {
