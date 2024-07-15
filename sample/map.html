@@ -137,6 +137,8 @@
 	var dataInformationUrl = "/sample/persistence/json/";
 	magoStart(null, "magoContainer", imagePath);
 
+	
+
     // mago3d 시작, 정책 데이터 파일을 로딩
 	function magoStart(viewer, renderDivId, imagePath) {
 		$.ajax({
@@ -177,30 +179,62 @@
 				//serverPolicy.terrainValue = 'http://211.106.171.246:49998/tilesets/terrain_sj/'; // from Kim Jin Ho 20220420 (to test terrain excavation bugs).***
 				//serverPolicy.terrainValue = 'http://175.197.92.213:10207/tilesets/terrain_ws2_sangam/';
 
-				//cesiumViewerOption.terrainProvider = new Cesium.EditableCesiumTerrainProvider({
-				//										url: 'http://211.106.171.246:49998/tilesets/terrain_sj/'
-				//										});
+				//var terrainUrl = '../f4d/terrainAsia_L8/';
+				var terrainUrl = '../f4d/terrainSejong20240704/';
+				//var terrainUrl = '../f4d/terrainKorea_miniSeoul/';
+				//var terrainUrl = '../f4d/terrainAsia_L11/';
 
-				//serverPolicy.terrainType = 'cesium-customer';
-				/*cesiumViewerOption.terrainProvider = new Cesium.CesiumTerrainProvider({
-														url: '../f4d/terrain_ws2_sangam/terrain_ws2_sangam/'
-														//url: 'http://localhost:8000/tilesets/terrain_ws2_nearest'
-														});*/
-
-
+				//const url = "/terrain-sample/seoul-12bilinear/";
+				const terrainProvider = Cesium.CesiumTerrainProvider.fromUrl(terrainUrl, {
+					requestVertexNormals: true,
+				})
+				const terrain = new Cesium.Terrain(terrainProvider);
+				
 				serverPolicy.initLatitude = 37.6168;
 				serverPolicy.initLongitude = 127.1823;
 				serverPolicy.initAltitude = 4000;
 				MAGO3D_INSTANCE = new Mago3D.Mago3d(renderDivId, serverPolicy, {loadend : loadend}, cesiumViewerOption);
 
-				// Active this code for tile inspector.**************************************************************************************
-				MAGO3D_INSTANCE.getViewer().extend(Cesium.viewerCesium3DTilesInspectorMixin);
-        		const inspectorViewModel = MAGO3D_INSTANCE.getViewer().cesium3DTilesInspector.viewModel;
-				// Active this code for tile inspector.**************************************************************************************
+				MAGO3D_INSTANCE.getViewer().scene.setTerrain(terrain);
+				MAGO3D_INSTANCE.getViewer().scene.globe.enableLighting = true;
+				//MAGO3D_INSTANCE.getViewer().scene.globe._surface._tileProvider._debug.wireframe = true;
+
+				// https://searchcode.com/codesearch/view/93566826/
+				addAdditionalLayerOption( 'Tile Coordinates', new Cesium.TileCoordinatesImageryProvider(), 1.0, true );
+
+				// // Active this code for tile inspector.**************************************************************************************
+				// MAGO3D_INSTANCE.getViewer().extend(Cesium.viewerCesium3DTilesInspectorMixin);
+        		// const inspectorViewModel = MAGO3D_INSTANCE.getViewer().cesium3DTilesInspector.viewModel;
+				// inspectorViewModel.pickActive = true;
+				// // Active this code for tile inspector.**************************************************************************************
 				
 				
 				//MAGO3D_INSTANCE.getViewer().scene.globe.translucency.enabled = true;
 				//MAGO3D_INSTANCE.getViewer().scene.globe.translucency.frontFaceAlphaByDistance = new Cesium.NearFarScalar(300.0, 0.0, 3000.0, 1.0);
+				// for Cesium v1.3.2.******************************************************************************
+				// var urlTest = "../f4d/3dtiles/fbx_HayashiSan/tileset.json";
+				// try{
+				// MAGO3D_INSTANCE.getViewer().scene.primitives.add(Cesium.Cesium3DTileset.fromUrl(urlTest));
+				// } catch (error) {
+				// console.log(`Error loading tileset: ${error}`);
+				// }
+
+				// urlTest = "../f4d/3dtiles/sejeong_citygml/tileset.json";
+				// MAGO3D_INSTANCE.getViewer().scene.primitives.add(new Cesium.Cesium3DTileset({
+				// 	url : urlTest
+				// }));
+
+				// urlTest = "../f4d/3dtiles/SejongBuildings_3ds/tileset.json";
+				// MAGO3D_INSTANCE.getViewer().scene.primitives.add(new Cesium.Cesium3DTileset({
+				// 	url : urlTest
+				// }));
+				//-------------------------------------------------------------------------------------------------
+				function addAdditionalLayerOption(name, imageryProvider, alpha, show) {
+					var layer = MAGO3D_INSTANCE.getViewer().scene.imageryLayers.addImageryProvider(imageryProvider);
+					layer.alpha = Cesium.defaultValue(alpha, 0.5);
+					layer.show = Cesium.defaultValue(show, true);
+					layer.name = name;
+				}
 
 			},
 			error: function(e){
@@ -215,6 +249,22 @@
 		console.info(magoInstance)
 		magoInstance.getViewer().scene.globe.depthTestAgainstTerrain = true;
 		magoInstance.setBaseUrl(dataInfo.baseUrl);
+
+		//var urlTest = "../f4d/3dtiles/(20240712)상지대 콜라다 데이터/tileset.json";
+		//var urlTest = "../f4d/3dtiles/splittedTile/tileset.json";
+		var urlTest = "../f4d/3dtiles/Data_HanamKyosan/건물/tileset.json";
+		//var urlTest = "../f4d/3dtiles/ComplicatedModels10/tileset.json";
+		try{
+			magoInstance.getViewer().scene.primitives.add(await Cesium.Cesium3DTileset.fromUrl(urlTest));
+		} catch (error) {
+		console.log(`Error loading tileset: ${error}`);
+		}
+
+		// Active this code for tile inspector.**************************************************************************************
+		magoInstance.getViewer().extend(Cesium.viewerCesium3DTilesInspectorMixin);
+		const inspectorViewModel = magoInstance.getViewer().cesium3DTilesInspector.viewModel;
+		//inspectorViewModel.pickActive = true;
+		// Active this code for tile inspector.**************************************************************************************
 
 
 		/*osmLayer = new Cesium.ImageryLayer(new Cesium.OpenStreetMapImageryProvider({
@@ -506,9 +556,9 @@
 
 		var options = {
 				timeScale : 2000,
-				year : 2023,
-				month : 4, // 0 to 11
-				day : 10,
+				year : 2024,
+				month : 2, // 0 to 11
+				day : 5,
 				hour : 12,
 				minute : 0,
 				second : 0
