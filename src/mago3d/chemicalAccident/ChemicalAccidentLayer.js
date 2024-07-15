@@ -875,9 +875,21 @@ ChemicalAccidentLayer.prototype.getTimeSliceIdxByCurrentUnixTimeMiliseconds = fu
 	for (var i=0; i<timeSlicesCount; i++)
 	{
 		var timeSlice = this._timeSlicesArray[i];
-		if (currUnixTimeMiliseconds >= timeSlice._startUnixTimeMiliseconds && currUnixTimeMiliseconds <= timeSlice._endUnixTimeMiliseconds)
+		var diffTime = timeSlice._startUnixTimeMiliseconds - currUnixTimeMiliseconds;
+		if (currUnixTimeMiliseconds >= timeSlice._startUnixTimeMiliseconds)
 		{
-			timeSliceIdx = i;
+			if (currUnixTimeMiliseconds <= timeSlice._endUnixTimeMiliseconds)
+			{
+				timeSliceIdx = i;
+				break;
+			}
+			else 
+			{
+				var hola = 0;
+			}
+		}
+		else 
+		{
 			break;
 		}
 	}
