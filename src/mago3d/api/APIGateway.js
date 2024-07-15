@@ -4,7 +4,7 @@
 WebGL2RenderingContext = undefined;
 
 /**
- * 
+ *
  * @class APIGateway
  */
 
@@ -116,14 +116,6 @@ function changeColorAPI(managerFactoryInstance, projectId, dataKey, objectIds, p
 	api.setColor(color);
 	managerFactoryInstance.callAPI(api);
 }
-
-/**
- * Object literal with change Location And Rotation animation option.
- * @typedef {Object} animationOption
- * @property {string} dutaion optional. 
- * @property {Boolean} autoChangeRotation optional. If this option is true, your heading, pitch will be ignore, Heading and pitch changes according to the direction.
- */
-
 /**
  * location and rotation 변경
  * @param {ManagerFactory} managerFactoryInstance
@@ -844,6 +836,4 @@ function selectF4dAPI(managerFactoryInstance, projectId, dataKey)
 	api.setProjectId(projectId);
 	api.setDataKey(dataKey);
 	managerFactoryInstance.callAPI(api);
-
-	
 }

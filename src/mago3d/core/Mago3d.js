@@ -1,20 +1,4 @@
 'use strict';
-/**
- * Mago3D return object
- * @typedef {object} Mago3d~returnObj
- * @property {function()} callAPI function. 
- * @property {function()} getViewer function. get this map viewr. Cesium.Viewer or Mago3d.MagoWorld
- * @property {function()} getMagoManagerState function. get magoManager starte
- * @property {function()} getMagoManager function. get magoManager
- * @property {function(string)} setBaseUrl function. set F4d Date base url.
- */
-
-/**
- * callback parameter info 
- * @typedef {object} Mago3d~callback
- * @property {function()} loadstart Optional. when mago3d load start trigger. return magostate.
- * @property {function(Mago3d~returnObj)} loadend Optional. when mago3d load end trigger. return magostate.
- */
 
 /**
  * This is mago3d entrypoint.
@@ -58,24 +42,13 @@ var Mago3d = function(containerId, serverPolicy, callback, options, legacyViewer
 	}
 
 	var magoManagerState = CODE.magoManagerState.INIT;
-	//this.emit('loadstart', this);
 
 	serverPolicy = validPolicy(serverPolicy);
 	options = validOption(options, serverPolicy.basicGlobe);
-	var viewerInitializer;
 
-	if (serverPolicy.basicGlobe === Constant.CESIUM) 
-	{
-		viewerInitializer = new CesiumViewerInit(containerId, serverPolicy, options, legacyViewer);
-	}
-	else 
-	{
-		viewerInitializer = new MagoEarthViewerInit(containerId, serverPolicy, options);
-	}
-
+	var viewerInitializer = new CesiumViewerInit(containerId, serverPolicy, options, legacyViewer);
 	viewer = viewerInitializer.viewer;
 	magoManager = viewerInitializer.magoManager;
-	//magoManager.magoPolicy.imagePath = imagePath;
 
 	var returnObj = {
 		// api gateway 역할
@@ -117,7 +90,6 @@ var Mago3d = function(containerId, serverPolicy, callback, options, legacyViewer
 	};
 
 	magoManagerState = CODE.magoManagerState.READY;
-	//init position
 	viewerInitializer.initPosition();
 	viewerInitializer.setEventHandler();
 
@@ -160,9 +132,8 @@ var Mago3d = function(containerId, serverPolicy, callback, options, legacyViewer
 	function validOption(opt, gType)
 	{
 		opt = opt ? opt : {};
-
 		var option = {};
-		if ( gType === Constant.CESIUM)
+		if (gType === Constant.CESIUM)
 		{
 			option.infoBox = false;
 			option.navigationHelpButton = false;
@@ -172,21 +143,12 @@ var Mago3d = function(containerId, serverPolicy, callback, options, legacyViewer
 			option.geocoder = false;
 			option.baseLayerPicker = false;
 			option.sceneModePicker = false;
-		} 
-
-		option.defaultControl = {};
-
-		option.defaultControl.zoom = true;
-		option.defaultControl.initCamera = true;
-		option.defaultControl.fullScreen = true;
-		option.defaultControl.measure = true;
-		option.defaultControl.tools = true;
-		option.defaultControl.attribution = true;
-		option.defaultControl.overviewMap = true;
-		
-		var defControl = Object.assign({}, option.defaultControl, opt.defaultControl||{});
-		opt.defaultControl = defControl;
-		
+			option.animation = false;
+			option.timeline = false;
+			option.baseLayerPicker = false;
+			option.geocoder = false;
+			option.geocoder = Cesium.SceneMode.SCENE3D;
+		}
 		return Object.assign({}, option, opt||{});
 	}
 };

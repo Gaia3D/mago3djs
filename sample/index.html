@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width" name="viewport">
+    <title>Cesium</title>
+    <link href="../src/engine/cesium/Widgets/widgets.css" rel="stylesheet"/>
+    <script src="../src/engine/cesium/Cesium.js" type="text/javascript"></script>
+    <script src="../build/mago3d/mago3d.js" type="text/javascript"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        .mapWrap {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    <div class="mapWrap" id="magoContainer"></div>
+    <script>
+        let magoInstance;
+
+		(function (viewer, renderDivId) {
+			let cesiumOption = {};
+			cesiumOption.infoBox = false;
+			cesiumOption.navigationHelpButton = false;
+			cesiumOption.selectionIndicator = false;
+			cesiumOption.homeButton = false;
+			cesiumOption.fullscreenButton = false;
+			cesiumOption.geocoder = false;
+			cesiumOption.baseLayerPicker = false;
+			cesiumOption.sceneModePicker = false;
+
+			let magoOptions = {};
+			magoOptions.basicGlobe = 'cesium';
+			magoOptions.geoserverEnable = false;
+			magoOptions.geoserverImageproviderEnable = false;
+			magoOptions.terrainType = 'cesium-default';
+			magoOptions.initCameraEnable = true;
+			magoOptions.initLatitude = 37.6168;
+			magoOptions.initLongitude = 127.1823;
+			magoOptions.initAltitude = 4000;
+			magoInstance = new Mago3D.Mago3d(renderDivId, magoOptions, {loadend : loadend}, cesiumOption);
+		})(null, "magoContainer");
+
+		async function loadend(magoInstance) {
+			const viewer = magoInstance.getViewer();
+			viewer.scene.globe.backFaceCulling = true
+			viewer.scene.globe.enableLighting = false
+			viewer.scene.shadowMap.darkness = 0.8
+			viewer.scene.postProcessStages.fxaa.enabled = true
+			viewer.scene.globe.depthTestAgainstTerrain = true
+			viewer.scene.globe.baseColor = Cesium.Color.fromCssColorString('#d2d8da')
+
+			await setImageryLayer(viewer);
+            await setTerrain(viewer);
+		}
+
+		async function setImageryLayer(viewer) {
+			const imageryLayer = await new Cesium.ImageryLayer(new Cesium.OpenStreetMapImageryProvider({
+				url : 'https://tile.openstreetmap.org/'
+			}));
+			viewer.imageryLayers.add(imageryLayer);
+        }
+
+		async function setTerrain(viewer) {
+			const scene = viewer.scene;
+			const url = "/f4d/terrain-sample/seoul-12bilinear/";
+			const terrainProvider = await Cesium.CesiumTerrainProvider.fromUrl(url, {
+				requestVertexNormals: true,
+			})
+			const terrain = new Cesium.Terrain(terrainProvider)
+			scene.setTerrain(terrain)
+        }
+    </script>
+</body>
+</html>

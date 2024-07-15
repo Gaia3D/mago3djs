@@ -167,15 +167,24 @@
 				cesiumViewerOption.defaultControl.overviewMap = false;
 
 				serverPolicy.basicGlobe = 'cesium';
-				//serverPolicy.terrainType = 'cesium-customer'; //serverPolicy.terrainType = 'cesium-default';
+				serverPolicy.initCameraEnable = true;
+				serverPolicy.geoserverEnable = false;
+				serverPolicy.geoserverImageproviderEnable = false;
 				serverPolicy.terrainType = 'cesium-default';
+				serverPolicy.initLatitude = 37.6168;
+				serverPolicy.initLongitude = 127.1823;
+				serverPolicy.initAltitude = 4000;
+
+
+				//serverPolicy.terrainType = 'cesium-customer'; //serverPolicy.terrainType = 'cesium-default';
+				//serverPolicy.terrainType = 'cesium-default';
 				//serverPolicy.terrainValue = 'http://192.168.10.11:8887/tilesets/sejong/';
 				//serverPolicy.terrainValue = 'http://192.168.10.182:9998/tilesets/terrain/';
 				//serverPolicy.terrainValue = 'https://mago3d.net/tilesets/terrain/';
 
 
 				//serverPolicy.terrainType = 'cesium-customer';
-				serverPolicy.terrainValue = '../f4d/terrain_ws2_sangam/terrain_ws2_sangam/';
+				//serverPolicy.terrainValue = '../f4d/terrain_ws2_sangam/terrain_ws2_sangam/';
 				//serverPolicy.terrainValue = 'http://211.106.171.246:49998/tilesets/terrain_sj/'; // from Kim Jin Ho 20220420 (to test terrain excavation bugs).***
 				//serverPolicy.terrainValue = 'http://175.197.92.213:10207/tilesets/terrain_ws2_sangam/';
 
@@ -193,6 +202,7 @@
 				serverPolicy.initLatitude = 37.6168;
 				serverPolicy.initLongitude = 127.1823;
 				serverPolicy.initAltitude = 4000;
+
 				MAGO3D_INSTANCE = new Mago3D.Mago3d(renderDivId, serverPolicy, {loadend : loadend}, cesiumViewerOption);
 
 				MAGO3D_INSTANCE.getViewer().scene.setTerrain(terrain);
