@@ -11,7 +11,7 @@ var ChemicalAccidentManager = function (options)
 	}
 
 	this.magoManager;
-	this.chemAccidentLayersArray;
+	this.chemAccidentLayersArray;  // volume layers.***
 
 	this._geoJsonIndexFileLoadState = CODE.fileLoadState.READY;
 	this._geoJsonIndexFile;

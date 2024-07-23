@@ -377,6 +377,42 @@ PostFxShadersManager.prototype._createShader_modelRefSsao = function ()
 	return shader;
 };
 
+PostFxShadersManager.prototype._createShader_chemAccident2D = function () 
+{
+	var use_linearOrLogarithmicDepth = this._get_useLinearOrLogarithmicDepth_string();
+	var use_multi_render_target = this._get_useMultiRenderTarget_string();
+	var gl = this.gl;
+
+	var shaderName = "chemAccident2d";
+	var ssao_vs_source = ShaderSource.chemicalAccident2DVS;
+	var ssao_fs_source = ShaderSource.chemicalAccident2DFS;
+	ssao_fs_source = ssao_fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
+	ssao_fs_source = ssao_fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
+	var shader = this.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this.magoManager);
+	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
+	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
+	shader.uFrustumIdx_loc = gl.getUniformLocation(shader.program, "uFrustumIdx");
+	shader.uModelOpacity_loc = gl.getUniformLocation(shader.program, "uModelOpacity");
+	shader.uSelColor4_loc = gl.getUniformLocation(shader.program, "uSelColor4");//
+	shader.uInterpolationFactor_loc = gl.getUniformLocation(shader.program, "uInterpolationFactor");
+	shader.uMinMaxQuantizedValues_tex0_loc = gl.getUniformLocation(shader.program, "uMinMaxQuantizedValues_tex0");
+	shader.uMinMaxQuantizedValues_tex1_loc = gl.getUniformLocation(shader.program, "uMinMaxQuantizedValues_tex1");
+	shader.uMinMaxValues_loc = gl.getUniformLocation(shader.program, "uMinMaxValues");
+	shader.uRenderBorder_loc = gl.getUniformLocation(shader.program, "uRenderBorder");
+	shader.uRenderingColorType_loc = gl.getUniformLocation(shader.program, "uRenderingColorType");
+	shader.uMinMaxValuesToRender_loc = gl.getUniformLocation(shader.program, "uMinMaxValuesToRender");
+
+	// textures.***
+	shader.texture_0_loc = gl.getUniformLocation(shader.program, "texture_0");
+	shader.texture_1_loc = gl.getUniformLocation(shader.program, "texture_1");
+	this.useProgram(shader);
+	gl.uniform1i(shader.texture_0_loc, 0);
+	gl.uniform1i(shader.texture_1_loc, 1);
+
+	this.shadersMap[shaderName] = shader;
+	return shader;
+};
+
 PostFxShadersManager.prototype._createShader_pollution = function () 
 {
 	// This shader is used to render transparent objects, 
@@ -1294,6 +1330,9 @@ PostFxShadersManager.prototype._createShaderByName = function (shaderName)
 		break;
 	case "electroMagnetismSurface":
 		this._createShader_electroMagnetismSurface();
+		break;
+	case "chemAccident2d":
+		this._createShader_chemAccident2D();
 		break;
 	}
 	

@@ -1616,6 +1616,11 @@ MagoManager.prototype.renderManagersTransparentPass = function ()
 		this.chemicalAccidentManager.render();
 	}
 
+	if (this.chemicalAccident2dManager)
+	{
+		this.chemicalAccident2dManager.render();
+	}
+
 	// process to render airPollutionManager(texture 3d)
 	if (this.airPollutionManager)
 	{

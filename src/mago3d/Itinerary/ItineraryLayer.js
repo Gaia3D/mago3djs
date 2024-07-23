@@ -1072,6 +1072,7 @@ ItineraryLayer.prototype.renderSampledPoints = function ()
 	if (!vbo.bindDataPosition(shaderLocal, magoManager.vboMemoryManager))
 	{ return false; }
 
+	gl.depthMask(false);
 	gl.depthRange(0.0, 0.1);
 
 	gl.drawArrays(gl.POINTS, 0, vbo.vertexCount);
@@ -1125,4 +1126,5 @@ ItineraryLayer.prototype.renderSampledPoints = function ()
 		gl.drawArrays(gl.POINTS, 0, samplingVbo.vertexCount);
 		gl.enable(gl.DEPTH_TEST); // return to default.***
 	}
+	gl.depthMask(true);
 };

@@ -476,7 +476,9 @@ ItineraryManager.prototype.render = function ()
 		
 		gl.uniform3fv(shader.buildingPosHIGH_loc, positionHIGH);
 		gl.uniform3fv(shader.buildingPosLOW_loc, positionLOW);
+		gl.depthMask(false);
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+		gl.depthMask(true);
 
 		if (currTime - this.lastTimeSubImageChanged > 300.0)
 		{

@@ -886,11 +886,13 @@ Globe.getRectangleMeshOnEllisoideCenteredAtGeographicCoord = function (centerGeo
 	rotMatPitch.rotationAxisAngRad(angRadPitch, rotAxisPitch.x, rotAxisPitch.y, rotAxisPitch.z);
 
 	var rotMatRoll = new Matrix4();
-	rotMatRoll.rotationAxisAngRad(angRadRoll, rotAxisRoll.x, rotAxisRoll.y, rotAxisRoll.z);
+	rotMatRoll.rotationAxisAngRad(-angRadRoll, rotAxisRoll.x, rotAxisRoll.y, rotAxisRoll.z);
 
 	var totalMat = rotMatRoll.getMultipliedByMatrix(rotMatPitch, undefined);
 
 	var westSouthPoint = totalMat.rotatePoint3D(centerPoint, undefined);
+	
+
 	var pointsArray = [];
 	var texCoordsArray = [];
 
