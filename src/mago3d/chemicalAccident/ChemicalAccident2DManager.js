@@ -25,6 +25,8 @@ var ChemicalAccident2DManager = function (options)
 	this._increTime;
 	this._isDoRender = true;
 	this.renderingColorType = 0; // 0= rainbow, 1= monotone.***
+	this.renderBorder = false;
+	this.textureFilterType = 0; // 0= nearest, 1= linear.***
 
 	this.pngsBinBlocksArray = undefined;
 
@@ -60,6 +62,17 @@ var ChemicalAccident2DManager = function (options)
 		{
 			this.renderingColorType = options.renderingColorType;
 		}
+
+		if (options.renderBorder !== undefined)
+		{
+			this.renderBorder = options.renderBorder;
+		
+		}
+
+		if (options.textureFilterType !== undefined)
+		{
+			this.textureFilterType = options.textureFilterType;
+		}
 	}
 
 	// test vars.***
@@ -71,6 +84,8 @@ var ChemicalAccident2DManager = function (options)
 ChemicalAccident2DManager.prototype.setTextureFilterType = function (textureFilterType)
 {
 	// textureFilterType = 0 : nearest, 1 : linear.***
+	this.textureFilterType = textureFilterType;
+	
 	var gl = this.magoManager.getGl();
 	var chemAccidentLayersCount = this.chemAccident2DLayersArray.length;
 	for (var i=0; i<chemAccidentLayersCount; i++)
@@ -90,10 +105,6 @@ ChemicalAccident2DManager.prototype.getIsDoRender = function ()
 	return this._isDoRender;
 };
 
-ChemicalAccident2DManager.prototype.setRenderingColorType = function (renderingColorType)
-{
-	this.renderingColorType = renderingColorType;
-};
 
 ChemicalAccident2DManager.prototype.getRenderingColorType = function ()
 {
@@ -102,6 +113,8 @@ ChemicalAccident2DManager.prototype.getRenderingColorType = function ()
 
 ChemicalAccident2DManager.prototype.setRenderBorder = function (renderBorder)
 {
+	this.renderBorder = renderBorder;
+
 	var chemAccidentLayersCount = this.chemAccident2DLayersArray.length;
 	for (var i=0; i<chemAccidentLayersCount; i++)
 	{
@@ -112,6 +125,8 @@ ChemicalAccident2DManager.prototype.setRenderBorder = function (renderBorder)
 
 ChemicalAccident2DManager.prototype.setRenderingColorType = function (renderingColorType)
 {
+	this.renderingColorType = renderingColorType;
+
 	var chemAccidentLayersCount = this.chemAccident2DLayersArray.length;
 	for (var i=0; i<chemAccidentLayersCount; i++)
 	{
@@ -513,6 +528,8 @@ ChemicalAccident2DManager.prototype.newChemAccidentLayer2D = function (options)
 
 	options.chemicalAccident2DManager = this;
 	options.renderingColorType = this.renderingColorType;
+	options.renderBorder = this.renderBorder;
+	options.textureFilterType = this.textureFilterType;
 
 	var chemAccLayer = new ChemicalAccident2DLayer(options);
 	this.chemAccident2DLayersArray.push(chemAccLayer);

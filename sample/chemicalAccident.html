@@ -623,7 +623,9 @@
 				magoManager : magoManager,
 				geoJsonIndexFileFolderPath : "\\f4d\\chemicalAccident\\output_chemicalAccident2D",
 				geoJsonIndexFilePath : "\\f4d\\chemicalAccident\\output_chemicalAccident2D\\JsonIndex2D.json",
-				renderingColorType : 1
+				renderingColorType : 1,
+				renderBorder : true,
+				textureFilterType : 0 // 0= nearest, 1= linear.***
 			};
 			magoManager.chemicalAccident2dManager = new Mago3D.ChemicalAccident2DManager(options);
 
@@ -739,13 +741,13 @@
 			var firstLayer = magoManager.chemicalAccident2dManager.getChemicalAccident2DLayer(0);
 			var renderBorder = firstLayer.getRenderBorder();
 
-			if(renderBorder === 0)
+			if(renderBorder === false)
 			{
-				renderBorder = 1;
+				renderBorder = true;
 			}
-			else if(renderBorder === 1)
+			else if(renderBorder === true)
 			{
-				renderBorder = 0;
+				renderBorder = false;
 			}
 
 			magoManager.chemicalAccident2dManager.setRenderBorder(renderBorder);

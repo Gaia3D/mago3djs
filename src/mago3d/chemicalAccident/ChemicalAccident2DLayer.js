@@ -87,6 +87,16 @@ var ChemicalAccident2DLayer = function(options)
 		{
 			this.renderingColorType = options.renderingColorType;
 		}
+
+		if (options.renderBorder !== undefined)
+		{
+			this.renderBorder = options.renderBorder;
+		}
+
+		if (options.textureFilterType !== undefined)
+		{
+			this.textureFilterType = options.textureFilterType;
+		}
 	}
 
 };
