@@ -23,6 +23,7 @@ var ChemicalAccidentManager = function (options)
 	this._animationStartTime = 0;
 	this._totalAnimTime;
 	this._increTime;
+	this._isDoRender = true;
 
 	this.volumePrepared = false;
 
@@ -62,6 +63,16 @@ var ChemicalAccidentManager = function (options)
 ChemicalAccidentManager.prototype.init = function ()
 {
 	this.test_started = false;
+};
+
+ChemicalAccidentManager.prototype.setIsDoRender = function (isDoRender)
+{
+	this._isDoRender = isDoRender;
+};
+
+ChemicalAccidentManager.prototype.getIsDoRender = function ()
+{
+	return this._isDoRender;
 };
 
 ChemicalAccidentManager.prototype.getChemicalAccidentLayersCount = function ()
@@ -364,6 +375,10 @@ ChemicalAccidentManager.prototype.render = function ()
 	if (!this.prepareVolume(magoManager))
 	{ return false; }
 
+	if (!this._isDoRender)
+	{
+		return true;
+	}
 	
 	if (this._animationState === CODE.processState.FINISHED || this._animationState === CODE.processState.NO_STARTED)
 	{

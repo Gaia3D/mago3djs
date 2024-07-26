@@ -82,6 +82,11 @@ var ChemicalAccident2DLayer = function(options)
 		{
 			this._metadataFolderPath = options.metadataFolderPath;
 		}
+
+		if (options.renderingColorType !== undefined)
+		{
+			this.renderingColorType = options.renderingColorType;
+		}
 	}
 
 };

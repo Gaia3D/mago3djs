@@ -60,6 +60,12 @@
 	<li onclick="swapRenderColorType();">
 		swap render color type
 	</li>
+	<li onclick="swapIsDoRender2d();">
+		swap isDoRender 2D
+	</li>
+	<li onclick="swapIsDoRender3d();">
+		swap isDoRender 3D
+	</li>
 
 
 </ul>
@@ -240,7 +246,7 @@
 		magoInstance.setBaseUrl(dataInfo.baseUrl);
 
 		//var urlTest = "../f4d/3dtiles/(20240712)상지대 콜라다 데이터/tileset.json";
-		var urlTest = "../f4d/3dtiles/(20240712)상지대 콜라다 데이터_2buildings/tileset.json";
+		var urlTest = "../f4d/3dtiles/(20240712)상지대 콜라다 데이터/tileset.json";
 		//var urlTest = "../f4d/3dtiles/splittedTile/tileset.json";
 		//var urlTest = "../f4d/3dtiles/Data_HanamKyosan/건물/tileset.json";
 		//var urlTest = "../f4d/3dtiles/ComplicatedModels10/tileset.json";
@@ -616,7 +622,8 @@
 			var options = {
 				magoManager : magoManager,
 				geoJsonIndexFileFolderPath : "\\f4d\\chemicalAccident\\output_chemicalAccident2D",
-				geoJsonIndexFilePath : "\\f4d\\chemicalAccident\\output_chemicalAccident2D\\JsonIndex2D.json"
+				geoJsonIndexFilePath : "\\f4d\\chemicalAccident\\output_chemicalAccident2D\\JsonIndex2D.json",
+				renderingColorType : 1
 			};
 			magoManager.chemicalAccident2dManager = new Mago3D.ChemicalAccident2DManager(options);
 
@@ -763,6 +770,50 @@
 			}
 
 			magoManager.chemicalAccident2dManager.setRenderingColorType(renderColorType);
+		}
+	
+	}
+	// <li onclick="swapIsDoRender2d();">
+	// <li onclick="swapIsDoRender3d();">
+
+	function swapIsDoRender3d()
+	{
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+		if(magoManager.chemicalAccidentManager !== undefined)
+		{
+			var currIsDoRender = magoManager.chemicalAccidentManager.getIsDoRender();
+
+			if(currIsDoRender === true)
+			{
+				currIsDoRender = false;
+			}
+			else if(currIsDoRender === false)
+			{
+				currIsDoRender = true;
+			}
+
+			magoManager.chemicalAccidentManager.setIsDoRender(currIsDoRender);
+		}
+	
+	}
+
+	function swapIsDoRender2d()
+	{
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+		if(magoManager.chemicalAccident2dManager !== undefined)
+		{
+			var currIsDoRender = magoManager.chemicalAccident2dManager.getIsDoRender();
+
+			if(currIsDoRender === true)
+			{
+				currIsDoRender = false;
+			}
+			else if(currIsDoRender === false)
+			{
+				currIsDoRender = true;
+			}
+
+			magoManager.chemicalAccident2dManager.setIsDoRender(currIsDoRender);
 		}
 	
 	}

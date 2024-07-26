@@ -23,6 +23,8 @@ var ChemicalAccident2DManager = function (options)
 	this._animationStartTime = 0;
 	this._totalAnimTime;
 	this._increTime;
+	this._isDoRender = true;
+	this.renderingColorType = 0; // 0= rainbow, 1= monotone.***
 
 	this.pngsBinBlocksArray = undefined;
 
@@ -53,6 +55,11 @@ var ChemicalAccident2DManager = function (options)
 			// AnimationSpeed by default is 1. If want to render faster, try to set animationSpeed = 2 or animationSpeed = 3.***
 			this._animationSpeed = options.animationSpeed;
 		}
+
+		if (options.renderingColorType !== undefined)
+		{
+			this.renderingColorType = options.renderingColorType;
+		}
 	}
 
 	// test vars.***
@@ -71,6 +78,26 @@ ChemicalAccident2DManager.prototype.setTextureFilterType = function (textureFilt
 		var chemAccLayer = this.chemAccident2DLayersArray[i];
 		chemAccLayer.setTextureFilterType(textureFilterType, gl);
 	}
+};
+
+ChemicalAccident2DManager.prototype.setIsDoRender = function (isDoRender)
+{
+	this._isDoRender = isDoRender;
+};
+
+ChemicalAccident2DManager.prototype.getIsDoRender = function ()
+{
+	return this._isDoRender;
+};
+
+ChemicalAccident2DManager.prototype.setRenderingColorType = function (renderingColorType)
+{
+	this.renderingColorType = renderingColorType;
+};
+
+ChemicalAccident2DManager.prototype.getRenderingColorType = function ()
+{
+	return this.renderingColorType;
 };
 
 ChemicalAccident2DManager.prototype.setRenderBorder = function (renderBorder)
@@ -121,6 +148,10 @@ ChemicalAccident2DManager.prototype.render = function ()
 	if (!this.prepareVolume(magoManager))
 	{ return false; }
 
+	if (!this._isDoRender)
+	{
+		return true;
+	}
 	
 	if (this._animationState === CODE.processState.FINISHED || this._animationState === CODE.processState.NO_STARTED)
 	{
@@ -481,6 +512,8 @@ ChemicalAccident2DManager.prototype.newChemAccidentLayer2D = function (options)
 	}
 
 	options.chemicalAccident2DManager = this;
+	options.renderingColorType = this.renderingColorType;
+
 	var chemAccLayer = new ChemicalAccident2DLayer(options);
 	this.chemAccident2DLayersArray.push(chemAccLayer);
 	return chemAccLayer;
