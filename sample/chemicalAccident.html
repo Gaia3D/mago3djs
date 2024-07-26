@@ -167,9 +167,10 @@
 				//serverPolicy.terrainValue = 'http://175.197.92.213:10207/tilesets/terrain_ws2_sangam/';
 
 				//var terrainUrl = '../f4d/terrainAsia_L8/';
-				var terrainUrl = '../f4d/terrainSejong20240704/';
+				//var terrainUrl = '../f4d/terrainSejong20240704/';
 				//var terrainUrl = '../f4d/terrainKorea_miniSeoul/';
 				//var terrainUrl = '../f4d/terrainAsia_L11/';
+				var terrainUrl = '../f4d/terrain_seoul_1/';
 
 				//const url = "/terrain-sample/seoul-12bilinear/";
 				const terrainProvider = Cesium.CesiumTerrainProvider.fromUrl(terrainUrl, {
@@ -239,9 +240,11 @@
 		magoInstance.setBaseUrl(dataInfo.baseUrl);
 
 		//var urlTest = "../f4d/3dtiles/(20240712)상지대 콜라다 데이터/tileset.json";
+		var urlTest = "../f4d/3dtiles/(20240712)상지대 콜라다 데이터_2buildings/tileset.json";
 		//var urlTest = "../f4d/3dtiles/splittedTile/tileset.json";
-		var urlTest = "../f4d/3dtiles/Data_HanamKyosan/건물/tileset.json";
+		//var urlTest = "../f4d/3dtiles/Data_HanamKyosan/건물/tileset.json";
 		//var urlTest = "../f4d/3dtiles/ComplicatedModels10/tileset.json";
+		//var urlTest = "../f4d/3dtiles/fbx_HayashiSan/tileset.json";
 		try{
 			magoInstance.getViewer().scene.primitives.add(await Cesium.Cesium3DTileset.fromUrl(urlTest));
 		} catch (error) {

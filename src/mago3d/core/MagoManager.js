@@ -1661,7 +1661,8 @@ MagoManager.prototype.renderManagersTransparentPass = function ()
 			}
 
 			// sample chemical contamination.***
-			if (this.chemicalAccidentManager !== undefined)
+			var isDoSamplePoints = this.itineraryManager.getIsDoSamplePoints();
+			if (isDoSamplePoints && this.chemicalAccidentManager !== undefined)
 			{
 				var chemicalAccidentManager = this.chemicalAccidentManager;
 				if (chemicalAccidentManager.chemAccidentLayersArray !== undefined && chemicalAccidentManager.chemAccidentLayersArray.length > 0)

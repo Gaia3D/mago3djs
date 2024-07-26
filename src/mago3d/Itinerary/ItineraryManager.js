@@ -16,6 +16,7 @@ var ItineraryManager = function (options)
 	 this._walkingManMosaicTexIsPrepared = false;
 	 this._renderThickLine = true;
 	 this._samplePointsSize = 5.0;
+	 this._isDoSamplePoints = false;
 
 	 this._samplingDataIncrementTimeMilisec = 200;
 
@@ -75,6 +76,16 @@ ItineraryManager.prototype.loadItineraryJsonFile = function (jsonjFilePath)
 		filePath: jsonjFilePath
 	};
 	var itiLayer = this.newItineraryLayer(options);
+};
+
+ItineraryManager.prototype.setIsDoSamplePoints = function (_isDoSamplePoints)
+{
+	this._isDoSamplePoints = _isDoSamplePoints;
+};
+
+ItineraryManager.prototype.getIsDoSamplePoints = function ()
+{
+	return this._isDoSamplePoints;
 };
 
 ItineraryManager.prototype.newItineraryLayer = function (options)
