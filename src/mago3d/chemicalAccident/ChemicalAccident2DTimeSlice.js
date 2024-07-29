@@ -137,10 +137,6 @@ ChemicalAccident2DTimeSlice.prototype._prepare = function (chemAccidentLayer)
 
 				var texWrap = gl.CLAMP_TO_EDGE;
 				var filter = gl.NEAREST;
-				if (this.textureFilterType === 1)
-				{
-					filter = gl.LINEAR;
-				}
 				var bPremultiplyAlphaWebgl = false;
 
 				texture.texId = Texture.createTexture(gl, filter, img, texture.imageWidth, texture.imageHeight, texWrap, bPremultiplyAlphaWebgl);
@@ -235,16 +231,4 @@ ChemicalAccident2DTimeSlice.prototype.getQuantizedMinMaxValues = function ()
 	}
 
 	return this.minMaxValues;
-};
-
-ChemicalAccident2DTimeSlice.prototype.setTextureFilterType = function (glFilter, gl)
-{
-	// textureFilterType = 0 : nearest, 1 : linear.***
-	if (this._texture2dAux !== undefined)
-	{
-		gl.bindTexture(gl.TEXTURE_2D, this._texture2dAux.texId);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, glFilter);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, glFilter);
-	}
-	
 };

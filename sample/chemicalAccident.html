@@ -66,6 +66,9 @@
 	<li onclick="swapIsDoRender3d();">
 		swap isDoRender 3D
 	</li>
+	<li onclick="swapItineraryIsDoRender();">
+		swap isDoRender Itinerary
+	</li>
 
 
 </ul>
@@ -245,8 +248,8 @@
 		magoInstance.getViewer().scene.globe.depthTestAgainstTerrain = true;
 		magoInstance.setBaseUrl(dataInfo.baseUrl);
 
-		//var urlTest = "../f4d/3dtiles/(20240712)상지대 콜라다 데이터/tileset.json";
 		var urlTest = "../f4d/3dtiles/(20240712)상지대 콜라다 데이터/tileset.json";
+		//var urlTest = "../f4d/3dtiles/(20240712)상지대 콜라다 데이터_2buildings/tileset.json";
 		//var urlTest = "../f4d/3dtiles/splittedTile/tileset.json";
 		//var urlTest = "../f4d/3dtiles/Data_HanamKyosan/건물/tileset.json";
 		//var urlTest = "../f4d/3dtiles/ComplicatedModels10/tileset.json";
@@ -612,6 +615,26 @@
 
 	}
 
+	function swapItineraryIsDoRender()
+	{
+		if(magoManager.itineraryManager === undefined)
+		{
+			return;
+		}
+
+		var isDoRender = magoManager.itineraryManager.getIsDoRender();
+		if(isDoRender === true)
+		{
+			isDoRender = false;
+		}
+		else if(isDoRender === false)
+		{
+			isDoRender = true;
+		}
+
+		magoManager.itineraryManager.setIsDoRender(isDoRender);
+	}
+
 	function chemicalAccident2d()
 	{
 		var magoManager = MAGO3D_INSTANCE.getMagoManager();
@@ -623,7 +646,7 @@
 				magoManager : magoManager,
 				geoJsonIndexFileFolderPath : "\\f4d\\chemicalAccident\\output_chemicalAccident2D",
 				geoJsonIndexFilePath : "\\f4d\\chemicalAccident\\output_chemicalAccident2D\\JsonIndex2D.json",
-				renderingColorType : 1,
+				renderingColorType : 2, // 0= rainbow, 1= monotone, 2= legendColors.***
 				renderBorder : true,
 				textureFilterType : 0 // 0= nearest, 1= linear.***
 			};
@@ -767,6 +790,10 @@
 				renderColorType = 1;
 			}
 			else if(renderColorType === 1)
+			{
+				renderColorType = 2;
+			}
+			else if(renderColorType === 2)
 			{
 				renderColorType = 0;
 			}

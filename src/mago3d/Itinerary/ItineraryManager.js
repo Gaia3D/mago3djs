@@ -17,6 +17,7 @@ var ItineraryManager = function (options)
 	 this._renderThickLine = true;
 	 this._samplePointsSize = 5.0;
 	 this._isDoSamplePoints = false;
+	 this._isDoRender = true;
 
 	 this._samplingDataIncrementTimeMilisec = 200;
 
@@ -78,14 +79,24 @@ ItineraryManager.prototype.loadItineraryJsonFile = function (jsonjFilePath)
 	var itiLayer = this.newItineraryLayer(options);
 };
 
-ItineraryManager.prototype.setIsDoSamplePoints = function (_isDoSamplePoints)
+ItineraryManager.prototype.setIsDoSamplePoints = function (isDoSamplePoints)
 {
-	this._isDoSamplePoints = _isDoSamplePoints;
+	this._isDoSamplePoints = isDoSamplePoints;
 };
 
 ItineraryManager.prototype.getIsDoSamplePoints = function ()
 {
 	return this._isDoSamplePoints;
+};
+
+ItineraryManager.prototype.setIsDoRender = function (isDoRender)
+{
+	this._isDoRender = isDoRender;
+};
+
+ItineraryManager.prototype.getIsDoRender = function ()
+{
+	return this._isDoRender;
 };
 
 ItineraryManager.prototype.newItineraryLayer = function (options)
@@ -252,6 +263,11 @@ ItineraryManager.prototype.resetSampledPoints = function ()
 ItineraryManager.prototype.render = function ()
 {
 	if (this._itineraryLayersArray === undefined)
+	{
+		return false;
+	}
+
+	if (!this._isDoRender)
 	{
 		return false;
 	}

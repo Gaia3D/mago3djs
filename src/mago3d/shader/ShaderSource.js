@@ -2426,9 +2426,15 @@ uniform vec2 uMinMaxQuantizedValues_tex0;\n\
 uniform vec2 uMinMaxQuantizedValues_tex1;\n\
 uniform vec2 uMinMaxValues;\n\
 uniform vec2 uMinMaxValuesToRender;\n\
+uniform int uTextureSize[2];\n\
+\n\
+// Legend colors.***\n\
+uniform vec4 uLegendColors[16];\n\
+uniform float uLegendValues[16];\n\
 \n\
 uniform int uRenderBorder;\n\
 uniform int uRenderingColorType; // 0= rainbow, 1= monotone.\n\
+uniform int uTextureFilterType; // 0= nearest, 1= linear interpolation.\n\
 \n\
 varying vec3 vNormal;\n\
 varying vec4 vColor4; // color from attributes\n\
@@ -2472,7 +2478,13 @@ float UnpackDepth32( in vec4 pack )\n\
 {\n\
 	float depth = dot( pack, vec4(1.0, 0.00390625, 0.000015258789, 0.000000059605) );\n\
     return depth * 1.000000059605;// 1.000000059605 = (16777216.0) / (16777216.0 - 1.0);\n\
-}             \n\
+}   \n\
+\n\
+float unQuantize(float quantizedValue, float minVal, float maxVal)\n\
+{\n\
+	float unquantizedValue = quantizedValue * (maxVal - minVal) + minVal;\n\
+	return unquantizedValue;\n\
+}\n\
 \n\
 vec3 getViewRay(vec2 tc)\n\
 {\n\
@@ -2481,108 +2493,76 @@ vec3 getViewRay(vec2 tc)\n\
     vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    \n\
     return ray;                      \n\
 }         \n\
-            \n\
 \n\
-\n\
-/*\n\
-\n\
-vec3 reconstructPosition(vec2 texCoord, float depth)\n\
+float getRealValueNearest(vec2 texCoord, int texIdx)\n\
 {\n\
-    // https://wickedengine.net/2019/09/22/improved-normal-reconstruction-from-depth/\n\
-    float x = texCoord.x * 2.0 - 1.0;\n\
-    //float y = (1.0 - texCoord.y) * 2.0 - 1.0;\n\
-    float y = (texCoord.y) * 2.0 - 1.0;\n\
-    float z = (1.0 - depth) * 2.0 - 1.0;\n\
-    vec4 pos_NDC = vec4(x, y, z, 1.0);\n\
-    vec4 pos_CC = projectionMatrixInv * pos_NDC;\n\
-    return pos_CC.xyz / pos_CC.w;\n\
-}\n\
-\n\
-vec3 normal_from_depth(float depth, vec2 texCoord) {\n\
-    // http://theorangeduck.com/page/pure-depth-ssao\n\
-    float pixelSizeX = 1.0/screenWidth;\n\
-    float pixelSizeY = 1.0/screenHeight;\n\
-\n\
-    vec2 offset1 = vec2(0.0,pixelSizeY);\n\
-    vec2 offset2 = vec2(pixelSizeX,0.0);\n\
-\n\
-	float depthA = 0.0;\n\
-	float depthB = 0.0;\n\
-	for(float i=0.0; i<1.0; i++)\n\
-	{\n\
-		depthA += getDepth(texCoord + offset1*(1.0+i));\n\
-		depthB += getDepth(texCoord + offset2*(1.0+i));\n\
-	}\n\
-\n\
-	vec3 posA = reconstructPosition(texCoord + offset1*1.0, depthA/1.0);\n\
-	vec3 posB = reconstructPosition(texCoord + offset2*1.0, depthB/1.0);\n\
-\n\
-    vec3 pos0 = reconstructPosition(texCoord, depth);\n\
-    vec3 normal = cross(posA - pos0, posB - pos0);\n\
-    normal.z = -normal.z;\n\
-\n\
-    return normalize(normal);\n\
-}\n\
-\n\
-mat3 sx = mat3( \n\
-    1.0, 2.0, 1.0, \n\
-    0.0, 0.0, 0.0, \n\
-    -1.0, -2.0, -1.0 \n\
-);\n\
-mat3 sy = mat3( \n\
-    1.0, 0.0, -1.0, \n\
-    2.0, 0.0, -2.0, \n\
-    1.0, 0.0, -1.0 \n\
-);\n\
-\n\
-bool isEdge()\n\
-{\n\
-	vec3 I[3];\n\
-	vec2 screenPos = vec2((gl_FragCoord.x) / screenWidth, (gl_FragCoord.y) / screenHeight);\n\
-	float linearDepth = getDepth(screenPos);\n\
-	vec3 normal = normal_from_depth(linearDepth, screenPos);\n\
-\n\
-    for (int i=0; i<3; i++) {\n\
-        //vec3 norm1 = texelFetch(normalTexture, ivec2(gl_FragCoord) + ivec2(i-1,-1), 0 ).rgb * 2.0f - 1.0f;\n\
-        //vec3 norm2 =  texelFetch(normalTexture, ivec2(gl_FragCoord) + ivec2(i-1,0), 0 ).rgb * 2.0f - 1.0f;\n\
-        //vec3 norm3 = texelFetch(normalTexture, ivec2(gl_FragCoord) + ivec2(i-1,1), 0 ).rgb * 2.0f - 1.0f;\n\
-		vec2 screenPos1 = vec2((gl_FragCoord.x+float(i-1)) / screenWidth, (gl_FragCoord.y-1.0) / screenHeight);\n\
-		float linearDepth1 = getDepth(screenPos1);  \n\
-\n\
-		vec2 screenPos2 = vec2((gl_FragCoord.x+float(i-1)) / screenWidth, (gl_FragCoord.y-0.0) / screenHeight);\n\
-		float linearDepth2 = getDepth(screenPos2);  \n\
-\n\
-		vec2 screenPos3 = vec2((gl_FragCoord.x+float(i-1)) / screenWidth, (gl_FragCoord.y+1.0) / screenHeight);\n\
-		float linearDepth3 = getDepth(screenPos1);  \n\
-\n\
-		vec3 norm1 = normal_from_depth(linearDepth1, screenPos1);\n\
-        vec3 norm2 =  normal_from_depth(linearDepth2, screenPos2);\n\
-        vec3 norm3 = normal_from_depth(linearDepth3, screenPos3);\n\
-        float sampleValLeft  = dot(normal, norm1);\n\
-        float sampleValMiddle  = dot(normal, norm2);\n\
-        float sampleValRight  = dot(normal, norm3);\n\
-        I[i] = vec3(sampleValLeft, sampleValMiddle, sampleValRight);\n\
+    vec4 textureColor;\n\
+    float minVal, maxVal;\n\
+    if(texIdx == 0)\n\
+    {\n\
+        textureColor = texture2D(texture_0, texCoord);\n\
+        minVal = uMinMaxQuantizedValues_tex0.x;\n\
+        maxVal = uMinMaxQuantizedValues_tex0.y;\n\
+    }\n\
+    else if(texIdx == 1)\n\
+    {\n\
+        textureColor = texture2D(texture_1, texCoord);\n\
+        minVal = uMinMaxQuantizedValues_tex1.x;\n\
+        maxVal = uMinMaxQuantizedValues_tex1.y;\n\
     }\n\
 \n\
-    float gx = dot(sx[0], I[0]) + dot(sx[1], I[1]) + dot(sx[2], I[2]); \n\
-    float gy = dot(sy[0], I[0]) + dot(sy[1], I[1]) + dot(sy[2], I[2]);\n\
+    float quantized = UnpackDepth32(textureColor);\n\
+    float realPollutionVal = unQuantize(quantized,minVal, maxVal);\n\
+    return realPollutionVal;\n\
+}         \n\
 \n\
-    if((gx < 0.0 && gy < 0.0) || (gy < 0.0 && gx < 0.0) ) \n\
-        return false;\n\
-	float g = sqrt(pow(gx, 2.0)+pow(gy, 2.0));\n\
 \n\
-    if(g > 0.2) {\n\
-        return true;\n\
-    } \n\
-	return false;\n\
-}\n\
-*/\n\
-\n\
-float unQuantize(float quantizedValue, float minVal, float maxVal)\n\
+float getRealValueLinearInterpolation(vec2 texCoord)\n\
 {\n\
-	float unquantizedValue = quantizedValue * (maxVal - minVal) + minVal;\n\
-	return unquantizedValue;\n\
+    float resultInterpolatedValue = 0.0;\n\
+    float imageWidth = float(uTextureSize[0]);\n\
+    float imageHeight = float(uTextureSize[1]);\n\
+    vec2 imageSize = vec2(imageWidth, imageHeight);\n\
+    vec2 pix = 1.0/imageSize;\n\
+    vec2 vc = (floor(texCoord * imageSize)) * pix;\n\
+\n\
+    if(uTextureFilterType == 0)\n\
+    {\n\
+        float vt_0 = getRealValueNearest(vc, 0);\n\
+        float vt_1 = getRealValueNearest(vc, 1);\n\
+        return mix(vt_0, vt_1, uInterpolationFactor);\n\
+    }\n\
+    else{\n\
+        vec2 f = fract(texCoord * imageSize);\n\
+        vec2 tl = vec2(vc);\n\
+        vec2 tr = (vc + vec2(pix.x, 0.0));\n\
+        vec2 bl = (vc + vec2(0.0, pix.y));\n\
+        vec2 br = (vc + pix);\n\
+        \n\
+        float value_tl_0 = getRealValueNearest(tl, 0);\n\
+        float value_tr_0 = getRealValueNearest(tr, 0);\n\
+        float value_bl_0 = getRealValueNearest(bl, 0);\n\
+        float value_br_0 = getRealValueNearest(br, 0);\n\
+\n\
+        float value_tl_1 = getRealValueNearest(tl, 1);\n\
+        float value_tr_1 = getRealValueNearest(tr, 1);\n\
+        float value_bl_1 = getRealValueNearest(bl, 1);\n\
+        float value_br_1 = getRealValueNearest(br, 1);\n\
+\n\
+        float value_tl = mix(value_tl_0, value_tl_1, uInterpolationFactor);\n\
+        float value_tr = mix(value_tr_0, value_tr_1, uInterpolationFactor);\n\
+        float value_bl = mix(value_bl_0, value_bl_1, uInterpolationFactor);\n\
+        float value_br = mix(value_br_0, value_br_1, uInterpolationFactor);\n\
+\n\
+        float value_t = mix(value_tl, value_tr, f.x);\n\
+        float value_b = mix(value_bl, value_br, f.x);\n\
+\n\
+        resultInterpolatedValue = mix(value_t, value_b, f.y);\n\
+    }\n\
+    return resultInterpolatedValue;\n\
 }\n\
+\n\
+\n\
 \n\
 vec4 getRainbowColor_byHeight(in float height, in float minHeight_rainbow, in float maxHeight_rainbow, bool hotToCold)\n\
 {\n\
@@ -2668,16 +2648,6 @@ vec4 getRainbowColor_byHeight(in float height, in float minHeight_rainbow, in fl
 \n\
 void main()\n\
 {\n\
-	vec4 textureColor;\n\
-	vec4 textureColor_0;\n\
-	vec4 textureColor_1;\n\
-\n\
-	float realPollutionVal_0 = 0.0;\n\
-	float realPollutionVal_1 = 0.0;\n\
-\n\
-    float quantized_0 = 0.0;\n\
-    float quantized_1 = 0.0;\n\
-\n\
 	vec2 finalTexCoord = vTexCoord;\n\
 	if(textureFlipYAxis)\n\
 	{\n\
@@ -2725,28 +2695,22 @@ void main()\n\
         }\n\
     }\n\
 \n\
-    if(colorType == 2)\n\
-    {\n\
-        textureColor_0 = texture2D(texture_0, finalTexCoord);\n\
-        textureColor_1 = texture2D(texture_1, finalTexCoord);\n\
-\n\
-        quantized_0 = UnpackDepth32(textureColor_0);\n\
-        quantized_1 = UnpackDepth32(textureColor_1);\n\
-\n\
-        realPollutionVal_0 = unQuantize(quantized_0, uMinMaxQuantizedValues_tex0.x, uMinMaxQuantizedValues_tex0.y);\n\
-        realPollutionVal_1 = unQuantize(quantized_1, uMinMaxQuantizedValues_tex1.x, uMinMaxQuantizedValues_tex1.y);\n\
-    }\n\
-    else if(colorType == 0)\n\
-	{\n\
-        textureColor = oneColor4;\n\
-    }\n\
-	else if(colorType == 1)\n\
-	{\n\
-        textureColor = vColor4;\n\
-    }\n\
+    // if(colorType == 2)\n\
+    // {\n\
+    //      float realPollutionValue = getRealValueLinearInterpolation(finalTexCoord);\n\
+    // }\n\
+    // else if(colorType == 0)\n\
+	// {\n\
+    //     textureColor = oneColor4;\n\
+    // }\n\
+	// else if(colorType == 1)\n\
+	// {\n\
+    //     textureColor = vColor4;\n\
+    // }\n\
 	\n\
     vec4 finalColor;\n\
-	float realPollutionValue = mix(realPollutionVal_0, realPollutionVal_1, uInterpolationFactor);\n\
+    float realPollutionValue = getRealValueLinearInterpolation(finalTexCoord);\n\
+    \n\
 \n\
     if(uRenderingColorType == 0)\n\
     {\n\
@@ -2768,27 +2732,45 @@ void main()\n\
 \n\
         finalColor = vec4(gray, 0.0, 0.0, gray);\n\
     }\n\
-	\n\
-	// //vec4 intensity4 = vec4(1.0 - pollutionValue, 1.0 - pollutionValue, 1.0 - pollutionValue, pollutionValue * 10.0);\n\
-	// vec4 intensity4 = vec4(pollutionValue, 1.0 - pollutionValue, pollutionValue, pollutionValue * 10.0);\n\
-	// //vec4 pollutionColor = vec4(0.5, 1.0, 0.1, 1.0); // original green.***\n\
-	// vec4 pollutionColor = vec4(rainbowColor4.rgb, 1.0);\n\
-	// finalColor = mix(intensity4, pollutionColor, pollutionValue);\n\
+    else if(uRenderingColorType == 2)\n\
+    {\n\
+        // use an external legend.***************************************************************************************************************************\n\
+        vec4 colorAux = vec4(0.3, 0.3, 0.3, 0.3);\n\
 \n\
-    // // test.***\n\
-    // finalColor = vec4(rainbowColor4.rgb, rainbowColor4.a * 15.0);\n\
+        // find legendIdx.***\n\
+        for(int i=0; i<15; i++)\n\
+        {\n\
+            if(realPollutionValue <= 0.0)\n\
+            {\n\
+                break;\n\
+            }\n\
+            else if(realPollutionValue > uLegendValues[i] && realPollutionValue <= uLegendValues[i + 1])\n\
+            {\n\
+                colorAux = uLegendColors[i];\n\
+                break;\n\
+            }\n\
+            else\n\
+            {\n\
+                if(i == 14)\n\
+                {\n\
+                    colorAux = uLegendColors[14];\n\
+                }\n\
+            }\n\
+        }\n\
 \n\
-    // if(finalTexCoord.x < 0.005 || finalTexCoord.x > 0.995 || finalTexCoord.y < 0.005 || finalTexCoord.y > 0.995) \n\
-    // {\n\
-    //     finalColor = vec4(0.25, 0.5, 0.99, 0.6);\n\
-    // }\n\
+        if(colorAux.a == 0.0)\n\
+        {\n\
+            discard;\n\
+        }\n\
+\n\
+        finalColor = colorAux;\n\
+        // End use an external legend.-------------------------------------------------------------------------------------------------------------------------\n\
+    }\n\
+\n\
+\n\
 \n\
     gl_FragData[0] = finalColor; // test.***\n\
-\n\
-\n\
 	vec4 albedo4 = finalColor;\n\
-\n\
-    \n\
 \n\
 	#ifdef USE_MULTI_RENDER_TARGET\n\
 	{\n\

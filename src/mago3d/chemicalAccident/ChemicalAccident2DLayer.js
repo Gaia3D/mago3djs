@@ -34,7 +34,8 @@ var ChemicalAccident2DLayer = function(options)
 
 	this.textureFilterType = 0; // 0= nearest, 1= linear.***
 	this.renderBorder = 0; // 0= no render border, 1= render border.***
-	this.renderingColorType = 0; // 0= rainbow, 1= monotone.***
+	this.renderingColorType = 0; // 0= rainbow, 1= monotone, 2= legendColors.***
+	this.interpolationBetweenSlices = 0; // 0= no interpolation, 1= interpolation.***
 
 	// object to render.***
 	this.simulationBox = undefined;
@@ -96,6 +97,11 @@ var ChemicalAccident2DLayer = function(options)
 		if (options.textureFilterType !== undefined)
 		{
 			this.textureFilterType = options.textureFilterType;
+		}
+
+		if (options.interpolationBetweenSlices !== undefined)
+		{
+			this.interpolationBetweenSlices = options.interpolationBetweenSlices;
 		}
 	}
 
@@ -439,23 +445,12 @@ ChemicalAccident2DLayer.prototype._getScreenFBO = function(magoManager)
 	return this.screenFBO;
 };
 
-ChemicalAccident2DLayer.prototype.setTextureFilterType = function (textureFilterType, gl)
+ChemicalAccident2DLayer.prototype.setTextureFilterType = function (textureFilterType)
 {
 	// textureFilterType = 0 : nearest, 1 : linear.***
 	if (this.textureFilterType !== textureFilterType)
 	{
 		this.textureFilterType = textureFilterType;
-		var glFilter = gl.NEAREST;
-		if (textureFilterType === 1)
-		{
-			glFilter = gl.LINEAR;
-		}
-		var timeSlicesCount = this._timeSlicesArray.length;
-		for (var i=0; i<timeSlicesCount; i++)
-		{
-			var timeSlice = this._timeSlicesArray[i];
-			timeSlice.setTextureFilterType(glFilter, gl);
-		}
 	}
 };
 
@@ -485,6 +480,32 @@ ChemicalAccident2DLayer.prototype.getRenderingColorType = function ()
 	return this.renderingColorType;
 };
 
+ChemicalAccident2DLayer.prototype.getTextureSize = function ()
+{
+	if (this.simulationTextureSiz === undefined)
+	{
+		if (this._timeSlicesArray !== undefined && this._timeSlicesArray.length > 0)
+		{
+			var timeSlice1rst = this._timeSlicesArray[0];
+			var imageWidth = timeSlice1rst._texture2dAux.imageWidth;
+			var imageHeight = timeSlice1rst._texture2dAux.imageHeight;
+			this.simulationTextureSize = new Int32Array([imageWidth, imageHeight]);
+		}
+	}
+
+	return this.simulationTextureSize;
+};
+
+ChemicalAccident2DLayer.prototype.setInterpolationBetweenSlices = function (interpolationBetweenSlices)
+{
+	this.interpolationBetweenSlices = interpolationBetweenSlices;
+};
+
+ChemicalAccident2DLayer.prototype.getInterpolationBetweenSlices = function ()
+{
+	return this.interpolationBetweenSlices;
+};
+
 ChemicalAccident2DLayer.prototype.render = function ()
 {
 	var magoManager = this.chemicalAccident2DManager.magoManager;
@@ -494,6 +515,11 @@ ChemicalAccident2DLayer.prototype.render = function ()
 	var resultObject = this.getTimeSliceIdxByCurrentUnixTimeMiliseconds(animTimeController._currentUnixTimeMilisec);
 	var texIdxCurr = resultObject.timeSliceIdx;
 	var factor = resultObject.factor;
+
+	if (this.interpolationBetweenSlices === 0)
+	{
+		factor = 0.0;
+	}
 
 	if (texIdxCurr > this._timeSlicesArray.length - 1)
 	{
@@ -539,11 +565,20 @@ ChemicalAccident2DLayer.prototype.render = function ()
 	gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.
 	gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
 	gl.uniform1i(currentShader.uRenderBorder_loc, this.renderBorder); // 0= no render border, 1= render border.***
-	gl.uniform1i(currentShader.uRenderingColorType_loc, this.renderingColorType); // 0= rainbow, 1= monotone.
+	gl.uniform1i(currentShader.uRenderingColorType_loc, this.renderingColorType); // 0= rainbow, 1= monotone, 2= legendColors.***
+	gl.uniform1i(currentShader.uTextureFilterType_loc, this.textureFilterType); // 0= nearest, 1= linear.***
 
 	var minMaxValues = this._getMinMaxQuantizedValues();
 	gl.uniform2fv(currentShader.uMinMaxValues_loc, [minMaxValues[0], minMaxValues[1]]);
 	gl.uniform2fv(currentShader.uMinMaxValuesToRender_loc, [minMaxValues[0], minMaxValues[1]*0.0000001]);
+	var texSize = this.getTextureSize();
+	gl.uniform1iv(currentShader.uTextureSize_loc, texSize);
+
+	// Color legend.***
+	var legendColors = this.chemicalAccident2DManager._legendColors4;
+	var legendValues = this.chemicalAccident2DManager._legendValues;
+	gl.uniform4fv(currentShader.uLegendColors_loc, legendColors);
+	gl.uniform1fv(currentShader.uLegendValues_loc, legendValues);
 	
 	
 	// Textures.*****************************************************************************************************

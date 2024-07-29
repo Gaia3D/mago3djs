@@ -24,9 +24,13 @@ var ChemicalAccident2DManager = function (options)
 	this._totalAnimTime;
 	this._increTime;
 	this._isDoRender = true;
-	this.renderingColorType = 0; // 0= rainbow, 1= monotone.***
+	this.renderingColorType = 2; // 0= rainbow, 1= monotone, 2= legendColors.***
 	this.renderBorder = false;
 	this.textureFilterType = 0; // 0= nearest, 1= linear.***
+	this.interpolationBetweenSlices = 0; // 0= nearest, 1= linear.***
+
+	this._legendColors4;
+	this._legendValues;
 
 	this.pngsBinBlocksArray = undefined;
 
@@ -73,26 +77,63 @@ var ChemicalAccident2DManager = function (options)
 		{
 			this.textureFilterType = options.textureFilterType;
 		}
+
+		if (options.interpolationBetweenSlices !== undefined)
+		{
+			this.interpolationBetweenSlices = options.interpolationBetweenSlices;
+		}
 	}
 
 	// test vars.***
 	this.test_started = false;
 
 	//this.init();
+	this._TEST_setLegendsColors();
 };
 
 ChemicalAccident2DManager.prototype.setTextureFilterType = function (textureFilterType)
 {
 	// textureFilterType = 0 : nearest, 1 : linear.***
 	this.textureFilterType = textureFilterType;
-	
-	var gl = this.magoManager.getGl();
+
 	var chemAccidentLayersCount = this.chemAccident2DLayersArray.length;
 	for (var i=0; i<chemAccidentLayersCount; i++)
 	{
 		var chemAccLayer = this.chemAccident2DLayersArray[i];
-		chemAccLayer.setTextureFilterType(textureFilterType, gl);
+		chemAccLayer.setTextureFilterType(textureFilterType);
 	}
+};
+
+ChemicalAccident2DManager.prototype._TEST_setLegendsColors = function ()
+{
+	this._legendColors4 = new Float32Array([0/255, 0/255, 143/255, 128/255,    // 0
+		0/255, 15/255, 255/255, 128/255,   // 1
+		0/255, 95/255, 255/255, 128/255,   // 2
+		0/255, 175/255, 255/255, 128/255,  // 3
+		0/255, 255/255, 255/255, 128/255,  // 4
+		79/255, 255/255, 175/255, 128/255, // 5
+		159/255, 255/255, 95/255, 128/255, // 6
+		239/255, 255/255, 15/255, 128/255, // 7
+		255/255, 191/255, 0/255, 128/255,  // 8
+		255/255, 111/255, 0/255, 128/255,  // 9
+		255/255, 31/255, 0/255, 128/255,   // 10
+		207/255, 0/255, 0/255, 128/255,    // 11
+		127/255, 0/255, 0/255, 128/255,
+		127/255, 0/255, 0/255, 128/255,   // 13
+		127/255, 0/255, 0/255, 128/255,   // 14
+		127/255, 0/255, 0/255, 128/255, ]);  // 15
+
+	var min = 0.0;
+	var max = 0.65 * 0.05;
+	var range = max - min;
+	var legendColorsCount = this._legendColors4.length / 4;
+	var incre = range / (legendColorsCount - 1);
+	var valuesArray = [];
+	for (var i=0; i<legendColorsCount; i++)
+	{
+		valuesArray.push(incre * i + min);
+	}
+	this._legendValues = new Float32Array(valuesArray);
 };
 
 ChemicalAccident2DManager.prototype.setIsDoRender = function (isDoRender)
@@ -132,6 +173,18 @@ ChemicalAccident2DManager.prototype.setRenderingColorType = function (renderingC
 	{
 		var chemAccLayer = this.chemAccident2DLayersArray[i];
 		chemAccLayer.setRenderingColorType(renderingColorType);
+	}
+};
+
+ChemicalAccident2DManager.prototype.setInterpolationBetweenSlices = function (interpolationBetweenSlices)
+{
+	this.interpolationBetweenSlices = interpolationBetweenSlices;
+
+	var chemAccidentLayersCount = this.chemAccident2DLayersArray.length;
+	for (var i=0; i<chemAccidentLayersCount; i++)
+	{
+		var chemAccLayer = this.chemAccident2DLayersArray[i];
+		chemAccLayer.setInterpolationBetweenSlices(interpolationBetweenSlices);
 	}
 };
 
@@ -530,6 +583,7 @@ ChemicalAccident2DManager.prototype.newChemAccidentLayer2D = function (options)
 	options.renderingColorType = this.renderingColorType;
 	options.renderBorder = this.renderBorder;
 	options.textureFilterType = this.textureFilterType;
+	options.interpolationBetweenSlices = this.interpolationBetweenSlices;
 
 	var chemAccLayer = new ChemicalAccident2DLayer(options);
 	this.chemAccident2DLayersArray.push(chemAccLayer);
