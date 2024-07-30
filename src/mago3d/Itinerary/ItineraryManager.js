@@ -89,12 +89,17 @@ ItineraryManager.prototype.getIsDoSamplePoints = function ()
 	return this._isDoSamplePoints;
 };
 
-ItineraryManager.prototype.setIsDoRender = function (isDoRender)
+ItineraryManager.prototype.show = function ()
 {
-	this._isDoRender = isDoRender;
+	this._isDoRender = true;
 };
 
-ItineraryManager.prototype.getIsDoRender = function ()
+ItineraryManager.prototype.hide = function ()
+{
+	this._isDoRender = false;
+};
+
+ItineraryManager.prototype.isShow = function ()
 {
 	return this._isDoRender;
 };

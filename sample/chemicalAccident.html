@@ -611,7 +611,7 @@
 
 		//magoManager.animationTimeController.reset(options);
 		//magoManager.animationTimeController._timeScale = 20;
-		magoManager.animationTimeController.startAnimation();
+		//magoManager.animationTimeController.startAnimation();
 
 	}
 
@@ -622,17 +622,15 @@
 			return;
 		}
 
-		var isDoRender = magoManager.itineraryManager.getIsDoRender();
+		var isDoRender = magoManager.itineraryManager.isShow();
 		if(isDoRender === true)
 		{
-			isDoRender = false;
+			magoManager.itineraryManager.hide();
 		}
 		else if(isDoRender === false)
 		{
-			isDoRender = true;
+			magoManager.itineraryManager.show();
 		}
-
-		magoManager.itineraryManager.setIsDoRender(isDoRender);
 	}
 
 	function chemicalAccident2d()
