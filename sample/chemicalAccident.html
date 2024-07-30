@@ -248,7 +248,7 @@
 		magoInstance.getViewer().scene.globe.depthTestAgainstTerrain = true;
 		magoInstance.setBaseUrl(dataInfo.baseUrl);
 
-		var urlTest = "../f4d/3dtiles/(20240712)상지대 콜라다 데이터/tileset.json";
+		var urlTest = "../f4d/3dtiles/(20240712)상지대 콜라다 데이터_6buildings/tileset.json";
 		//var urlTest = "../f4d/3dtiles/(20240712)상지대 콜라다 데이터_2buildings/tileset.json";
 		//var urlTest = "../f4d/3dtiles/splittedTile/tileset.json";
 		//var urlTest = "../f4d/3dtiles/Data_HanamKyosan/건물/tileset.json";
@@ -644,8 +644,7 @@
 		{
 			var options = {
 				magoManager : magoManager,
-				geoJsonIndexFileFolderPath : "\\f4d\\chemicalAccident\\output_chemicalAccident2D",
-				geoJsonIndexFilePath : "\\f4d\\chemicalAccident\\output_chemicalAccident2D\\JsonIndex2D.json",
+				url : "\\f4d\\chemicalAccident\\output_chemicalAccident2D\\JsonIndex2D.json",
 				renderingColorType : 2, // 0= rainbow, 1= monotone, 2= legendColors.***
 				renderBorder : true,
 				textureFilterType : 0 // 0= nearest, 1= linear.***
@@ -701,16 +700,9 @@
 		{
 			var options = {
 				magoManager : magoManager,
-				geoJsonIndexFileFolderPath : "\\f4d\\chemicalAccident\\output_chemicalAccident"
+				url : "\\f4d\\chemicalAccident\\output_chemicalAccident\\JsonIndex.json"
 			};
 			magoManager.chemicalAccidentManager = new Mago3D.ChemicalAccidentManager(options);
-
-			//magoManager.chemicalAccidentManager.setMinMaxValuesToRender(0.0, 0.0);
-
-			// set the geoJsonIndexFilePath.***
-			var geoJsonIndexFilePath = "\\f4d\\chemicalAccident\\output_chemicalAccident\\JsonIndex.json"; 
-			magoManager.chemicalAccidentManager.load_chemicalAccidentIndexFile(geoJsonIndexFilePath);
-
 			magoManager.chemicalAccidentManager._animationState = Mago3D.CODE.processState.STARTED;
 
 			var options = {
@@ -810,18 +802,16 @@
 		var magoManager = MAGO3D_INSTANCE.getMagoManager();
 		if(magoManager.chemicalAccidentManager !== undefined)
 		{
-			var currIsDoRender = magoManager.chemicalAccidentManager.getIsDoRender();
+			var currIsDoRender = magoManager.chemicalAccidentManager.isShow();
 
 			if(currIsDoRender === true)
 			{
-				currIsDoRender = false;
+				magoManager.chemicalAccidentManager.hide();
 			}
 			else if(currIsDoRender === false)
 			{
-				currIsDoRender = true;
+				magoManager.chemicalAccidentManager.show();
 			}
-
-			magoManager.chemicalAccidentManager.setIsDoRender(currIsDoRender);
 		}
 	
 	}
@@ -831,18 +821,17 @@
 		var magoManager = MAGO3D_INSTANCE.getMagoManager();
 		if(magoManager.chemicalAccident2dManager !== undefined)
 		{
-			var currIsDoRender = magoManager.chemicalAccident2dManager.getIsDoRender();
+			var currIsDoRender = magoManager.chemicalAccident2dManager.isShow();
 
 			if(currIsDoRender === true)
 			{
-				currIsDoRender = false;
+				magoManager.chemicalAccident2dManager.hide();
 			}
 			else if(currIsDoRender === false)
 			{
-				currIsDoRender = true;
+				magoManager.chemicalAccident2dManager.show();
 			}
 
-			magoManager.chemicalAccident2dManager.setIsDoRender(currIsDoRender);
 		}
 	
 	}

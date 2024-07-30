@@ -1652,7 +1652,7 @@ Renderer.prototype.renderScreenQuad2 = function (gl)
 	}
 
 	// Chemical accident volumetric render.***
-	if (magoManager.chemicalAccidentManager && magoManager.chemicalAccidentManager.chemAccidentLayersArray && magoManager.chemicalAccidentManager.getIsDoRender())
+	if (magoManager.chemicalAccidentManager && magoManager.chemicalAccidentManager.chemAccidentLayersArray && magoManager.chemicalAccidentManager.isShow())
 	{
 		// check if exist chemAccidentVolumetricTex.***
 		if (magoManager.chemicalAccidentManager.chemAccidentLayersArray.length > 0)

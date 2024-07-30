@@ -34,7 +34,7 @@ var ChemicalAccident2DManager = function (options)
 
 	this.pngsBinBlocksArray = undefined;
 
-	this.volumePrepared = false;
+	this._isReadyToRender  = false;
 
 	// aux vars.***
 	this.counterAux = 0;
@@ -46,14 +46,13 @@ var ChemicalAccident2DManager = function (options)
 			this.magoManager = options.magoManager;
 		}
 
-		if (options.geoJsonIndexFilePath)
+		if (options.url)
 		{
-			this._geoJsonIndexFilePath = options.geoJsonIndexFilePath;
-		}
+			this._geoJsonIndexFilePath = options.url;
 
-		if (options.geoJsonIndexFileFolderPath)
-		{
-			this._geoJsonIndexFileFolderPath = options.geoJsonIndexFileFolderPath;
+			// calculate the folderPath from this._geoJsonIndexFilePath.***
+			var lastSlashIndex = this._geoJsonIndexFilePath.lastIndexOf("\\");
+			this._geoJsonIndexFileFolderPath = this._geoJsonIndexFilePath.substring(0, lastSlashIndex);
 		}
 
 		if (options.animationSpeed !== undefined)
@@ -136,12 +135,17 @@ ChemicalAccident2DManager.prototype._TEST_setLegendsColors = function ()
 	this._legendValues = new Float32Array(valuesArray);
 };
 
-ChemicalAccident2DManager.prototype.setIsDoRender = function (isDoRender)
+ChemicalAccident2DManager.prototype.show = function ()
 {
-	this._isDoRender = isDoRender;
+	this._isDoRender = true;
 };
 
-ChemicalAccident2DManager.prototype.getIsDoRender = function ()
+ChemicalAccident2DManager.prototype.hide = function ()
+{
+	this._isDoRender = false;
+};
+
+ChemicalAccident2DManager.prototype.isShow = function ()
 {
 	return this._isDoRender;
 };
@@ -269,7 +273,7 @@ ChemicalAccident2DManager.prototype.prepareVolume = function (magoManager)
 	// 2- pollution-layers (if GeoJsonIndexFile is loaded).
 	//-------------------------------------------------------------
 
-	if (this.volumePrepared)
+	if (this._isReadyToRender )
 	{
 		return true;
 	}
@@ -294,11 +298,16 @@ ChemicalAccident2DManager.prototype.prepareVolume = function (magoManager)
 		return false;
 	}
 
-	this.volumePrepared = true;
+	this._isReadyToRender  = true;
 
 	this.pngsBinBlocksArray = undefined; // free memory.***
 
 	return false;
+};
+
+ChemicalAccident2DManager.prototype.isReady = function ()
+{
+	return this._isReadyToRender;
 };
 
 ChemicalAccident2DManager.prototype._preparePollutionGeoJsonIndexFile = function ()

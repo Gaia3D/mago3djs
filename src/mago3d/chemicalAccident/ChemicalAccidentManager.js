@@ -25,7 +25,7 @@ var ChemicalAccidentManager = function (options)
 	this._increTime;
 	this._isDoRender = true;
 
-	this.volumePrepared = false;
+	this._isReadyToRender  = false;
 
 	// aux vars.***
 	this.counterAux = 0;
@@ -37,9 +37,18 @@ var ChemicalAccidentManager = function (options)
 			this.magoManager = options.magoManager;
 		}
 
-		if (options.geoJsonIndexFilePath)
+		// if (options.geoJsonIndexFilePath)
+		// {
+		// 	this._geoJsonIndexFilePath = options.geoJsonIndexFilePath;
+		// }
+
+		if (options.url)
 		{
-			this._geoJsonIndexFilePath = options.geoJsonIndexFilePath;
+			this._geoJsonIndexFilePath = options.url;
+
+			// calculate the folderPath from this._geoJsonIndexFilePath.***
+			var lastSlashIndex = this._geoJsonIndexFilePath.lastIndexOf("\\");
+			this._geoJsonIndexFileFolderPath = this._geoJsonIndexFilePath.substring(0, lastSlashIndex);
 		}
 
 		if (options.geoJsonIndexFileFolderPath)
@@ -55,24 +64,38 @@ var ChemicalAccidentManager = function (options)
 	}
 
 	// test vars.***
-	this.test_started = false;
+	this.test_started = false; // delete this var after test.***
 
 	this.init();
 };
 
 ChemicalAccidentManager.prototype.init = function ()
 {
-	this.test_started = false;
+	if (this._geoJsonIndexFilePath !== undefined)
+	{
+		this.load_chemicalAccidentIndexFile(this._geoJsonIndexFilePath);
+	}
+	this.test_started = false; // delete this var after test.***
 };
 
-ChemicalAccidentManager.prototype.setIsDoRender = function (isDoRender)
+ChemicalAccidentManager.prototype.show = function ()
 {
-	this._isDoRender = isDoRender;
+	this._isDoRender = true;
 };
 
-ChemicalAccidentManager.prototype.getIsDoRender = function ()
+ChemicalAccidentManager.prototype.hide = function ()
+{
+	this._isDoRender = false;
+};
+
+ChemicalAccidentManager.prototype.isShow = function ()
 {
 	return this._isDoRender;
+};
+
+ChemicalAccidentManager.prototype.isReady = function ()
+{
+	return this._isReadyToRender;
 };
 
 ChemicalAccidentManager.prototype.getChemicalAccidentLayersCount = function ()
@@ -331,7 +354,7 @@ ChemicalAccidentManager.prototype.prepareVolume = function (magoManager)
 	// 2- pollution-layers (if GeoJsonIndexFile is loaded).
 	//-------------------------------------------------------------
 
-	if (this.volumePrepared)
+	if (this._isReadyToRender )
 	{
 		return true;
 	}
@@ -356,7 +379,7 @@ ChemicalAccidentManager.prototype.prepareVolume = function (magoManager)
 		return false;
 	}
 
-	this.volumePrepared = true;
+	this._isReadyToRender  = true;
 
 	this.pngsBinBlocksArray = undefined; // free memory.***
 
