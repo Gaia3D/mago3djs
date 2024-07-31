@@ -181,8 +181,8 @@
 				//var terrainUrl = '../f4d/terrainAsia_L8/';
 				//var terrainUrl = '../f4d/terrainSejong20240704/';
 				//var terrainUrl = '../f4d/terrainKorea_miniSeoul/';
-				//var terrainUrl = '../f4d/terrainAsia_L11/';
-				var terrainUrl = '../f4d/terrain_seoul_1/';
+				var terrainUrl = '../f4d/terrainAsia_L11/';
+				//var terrainUrl = '../f4d/terrain_seoul_1/';
 
 				//const url = "/terrain-sample/seoul-12bilinear/";
 				const terrainProvider = Cesium.CesiumTerrainProvider.fromUrl(terrainUrl, {
@@ -645,7 +645,7 @@
 		{
 			var options = {
 				magoManager : magoManager,
-				url : "\\f4d\\chemicalAccident\\output_chemicalAccident2D\\JsonIndex2D.json",
+				url : "/f4d/chemicalAccident/output_chemicalAccident2D/JsonIndex2D.json",
 				renderingColorType : 2, // 0= rainbow, 1= monotone, 2= legendColors.***
 				renderBorder : true,
 				textureFilterType : 0 // 0= nearest, 1= linear.***
@@ -747,7 +747,7 @@
 		{
 			var options = {
 				magoManager : magoManager,
-				url : "\\f4d\\chemicalAccident\\output_chemicalAccident\\JsonIndex.json",
+				url : "/f4d/chemicalAccident/output_chemicalAccident/JsonIndex.json",
 				renderingColorType : 2, // 0= rainbow, 1= monotone, 2= legendColors.***
 			};
 			magoManager.chemicalAccidentManager = new Mago3D.ChemicalAccidentManager(options);

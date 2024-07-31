@@ -53,7 +53,7 @@ var ChemicalAccidentManager = function (options)
 			this._geoJsonIndexFilePath = options.url;
 
 			// calculate the folderPath from this._geoJsonIndexFilePath.***
-			var lastSlashIndex = this._geoJsonIndexFilePath.lastIndexOf("\\");
+			var lastSlashIndex = this._geoJsonIndexFilePath.lastIndexOf("/");
 			this._geoJsonIndexFileFolderPath = this._geoJsonIndexFilePath.substring(0, lastSlashIndex);
 		}
 
