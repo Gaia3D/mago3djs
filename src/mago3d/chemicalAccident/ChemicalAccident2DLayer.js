@@ -565,7 +565,7 @@ ChemicalAccident2DLayer.prototype.render = function ()
 	gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.
 	gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
 	gl.uniform1i(currentShader.uRenderBorder_loc, this.renderBorder); // 0= no render border, 1= render border.***
-	gl.uniform1i(currentShader.uRenderingColorType_loc, this.renderingColorType); // 0= rainbow, 1= monotone, 2= legendColors.***
+	
 	gl.uniform1i(currentShader.uTextureFilterType_loc, this.textureFilterType); // 0= nearest, 1= linear.***
 
 	var minMaxValues = this._getMinMaxQuantizedValues();
@@ -575,11 +575,23 @@ ChemicalAccident2DLayer.prototype.render = function ()
 	gl.uniform1iv(currentShader.uTextureSize_loc, texSize);
 
 	// Color legend.***
-	var legendColors = this.chemicalAccident2DManager._legendColors4;
-	var legendValues = this.chemicalAccident2DManager._legendValues;
-	gl.uniform4fv(currentShader.uLegendColors_loc, legendColors);
-	gl.uniform1fv(currentShader.uLegendValues_loc, legendValues);
-	gl.uniform1i(currentShader.uLegendColorsCount_loc, this.chemicalAccident2DManager._legendColorsCount);
+	if (this.renderingColorType === 2)
+	{
+		if (this.chemicalAccident2DManager._legendColors4 !== undefined && this.chemicalAccident2DManager._legendValues !== undefined)
+		{
+			var legendColors = this.chemicalAccident2DManager._legendColors4;
+			var legendValues = this.chemicalAccident2DManager._legendValues;
+			gl.uniform4fv(currentShader.uLegendColors_loc, legendColors);
+			gl.uniform1fv(currentShader.uLegendValues_loc, legendValues);
+			gl.uniform1i(currentShader.uLegendColorsCount_loc, this.chemicalAccident2DManager._legendColorsCount);
+		}
+		else
+		{
+			this.renderingColorType = 0;
+		}
+	}
+
+	gl.uniform1i(currentShader.uRenderingColorType_loc, this.renderingColorType); // 0= rainbow, 1= monotone, 2= legendColors.***
 	
 	
 	// Textures.*****************************************************************************************************

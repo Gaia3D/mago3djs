@@ -1314,11 +1314,22 @@ ChemicalAccidentLayer.prototype.render = function ()
 	gl.uniform1i(shader.u_useMinMaxValuesToRender_loc, this.useMinMaxValuesToRender);
 
 	// Color legend.***
-	var legendColors = chemicalAccidentManager._legendColors4;
-	var legendValues = chemicalAccidentManager._legendValues;
-	gl.uniform4fv(shader.uLegendColors_loc, legendColors);
-	gl.uniform1fv(shader.uLegendValues_loc, legendValues);
-	gl.uniform1i(shader.uLegendColorsCount_loc, chemicalAccidentManager._legendColorsCount);
+	if (this.renderingColorType === 2)
+	{
+		if (chemicalAccidentManager._legendColors4 !== undefined && chemicalAccidentManager._legendValues !== undefined)
+		{
+			var legendColors = chemicalAccidentManager._legendColors4;
+			var legendValues = chemicalAccidentManager._legendValues;
+			gl.uniform4fv(shader.uLegendColors_loc, legendColors);
+			gl.uniform1fv(shader.uLegendValues_loc, legendValues);
+			gl.uniform1i(shader.uLegendColorsCount_loc, chemicalAccidentManager._legendColorsCount);
+		}
+		else 
+		{
+			this.renderingColorType = 0;
+			
+		}
+	}
 
 	gl.uniform1i(shader.uRenderingColorType_loc, this.renderingColorType); // 0= rainbow, 1= monotone, 2= legendColors.***
 

@@ -646,7 +646,7 @@
 			var options = {
 				magoManager : magoManager,
 				url : "/f4d/chemicalAccident/output_chemicalAccident2D/JsonIndex2D.json",
-				renderingColorType : 2, // 0= rainbow, 1= monotone, 2= legendColors.***
+				renderingColorType : 0, // 0= rainbow, 1= monotone, 2= legendColors.***
 				renderBorder : true,
 				textureFilterType : 0 // 0= nearest, 1= linear.***
 			};
@@ -748,7 +748,7 @@
 			var options = {
 				magoManager : magoManager,
 				url : "/f4d/chemicalAccident/output_chemicalAccident/JsonIndex.json",
-				renderingColorType : 2, // 0= rainbow, 1= monotone, 2= legendColors.***
+				renderingColorType : 0, // 0= rainbow, 1= monotone, 2= legendColors.***
 			};
 			magoManager.chemicalAccidentManager = new Mago3D.ChemicalAccidentManager(options);
 			magoManager.chemicalAccidentManager._animationState = Mago3D.CODE.processState.STARTED;
