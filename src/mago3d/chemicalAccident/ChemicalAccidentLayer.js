@@ -24,6 +24,7 @@ var ChemicalAccidentTimeSlice = function(options)
 
 	 this._startUnixTimeMiliseconds;
 	 this._endUnixTimeMiliseconds;
+	 
 
 	 // uniforms.***
 	this.uMinMaxAltitudeSlices = undefined; // the uniform (vec2) is limited to 32.***
@@ -49,6 +50,8 @@ var ChemicalAccidentTimeSlice = function(options)
 		{
 			this._endUnixTimeMiliseconds = options.endUnixTimeMiliseconds;
 		}
+
+		
 	 }
 };
 
@@ -465,6 +468,8 @@ var ChemicalAccidentLayer = function(options)
 	//this.minMaxPollutionValuesToRender = new Float32Array([0.0, 0.0194]);
 	this.minMaxPollutionValuesToRender = new Float32Array([0.0, 0.0194 * 0.5]);
 
+	this.renderingColorType = 0; // 0= rainbow, 1= monotone, 2= legendColors.***
+
 	// cutting planes.
 	this.cuttingPlanesArray = [];
 	this.currentActiveCuttingPlaneIdx = -1;
@@ -499,6 +504,11 @@ var ChemicalAccidentLayer = function(options)
 		if (options.metadataFolderPath !== undefined)
 		{
 			this._metadataFolderPath = options.metadataFolderPath;
+		}
+
+		if (options.renderingColorType !== undefined)
+		{
+			this.renderingColorType = options.renderingColorType; // 0= rainbow, 1= monotone, 2= legendColors.***
 		}
 	}
 
@@ -923,6 +933,16 @@ ChemicalAccidentLayer.prototype.setMinMaxValuesToRender = function (min, max)
 	this.minMaxPollutionValuesToRender[1] = max;
 };
 
+ChemicalAccidentLayer.prototype.setRenderingColorType = function (renderingColorType)
+{
+	this.renderingColorType = renderingColorType;
+};
+
+ChemicalAccidentLayer.prototype.getRenderingColorType = function ()
+{
+	return this.renderingColorType;
+};
+
 ChemicalAccidentLayer.prototype.createCuttingPlaneXZ = function ()
 {
 	// 1. Calculate the rectangle in local coord.***
@@ -1292,6 +1312,15 @@ ChemicalAccidentLayer.prototype.render = function ()
 	// uMinMaxAltitudeSlices is a vec2 array.***
 	gl.uniform2fv(shader.uMinMaxAltitudeSlices_loc, testTimeSlice.uMinMaxAltitudeSlices);
 	gl.uniform1i(shader.u_useMinMaxValuesToRender_loc, this.useMinMaxValuesToRender);
+
+	// Color legend.***
+	var legendColors = chemicalAccidentManager._legendColors4;
+	var legendValues = chemicalAccidentManager._legendValues;
+	gl.uniform4fv(shader.uLegendColors_loc, legendColors);
+	gl.uniform1fv(shader.uLegendValues_loc, legendValues);
+	gl.uniform1i(shader.uLegendColorsCount_loc, chemicalAccidentManager._legendColorsCount);
+
+	gl.uniform1i(shader.uRenderingColorType_loc, this.renderingColorType); // 0= rainbow, 1= monotone, 2= legendColors.***
 
 	var useCuttingPlane = false;
 	if (this.currentActiveCuttingPlaneIdx >= 0 && this.currentActiveCuttingPlaneIdx < this.cuttingPlanesArray.length)

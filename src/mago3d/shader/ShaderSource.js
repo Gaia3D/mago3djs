@@ -69,6 +69,8 @@ uniform vec3 u_simulBoxPosLow;\n\
 uniform vec3 u_simulBoxMinPosLC;\n\
 uniform vec3 u_simulBoxMaxPosLC;\n\
 \n\
+uniform int uRenderingColorType; // 0= rainbow, 1= monotone, 2= legendColors.\n\
+\n\
 \n\
 \n\
 \n\
@@ -1615,45 +1617,13 @@ void main(){\n\
     {\n\
         smplingCount = 1.0;\n\
     }\n\
-    /*\n\
-    if(smplingCount < 10.0)\n\
-    {\n\
-        color4Aux = vec4(1.0, 0.0, 0.0, 0.7);\n\
-    }\n\
-    else if(smplingCount < 20.0)\n\
-    {\n\
-        color4Aux = vec4(0.0, 1.0, 0.0, 0.7);\n\
-    }\n\
-    else if(smplingCount < 30.0)\n\
-    {\n\
-        color4Aux = vec4(0.0, 0.0, 1.0, 0.7);\n\
-    }\n\
-    else if(smplingCount < 40.0)\n\
-    {\n\
-        color4Aux = vec4(1.0, 1.0, 0.0, 0.7);\n\
-    }\n\
-    else\n\
-    {\n\
-        color4Aux = vec4(1.0, 0.0, 1.0, 0.7);\n\
-    }\n\
-    */\n\
 \n\
-    //vec4 rainbowColor = getRainbowColor_byHeight(contaminationAccum/smplingCount, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y, false);\n\
-\n\
-\n\
-    //float finalAlpha = finalColor4.a;\n\
-    //finalAlpha *= 2.0;\n\
-    //if(finalAlpha > 1.0)\n\
-    //{\n\
-    //    finalAlpha = 1.0;\n\
-    //}\n\
-    //finalColor4.a = finalAlpha;\n\
     color4Aux = finalColor4;\n\
 \n\
-    if(!normalLC_calculated)\n\
-    {\n\
-        //color4Aux = vec4(1.0, 0.0, 0.0, 1.0);\n\
-    }\n\
+    // if(!normalLC_calculated)\n\
+    // {\n\
+    //     //color4Aux = vec4(1.0, 0.0, 0.0, 1.0);\n\
+    // }\n\
 \n\
     gl_FragData[0] = color4Aux;\n\
 \n\
@@ -2431,9 +2401,10 @@ uniform int uTextureSize[2];\n\
 // Legend colors.***\n\
 uniform vec4 uLegendColors[16];\n\
 uniform float uLegendValues[16];\n\
+uniform int uLegendColorsCount;\n\
 \n\
 uniform int uRenderBorder;\n\
-uniform int uRenderingColorType; // 0= rainbow, 1= monotone.\n\
+uniform int uRenderingColorType; // 0= rainbow, 1= monotone, 2= legendColors.\n\
 uniform int uTextureFilterType; // 0= nearest, 1= linear interpolation.\n\
 \n\
 varying vec3 vNormal;\n\
@@ -2646,6 +2617,45 @@ vec4 getRainbowColor_byHeight(in float height, in float minHeight_rainbow, in fl
     return resultColor;\n\
 }\n\
 \n\
+vec4 getColorByLegendColors(float realPollutionValue)\n\
+{\n\
+    vec4 colorAux = vec4(0.3, 0.3, 0.3, 0.1);\n\
+\n\
+    // find legendIdx.***\n\
+    for(int i=0; i<16; i++)\n\
+    {\n\
+        if( i >= uLegendColorsCount)\n\
+        {\n\
+            break;\n\
+        }\n\
+\n\
+        if(realPollutionValue <= 0.0)\n\
+        {\n\
+            colorAux = vec4(0.3, 0.3, 0.3, 0.1);\n\
+            break;\n\
+        }\n\
+        else if(i < uLegendColorsCount - 1)// && realPollutionValue <= uLegendValues[i + 1])\n\
+        {\n\
+            if(realPollutionValue >= uLegendValues[i] && realPollutionValue < uLegendValues[i + 1])\n\
+            {\n\
+                colorAux = uLegendColors[i];\n\
+                break;\n\
+            }\n\
+        }\n\
+        else if(i == uLegendColorsCount - 1)\n\
+        {\n\
+            if(realPollutionValue >= uLegendValues[i])\n\
+            {\n\
+                colorAux = uLegendColors[i];\n\
+                break;\n\
+            }\n\
+        }\n\
+\n\
+    }\n\
+\n\
+    return colorAux;\n\
+}\n\
+\n\
 void main()\n\
 {\n\
 	vec2 finalTexCoord = vTexCoord;\n\
@@ -2735,29 +2745,7 @@ void main()\n\
     else if(uRenderingColorType == 2)\n\
     {\n\
         // use an external legend.***************************************************************************************************************************\n\
-        vec4 colorAux = vec4(0.3, 0.3, 0.3, 0.3);\n\
-\n\
-        // find legendIdx.***\n\
-        for(int i=0; i<15; i++)\n\
-        {\n\
-            if(realPollutionValue <= 0.0)\n\
-            {\n\
-                break;\n\
-            }\n\
-            else if(realPollutionValue > uLegendValues[i] && realPollutionValue <= uLegendValues[i + 1])\n\
-            {\n\
-                colorAux = uLegendColors[i];\n\
-                break;\n\
-            }\n\
-            else\n\
-            {\n\
-                if(i == 14)\n\
-                {\n\
-                    colorAux = uLegendColors[14];\n\
-                }\n\
-            }\n\
-        }\n\
-\n\
+        vec4 colorAux = getColorByLegendColors(realPollutionValue);\n\
         if(colorAux.a == 0.0)\n\
         {\n\
             discard;\n\
@@ -2766,7 +2754,6 @@ void main()\n\
         finalColor = colorAux;\n\
         // End use an external legend.-------------------------------------------------------------------------------------------------------------------------\n\
     }\n\
-\n\
 \n\
 \n\
     gl_FragData[0] = finalColor; // test.***\n\
@@ -2978,6 +2965,13 @@ uniform vec3 u_simulBoxPosHigh;\n\
 uniform vec3 u_simulBoxPosLow;\n\
 uniform vec3 u_simulBoxMinPosLC;\n\
 uniform vec3 u_simulBoxMaxPosLC;\n\
+\n\
+// Legend colors.***\n\
+uniform vec4 uLegendColors[16];\n\
+uniform float uLegendValues[16];\n\
+uniform int uLegendColorsCount;\n\
+\n\
+uniform int uRenderingColorType;  // 0= rainbow, 1= monotone, 2= legendColors.\n\
 \n\
 \n\
 \n\
@@ -3942,6 +3936,54 @@ vec4 getRainbowColor_byHeight(in float height, in float minHeight_rainbow, in fl
     return resultColor;\n\
 }\n\
 \n\
+vec4 getColorByLegendColors(float realPollutionValue)\n\
+{\n\
+    vec4 colorAux = vec4(0.3, 0.3, 0.3, 0.01);\n\
+\n\
+    // find legendIdx.***\n\
+    for(int i=0; i<16; i++)\n\
+    {\n\
+        if( i >= uLegendColorsCount)\n\
+        {\n\
+            break;\n\
+        }\n\
+\n\
+        if(realPollutionValue <= 0.0)\n\
+        {\n\
+            colorAux = vec4(0.3, 0.3, 0.3, 0.0);\n\
+            break;\n\
+        }\n\
+        else if(i < uLegendColorsCount - 1)// && realPollutionValue <= uLegendValues[i + 1])\n\
+        {\n\
+            if(realPollutionValue >= uLegendValues[i] && realPollutionValue < uLegendValues[i + 1])\n\
+            {\n\
+                // interpolate values.***\n\
+                vec4 color_0 = uLegendColors[i];\n\
+                vec4 color_1 = uLegendColors[i + 1];\n\
+                float value_0 = uLegendValues[i];\n\
+                float value_1 = uLegendValues[i + 1];\n\
+\n\
+                float f = (realPollutionValue - value_0) / (value_1 - value_0);\n\
+                colorAux = mix(color_0, color_1, f);\n\
+                break;\n\
+                // colorAux = uLegendColors[i];\n\
+                // break;\n\
+            }\n\
+        }\n\
+        else if(i == uLegendColorsCount - 1)\n\
+        {\n\
+            if(realPollutionValue >= uLegendValues[i])\n\
+            {\n\
+                colorAux = uLegendColors[i];\n\
+                break;\n\
+            }\n\
+        }\n\
+\n\
+    }\n\
+\n\
+    return colorAux;\n\
+}\n\
+\n\
 \n\
 // https://www.willusher.io/webgl/2019/01/13/volume-rendering-with-webgl\n\
 // The transfer function specifies what color and opacity value should be assigned for a given value sampled from the volume. \n\
@@ -4465,12 +4507,25 @@ void main(){\n\
     }\n\
 \n\
     int samplesCount2 = 0;\n\
+    vec4 currColor4;\n\
     for(int i=0; i<30; i++)\n\
     {\n\
         contaminationSample = contaminationSamples[i];\n\
         if(contaminationSample > 0.0)\n\
         {\n\
-            vec4 currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);\n\
+            if(uRenderingColorType == 0)\n\
+            {\n\
+                currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);\n\
+            }\n\
+            else if(uRenderingColorType == 1)\n\
+            {\n\
+                // for the moment use rainbow colors.***\n\
+                currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);\n\
+            }\n\
+            else if(uRenderingColorType == 2)\n\
+            {\n\
+                currColor4 = getColorByLegendColors(contaminationSample);\n\
+            }\n\
 \n\
             if(u_useMinMaxValuesToRender == 1)\n\
             {\n\

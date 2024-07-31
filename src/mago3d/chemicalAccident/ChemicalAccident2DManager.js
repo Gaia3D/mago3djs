@@ -31,6 +31,7 @@ var ChemicalAccident2DManager = function (options)
 
 	this._legendColors4;
 	this._legendValues;
+	this._legendColorsCount = 0;
 
 	this.pngsBinBlocksArray = undefined;
 
@@ -85,9 +86,6 @@ var ChemicalAccident2DManager = function (options)
 
 	// test vars.***
 	this.test_started = false;
-
-	//this.init();
-	this._TEST_setLegendsColors();
 };
 
 ChemicalAccident2DManager.prototype.setTextureFilterType = function (textureFilterType)
@@ -103,36 +101,28 @@ ChemicalAccident2DManager.prototype.setTextureFilterType = function (textureFilt
 	}
 };
 
-ChemicalAccident2DManager.prototype._TEST_setLegendsColors = function ()
+ChemicalAccident2DManager.prototype.setLegendColors = function (legendColorsArray)
 {
-	this._legendColors4 = new Float32Array([0/255, 0/255, 143/255, 128/255,    // 0
-		0/255, 15/255, 255/255, 128/255,   // 1
-		0/255, 95/255, 255/255, 128/255,   // 2
-		0/255, 175/255, 255/255, 128/255,  // 3
-		0/255, 255/255, 255/255, 128/255,  // 4
-		79/255, 255/255, 175/255, 128/255, // 5
-		159/255, 255/255, 95/255, 128/255, // 6
-		239/255, 255/255, 15/255, 128/255, // 7
-		255/255, 191/255, 0/255, 128/255,  // 8
-		255/255, 111/255, 0/255, 128/255,  // 9
-		255/255, 31/255, 0/255, 128/255,   // 10
-		207/255, 0/255, 0/255, 128/255,    // 11
-		127/255, 0/255, 0/255, 128/255,
-		127/255, 0/255, 0/255, 128/255,   // 13
-		127/255, 0/255, 0/255, 128/255,   // 14
-		127/255, 0/255, 0/255, 128/255, ]);  // 15
+	var legendColorsCount = legendColorsArray.length;
+	if (legendColorsCount === 0)
+	{
+		return false;
+	}
 
-	var min = 0.0;
-	var max = 0.65 * 0.05;
-	var range = max - min;
-	var legendColorsCount = this._legendColors4.length / 4;
-	var incre = range / (legendColorsCount - 1);
-	var valuesArray = [];
+	this._legendColors4 = new Float32Array(legendColorsCount * 4);
+	this._legendValues = new Float32Array(legendColorsCount);
+
 	for (var i=0; i<legendColorsCount; i++)
 	{
-		valuesArray.push(incre * i + min);
+		var color = legendColorsArray[i];
+		this._legendColors4[i*4] = color.red;
+		this._legendColors4[i*4+1] = color.green;
+		this._legendColors4[i*4+2] = color.blue;
+		this._legendColors4[i*4+3] = color.alpha;
+		this._legendValues[i] = color.value;
 	}
-	this._legendValues = new Float32Array(valuesArray);
+
+	this._legendColorsCount = legendColorsCount;
 };
 
 ChemicalAccident2DManager.prototype.show = function ()
@@ -381,75 +371,8 @@ ChemicalAccident2DManager.prototype.createDefaultShaders = function ()
 	}
 
 	// here creates the necessary shaders for waterManager.***
-
-	// 6) simple texture copy Shader.*********************************************************************************************
-	var shaderName = "copyTextureIntoMosaic";
-	var vs_source = ShaderSource.quadVertTexCoordVS;
-	var fs_source = ShaderSource.soundCopyFS;
-	fs_source = fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
-	fs_source = fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
-	var shader = magoManager.postFxShadersManager.createShaderProgram(gl, vs_source, fs_source, shaderName, this.magoManager);
-	shader.a_pos_loc = gl.getAttribLocation(shader.program, "a_pos");//
-	shader.a_texcoord_loc = gl.getAttribLocation(shader.program, "a_texcoord");//
-	shader.texToCopy_loc = gl.getUniformLocation(shader.program, "texToCopy");
-	shader.u_textureFlipYAxis_loc = gl.getUniformLocation(shader.program, "u_textureFlipYAxis");
-	magoManager.postFxShadersManager.useProgram(shader);
-	gl.uniform1i(shader.texToCopy_loc, 0);
-
-	// 1) volumetric Shader.*********************************************************************************************
-	shaderName = "volumetric";
-	vs_source = ShaderSource.waterQuadVertVS;
-	fs_source = ShaderSource.chemicalAccidentVolumRenderFS;
+	// NOTE : actually, the chemicalAccident2D shader is created in postEffectShaderManager.***
 	
-	fs_source = fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
-	fs_source = fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
-	shader = magoManager.postFxShadersManager.createShaderProgram(gl, vs_source, fs_source, shaderName, this.magoManager);
-	
-	shader.simulationBoxDoubleDepthTex_loc = gl.getUniformLocation(shader.program, "simulationBoxDoubleDepthTex");
-	shader.simulationBoxDoubleNormalTex_loc = gl.getUniformLocation(shader.program, "simulationBoxDoubleNormalTex");
-	shader.pollutionMosaicTex_loc = gl.getUniformLocation(shader.program, "pollutionMosaicTex");
-	shader.sceneDepthTex_loc = gl.getUniformLocation(shader.program, "sceneDepthTex"); // scene depth tex.***
-	shader.sceneNormalTex_loc = gl.getUniformLocation(shader.program, "sceneNormalTex"); // scene normal tex.***
-	shader.cuttingPlaneDepthTex_loc = gl.getUniformLocation(shader.program, "cuttingPlaneDepthTex");
-	shader.cuttingPlaneNormalTex_loc = gl.getUniformLocation(shader.program, "cuttingPlaneNormalTex");
-
-	shader.a_pos_loc = gl.getAttribLocation(shader.program, "a_pos");
-	shader.u_screenSize_loc = gl.getUniformLocation(shader.program, "u_screenSize");
-	shader.uNearFarArray_loc = gl.getUniformLocation(shader.program, "uNearFarArray");
-	shader.tangentOfHalfFovy_loc = gl.getUniformLocation(shader.program, "tangentOfHalfFovy");
-	shader.aspectRatio_loc = gl.getUniformLocation(shader.program, "aspectRatio");
-	shader.modelViewMatrixRelToEyeInv_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEyeInv");
-
-	shader.u_texSize_loc = gl.getUniformLocation(shader.program, "u_texSize"); // The original texture3D size.***
-	shader.u_mosaicTexSize_loc = gl.getUniformLocation(shader.program, "u_mosaicTexSize"); // The mosaic texture size.***
-	shader.u_mosaicSize_loc = gl.getUniformLocation(shader.program, "u_mosaicSize"); // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***
-	shader.u_minMaxPollutionValues_loc = gl.getUniformLocation(shader.program, "u_minMaxPollutionValues");//
-	shader.u_airEnvirontmentPressure_loc = gl.getUniformLocation(shader.program, "u_airEnvirontmentPressure");
-	shader.u_maxVelocity_loc = gl.getUniformLocation(shader.program, "u_maxVelocity");
-	shader.u_voxelSizeMeters_loc = gl.getUniformLocation(shader.program, "u_voxelSizeMeters");//
-	shader.u_minMaxPollutionValuesToRender_loc = gl.getUniformLocation(shader.program, "u_minMaxPollutionValuesToRender");
-	shader.u_cuttingPlaneIdx_loc = gl.getUniformLocation(shader.program, "u_cuttingPlaneIdx");//
-	shader.u_useMinMaxValuesToRender_loc = gl.getUniformLocation(shader.program, "u_useMinMaxValuesToRender");//
-	shader.u_cuttingPlanePosLC_loc = gl.getUniformLocation(shader.program, "u_cuttingPlanePosLC");
-
-	shader.u_simulBoxTMat_loc = gl.getUniformLocation(shader.program, "u_simulBoxTMat");
-	shader.u_simulBoxTMatInv_loc = gl.getUniformLocation(shader.program, "u_simulBoxTMatInv");
-	shader.u_simulBoxPosHigh_loc = gl.getUniformLocation(shader.program, "u_simulBoxPosHigh");
-	shader.u_simulBoxPosLow_loc = gl.getUniformLocation(shader.program, "u_simulBoxPosLow");
-	shader.u_simulBoxMinPosLC_loc = gl.getUniformLocation(shader.program, "u_simulBoxMinPosLC");
-	shader.u_simulBoxMaxPosLC_loc = gl.getUniformLocation(shader.program, "u_simulBoxMaxPosLC");
-	shader.uMinMaxAltitudeSlices_loc = gl.getUniformLocation(shader.program, "uMinMaxAltitudeSlices");
-	
-	magoManager.postFxShadersManager.useProgram(shader);
-	gl.uniform1i(shader.simulationBoxDoubleDepthTex_loc, 0);
-	gl.uniform1i(shader.simulationBoxDoubleNormalTex_loc, 1);
-	gl.uniform1i(shader.pollutionMosaicTex_loc, 2);
-	gl.uniform1i(shader.sceneDepthTex_loc, 3);
-	gl.uniform1i(shader.sceneNormalTex_loc, 4);
-	gl.uniform1i(shader.cuttingPlaneDepthTex_loc, 5);
-	gl.uniform1i(shader.cuttingPlaneNormalTex_loc, 6);
-
-	magoManager.postFxShadersManager.useProgram(null);
 };
 
 ChemicalAccident2DManager.prototype._preparePollutionLayers = function (magoManager)

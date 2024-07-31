@@ -25,6 +25,12 @@ var ChemicalAccidentManager = function (options)
 	this._increTime;
 	this._isDoRender = true;
 
+	this.renderingColorType = 2; // 0= rainbow, 1= monotone, 2= legendColors.***
+
+	this._legendColors4;
+	this._legendValues;
+	this._legendColorsCount = 0;
+
 	this._isReadyToRender  = false;
 
 	// aux vars.***
@@ -61,6 +67,11 @@ var ChemicalAccidentManager = function (options)
 			// AnimationSpeed by default is 1. If want to render faster, try to set animationSpeed = 2 or animationSpeed = 3.***
 			this._animationSpeed = options.animationSpeed;
 		}
+
+		if ( options.renderingColorType !== undefined)
+		{
+			this.renderingColorType = options.renderingColorType; // 0= rainbow, 1= monotone, 2= legendColors.***
+		}
 	}
 
 	// test vars.***
@@ -96,6 +107,30 @@ ChemicalAccidentManager.prototype.isShow = function ()
 ChemicalAccidentManager.prototype.isReady = function ()
 {
 	return this._isReadyToRender;
+};
+
+ChemicalAccidentManager.prototype.setLegendColors = function (legendColorsArray)
+{
+	var legendColorsCount = legendColorsArray.length;
+	if (legendColorsCount === 0)
+	{
+		return false;
+	}
+
+	this._legendColors4 = new Float32Array(legendColorsCount * 4);
+	this._legendValues = new Float32Array(legendColorsCount);
+
+	for (var i=0; i<legendColorsCount; i++)
+	{
+		var color = legendColorsArray[i];
+		this._legendColors4[i*4] = color.red;
+		this._legendColors4[i*4+1] = color.green;
+		this._legendColors4[i*4+2] = color.blue;
+		this._legendColors4[i*4+3] = color.alpha;
+		this._legendValues[i] = color.value;
+	}
+
+	this._legendColorsCount = legendColorsCount;
 };
 
 ChemicalAccidentManager.prototype.getChemicalAccidentLayersCount = function ()
@@ -136,9 +171,22 @@ ChemicalAccidentManager.prototype.newChemAccidentLayer = function (options)
 	}
 
 	options.chemicalAccidentManager = this;
+	options.renderingColorType = this.renderingColorType;
 	var chemAccLayer = new ChemicalAccidentLayer(options);
 	this.chemAccidentLayersArray.push(chemAccLayer);
 	return chemAccLayer;
+};
+
+ChemicalAccidentManager.prototype.setRenderingColorType = function (renderingColorType)
+{
+	this.renderingColorType = renderingColorType;
+
+	var chemAccidentLayersCount = this.chemAccidentLayersArray.length;
+	for (var i=0; i<chemAccidentLayersCount; i++)
+	{
+		var chemAccLayer = this.chemAccidentLayersArray[i];
+		chemAccLayer.setRenderingColorType(renderingColorType);
+	}
 };
 
 ChemicalAccidentManager.prototype._loadGeoJsonIndexFile = function ()
@@ -583,6 +631,12 @@ ChemicalAccidentManager.prototype.createDefaultShaders = function ()
 	shader.u_simulBoxMinPosLC_loc = gl.getUniformLocation(shader.program, "u_simulBoxMinPosLC");
 	shader.u_simulBoxMaxPosLC_loc = gl.getUniformLocation(shader.program, "u_simulBoxMaxPosLC");
 	shader.uMinMaxAltitudeSlices_loc = gl.getUniformLocation(shader.program, "uMinMaxAltitudeSlices");
+
+	shader.uLegendColors_loc = gl.getUniformLocation(shader.program, "uLegendColors");
+	shader.uLegendValues_loc = gl.getUniformLocation(shader.program, "uLegendValues");
+	shader.uLegendColorsCount_loc = gl.getUniformLocation(shader.program, "uLegendColorsCount");
+
+	shader.uRenderingColorType_loc = gl.getUniformLocation(shader.program, "uRenderingColorType");
 	
 	magoManager.postFxShadersManager.useProgram(shader);
 	gl.uniform1i(shader.simulationBoxDoubleDepthTex_loc, 0);

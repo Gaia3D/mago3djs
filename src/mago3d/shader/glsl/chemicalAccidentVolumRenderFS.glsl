@@ -73,6 +73,13 @@ uniform vec3 u_simulBoxPosLow;
 uniform vec3 u_simulBoxMinPosLC;
 uniform vec3 u_simulBoxMaxPosLC;
 
+// Legend colors.***
+uniform vec4 uLegendColors[16];
+uniform float uLegendValues[16];
+uniform int uLegendColorsCount;
+
+uniform int uRenderingColorType;  // 0= rainbow, 1= monotone, 2= legendColors.
+
 
 
 
@@ -1036,6 +1043,54 @@ vec4 getRainbowColor_byHeight(in float height, in float minHeight_rainbow, in fl
     return resultColor;
 }
 
+vec4 getColorByLegendColors(float realPollutionValue)
+{
+    vec4 colorAux = vec4(0.3, 0.3, 0.3, 0.01);
+
+    // find legendIdx.***
+    for(int i=0; i<16; i++)
+    {
+        if( i >= uLegendColorsCount)
+        {
+            break;
+        }
+
+        if(realPollutionValue <= 0.0)
+        {
+            colorAux = vec4(0.3, 0.3, 0.3, 0.0);
+            break;
+        }
+        else if(i < uLegendColorsCount - 1)// && realPollutionValue <= uLegendValues[i + 1])
+        {
+            if(realPollutionValue >= uLegendValues[i] && realPollutionValue < uLegendValues[i + 1])
+            {
+                // interpolate values.***
+                vec4 color_0 = uLegendColors[i];
+                vec4 color_1 = uLegendColors[i + 1];
+                float value_0 = uLegendValues[i];
+                float value_1 = uLegendValues[i + 1];
+
+                float f = (realPollutionValue - value_0) / (value_1 - value_0);
+                colorAux = mix(color_0, color_1, f);
+                break;
+                // colorAux = uLegendColors[i];
+                // break;
+            }
+        }
+        else if(i == uLegendColorsCount - 1)
+        {
+            if(realPollutionValue >= uLegendValues[i])
+            {
+                colorAux = uLegendColors[i];
+                break;
+            }
+        }
+
+    }
+
+    return colorAux;
+}
+
 
 // https://www.willusher.io/webgl/2019/01/13/volume-rendering-with-webgl
 // The transfer function specifies what color and opacity value should be assigned for a given value sampled from the volume. 
@@ -1559,12 +1614,25 @@ void main(){
     }
 
     int samplesCount2 = 0;
+    vec4 currColor4;
     for(int i=0; i<30; i++)
     {
         contaminationSample = contaminationSamples[i];
         if(contaminationSample > 0.0)
         {
-            vec4 currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);
+            if(uRenderingColorType == 0)
+            {
+                currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);
+            }
+            else if(uRenderingColorType == 1)
+            {
+                // for the moment use rainbow colors.***
+                currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);
+            }
+            else if(uRenderingColorType == 2)
+            {
+                currColor4 = getColorByLegendColors(contaminationSample);
+            }
 
             if(u_useMinMaxValuesToRender == 1)
             {

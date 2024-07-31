@@ -45,9 +45,10 @@ uniform int uTextureSize[2];
 // Legend colors.***
 uniform vec4 uLegendColors[16];
 uniform float uLegendValues[16];
+uniform int uLegendColorsCount;
 
 uniform int uRenderBorder;
-uniform int uRenderingColorType; // 0= rainbow, 1= monotone.
+uniform int uRenderingColorType; // 0= rainbow, 1= monotone, 2= legendColors.
 uniform int uTextureFilterType; // 0= nearest, 1= linear interpolation.
 
 varying vec3 vNormal;
@@ -260,6 +261,45 @@ vec4 getRainbowColor_byHeight(in float height, in float minHeight_rainbow, in fl
     return resultColor;
 }
 
+vec4 getColorByLegendColors(float realPollutionValue)
+{
+    vec4 colorAux = vec4(0.3, 0.3, 0.3, 0.1);
+
+    // find legendIdx.***
+    for(int i=0; i<16; i++)
+    {
+        if( i >= uLegendColorsCount)
+        {
+            break;
+        }
+
+        if(realPollutionValue <= 0.0)
+        {
+            colorAux = vec4(0.3, 0.3, 0.3, 0.1);
+            break;
+        }
+        else if(i < uLegendColorsCount - 1)// && realPollutionValue <= uLegendValues[i + 1])
+        {
+            if(realPollutionValue >= uLegendValues[i] && realPollutionValue < uLegendValues[i + 1])
+            {
+                colorAux = uLegendColors[i];
+                break;
+            }
+        }
+        else if(i == uLegendColorsCount - 1)
+        {
+            if(realPollutionValue >= uLegendValues[i])
+            {
+                colorAux = uLegendColors[i];
+                break;
+            }
+        }
+
+    }
+
+    return colorAux;
+}
+
 void main()
 {
 	vec2 finalTexCoord = vTexCoord;
@@ -349,29 +389,7 @@ void main()
     else if(uRenderingColorType == 2)
     {
         // use an external legend.***************************************************************************************************************************
-        vec4 colorAux = vec4(0.3, 0.3, 0.3, 0.3);
-
-        // find legendIdx.***
-        for(int i=0; i<15; i++)
-        {
-            if(realPollutionValue <= 0.0)
-            {
-                break;
-            }
-            else if(realPollutionValue > uLegendValues[i] && realPollutionValue <= uLegendValues[i + 1])
-            {
-                colorAux = uLegendColors[i];
-                break;
-            }
-            else
-            {
-                if(i == 14)
-                {
-                    colorAux = uLegendColors[14];
-                }
-            }
-        }
-
+        vec4 colorAux = getColorByLegendColors(realPollutionValue);
         if(colorAux.a == 0.0)
         {
             discard;
@@ -380,7 +398,6 @@ void main()
         finalColor = colorAux;
         // End use an external legend.-------------------------------------------------------------------------------------------------------------------------
     }
-
 
 
     gl_FragData[0] = finalColor; // test.***

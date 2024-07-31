@@ -67,6 +67,8 @@ uniform vec3 u_simulBoxPosLow;
 uniform vec3 u_simulBoxMinPosLC;
 uniform vec3 u_simulBoxMaxPosLC;
 
+uniform int uRenderingColorType; // 0= rainbow, 1= monotone, 2= legendColors.
+
 
 
 
@@ -1613,45 +1615,13 @@ void main(){
     {
         smplingCount = 1.0;
     }
-    /*
-    if(smplingCount < 10.0)
-    {
-        color4Aux = vec4(1.0, 0.0, 0.0, 0.7);
-    }
-    else if(smplingCount < 20.0)
-    {
-        color4Aux = vec4(0.0, 1.0, 0.0, 0.7);
-    }
-    else if(smplingCount < 30.0)
-    {
-        color4Aux = vec4(0.0, 0.0, 1.0, 0.7);
-    }
-    else if(smplingCount < 40.0)
-    {
-        color4Aux = vec4(1.0, 1.0, 0.0, 0.7);
-    }
-    else
-    {
-        color4Aux = vec4(1.0, 0.0, 1.0, 0.7);
-    }
-    */
 
-    //vec4 rainbowColor = getRainbowColor_byHeight(contaminationAccum/smplingCount, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y, false);
-
-
-    //float finalAlpha = finalColor4.a;
-    //finalAlpha *= 2.0;
-    //if(finalAlpha > 1.0)
-    //{
-    //    finalAlpha = 1.0;
-    //}
-    //finalColor4.a = finalAlpha;
     color4Aux = finalColor4;
 
-    if(!normalLC_calculated)
-    {
-        //color4Aux = vec4(1.0, 0.0, 0.0, 1.0);
-    }
+    // if(!normalLC_calculated)
+    // {
+    //     //color4Aux = vec4(1.0, 0.0, 0.0, 1.0);
+    // }
 
     gl_FragData[0] = color4Aux;
 

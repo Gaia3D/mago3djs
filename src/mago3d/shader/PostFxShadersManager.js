@@ -399,13 +399,14 @@ PostFxShadersManager.prototype._createShader_chemAccident2D = function ()
 	shader.uMinMaxQuantizedValues_tex1_loc = gl.getUniformLocation(shader.program, "uMinMaxQuantizedValues_tex1");
 	shader.uMinMaxValues_loc = gl.getUniformLocation(shader.program, "uMinMaxValues");
 	shader.uRenderBorder_loc = gl.getUniformLocation(shader.program, "uRenderBorder");
-	shader.uRenderingColorType_loc = gl.getUniformLocation(shader.program, "uRenderingColorType");
+	shader.uRenderingColorType_loc = gl.getUniformLocation(shader.program, "uRenderingColorType"); // 0= rainbow, 1= monotone, 2= legendColors.
 	shader.uMinMaxValuesToRender_loc = gl.getUniformLocation(shader.program, "uMinMaxValuesToRender");
 	shader.uTextureSize_loc = gl.getUniformLocation(shader.program, "uTextureSize");
 	shader.uTextureFilterType_loc = gl.getUniformLocation(shader.program, "uTextureFilterType");
 
 	shader.uLegendColors_loc = gl.getUniformLocation(shader.program, "uLegendColors");
 	shader.uLegendValues_loc = gl.getUniformLocation(shader.program, "uLegendValues");
+	shader.uLegendColorsCount_loc = gl.getUniformLocation(shader.program, "uLegendColorsCount");
 
 	// textures.***
 	shader.texture_0_loc = gl.getUniformLocation(shader.program, "texture_0");

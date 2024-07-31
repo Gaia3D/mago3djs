@@ -579,6 +579,7 @@ ChemicalAccident2DLayer.prototype.render = function ()
 	var legendValues = this.chemicalAccident2DManager._legendValues;
 	gl.uniform4fv(currentShader.uLegendColors_loc, legendColors);
 	gl.uniform1fv(currentShader.uLegendValues_loc, legendValues);
+	gl.uniform1i(currentShader.uLegendColorsCount_loc, this.chemicalAccident2DManager._legendColorsCount);
 	
 	
 	// Textures.*****************************************************************************************************

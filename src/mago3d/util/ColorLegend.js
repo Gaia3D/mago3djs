@@ -2,7 +2,7 @@
 
 const ColorLegend = function(red = 1, green = 1, blue = 1, alpha = 1, value = 0)
 {
-	if (!(this instanceof ByteColor)) 
+	if (!(this instanceof ColorLegend)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
