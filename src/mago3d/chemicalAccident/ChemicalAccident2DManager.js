@@ -32,6 +32,7 @@ var ChemicalAccident2DManager = function (options)
 	this._legendColors4;
 	this._legendValues;
 	this._legendColorsCount = 0;
+	this._legendValuesScale = 1.0;
 
 	this.pngsBinBlocksArray = undefined;
 
@@ -123,6 +124,16 @@ ChemicalAccident2DManager.prototype.setLegendColors = function (legendColorsArra
 	}
 
 	this._legendColorsCount = legendColorsCount;
+};
+
+ChemicalAccident2DManager.prototype.setLegendValuesScale = function (legendValuesScale)
+{
+	this._legendValuesScale = legendValuesScale;
+};
+
+ChemicalAccident2DManager.prototype.getLegendValuesScale = function ()
+{
+	return this._legendValuesScale;
 };
 
 ChemicalAccident2DManager.prototype.show = function ()
@@ -518,6 +529,13 @@ ChemicalAccident2DManager.prototype.newChemAccidentLayer2D = function (options)
 	options.interpolationBetweenSlices = this.interpolationBetweenSlices;
 
 	var chemAccLayer = new ChemicalAccident2DLayer(options);
+
+	// set the legendColors.***
+	if (this._legendColors4 !== undefined && this._legendValues !== undefined)
+	{
+		chemAccLayer.copyLegendColors(this._legendColors4, this._legendValues, this._legendColorsCount, this._legendValuesScale);
+	}
+
 	this.chemAccident2DLayersArray.push(chemAccLayer);
 	return chemAccLayer;
 };

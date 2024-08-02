@@ -407,6 +407,7 @@ PostFxShadersManager.prototype._createShader_chemAccident2D = function ()
 	shader.uLegendColors_loc = gl.getUniformLocation(shader.program, "uLegendColors");
 	shader.uLegendValues_loc = gl.getUniformLocation(shader.program, "uLegendValues");
 	shader.uLegendColorsCount_loc = gl.getUniformLocation(shader.program, "uLegendColorsCount");
+	shader.uLegendValuesScale_loc = gl.getUniformLocation(shader.program, "uLegendValuesScale");
 
 	// textures.***
 	shader.texture_0_loc = gl.getUniformLocation(shader.program, "texture_0");

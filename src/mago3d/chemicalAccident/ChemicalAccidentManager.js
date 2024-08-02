@@ -27,9 +27,11 @@ var ChemicalAccidentManager = function (options)
 
 	this.renderingColorType = 2; // 0= rainbow, 1= monotone, 2= legendColors.***
 
+	// legend colors.***
 	this._legendColors4;
 	this._legendValues;
 	this._legendColorsCount = 0;
+	this._legendValuesScale = 1.0;
 
 	this._isReadyToRender  = false;
 
@@ -133,6 +135,16 @@ ChemicalAccidentManager.prototype.setLegendColors = function (legendColorsArray)
 	this._legendColorsCount = legendColorsCount;
 };
 
+ChemicalAccidentManager.prototype.setLegendValuesScale = function (legendValuesScale)
+{
+	this._legendValuesScale = legendValuesScale;
+};
+
+ChemicalAccidentManager.prototype.getLegendValuesScale = function ()
+{
+	return this._legendValuesScale;
+};
+
 ChemicalAccidentManager.prototype.getChemicalAccidentLayersCount = function ()
 {
 	if (this.chemAccidentLayersArray === undefined)
@@ -173,6 +185,13 @@ ChemicalAccidentManager.prototype.newChemAccidentLayer = function (options)
 	options.chemicalAccidentManager = this;
 	options.renderingColorType = this.renderingColorType;
 	var chemAccLayer = new ChemicalAccidentLayer(options);
+
+	// set the legendColors.***
+	if (this._legendColors4 !== undefined && this._legendValues !== undefined)
+	{
+		chemAccLayer.copyLegendColors(this._legendColors4, this._legendValues, this._legendColorsCount, this._legendValuesScale);
+	}
+
 	this.chemAccidentLayersArray.push(chemAccLayer);
 	return chemAccLayer;
 };
@@ -635,6 +654,7 @@ ChemicalAccidentManager.prototype.createDefaultShaders = function ()
 	shader.uLegendColors_loc = gl.getUniformLocation(shader.program, "uLegendColors");
 	shader.uLegendValues_loc = gl.getUniformLocation(shader.program, "uLegendValues");
 	shader.uLegendColorsCount_loc = gl.getUniformLocation(shader.program, "uLegendColorsCount");
+	shader.uLegendValuesScale_loc = gl.getUniformLocation(shader.program, "uLegendValuesScale");
 
 	shader.uRenderingColorType_loc = gl.getUniformLocation(shader.program, "uRenderingColorType");
 	

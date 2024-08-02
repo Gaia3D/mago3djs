@@ -77,6 +77,7 @@ uniform vec3 u_simulBoxMaxPosLC;
 uniform vec4 uLegendColors[16];
 uniform float uLegendValues[16];
 uniform int uLegendColorsCount;
+uniform float uLegendValuesScale;
 
 uniform int uRenderingColorType;  // 0= rainbow, 1= monotone, 2= legendColors.
 
@@ -1045,7 +1046,11 @@ vec4 getRainbowColor_byHeight(in float height, in float minHeight_rainbow, in fl
 
 vec4 getColorByLegendColors(float realPollutionValue)
 {
-    vec4 colorAux = vec4(0.3, 0.3, 0.3, 0.01);
+    vec4 colorAux = vec4(0.3, 0.3, 0.3, 0.1);
+    vec4 colorZero = vec4(0.3, 0.3, 0.3, 0.1);
+
+    // The legendValues are scaled, so must scale the realPollutionValue.***
+    float scaledValue = realPollutionValue * uLegendValuesScale;
 
     // find legendIdx.***
     for(int i=0; i<16; i++)
@@ -1055,34 +1060,50 @@ vec4 getColorByLegendColors(float realPollutionValue)
             break;
         }
 
-        if(realPollutionValue <= 0.0)
+        if(i == 0)
         {
-            colorAux = vec4(0.3, 0.3, 0.3, 0.0);
-            break;
-        }
-        else if(i < uLegendColorsCount - 1)// && realPollutionValue <= uLegendValues[i + 1])
-        {
-            if(realPollutionValue >= uLegendValues[i] && realPollutionValue < uLegendValues[i + 1])
+            if(scaledValue < uLegendValues[i])
             {
-                // interpolate values.***
-                vec4 color_0 = uLegendColors[i];
-                vec4 color_1 = uLegendColors[i + 1];
-                float value_0 = uLegendValues[i];
-                float value_1 = uLegendValues[i + 1];
-
-                float f = (realPollutionValue - value_0) / (value_1 - value_0);
-                colorAux = mix(color_0, color_1, f);
+                float value0 = 0.0;
+                float value1 = uLegendValues[i];
+                float factor = (scaledValue - value0) / (value1 - value0);
+                colorAux = mix(colorZero, uLegendColors[i], factor);
+                //colorAux = vec4(0.3, 0.3, 0.3, 0.0);
                 break;
-                // colorAux = uLegendColors[i];
-                // break;
+            }
+        }
+
+        if(i < uLegendColorsCount - 1)
+        {
+            if(scaledValue >= uLegendValues[i] && scaledValue < uLegendValues[i + 1])
+            {
+                // if(uTextureFilterType == 0)
+                // {
+                //     colorAux = uLegendColors[i];
+                // }
+                // else
+                {
+                    float value0 = uLegendValues[i];
+                    float value1 = uLegendValues[i + 1];
+                    float factor = (scaledValue - value0) / (value1 - value0);
+                    colorAux = mix(uLegendColors[i], uLegendColors[i + 1], factor);
+                }
+                break;
             }
         }
         else if(i == uLegendColorsCount - 1)
         {
-            if(realPollutionValue >= uLegendValues[i])
+            if(scaledValue >= uLegendValues[i])
             {
                 colorAux = uLegendColors[i];
                 break;
+            }
+            else
+            {
+                float value0 = uLegendValues[i];
+                float value1 = uLegendValues[i];
+                float factor = (scaledValue - value0) / (value1 - value0);
+                colorAux = mix(uLegendColors[i], uLegendColors[i], factor);
             }
         }
 

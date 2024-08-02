@@ -22,6 +22,12 @@ var ChemicalAccidentTimeSlice = function(options)
 	 this._mosaicTexture; // note : the mosaicTexture is a Texture3D too.***
 	 this._texture2dAux;	// aux texture.***
 
+	 // legend colors.***
+	this._legendColors4;
+	this._legendValues;
+	this._legendColorsCount = 0;
+	this._legendValuesScale = 1.0;
+
 	 this._startUnixTimeMiliseconds;
 	 this._endUnixTimeMiliseconds;
 	 
@@ -943,6 +949,53 @@ ChemicalAccidentLayer.prototype.getRenderingColorType = function ()
 	return this.renderingColorType;
 };
 
+ChemicalAccidentLayer.prototype.setLegendColors = function (legendColorsArray)
+{
+	var legendColorsCount = legendColorsArray.length;
+	if (legendColorsCount === 0)
+	{
+		return false;
+	}
+
+	this._legendColors4 = new Float32Array(legendColorsCount * 4);
+	this._legendValues = new Float32Array(legendColorsCount);
+
+	for (var i=0; i<legendColorsCount; i++)
+	{
+		var color = legendColorsArray[i];
+		this._legendColors4[i*4] = color.red;
+		this._legendColors4[i*4+1] = color.green;
+		this._legendColors4[i*4+2] = color.blue;
+		this._legendColors4[i*4+3] = color.alpha;
+		this._legendValues[i] = color.value;
+	}
+
+	this._legendColorsCount = legendColorsCount;
+};
+
+ChemicalAccidentLayer.prototype.setLegendValuesScale = function (legendValuesScale)
+{
+	this._legendValuesScale = legendValuesScale;
+};
+
+ChemicalAccidentLayer.prototype.getLegendValuesScale = function ()
+{
+	return this._legendValuesScale;
+};
+
+ChemicalAccidentLayer.prototype.copyLegendColors = function (legendColors4, legendValues, legendColorsCount, legendValuesScale)
+{
+	if (legendColors4 === undefined || legendValues === undefined || legendColorsCount === undefined)
+	{
+		return false;
+	}
+
+	this._legendColors4 = new Float32Array(legendColors4);
+	this._legendValues = new Float32Array(legendValues);
+	this._legendColorsCount = legendColorsCount;
+	this._legendValuesScale = legendValuesScale;
+};
+
 ChemicalAccidentLayer.prototype.createCuttingPlaneXZ = function ()
 {
 	// 1. Calculate the rectangle in local coord.***
@@ -1323,6 +1376,7 @@ ChemicalAccidentLayer.prototype.render = function ()
 			gl.uniform4fv(shader.uLegendColors_loc, legendColors);
 			gl.uniform1fv(shader.uLegendValues_loc, legendValues);
 			gl.uniform1i(shader.uLegendColorsCount_loc, chemicalAccidentManager._legendColorsCount);
+			gl.uniform1f(shader.uLegendValuesScale_loc, this._legendValuesScale);
 		}
 		else 
 		{

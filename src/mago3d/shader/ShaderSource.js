@@ -2402,6 +2402,7 @@ uniform int uTextureSize[2];\n\
 uniform vec4 uLegendColors[16];\n\
 uniform float uLegendValues[16];\n\
 uniform int uLegendColorsCount;\n\
+uniform float uLegendValuesScale;\n\
 \n\
 uniform int uRenderBorder;\n\
 uniform int uRenderingColorType; // 0= rainbow, 1= monotone, 2= legendColors.\n\
@@ -2453,6 +2454,8 @@ float UnpackDepth32( in vec4 pack )\n\
 \n\
 float unQuantize(float quantizedValue, float minVal, float maxVal)\n\
 {\n\
+    if(quantizedValue > 1.0){ quantizedValue = 1.0; }\n\
+    else if(quantizedValue < 0.0){ quantizedValue = 0.0; }\n\
 	float unquantizedValue = quantizedValue * (maxVal - minVal) + minVal;\n\
 	return unquantizedValue;\n\
 }\n\
@@ -2491,13 +2494,18 @@ float getRealValueNearest(vec2 texCoord, int texIdx)\n\
 float getRealValueLinearInterpolation(vec2 texCoord)\n\
 {\n\
     float resultInterpolatedValue = 0.0;\n\
-    float imageWidth = float(uTextureSize[0]);\n\
-    float imageHeight = float(uTextureSize[1]);\n\
-    vec2 imageSize = vec2(imageWidth, imageHeight);\n\
+\n\
+    if(uTextureSize[0] != 150 || uTextureSize[1] != 150)\n\
+    {\n\
+        return 0.0;\n\
+    }\n\
+\n\
+        \n\
+    vec2 imageSize = vec2(float(uTextureSize[0]), float(uTextureSize[1]));\n\
     vec2 pix = 1.0/imageSize;\n\
     vec2 vc = (floor(texCoord * imageSize)) * pix;\n\
 \n\
-    if(uTextureFilterType == 0)\n\
+    if(uTextureFilterType == 0)  // 0= nearest, 1= linear interpolation.\n\
     {\n\
         float vt_0 = getRealValueNearest(vc, 0);\n\
         float vt_1 = getRealValueNearest(vc, 1);\n\
@@ -2620,6 +2628,10 @@ vec4 getRainbowColor_byHeight(in float height, in float minHeight_rainbow, in fl
 vec4 getColorByLegendColors(float realPollutionValue)\n\
 {\n\
     vec4 colorAux = vec4(0.3, 0.3, 0.3, 0.1);\n\
+    vec4 colorZero = vec4(0.3, 0.3, 0.3, 0.1);\n\
+\n\
+    // The legendValues are scaled, so must scale the realPollutionValue.***\n\
+    float scaledValue = realPollutionValue * uLegendValuesScale;\n\
 \n\
     // find legendIdx.***\n\
     for(int i=0; i<16; i++)\n\
@@ -2629,25 +2641,49 @@ vec4 getColorByLegendColors(float realPollutionValue)\n\
             break;\n\
         }\n\
 \n\
-        if(realPollutionValue <= 0.0)\n\
+        if(i == 0)\n\
         {\n\
-            colorAux = vec4(0.3, 0.3, 0.3, 0.1);\n\
-            break;\n\
-        }\n\
-        else if(i < uLegendColorsCount - 1)// && realPollutionValue <= uLegendValues[i + 1])\n\
-        {\n\
-            if(realPollutionValue >= uLegendValues[i] && realPollutionValue < uLegendValues[i + 1])\n\
+            if(scaledValue < uLegendValues[i])\n\
             {\n\
-                colorAux = uLegendColors[i];\n\
+                float value0 = 0.0;\n\
+                float value1 = uLegendValues[i];\n\
+                float factor = (scaledValue - value0) / (value1 - value0);\n\
+                colorAux = mix(colorZero, uLegendColors[i], factor);\n\
+                break;\n\
+            }\n\
+        }\n\
+        \n\
+        if(i < uLegendColorsCount - 1)\n\
+        {\n\
+            if(scaledValue >= uLegendValues[i] && scaledValue < uLegendValues[i + 1])\n\
+            {\n\
+                if(uTextureFilterType == 0)\n\
+                {\n\
+                    colorAux = uLegendColors[i];\n\
+                }\n\
+                else\n\
+                {\n\
+                    float value0 = uLegendValues[i];\n\
+                    float value1 = uLegendValues[i + 1];\n\
+                    float factor = (scaledValue - value0) / (value1 - value0);\n\
+                    colorAux = mix(uLegendColors[i], uLegendColors[i + 1], factor);\n\
+                }\n\
                 break;\n\
             }\n\
         }\n\
         else if(i == uLegendColorsCount - 1)\n\
         {\n\
-            if(realPollutionValue >= uLegendValues[i])\n\
+            if(scaledValue >= uLegendValues[i])\n\
             {\n\
                 colorAux = uLegendColors[i];\n\
                 break;\n\
+            }\n\
+            else\n\
+            {\n\
+                float value0 = uLegendValues[i];\n\
+                float value1 = uLegendValues[i];\n\
+                float factor = (scaledValue - value0) / (value1 - value0);\n\
+                colorAux = mix(uLegendColors[i], uLegendColors[i], factor);\n\
             }\n\
         }\n\
 \n\
@@ -2720,6 +2756,8 @@ void main()\n\
 	\n\
     vec4 finalColor;\n\
     float realPollutionValue = getRealValueLinearInterpolation(finalTexCoord);\n\
+\n\
+    \n\
     \n\
 \n\
     if(uRenderingColorType == 0)\n\
@@ -2970,6 +3008,7 @@ uniform vec3 u_simulBoxMaxPosLC;\n\
 uniform vec4 uLegendColors[16];\n\
 uniform float uLegendValues[16];\n\
 uniform int uLegendColorsCount;\n\
+uniform float uLegendValuesScale;\n\
 \n\
 uniform int uRenderingColorType;  // 0= rainbow, 1= monotone, 2= legendColors.\n\
 \n\
@@ -3938,7 +3977,11 @@ vec4 getRainbowColor_byHeight(in float height, in float minHeight_rainbow, in fl
 \n\
 vec4 getColorByLegendColors(float realPollutionValue)\n\
 {\n\
-    vec4 colorAux = vec4(0.3, 0.3, 0.3, 0.01);\n\
+    vec4 colorAux = vec4(0.3, 0.3, 0.3, 0.1);\n\
+    vec4 colorZero = vec4(0.3, 0.3, 0.3, 0.1);\n\
+\n\
+    // The legendValues are scaled, so must scale the realPollutionValue.***\n\
+    float scaledValue = realPollutionValue * uLegendValuesScale;\n\
 \n\
     // find legendIdx.***\n\
     for(int i=0; i<16; i++)\n\
@@ -3948,34 +3991,50 @@ vec4 getColorByLegendColors(float realPollutionValue)\n\
             break;\n\
         }\n\
 \n\
-        if(realPollutionValue <= 0.0)\n\
+        if(i == 0)\n\
         {\n\
-            colorAux = vec4(0.3, 0.3, 0.3, 0.0);\n\
-            break;\n\
-        }\n\
-        else if(i < uLegendColorsCount - 1)// && realPollutionValue <= uLegendValues[i + 1])\n\
-        {\n\
-            if(realPollutionValue >= uLegendValues[i] && realPollutionValue < uLegendValues[i + 1])\n\
+            if(scaledValue < uLegendValues[i])\n\
             {\n\
-                // interpolate values.***\n\
-                vec4 color_0 = uLegendColors[i];\n\
-                vec4 color_1 = uLegendColors[i + 1];\n\
-                float value_0 = uLegendValues[i];\n\
-                float value_1 = uLegendValues[i + 1];\n\
-\n\
-                float f = (realPollutionValue - value_0) / (value_1 - value_0);\n\
-                colorAux = mix(color_0, color_1, f);\n\
+                float value0 = 0.0;\n\
+                float value1 = uLegendValues[i];\n\
+                float factor = (scaledValue - value0) / (value1 - value0);\n\
+                colorAux = mix(colorZero, uLegendColors[i], factor);\n\
+                //colorAux = vec4(0.3, 0.3, 0.3, 0.0);\n\
                 break;\n\
-                // colorAux = uLegendColors[i];\n\
-                // break;\n\
+            }\n\
+        }\n\
+\n\
+        if(i < uLegendColorsCount - 1)\n\
+        {\n\
+            if(scaledValue >= uLegendValues[i] && scaledValue < uLegendValues[i + 1])\n\
+            {\n\
+                // if(uTextureFilterType == 0)\n\
+                // {\n\
+                //     colorAux = uLegendColors[i];\n\
+                // }\n\
+                // else\n\
+                {\n\
+                    float value0 = uLegendValues[i];\n\
+                    float value1 = uLegendValues[i + 1];\n\
+                    float factor = (scaledValue - value0) / (value1 - value0);\n\
+                    colorAux = mix(uLegendColors[i], uLegendColors[i + 1], factor);\n\
+                }\n\
+                break;\n\
             }\n\
         }\n\
         else if(i == uLegendColorsCount - 1)\n\
         {\n\
-            if(realPollutionValue >= uLegendValues[i])\n\
+            if(scaledValue >= uLegendValues[i])\n\
             {\n\
                 colorAux = uLegendColors[i];\n\
                 break;\n\
+            }\n\
+            else\n\
+            {\n\
+                float value0 = uLegendValues[i];\n\
+                float value1 = uLegendValues[i];\n\
+                float factor = (scaledValue - value0) / (value1 - value0);\n\
+                colorAux = mix(uLegendColors[i], uLegendColors[i], factor);\n\
             }\n\
         }\n\
 \n\

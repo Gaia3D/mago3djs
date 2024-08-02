@@ -46,6 +46,7 @@ uniform int uTextureSize[2];
 uniform vec4 uLegendColors[16];
 uniform float uLegendValues[16];
 uniform int uLegendColorsCount;
+uniform float uLegendValuesScale;
 
 uniform int uRenderBorder;
 uniform int uRenderingColorType; // 0= rainbow, 1= monotone, 2= legendColors.
@@ -97,6 +98,8 @@ float UnpackDepth32( in vec4 pack )
 
 float unQuantize(float quantizedValue, float minVal, float maxVal)
 {
+    if(quantizedValue > 1.0){ quantizedValue = 1.0; }
+    else if(quantizedValue < 0.0){ quantizedValue = 0.0; }
 	float unquantizedValue = quantizedValue * (maxVal - minVal) + minVal;
 	return unquantizedValue;
 }
@@ -135,13 +138,18 @@ float getRealValueNearest(vec2 texCoord, int texIdx)
 float getRealValueLinearInterpolation(vec2 texCoord)
 {
     float resultInterpolatedValue = 0.0;
-    float imageWidth = float(uTextureSize[0]);
-    float imageHeight = float(uTextureSize[1]);
-    vec2 imageSize = vec2(imageWidth, imageHeight);
+
+    if(uTextureSize[0] != 150 || uTextureSize[1] != 150)
+    {
+        return 0.0;
+    }
+
+        
+    vec2 imageSize = vec2(float(uTextureSize[0]), float(uTextureSize[1]));
     vec2 pix = 1.0/imageSize;
     vec2 vc = (floor(texCoord * imageSize)) * pix;
 
-    if(uTextureFilterType == 0)
+    if(uTextureFilterType == 0)  // 0= nearest, 1= linear interpolation.
     {
         float vt_0 = getRealValueNearest(vc, 0);
         float vt_1 = getRealValueNearest(vc, 1);
@@ -264,6 +272,10 @@ vec4 getRainbowColor_byHeight(in float height, in float minHeight_rainbow, in fl
 vec4 getColorByLegendColors(float realPollutionValue)
 {
     vec4 colorAux = vec4(0.3, 0.3, 0.3, 0.1);
+    vec4 colorZero = vec4(0.3, 0.3, 0.3, 0.1);
+
+    // The legendValues are scaled, so must scale the realPollutionValue.***
+    float scaledValue = realPollutionValue * uLegendValuesScale;
 
     // find legendIdx.***
     for(int i=0; i<16; i++)
@@ -273,25 +285,49 @@ vec4 getColorByLegendColors(float realPollutionValue)
             break;
         }
 
-        if(realPollutionValue <= 0.0)
+        if(i == 0)
         {
-            colorAux = vec4(0.3, 0.3, 0.3, 0.1);
-            break;
-        }
-        else if(i < uLegendColorsCount - 1)// && realPollutionValue <= uLegendValues[i + 1])
-        {
-            if(realPollutionValue >= uLegendValues[i] && realPollutionValue < uLegendValues[i + 1])
+            if(scaledValue < uLegendValues[i])
             {
-                colorAux = uLegendColors[i];
+                float value0 = 0.0;
+                float value1 = uLegendValues[i];
+                float factor = (scaledValue - value0) / (value1 - value0);
+                colorAux = mix(colorZero, uLegendColors[i], factor);
+                break;
+            }
+        }
+        
+        if(i < uLegendColorsCount - 1)
+        {
+            if(scaledValue >= uLegendValues[i] && scaledValue < uLegendValues[i + 1])
+            {
+                if(uTextureFilterType == 0)
+                {
+                    colorAux = uLegendColors[i];
+                }
+                else
+                {
+                    float value0 = uLegendValues[i];
+                    float value1 = uLegendValues[i + 1];
+                    float factor = (scaledValue - value0) / (value1 - value0);
+                    colorAux = mix(uLegendColors[i], uLegendColors[i + 1], factor);
+                }
                 break;
             }
         }
         else if(i == uLegendColorsCount - 1)
         {
-            if(realPollutionValue >= uLegendValues[i])
+            if(scaledValue >= uLegendValues[i])
             {
                 colorAux = uLegendColors[i];
                 break;
+            }
+            else
+            {
+                float value0 = uLegendValues[i];
+                float value1 = uLegendValues[i];
+                float factor = (scaledValue - value0) / (value1 - value0);
+                colorAux = mix(uLegendColors[i], uLegendColors[i], factor);
             }
         }
 
@@ -364,6 +400,8 @@ void main()
 	
     vec4 finalColor;
     float realPollutionValue = getRealValueLinearInterpolation(finalTexCoord);
+
+    
     
 
     if(uRenderingColorType == 0)

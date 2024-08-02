@@ -37,6 +37,12 @@ var ChemicalAccident2DLayer = function(options)
 	this.renderingColorType = 0; // 0= rainbow, 1= monotone, 2= legendColors.***
 	this.interpolationBetweenSlices = 0; // 0= no interpolation, 1= interpolation.***
 
+	// legend colors.***
+	this._legendColors4;
+	this._legendValues;
+	this._legendColorsCount = 0;
+	this._legendValuesScale = 1.0;
+
 	// object to render.***
 	this.simulationBox = undefined;
 	this.vboKeysContainer;
@@ -105,6 +111,53 @@ var ChemicalAccident2DLayer = function(options)
 		}
 	}
 
+};
+
+ChemicalAccident2DLayer.prototype.setLegendColors = function (legendColorsArray)
+{
+	var legendColorsCount = legendColorsArray.length;
+	if (legendColorsCount === 0)
+	{
+		return false;
+	}
+
+	this._legendColors4 = new Float32Array(legendColorsCount * 4);
+	this._legendValues = new Float32Array(legendColorsCount);
+
+	for (var i=0; i<legendColorsCount; i++)
+	{
+		var color = legendColorsArray[i];
+		this._legendColors4[i*4] = color.red;
+		this._legendColors4[i*4+1] = color.green;
+		this._legendColors4[i*4+2] = color.blue;
+		this._legendColors4[i*4+3] = color.alpha;
+		this._legendValues[i] = color.value;
+	}
+
+	this._legendColorsCount = legendColorsCount;
+};
+
+ChemicalAccident2DLayer.prototype.setLegendValuesScale = function (legendValuesScale)
+{
+	this._legendValuesScale = legendValuesScale;
+};
+
+ChemicalAccident2DLayer.prototype.getLegendValuesScale = function ()
+{
+	return this._legendValuesScale;
+};
+
+ChemicalAccident2DLayer.prototype.copyLegendColors = function (legendColors4, legendValues, legendColorsCount, legendValuesScale)
+{
+	if (legendColors4 === undefined || legendValues === undefined || legendColorsCount === undefined)
+	{
+		return false;
+	}
+
+	this._legendColors4 = new Float32Array(legendColors4);
+	this._legendValues = new Float32Array(legendValues);
+	this._legendColorsCount = legendColorsCount;
+	this._legendValuesScale = legendValuesScale;
 };
 
 ChemicalAccident2DLayer.prototype._prepareLayer = function ()
@@ -489,7 +542,9 @@ ChemicalAccident2DLayer.prototype.getTextureSize = function ()
 			var timeSlice1rst = this._timeSlicesArray[0];
 			var imageWidth = timeSlice1rst._texture2dAux.imageWidth;
 			var imageHeight = timeSlice1rst._texture2dAux.imageHeight;
-			this.simulationTextureSize = new Int32Array([imageWidth, imageHeight]);
+			this.simulationTextureSize = new Int32Array(2);
+			this.simulationTextureSize[0] = imageWidth;
+			this.simulationTextureSize[1] = imageHeight;
 		}
 	}
 
@@ -520,6 +575,9 @@ ChemicalAccident2DLayer.prototype.render = function ()
 	{
 		factor = 0.0;
 	}
+
+	// test.***
+	//texIdxCurr = 600;
 
 	if (texIdxCurr > this._timeSlicesArray.length - 1)
 	{
@@ -568,22 +626,27 @@ ChemicalAccident2DLayer.prototype.render = function ()
 	
 	gl.uniform1i(currentShader.uTextureFilterType_loc, this.textureFilterType); // 0= nearest, 1= linear.***
 
+	var texSize = this.getTextureSize();
+	var texWidth = texSize[0];
+	var texHeight = texSize[1];
+	gl.uniform1iv(currentShader.uTextureSize_loc, [texSize[0], texSize[1]]);
+
 	var minMaxValues = this._getMinMaxQuantizedValues();
 	gl.uniform2fv(currentShader.uMinMaxValues_loc, [minMaxValues[0], minMaxValues[1]]);
 	gl.uniform2fv(currentShader.uMinMaxValuesToRender_loc, [minMaxValues[0], minMaxValues[1]*0.0000001]);
-	var texSize = this.getTextureSize();
-	gl.uniform1iv(currentShader.uTextureSize_loc, texSize);
+	
 
 	// Color legend.***
 	if (this.renderingColorType === 2)
 	{
-		if (this.chemicalAccident2DManager._legendColors4 !== undefined && this.chemicalAccident2DManager._legendValues !== undefined)
+		if (this._legendColors4 !== undefined && this._legendValues !== undefined)
 		{
-			var legendColors = this.chemicalAccident2DManager._legendColors4;
-			var legendValues = this.chemicalAccident2DManager._legendValues;
+			var legendColors = this._legendColors4;
+			var legendValues = this._legendValues;
 			gl.uniform4fv(currentShader.uLegendColors_loc, legendColors);
 			gl.uniform1fv(currentShader.uLegendValues_loc, legendValues);
-			gl.uniform1i(currentShader.uLegendColorsCount_loc, this.chemicalAccident2DManager._legendColorsCount);
+			gl.uniform1i(currentShader.uLegendColorsCount_loc, this._legendColorsCount);
+			gl.uniform1f(currentShader.uLegendValuesScale_loc, this._legendValuesScale);
 		}
 		else
 		{
@@ -596,11 +659,6 @@ ChemicalAccident2DLayer.prototype.render = function ()
 	
 	// Textures.*****************************************************************************************************
 	var timeSlicesCount = this._timeSlicesArray.length;
-
-	if (texIdxCurr >= timeSlicesCount)
-	{
-		texIdxCurr = timeSlicesCount - 1;
-	}
 
 	var texIdxNext = texIdxCurr + 1;
 	if (texIdxNext >= timeSlicesCount)
@@ -622,7 +680,7 @@ ChemicalAccident2DLayer.prototype.render = function ()
 
 	gl.frontFace(gl.CCW);
 	gl.enable(gl.BLEND);
-	// gl.depthMask(false);
+	gl.depthMask(false);
 
 	var minMaxQuantizedValues_tex0 = timeSliceCurr.getQuantizedMinMaxValues();
 	var minMaxQuantizedValues_tex1 = timeSliceNext.getQuantizedMinMaxValues();
