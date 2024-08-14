@@ -13,7 +13,7 @@ var ChemicalAccident2DManager = function (options)
 	this.magoManager;
 	this.chemAccident2DLayersArray;
 
-	this._jsonIndexFilesArry = [];
+	//this._jsonIndexFilesArry = [];
 
 	this._animationState = CODE.processState.NO_STARTED; 
 	this._animationStartTime = 0;
@@ -44,24 +44,24 @@ var ChemicalAccident2DManager = function (options)
 			this.magoManager = options.magoManager;
 		}
 
-		if (options.url)
-		{
-			// check if the "url" is an array of urls.***
-			if (Array.isArray(options.url))
-			{
-				var jsonIndexFilesCount = options.url.length;
-				for (var i=0; i<jsonIndexFilesCount; i++)
-				{
-					var jsonIndexFile = new JsonIndexFile({url: options.url[i]});
-					this._jsonIndexFilesArry.push(jsonIndexFile);
-				}
-			}
-			else 
-			{
-				var jsonIndexFile = new JsonIndexFile({url: options.url});
-				this._jsonIndexFilesArry.push(jsonIndexFile);
-			}
-		}
+		// if (options.url)
+		// {
+		// 	// check if the "url" is an array of urls.***
+		// 	if (Array.isArray(options.url))
+		// 	{
+		// 		var jsonIndexFilesCount = options.url.length;
+		// 		for (var i=0; i<jsonIndexFilesCount; i++)
+		// 		{
+		// 			var jsonIndexFile = new JsonIndexFile({url: options.url[i]});
+		// 			this._jsonIndexFilesArry.push(jsonIndexFile);
+		// 		}
+		// 	}
+		// 	else 
+		// 	{
+		// 		var jsonIndexFile = new JsonIndexFile({url: options.url});
+		// 		this._jsonIndexFilesArry.push(jsonIndexFile);
+		// 	}
+		// }
 
 		if (options.animationSpeed !== undefined)
 		{
@@ -312,26 +312,26 @@ ChemicalAccident2DManager.prototype.isReady = function ()
 	return this._isReadyToRender;
 };
 
-ChemicalAccident2DManager.prototype._preparePollutionGeoJsonIndexFile = function ()
-{
-	// // check if exist jsonIndexFiles.***
-	if (this._jsonIndexFilesArry === undefined || this._jsonIndexFilesArry.length === 0)
-	{
-		return false;
-	}
+// ChemicalAccident2DManager.prototype._preparePollutionGeoJsonIndexFile = function ()
+// {
+// 	// // check if exist jsonIndexFiles.***
+// 	if (this._jsonIndexFilesArry === undefined || this._jsonIndexFilesArry.length === 0)
+// 	{
+// 		return false;
+// 	}
 
-	var jsonFilesCount = this._jsonIndexFilesArry.length;
-	for (var i=0; i<jsonFilesCount; i++)
-	{
-		var jsonIndexFile = this._jsonIndexFilesArry[i];
-		if (!jsonIndexFile._prepare())
-		{
-			return false;
-		}
-	}
+// 	var jsonFilesCount = this._jsonIndexFilesArry.length;
+// 	for (var i=0; i<jsonFilesCount; i++)
+// 	{
+// 		var jsonIndexFile = this._jsonIndexFilesArry[i];
+// 		if (!jsonIndexFile._prepare())
+// 		{
+// 			return false;
+// 		}
+// 	}
 
-	return true;
-};
+// 	return true;
+// };
 
 ChemicalAccident2DManager.prototype._loadGeoJsonIndexFile = function ()
 {

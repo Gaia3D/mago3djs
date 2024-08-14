@@ -31,6 +31,7 @@ var ChemicalAccident2DLayer = function(options)
 	this._terrainSamplingState = CODE.processState.NO_STARTED;
 
 	this._layerData;
+	this._isDoRender = true;
 
 	this.textureFilterType = 0; // 0= nearest, 1= linear.***
 	this.renderBorder = 0; // 0= no render border, 1= render border.***
@@ -130,6 +131,21 @@ ChemicalAccident2DLayer.prototype.setLegendColors = function (legendColorsArray)
 	}
 
 	this._legendColorsCount = legendColorsCount;
+};
+
+ChemicalAccident2DLayer.prototype.show = function ()
+{
+	this._isDoRender = true;
+};
+
+ChemicalAccident2DLayer.prototype.hide = function ()
+{
+	this._isDoRender = false;
+};
+
+ChemicalAccident2DLayer.prototype.isShow = function ()
+{
+	return this._isDoRender;
 };
 
 ChemicalAccident2DLayer.prototype.setLegendValuesScale = function (legendValuesScale)
@@ -1033,6 +1049,11 @@ ChemicalAccident2DLayer.prototype.getInterpolationBetweenSlices = function ()
 
 ChemicalAccident2DLayer.prototype.render = function ()
 {
+	if (!this._isDoRender)
+	{
+		return true;
+	}
+
 	var magoManager = this.chemicalAccident2DManager.magoManager;
 	var animTimeController = magoManager.animationTimeController;
 	var gl = magoManager.getGl();

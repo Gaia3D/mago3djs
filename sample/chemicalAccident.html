@@ -716,7 +716,7 @@
 
 			// create legend colors.***
 			var legendColors = [];
-			var LegendColor = new Mago3D.ColorLegend(0/255, 0/255, 143/255, 0, legendValues[0]);  // 0
+			var LegendColor = new Mago3D.ColorLegend(0/255, 0/255, 143/255, 0.0, legendValues[0]);  // 0
 			legendColors.push(LegendColor);
 			LegendColor = new Mago3D.ColorLegend(0/255, 15/255, 255/255, 128/255, legendValues[1]);  // 1
 			legendColors.push(LegendColor);
@@ -748,7 +748,7 @@
 			// 2nd layer.************************************************************************************************************************
 			var options = {
 				url : "/f4d/chemicalAccident/output_chemAcc2D_20240806/JsonIndex2D.json",
-				renderingColorType : 0,  // 0= rainbow, 1= monotone, 2= legendColors.***
+				renderingColorType : 2,  // 0= rainbow, 1= monotone, 2= legendColors.***
 				renderBorder : true, // true, false.***
 				textureFilterType : 0,  // 0= nearest, 1= linear.***
 				interpolationBetweenSlices : 0  // 0= nearest, 1= linear.***
@@ -765,7 +765,7 @@
 
 			// create legend colors.***
 			var legendColors = [];
-			var LegendColor = new Mago3D.ColorLegend(0/255, 0/255, 143/255, 0, legendValues[0]);  // 0
+			var LegendColor = new Mago3D.ColorLegend(0/255, 0/255, 143/255, 0.0, legendValues[0]);  // 0
 			legendColors.push(LegendColor);
 			LegendColor = new Mago3D.ColorLegend(0/255, 15/255, 255/255, 128/255, legendValues[1]);  // 1
 			legendColors.push(LegendColor);
@@ -1043,15 +1043,25 @@
 		var magoManager = MAGO3D_INSTANCE.getMagoManager();
 		if(magoManager.chemicalAccident2dManager !== undefined)
 		{
-			var currIsDoRender = magoManager.chemicalAccident2dManager.isShow();
+			// var currIsDoRender = magoManager.chemicalAccident2dManager.isShow();
 
-			if(currIsDoRender === true)
+			// if(currIsDoRender === true)
+			// {
+			// 	magoManager.chemicalAccident2dManager.hide();
+			// }
+			// else if(currIsDoRender === false)
+			// {
+			// 	magoManager.chemicalAccident2dManager.show();
+			// }
+
+			var layer = magoManager.chemicalAccident2dManager.getChemicalAccident2DLayer(0);
+			if(layer.isShow())
 			{
-				magoManager.chemicalAccident2dManager.hide();
+				layer.hide();
 			}
-			else if(currIsDoRender === false)
+			else
 			{
-				magoManager.chemicalAccident2dManager.show();
+				layer.show();
 			}
 
 		}
