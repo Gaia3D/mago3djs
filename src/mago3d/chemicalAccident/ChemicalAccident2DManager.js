@@ -281,10 +281,10 @@ ChemicalAccident2DManager.prototype.prepareVolume = function (magoManager)
 	}
 
 	// 1rst, check if the geoJson is loaded.***
-	if (!this._preparePollutionGeoJsonIndexFile())
-	{
-		return false;
-	}
+	// if (!this._preparePollutionGeoJsonIndexFile())
+	// {
+	// 	return false;
+	// }
 
 	// create default shaders.***
 	if (!this._createdShaders)
@@ -406,22 +406,22 @@ ChemicalAccident2DManager.prototype._preparePollutionLayers = function (magoMana
 		this.chemAccident2DLayersArray = [];
 	}
 
-	var pollutionLayersCount = this.chemAccident2DLayersArray.length;
-	if (pollutionLayersCount === 0)
-	{
-		// use "GeoJsonIndexFile" to create pollutionLayers.***
-		var layersCount = this._jsonIndexFilesArry.length;
-		for (var j=0; j<layersCount; j++)
-		{
-			var jsonIndexFile = this._jsonIndexFilesArry[j];
-			var options = {
-				pollutionVolumeOwner : this,
-				jsonIndexFile        : jsonIndexFile,
-				metadataFolderPath   : jsonIndexFile._geoJsonIndexFileFolderPath,
-			};
-			var chemAccidentLayer = this.newChemAccidentLayer2D(options);
-		}
-	}
+	// var pollutionLayersCount = this.chemAccident2DLayersArray.length;
+	// if (pollutionLayersCount === 0)
+	// {
+	// 	// use "GeoJsonIndexFile" to create pollutionLayers.***
+	// 	var layersCount = this._jsonIndexFilesArry.length;
+	// 	for (var j=0; j<layersCount; j++)
+	// 	{
+	// 		var jsonIndexFile = this._jsonIndexFilesArry[j];
+	// 		var options = {
+	// 			pollutionVolumeOwner : this,
+	// 			jsonIndexFile        : jsonIndexFile,
+	// 			metadataFolderPath   : jsonIndexFile._geoJsonIndexFileFolderPath,
+	// 		};
+	// 		var chemAccidentLayer = this.newChemAccidentLayer2D(options);
+	// 	}
+	// }
 
 	// Now, check if all pollutionLayers are prepared.***
 	
@@ -469,5 +469,16 @@ ChemicalAccident2DManager.prototype.newChemAccidentLayer2D = function (options)
 
 	this.chemAccident2DLayersArray.push(chemAccLayer);
 	return chemAccLayer;
+};
+
+ChemicalAccident2DManager.prototype.addChemAccidentLayer2D = function (chemicalAccident2DLayer)
+{
+	if (!this.chemAccident2DLayersArray)
+	{
+		this.chemAccident2DLayersArray = [];
+	}
+
+	this.chemAccident2DLayersArray.push(chemicalAccident2DLayer);
+	chemicalAccident2DLayer.chemicalAccident2DManager = this;
 };
 

@@ -13,6 +13,7 @@ var ChemicalAccident2DLayer = function(options)
 	this.chemicalAccident2DManager = undefined;
 	this.geographicExtent;
 
+	this._jsonIndexFile;
 	this._geoJsonIndexFileLoadState = CODE.fileLoadState.READY;
 	this._geoJsonIndexFile;
 	this._geoJsonIndexFilePath;
@@ -30,7 +31,6 @@ var ChemicalAccident2DLayer = function(options)
 	this._terrainSamplingState = CODE.processState.NO_STARTED;
 
 	this._layerData;
-	this._metadataFolderPath;
 
 	this.textureFilterType = 0; // 0= nearest, 1= linear.***
 	this.renderBorder = 0; // 0= no render border, 1= render border.***
@@ -60,15 +60,9 @@ var ChemicalAccident2DLayer = function(options)
 
 	if (options)
 	{
-		// if (options.layerData)
-		// {
-		// 	this._layerData = options.layerData;
-		// }
-
-		if (options.jsonIndexFile)
+		if (options.url)
 		{
-			this._geoJsonIndexFile = options.jsonIndexFile._geoJsonIndexFile;
-			this._layerData = this._geoJsonIndexFile.layers[0];
+			this._jsonIndexFile = new JsonIndexFile({url: options.url});
 		}
 
 		if (options.chemicalAccident2DManager)
@@ -89,11 +83,6 @@ var ChemicalAccident2DLayer = function(options)
 		if (options.timeSliceFileNames !== undefined)
 		{
 			this.timeSliceFileNames = options.timeSliceFileNames;
-		}
-
-		if (options.metadataFolderPath !== undefined)
-		{
-			this._metadataFolderPath = options.metadataFolderPath;
 		}
 
 		if (options.renderingColorType !== undefined)
@@ -198,6 +187,22 @@ ChemicalAccident2DLayer.prototype.getBlobArrayBuffer = function (mosaicFileName)
 	
 };
 
+ChemicalAccident2DLayer.prototype._prepareJsonIndexFile = function ()
+{
+	// // check if exist jsonIndexFiles.***
+	if (this._jsonIndexFile === undefined)
+	{
+		return false;
+	}
+
+	if (!this._jsonIndexFile._prepare())
+	{
+		return false;
+	}
+
+	return true;
+};
+
 ChemicalAccident2DLayer.prototype._prepareLayer = function ()
 {
 	if (this._isPrepared)
@@ -211,6 +216,12 @@ ChemicalAccident2DLayer.prototype._prepareLayer = function ()
 		this._timeSlicesArray = [];
 	}
 
+	if (!this._prepareJsonIndexFile())
+	{
+		return false;
+	}
+
+	this._geoJsonIndexFile = this._jsonIndexFile._geoJsonIndexFile;
 	if (this._geoJsonIndexFile === undefined)
 	{
 		return false;
@@ -306,6 +317,11 @@ ChemicalAccident2DLayer.prototype._prepareLayer = function ()
 
 		var date = new Date(year, month, day, hour, minute, second, millisecond);
 		var startUnixTimeMiliseconds = date.getTime();
+
+		if (this._layerData === undefined)
+		{
+			this._layerData = this._geoJsonIndexFile.layers[0];
+		}
 
 		//var timeSliceFileNamesCount = geoJsonIndexFile.mosaicTexMetaDataJsonArray.length;
 		var timeSliceFileNamesCount = this._layerData.timeSlicesCount;
