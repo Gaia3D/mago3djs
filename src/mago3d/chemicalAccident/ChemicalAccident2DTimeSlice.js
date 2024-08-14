@@ -101,7 +101,7 @@ ChemicalAccident2DTimeSlice.prototype._prepare = function (chemAccidentLayer)
 	{
 		this._texture2dAux.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 		var that = this;
-		var mosaicTextureFolderPath = this.owner.chemicalAccident2DManager._geoJsonIndexFileFolderPath;
+		var mosaicTextureFolderPath = this.owner._geoJsonIndexFile._geoJsonIndexFileFolderPath;
 		var imageFileName = this._jsonFile.imagefileName;
 		var imageFilePath = mosaicTextureFolderPath + "\\" + imageFileName;
 		var flip_y_texCoord = false;
@@ -112,7 +112,7 @@ ChemicalAccident2DTimeSlice.prototype._prepare = function (chemAccidentLayer)
 
 		// check if exist blob data.***
 		var chemAccidentManager = chemAccidentLayer.chemicalAccident2DManager;
-		var blobArrayBuffer = chemAccidentManager.getBlobArrayBuffer(imageFileName);
+		var blobArrayBuffer = this.owner.getBlobArrayBuffer(imageFileName);
 		var blob = new Blob([blobArrayBuffer], { type: "image/png" });
 
 		if (blob !== undefined)

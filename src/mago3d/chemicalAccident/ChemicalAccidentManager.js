@@ -611,6 +611,7 @@ ChemicalAccidentManager.prototype.createDefaultShaders = function ()
 	shaderName = "volumetric";
 	vs_source = ShaderSource.waterQuadVertVS;
 	fs_source = ShaderSource.chemicalAccidentVolumRenderFS;
+	//fs_source = ShaderSource.chemicalAccidentBresenham3DRenderFS; // test.***
 	
 	fs_source = fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
 	fs_source = fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);

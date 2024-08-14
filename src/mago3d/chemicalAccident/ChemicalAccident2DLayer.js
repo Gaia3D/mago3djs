@@ -60,9 +60,15 @@ var ChemicalAccident2DLayer = function(options)
 
 	if (options)
 	{
-		if (options.layerData)
+		// if (options.layerData)
+		// {
+		// 	this._layerData = options.layerData;
+		// }
+
+		if (options.jsonIndexFile)
 		{
-			this._layerData = options.layerData;
+			this._geoJsonIndexFile = options.jsonIndexFile._geoJsonIndexFile;
+			this._layerData = this._geoJsonIndexFile.layers[0];
 		}
 
 		if (options.chemicalAccident2DManager)
@@ -160,6 +166,38 @@ ChemicalAccident2DLayer.prototype.copyLegendColors = function (legendColors4, le
 	this._legendValuesScale = legendValuesScale;
 };
 
+ChemicalAccident2DLayer.prototype.getBlobArrayBuffer = function (mosaicFileName)
+{
+	if (this.map_pngOriginalFileName_pngsBinData === undefined)
+	{
+		return undefined;
+	}
+
+
+	var pngsBinData = this.map_pngOriginalFileName_pngsBinData[mosaicFileName];
+	if (pngsBinData === undefined)
+	{
+		return undefined;
+	}
+
+	var pngsBinBlocksCount = this.pngsBinBlocksArray.length;
+	for (var i=0; i<pngsBinBlocksCount; i++)
+	{
+		var pngsBinBlock = this.pngsBinBlocksArray[i];
+		if (pngsBinBlock.fileName === pngsBinData.pngsBinaryBlockDataFileName)
+		{
+			var startIdx = pngsBinData.startByteIndex;
+			var endIdx = pngsBinData.endByteIndex;
+			var pngsBinBlockData = pngsBinBlock.dataArraybuffer;
+			var pngsBinBlockDataCopy = pngsBinBlockData.slice(startIdx, endIdx);
+			return pngsBinBlockDataCopy;
+		}
+	}
+	
+	return undefined;
+	
+};
+
 ChemicalAccident2DLayer.prototype._prepareLayer = function ()
 {
 	if (this._isPrepared)
@@ -172,6 +210,402 @@ ChemicalAccident2DLayer.prototype._prepareLayer = function ()
 	{
 		this._timeSlicesArray = [];
 	}
+
+	if (this._geoJsonIndexFile === undefined)
+	{
+		return false;
+	}
+
+	// Check if exist png's blob arrayBuffers.***
+	if (this._geoJsonIndexFile.pngsBinBlockFileNames !== undefined)
+	{
+		// make map originalPngFileName_
+		var pngsBinBlockFileNames = this._geoJsonIndexFile.pngsBinBlockFileNames;
+		var pngsBinBlockFileNamesCount = pngsBinBlockFileNames.length;
+
+		if (this.pngsBinBlocksArray === undefined)
+		{
+			this.pngsBinBlocksArray = [];
+
+			for (var i=0; i<pngsBinBlockFileNamesCount; i++)
+			{
+				var pngsBinBlockFileName = pngsBinBlockFileNames[i];
+				var pngsBinBlock = {
+					fileName        : pngsBinBlockFileName.fileName,
+					dataArraybuffer : undefined,
+					fileLoadState   : CODE.fileLoadState.READY
+				};
+				this.pngsBinBlocksArray.push(pngsBinBlock);
+			}
+
+		}
+
+		// Now, check if all pngsBinBlocks are loaded.***
+		var allPngsBinBlocksLoaded = true;
+		var loadRequestsCount = 0;
+		for (var i=0; i<pngsBinBlockFileNamesCount; i++)
+		{
+			var pngsBinBlock = this.pngsBinBlocksArray[i];
+			if (pngsBinBlock.fileLoadState === CODE.fileLoadState.READY)
+			{
+				this._loadPngsBinaryBlockData(pngsBinBlock, this._geoJsonIndexFile._geoJsonIndexFileFolderPath);
+				loadRequestsCount += 1;
+			}
+			else if (pngsBinBlock.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
+			{
+				loadRequestsCount += 1;
+				allPngsBinBlocksLoaded = false;
+			}
+
+			if (loadRequestsCount > 0)
+			{
+				return false;
+			}
+		}	
+		
+		if (!allPngsBinBlocksLoaded)
+		{
+			return false;
+		}
+
+		// make a map key = originalPngFileName, value = pngsBinBlock.***
+		if (this.map_pngOriginalFileName_pngsBinData === undefined)
+		{
+			this.map_pngOriginalFileName_pngsBinData = {};
+			var originalPngFileNamesCount = this._geoJsonIndexFile.pngsBinDataArray.length;
+			for (var i=0; i<originalPngFileNamesCount; i++)
+			{
+				var pngsBinData = this._geoJsonIndexFile.pngsBinDataArray[i];
+				this.map_pngOriginalFileName_pngsBinData[pngsBinData.originalPngFileName] = pngsBinData;
+			}
+
+		}
+
+	}
+
+	if (this._timeSlicesArray.length === 0)
+	{
+		// start to load files.***
+		var geoJsonIndexFile = this._geoJsonIndexFile;
+		var year = geoJsonIndexFile.year;
+		var month = geoJsonIndexFile.month - 1; // month is 0 to 11.***
+		var day = geoJsonIndexFile.day;
+		var hour = geoJsonIndexFile.hour;
+		var minute = geoJsonIndexFile.minute;
+		var second = geoJsonIndexFile.second;
+		var millisecond = geoJsonIndexFile.millisecond;
+
+		var timeIncrementMilisecond = 0;
+		var timeInterval = geoJsonIndexFile.timeInterval;
+		var timeIntervalUnits = geoJsonIndexFile.timeIntervalUnits;
+
+		if (timeIntervalUnits === "minutes" || timeIntervalUnits === "minute")
+		{
+			timeIncrementMilisecond = timeInterval * 60 * 1000;
+		}
+
+		var date = new Date(year, month, day, hour, minute, second, millisecond);
+		var startUnixTimeMiliseconds = date.getTime();
+
+		//var timeSliceFileNamesCount = geoJsonIndexFile.mosaicTexMetaDataJsonArray.length;
+		var timeSliceFileNamesCount = this._layerData.timeSlicesCount;
+		for (var i=0; i<timeSliceFileNamesCount; i++)
+		{
+			var timeSliceStartUnixTimeMiliseconds = startUnixTimeMiliseconds + i * timeIncrementMilisecond;
+			var timeSliceEndUnixTimeMiliseconds = timeSliceStartUnixTimeMiliseconds + timeIncrementMilisecond;
+			var options = {
+				owner                    : this,
+				startUnixTimeMiliseconds : timeSliceStartUnixTimeMiliseconds,
+				endUnixTimeMiliseconds   : timeSliceEndUnixTimeMiliseconds
+			};
+			var timeSlice = new ChemicalAccident2DTimeSlice(options);
+			//timeSlice._jsonFile = geoJsonIndexFile.mosaicTexMetaDataJsonArray[i];
+			timeSlice._jsonFile = this._layerData.timeSlices[i];
+			timeSlice._fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+
+			this._timeSlicesArray.push(timeSlice);
+		}
+
+		return false;
+	}
+
+	// now, check if all timeSlices are ready.***
+	var isPrepared = true;
+	var timeSlicesCount = this._timeSlicesArray.length;
+	var counterAux = 0;
+	for (var i=0; i<timeSlicesCount; i++)
+	{
+		var timeSlice = this._timeSlicesArray[i];
+		if (!timeSlice._prepare(this))
+		{
+			isPrepared = false;
+			counterAux++;
+		}
+
+		if (counterAux > 2)
+		{ break; }
+	}
+
+	if (!isPrepared)
+	{
+		return false;
+	}
+
+	// // create a voxelizer.***
+	// if (!this.voxelizer)
+	// {
+	// 	// The voxelizer here is used to make the mosaicTexture from textures3D.***
+	// 	// note : the mosaicTexture is Texture3D too.***
+	// 	var options = {};
+	// 	this.voxelizer = new Voxelizer(options);
+	// }
+
+	// if (!this.oneVoxelSizeInMeters)
+	// {
+	// 	this.oneVoxelSizeInMeters = new Float32Array([1.0, 1.0, 1.0]);
+
+	// 	var someSlice3D = this._timeSlicesArray[0];
+
+	// 	var geoJsonIndexFile = this.chemicalAccident2DManager._geoJsonIndexFile;
+	// 	var widthMeters = geoJsonIndexFile.height_km * 1000.0;
+	// 	var heightMeters = geoJsonIndexFile.width_km * 1000.0;
+
+	// 	// take any slice2d to get columnsCount and rowsCount.***
+	// 	var slice2d = someSlice3D._jsonFile.dataSlices[0];
+	// 	var columnsCount = slice2d.width;
+	// 	var rowsCount = slice2d.height;
+
+	// 	this.oneVoxelSizeInMeters[0] = widthMeters / columnsCount;
+	// 	this.oneVoxelSizeInMeters[1] = heightMeters / rowsCount;
+	// 	this.oneVoxelSizeInMeters[2] = this.oneVoxelSizeInMeters[0]; // in z direction is the same.***
+	// }
+
+	// // Now make the textures3D.***
+	// if (!this._allTimeSlicesTextures3DReady)
+	// {
+	// 	if (this.minMaxPollutionValues === undefined)
+	// 	{
+	// 		this.minMaxPollutionValues = new Float32Array(2); 
+	// 	}
+	// 	var someSlice3D = this._timeSlicesArray[0];
+	// 	this.minMaxPollutionValues[0] = someSlice3D._jsonFile.minValue;
+	// 	this.minMaxPollutionValues[1] = someSlice3D._jsonFile.maxValue;
+
+	// 	var magoManager = this.chemicalAccident2DManager.magoManager;
+	// 	var gl = magoManager.sceneState.gl;
+	// 	//var minmaxPollutionValues = this.getMinMaxPollutionValues();
+	// 	this._makeTextures(gl, this.minMaxPollutionValues);
+	// }
+	
+
+	// // Now, make the surface mesh.***
+	// if (this._timeSlicesArray.length === 0)
+	// {
+	// 	return false;
+	// }
+
+	// if (this._terrainSampled === undefined)
+	// {
+	// 	this._terrainSampled = false;
+	// }
+
+	var magoManager = this.chemicalAccident2DManager.magoManager;
+
+	if (this.geoLocDataManager === undefined)
+	{
+		// Now, calculate the geoCoord of the centerPos.***
+		var geoJsonIndexFile = this._geoJsonIndexFile;
+		var centerGeoCoord = geoJsonIndexFile.centerGeographicCoord;
+
+		this.geoLocDataManager = new GeoLocationDataManager();
+
+		var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
+		if (geoLocData === undefined)
+		{
+			geoLocData = this.geoLocDataManager.newGeoLocationData("default");
+		}
+
+		var heading = 0.0;
+		var pitch = 0.0;
+		var roll = 0.0;
+
+		geoLocData = ManagerUtils.calculateGeoLocationData(centerGeoCoord.longitude, centerGeoCoord.latitude, centerGeoCoord.altitude, heading, pitch, roll, geoLocData);
+	}
+
+	// create a mesh data container.***
+	if (this.vboKeysContainer === undefined)
+	{
+		this.vboKeysContainer = new VBOVertexIdxCacheKeysContainer();
+
+		// create a vboKey.***
+		this.vboKeysContainer.newVBOVertexIdxCacheKey();
+	}
+
+	if (this._terrainSamplingState === CODE.processState.NO_STARTED)
+	{
+		this._terrainSamplingState = CODE.processState.STARTED;
+
+		// create a mesh data container.***
+		if (this.vboKeysContainer === undefined)
+		{
+			this.vboKeysContainer = new VBOVertexIdxCacheKeysContainer();
+
+			// create a vboKey.***
+			this.vboKeysContainer.newVBOVertexIdxCacheKey();
+		}
+		var vboKey = this.vboKeysContainer.getVboKey(0);
+
+		// Take the numCols & numRoes from the 1rst timeSlice.***
+		var timeSlice = this._timeSlicesArray[0];
+		var numCols = timeSlice._jsonFile.width;
+		var numRows = timeSlice._jsonFile.height;
+		var geoJsonIndexFile = this._geoJsonIndexFile;
+		var centerGeoCoord = geoJsonIndexFile.centerGeographicCoord;
+
+		// must find the 4 geoCoords of the rectangle.***
+		var widthMeters = geoJsonIndexFile.height_km * 1000.0;
+		var heightMeters = geoJsonIndexFile.width_km * 1000.0;
+		var resultObject = Globe.getRectangleMeshOnEllisoideCenteredAtGeographicCoord(centerGeoCoord, widthMeters, heightMeters, numCols, numRows);
+
+		vboKey.setDataArrayIdx(resultObject.indices, magoManager.vboMemoryManager);
+
+		//////////////////////////////////////////////////////////////////////////////////////////////
+		var terrainProvider = magoManager.scene.globe.terrainProvider;
+		var maxZoom = MagoManager.getMaximumLevelOfTerrainProvider(terrainProvider);
+		//////////////////////////////////////////////////////////////////////////////////////////////
+
+		// Now, must transform points to geoCoords.***
+		var bStoreAbsolutePosition = false;
+		var pointsArray = resultObject.pointsArray; // Point3D array.***
+		this._texCoordsArray = resultObject.texCoordsArray;
+		var result = Globe.Point3DToGeographicWgs84Array(pointsArray, bStoreAbsolutePosition);
+		var geoCoordsArray = result.geoCoordsArray;
+
+		// Now, transform geoCoords to Cesium.Cartographic {lonRad, latRad, height}.***
+		var geoCoordsCount = geoCoordsArray.length;
+		this._cartographicsArray = new Array(geoCoordsCount); // {lonRad, latRad, height} array.***
+		for (var i=0; i<geoCoordsCount; i++)
+		{
+			var geoCoord = geoCoordsArray[i];
+			this._cartographicsArray[i] = Cesium.Cartographic.fromDegrees(geoCoord.longitude, geoCoord.latitude);
+		}
+
+		this._terrainSamplingState = CODE.processState.FINISHED;
+
+		// // Finally sample terrain.***
+		// var terrainLevel = 10;
+		// if (terrainLevel > maxZoom)
+		// {
+		// 	terrainLevel = maxZoom;
+		// }
+		// var promise = Cesium.sampleTerrain(terrainProvider, terrainLevel, this._cartographicsArray);
+		// var that = this;
+		// Cesium.when(promise, function(updatedPositions) 
+		// {
+		// 	// positions[0].height and positions[1].height have been updated.
+		// 	// updatedPositions is just a reference to positions.
+		// 	//console.log('XXX - Height in meters is: ' + updatedPositions[0].height);
+		// 	that._terrainSamplingState = CODE.processState.FINISHED;
+		// });
+	}
+
+	if (this._terrainSamplingState !== CODE.processState.FINISHED)
+	{
+		return false;
+	}
+
+	if (this._makingRectangleMeshProcess === undefined)
+	{
+		this._makingRectangleMeshProcess = CODE.processState.NO_STARTED;
+	}
+
+	if (this._makingRectangleMeshProcess === CODE.processState.NO_STARTED)
+	{
+		// Now, make the rectangle's vbo.***
+		// 1rst, for all points, add 10m to altitude.***
+		var altitude = 10.0;
+		var cartographicsCount = this._cartographicsArray.length;
+		var lonArray = new Array(cartographicsCount);
+		var latArray = new Array(cartographicsCount);
+		var altArray = new Array(cartographicsCount);
+		for (var i=0; i<cartographicsCount; i++)
+		{
+			var cartographic = this._cartographicsArray[i]; // Cartographic {longitude, latitude, height}
+			lonArray[i] = cartographic.longitude;
+			latArray[i] = cartographic.latitude;
+			altArray[i] = cartographic.height + altitude;
+		}
+
+		var positionsWC = Globe.geographicRadianArrayToFloat32ArrayWgs84(lonArray, latArray, altArray, undefined);
+
+		// now, calculate the local positions to center the rectangle.***
+		var geoJsonIndexFile = this._geoJsonIndexFile;
+		var centerGeoCoord = geoJsonIndexFile.centerGeographicCoord;
+		var tMatAtCenter = Globe.transformMatrixAtGeographicCoord(centerGeoCoord, undefined);
+		var tMatAtCenterInv = Cesium.Matrix4.inverse(tMatAtCenter, new Cesium.Matrix4());
+		var localPosFloatArray = new Float32Array(positionsWC.length);
+		var posWCCount = positionsWC.length/3;
+		for (var i=0; i<posWCCount; i++)
+		{
+			var posWC = new Cesium.Cartesian3(positionsWC[3*i], positionsWC[3*i+1], positionsWC[3*i+2]);
+			var posLC = Cesium.Matrix4.multiplyByPoint(tMatAtCenterInv, posWC, new Cesium.Cartesian3());
+			localPosFloatArray[3*i] = posLC.x;
+			localPosFloatArray[3*i+1] = posLC.y;
+			localPosFloatArray[3*i+2] = posLC.z;
+		}
+
+		// Now, set vbo position & texCoords.***
+		
+		var vboKey = this.vboKeysContainer.getVboKey(0);
+		vboKey.setDataArrayPos(localPosFloatArray, magoManager.vboMemoryManager);
+
+		// this._texCoordsArray
+		var texCoordsCount = this._texCoordsArray.length;
+		var texCoordsFloatArray = new Float32Array(texCoordsCount*2);
+		for (var i=0; i<texCoordsCount; i++)
+		{
+			var texCoord = this._texCoordsArray[i];
+			texCoordsFloatArray[2*i] = texCoord.x;
+			texCoordsFloatArray[2*i+1] = texCoord.y;
+		}
+		vboKey.setDataArrayTexCoord(texCoordsFloatArray, magoManager.vboMemoryManager);
+
+		// The process finished.***
+		this._makingRectangleMeshProcess = CODE.processState.FINISHED;
+		return false;
+	}
+
+	// // make the depth box.***
+	// // the depth box is used for volumetric rendering. The depthBox renders rearFaces & frontFaces, so
+	// // creates the volumetric zone.***
+	// if (!this.simulationBox)
+	// {
+	// 	this._makeSimulationBox();
+	// }
+
+
+
+
+	// If all process are finished, then set isPrepared as true.***
+	this._isPrepared = true;
+
+	return this._isPrepared;
+};
+
+ChemicalAccident2DLayer.prototype._prepareLayer_original = function ()
+{
+	if (this._isPrepared)
+	{
+		return true;
+	}
+
+	// check if all timeSliceFiles are loaded.***
+	if (this._timeSlicesArray === undefined)
+	{
+		this._timeSlicesArray = [];
+	}
+
+	
 
 	if (this._timeSlicesArray.length === 0)
 	{
@@ -480,6 +914,26 @@ ChemicalAccident2DLayer.prototype._prepareLayer = function ()
 	this._isPrepared = true;
 
 	return this._isPrepared;
+};
+
+ChemicalAccident2DLayer.prototype._loadPngsBinaryBlockData = function (pngsBinBlock, folderPath)
+{
+	// var pngsBinBlock = {
+	// 	fileName : pngsBinBlockFileName,
+	// 	dataArraybuffer : undefined,
+	// 	fileLoadState : CODE.fileLoadState.READY
+	// };
+	if (pngsBinBlock.fileLoadState === CODE.fileLoadState.READY)
+	{
+		pngsBinBlock.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+		var that = pngsBinBlock;
+		var filePath = folderPath + "\\" + pngsBinBlock.fileName;
+		loadWithXhr(filePath).done(function(res) 
+		{
+			that.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			that.dataArraybuffer = res;
+		});
+	}
 };
 
 ChemicalAccident2DLayer.prototype._getScreenFBO = function(magoManager)

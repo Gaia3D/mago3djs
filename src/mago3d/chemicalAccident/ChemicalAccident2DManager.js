@@ -13,11 +13,7 @@ var ChemicalAccident2DManager = function (options)
 	this.magoManager;
 	this.chemAccident2DLayersArray;
 
-	this._geoJsonIndexFileLoadState = CODE.fileLoadState.READY;
-	this._geoJsonIndexFile;
-	this._geoJsonIndexFilePath = undefined;
-	this._geoJsonIndexFileFolderPath;
-	this._allLayersArePrepared = false;
+	this._jsonIndexFilesArry = [];
 
 	this._animationState = CODE.processState.NO_STARTED; 
 	this._animationStartTime = 0;
@@ -50,11 +46,21 @@ var ChemicalAccident2DManager = function (options)
 
 		if (options.url)
 		{
-			this._geoJsonIndexFilePath = options.url;
-
-			// calculate the folderPath from this._geoJsonIndexFilePath.***
-			var lastSlashIndex = this._geoJsonIndexFilePath.lastIndexOf("/");
-			this._geoJsonIndexFileFolderPath = this._geoJsonIndexFilePath.substring(0, lastSlashIndex);
+			// check if the "url" is an array of urls.***
+			if (Array.isArray(options.url))
+			{
+				var jsonIndexFilesCount = options.url.length;
+				for (var i=0; i<jsonIndexFilesCount; i++)
+				{
+					var jsonIndexFile = new JsonIndexFile({url: options.url[i]});
+					this._jsonIndexFilesArry.push(jsonIndexFile);
+				}
+			}
+			else 
+			{
+				var jsonIndexFile = new JsonIndexFile({url: options.url});
+				this._jsonIndexFilesArry.push(jsonIndexFile);
+			}
 		}
 
 		if (options.animationSpeed !== undefined)
@@ -211,11 +217,6 @@ ChemicalAccident2DManager.prototype.getChemicalAccident2DLayer = function (layer
 
 ChemicalAccident2DManager.prototype.render = function ()
 {
-	if (!this._geoJsonIndexFilePath)
-	{
-		return false;
-	}
-
 	var magoManager = this.magoManager;
 	
 	if (!this.prepareVolume(magoManager))
@@ -313,14 +314,20 @@ ChemicalAccident2DManager.prototype.isReady = function ()
 
 ChemicalAccident2DManager.prototype._preparePollutionGeoJsonIndexFile = function ()
 {
-	if (this._geoJsonIndexFileLoadState === CODE.fileLoadState.READY)
+	// // check if exist jsonIndexFiles.***
+	if (this._jsonIndexFilesArry === undefined || this._jsonIndexFilesArry.length === 0)
 	{
-		this._loadGeoJsonIndexFile();
 		return false;
 	}
-	else if (this._geoJsonIndexFileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
+
+	var jsonFilesCount = this._jsonIndexFilesArry.length;
+	for (var i=0; i<jsonFilesCount; i++)
 	{
-		return false;
+		var jsonIndexFile = this._jsonIndexFilesArry[i];
+		if (!jsonIndexFile._prepare())
+		{
+			return false;
+		}
 	}
 
 	return true;
@@ -393,79 +400,6 @@ ChemicalAccident2DManager.prototype._preparePollutionLayers = function (magoMana
 		return true;
 	}
 
-	// 1rst, check if exist pngsBinaryBlocks.***
-	if (this._geoJsonIndexFile === undefined)
-	{
-		return false;
-	}
-
-	// Check if exist png's blob arrayBuffers.***
-	if (this._geoJsonIndexFile.pngsBinBlockFileNames !== undefined)
-	{
-		// make map originalPngFileName_
-		var pngsBinBlockFileNames = this._geoJsonIndexFile.pngsBinBlockFileNames;
-		var pngsBinBlockFileNamesCount = pngsBinBlockFileNames.length;
-
-		if (this.pngsBinBlocksArray === undefined)
-		{
-			this.pngsBinBlocksArray = [];
-
-			for (var i=0; i<pngsBinBlockFileNamesCount; i++)
-			{
-				var pngsBinBlockFileName = pngsBinBlockFileNames[i];
-				var pngsBinBlock = {
-					fileName        : pngsBinBlockFileName.fileName,
-					dataArraybuffer : undefined,
-					fileLoadState   : CODE.fileLoadState.READY
-				};
-				this.pngsBinBlocksArray.push(pngsBinBlock);
-			}
-
-		}
-
-		// Now, check if all pngsBinBlocks are loaded.***
-		var allPngsBinBlocksLoaded = true;
-		var loadRequestsCount = 0;
-		for (var i=0; i<pngsBinBlockFileNamesCount; i++)
-		{
-			var pngsBinBlock = this.pngsBinBlocksArray[i];
-			if (pngsBinBlock.fileLoadState === CODE.fileLoadState.READY)
-			{
-				this._loadPngsBinaryBlockData(pngsBinBlock, this._geoJsonIndexFileFolderPath);
-				loadRequestsCount += 1;
-			}
-			else if (pngsBinBlock.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
-			{
-				loadRequestsCount += 1;
-				allPngsBinBlocksLoaded = false;
-			}
-
-			if (loadRequestsCount > 0)
-			{
-				return false;
-			}
-		}	
-		
-		if (!allPngsBinBlocksLoaded)
-		{
-			return false;
-		}
-
-		// make a map key = originalPngFileName, value = pngsBinBlock.***
-		if (this.map_pngOriginalFileName_pngsBinData === undefined)
-		{
-			this.map_pngOriginalFileName_pngsBinData = {};
-			var originalPngFileNamesCount = this._geoJsonIndexFile.pngsBinDataArray.length;
-			for (var i=0; i<originalPngFileNamesCount; i++)
-			{
-				var pngsBinData = this._geoJsonIndexFile.pngsBinDataArray[i];
-				this.map_pngOriginalFileName_pngsBinData[pngsBinData.originalPngFileName] = pngsBinData;
-			}
-
-		}
-
-	}
-
 	// Check if layers exist.***
 	if (this.chemAccident2DLayersArray === undefined)
 	{
@@ -476,17 +410,14 @@ ChemicalAccident2DManager.prototype._preparePollutionLayers = function (magoMana
 	if (pollutionLayersCount === 0)
 	{
 		// use "GeoJsonIndexFile" to create pollutionLayers.***
-		//var layersCount = this._geoJsonIndexFile.layersCount; // usually layersCount = 1.***
-		var layersCount = 1;
-		var timeSliceFileFolderPath = this._geoJsonIndexFileFolderPath;
-
-		for (var i=0; i<layersCount; i++) 
+		var layersCount = this._jsonIndexFilesArry.length;
+		for (var j=0; j<layersCount; j++)
 		{
-			//var layer = this._geoJsonIndexFile.layers[i];
+			var jsonIndexFile = this._jsonIndexFilesArry[j];
 			var options = {
-				pollutionVolumeOwner : this, 
-				layerData            : this._geoJsonIndexFile.layers[0],
-				metadataFolderPath 		: timeSliceFileFolderPath,
+				pollutionVolumeOwner : this,
+				jsonIndexFile        : jsonIndexFile,
+				metadataFolderPath   : jsonIndexFile._geoJsonIndexFileFolderPath,
 			};
 			var chemAccidentLayer = this.newChemAccidentLayer2D(options);
 		}
@@ -540,54 +471,3 @@ ChemicalAccident2DManager.prototype.newChemAccidentLayer2D = function (options)
 	return chemAccLayer;
 };
 
-ChemicalAccident2DManager.prototype._loadPngsBinaryBlockData = function (pngsBinBlock, folderPath)
-{
-	// var pngsBinBlock = {
-	// 	fileName : pngsBinBlockFileName,
-	// 	dataArraybuffer : undefined,
-	// 	fileLoadState : CODE.fileLoadState.READY
-	// };
-	if (pngsBinBlock.fileLoadState === CODE.fileLoadState.READY)
-	{
-		pngsBinBlock.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
-		var that = pngsBinBlock;
-		var filePath = folderPath + "\\" + pngsBinBlock.fileName;
-		loadWithXhr(filePath).done(function(res) 
-		{
-			that.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-			that.dataArraybuffer = res;
-		});
-	}
-};
-
-ChemicalAccident2DManager.prototype.getBlobArrayBuffer = function (mosaicFileName)
-{
-	if (this.map_pngOriginalFileName_pngsBinData === undefined)
-	{
-		return undefined;
-	}
-
-
-	var pngsBinData = this.map_pngOriginalFileName_pngsBinData[mosaicFileName];
-	if (pngsBinData === undefined)
-	{
-		return undefined;
-	}
-
-	var pngsBinBlocksCount = this.pngsBinBlocksArray.length;
-	for (var i=0; i<pngsBinBlocksCount; i++)
-	{
-		var pngsBinBlock = this.pngsBinBlocksArray[i];
-		if (pngsBinBlock.fileName === pngsBinData.pngsBinaryBlockDataFileName)
-		{
-			var startIdx = pngsBinData.startByteIndex;
-			var endIdx = pngsBinData.endByteIndex;
-			var pngsBinBlockData = pngsBinBlock.dataArraybuffer;
-			var pngsBinBlockDataCopy = pngsBinBlockData.slice(startIdx, endIdx);
-			return pngsBinBlockDataCopy;
-		}
-	}
-	
-	return undefined;
-	
-};

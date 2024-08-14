@@ -2929,6 +2929,1837 @@ ShaderSource.chemicalAccident2DVS = "\n\
 \n\
 		gl_PointSize = 5.0;\n\
 	}";
+ShaderSource.chemicalAccidentBresenham3DRenderFS = "//#version 300 es\n\
+\n\
+#ifdef GL_ES\n\
+    //precision lowp float;\n\
+    //precision lowp int;\n\
+    precision highp float;\n\
+    precision highp int;\n\
+#endif\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+// https://draemm.li/various/volumeRendering/webgl2/\n\
+\n\
+    //*********************************************************\n\
+    // R= right, F= front, U= up, L= left, B= back, D= down.\n\
+    // RFU = x, y, z.\n\
+    // LBD = -x, -y, -z.\n\
+    //*********************************************************\n\
+\n\
+    //      +-----------------+\n\
+	//      |                 |          \n\
+	//      |   screen size   |  \n\
+	//      |                 | \n\
+	//      +-----------------+\n\
+	//      +-----------------+----------------+\n\
+	//      |                 |                | \n\
+	//      |   front depth   |   rear depth   |\n\
+	//      |                 |                |\n\
+	//      +-----------------+----------------+\n\
+	\n\
+uniform sampler2D simulationBoxDoubleDepthTex;\n\
+uniform sampler2D simulationBoxDoubleNormalTex; // used to calculate the current frustum idx.***\n\
+uniform sampler2D pollutionMosaicTex; // pollutionTex. (from chemical accident).***\n\
+uniform sampler2D sceneDepthTex; // scene depth texture.***\n\
+uniform sampler2D sceneNormalTex; // scene normal texture.***\n\
+uniform sampler2D cuttingPlaneDepthTex;\n\
+uniform sampler2D cuttingPlaneNormalTex;\n\
+\n\
+uniform int u_texSize[3]; // The original texture3D size.***\n\
+uniform int u_mosaicSize[3]; // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***\n\
+uniform vec3 u_voxelSizeMeters;\n\
+\n\
+varying vec2 v_tex_pos;\n\
+\n\
+uniform mat4 modelViewMatrixRelToEye;\n\
+uniform mat4 modelViewMatrixRelToEyeInv;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+\n\
+uniform vec2 u_minMaxPollutionValues;\n\
+uniform vec2 u_minMaxPollutionValuesToRender;\n\
+uniform float u_airEnvirontmentPressure;\n\
+uniform vec2 u_screenSize;\n\
+uniform vec2 uNearFarArray[4];\n\
+uniform float tangentOfHalfFovy;\n\
+uniform float aspectRatio;\n\
+uniform vec2 uMinMaxAltitudeSlices[32]; // limited to 32 slices.***\n\
+uniform int u_cuttingPlaneIdx;\n\
+uniform int u_useMinMaxValuesToRender;\n\
+uniform vec4 u_cuttingPlanePosLC;\n\
+\n\
+uniform mat4 u_simulBoxTMat;\n\
+uniform mat4 u_simulBoxTMatInv;\n\
+uniform vec3 u_simulBoxPosHigh;\n\
+uniform vec3 u_simulBoxPosLow;\n\
+uniform vec3 u_simulBoxMinPosLC;\n\
+uniform vec3 u_simulBoxMaxPosLC;\n\
+\n\
+// Legend colors.***\n\
+uniform vec4 uLegendColors[16];\n\
+uniform float uLegendValues[16];\n\
+uniform int uLegendColorsCount;\n\
+uniform float uLegendValuesScale;\n\
+\n\
+uniform int uRenderingColorType;  // 0= rainbow, 1= monotone, 2= legendColors.\n\
+\n\
+\n\
+\n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+}\n\
+\n\
+float getDepth(vec2 coord)\n\
+{\n\
+	//if(bUseLogarithmicDepth)\n\
+	//{\n\
+	//	float linearDepth = unpackDepth(texture2D(depthTex, coord.xy));\n\
+	//	// gl_FragDepthEXT = linearDepth = log2(flogz) * Fcoef_half;\n\
+	//	// flogz = 1.0 + gl_Position.z*0.0001;\n\
+    //    float Fcoef_half = uFCoef_logDepth/2.0;\n\
+	//	float flogzAux = pow(2.0, linearDepth/Fcoef_half);\n\
+	//	float z = (flogzAux - 1.0);\n\
+	//	linearDepth = z/(far);\n\
+	//	return linearDepth;\n\
+	//}\n\
+	//else{\n\
+		return unpackDepth(texture2D(sceneDepthTex, coord.xy));\n\
+	//}\n\
+}\n\
+\n\
+float getDepth_simulationBox(vec2 coord)\n\
+{\n\
+	//if(bUseLogarithmicDepth)\n\
+	//{\n\
+	//	float linearDepth = unpackDepth(texture2D(depthTex, coord.xy));\n\
+	//	// gl_FragDepthEXT = linearDepth = log2(flogz) * Fcoef_half;\n\
+	//	// flogz = 1.0 + gl_Position.z*0.0001;\n\
+    //    float Fcoef_half = uFCoef_logDepth/2.0;\n\
+	//	float flogzAux = pow(2.0, linearDepth/Fcoef_half);\n\
+	//	float z = (flogzAux - 1.0);\n\
+	//	linearDepth = z/(far);\n\
+	//	return linearDepth;\n\
+	//}\n\
+	//else{\n\
+		return unpackDepth(texture2D(simulationBoxDoubleDepthTex, coord.xy));\n\
+	//}\n\
+}\n\
+\n\
+float getDepth_cuttingPlane(vec2 coord)\n\
+{\n\
+	//if(bUseLogarithmicDepth)\n\
+	//{\n\
+	//	float linearDepth = unpackDepth(texture2D(depthTex, coord.xy));\n\
+	//	// gl_FragDepthEXT = linearDepth = log2(flogz) * Fcoef_half;\n\
+	//	// flogz = 1.0 + gl_Position.z*0.0001;\n\
+    //    float Fcoef_half = uFCoef_logDepth/2.0;\n\
+	//	float flogzAux = pow(2.0, linearDepth/Fcoef_half);\n\
+	//	float z = (flogzAux - 1.0);\n\
+	//	linearDepth = z/(far);\n\
+	//	return linearDepth;\n\
+	//}\n\
+	//else{\n\
+		return unpackDepth(texture2D(cuttingPlaneDepthTex, coord.xy));\n\
+	//}\n\
+}\n\
+\n\
+vec4 decodeNormal(in vec4 normal)\n\
+{\n\
+	return vec4(normal.xyz * 2.0 - 1.0, normal.w);\n\
+}\n\
+\n\
+vec4 getNormal(in vec2 texCoord)\n\
+{\n\
+    vec4 encodedNormal = texture2D(sceneNormalTex, texCoord);\n\
+    return decodeNormal(encodedNormal);\n\
+}\n\
+\n\
+\n\
+vec4 getNormal_simulationBox(in vec2 texCoord)\n\
+{\n\
+    vec4 encodedNormal = texture2D(simulationBoxDoubleNormalTex, texCoord);\n\
+    return decodeNormal(encodedNormal);\n\
+}\n\
+\n\
+vec4 getNormal_cuttingPlane(in vec2 texCoord)\n\
+{\n\
+    vec4 encodedNormal = texture2D(cuttingPlaneNormalTex, texCoord);\n\
+    return decodeNormal(encodedNormal);\n\
+}\n\
+\n\
+int getRealFrustumIdx(in int estimatedFrustumIdx, inout int dataType)\n\
+{\n\
+    // Check the type of the data.******************\n\
+    // frustumIdx 0 .. 3 -> general geometry data.\n\
+    // frustumIdx 10 .. 13 -> tinTerrain data.\n\
+    // frustumIdx 20 .. 23 -> points cloud data.\n\
+    //----------------------------------------------\n\
+    int realFrustumIdx = -1;\n\
+    \n\
+     if(estimatedFrustumIdx >= 10)\n\
+    {\n\
+        estimatedFrustumIdx -= 10;\n\
+        if(estimatedFrustumIdx >= 10)\n\
+        {\n\
+            // points cloud data.\n\
+            estimatedFrustumIdx -= 10;\n\
+            dataType = 2;\n\
+        }\n\
+        else\n\
+        {\n\
+            // tinTerrain data.\n\
+            dataType = 1;\n\
+        }\n\
+    }\n\
+    else\n\
+    {\n\
+        // general geomtry.\n\
+        dataType = 0;\n\
+    }\n\
+\n\
+    realFrustumIdx = estimatedFrustumIdx;\n\
+    return realFrustumIdx;\n\
+}\n\
+\n\
+vec2 getNearFar_byFrustumIdx(in int frustumIdx)\n\
+{\n\
+    vec2 nearFar;\n\
+    if(frustumIdx == 0)\n\
+    {\n\
+        nearFar = uNearFarArray[0];\n\
+    }\n\
+    else if(frustumIdx == 1)\n\
+    {\n\
+        nearFar = uNearFarArray[1];\n\
+    }\n\
+    else if(frustumIdx == 2)\n\
+    {\n\
+        nearFar = uNearFarArray[2];\n\
+    }\n\
+    else if(frustumIdx == 3)\n\
+    {\n\
+        nearFar = uNearFarArray[3];\n\
+    }\n\
+\n\
+    return nearFar;\n\
+}\n\
+\n\
+void get_FrontAndRear_depthTexCoords(in vec2 texCoord, inout vec2 frontTexCoord, inout vec2 rearTexCoord)\n\
+{\n\
+    //      +-----------------+\n\
+	//      |                 |          \n\
+	//      |   screen size   |  \n\
+	//      |                 | \n\
+	//      +-----------------+\n\
+	//      +-----------------+----------------+\n\
+	//      |                 |                | \n\
+	//      |   front depth   |   rear depth   |\n\
+	//      |                 |                |\n\
+	//      +-----------------+----------------+\n\
+    vec2 normalTexSize = vec2(u_screenSize.x * 2.0, u_screenSize.y); // the normal tex width is double of the screen size width.***\n\
+    //vec2 frontNormalFragCoord = vec2(gl_FragCoord.x, gl_FragCoord.y);\n\
+    //vec2 rearNormalFragCoord = vec2(gl_FragCoord.x + u_screenSize.x, gl_FragCoord.y);\n\
+    float windows_x = texCoord.x * u_screenSize.x;\n\
+    float windows_y = texCoord.y * u_screenSize.y;\n\
+    vec2 frontNormalFragCoord = vec2(windows_x, windows_y);\n\
+    vec2 rearNormalFragCoord = vec2(windows_x + u_screenSize.x, windows_y);\n\
+\n\
+    frontTexCoord = vec2(frontNormalFragCoord.x / normalTexSize.x, frontNormalFragCoord.y / normalTexSize.y);\n\
+    rearTexCoord = vec2(rearNormalFragCoord.x / normalTexSize.x, rearNormalFragCoord.y / normalTexSize.y);\n\
+}\n\
+\n\
+vec3 getViewRay(vec2 tc, in float relFar)\n\
+{\n\
+	float hfar = 2.0 * tangentOfHalfFovy * relFar;\n\
+    float wfar = hfar * aspectRatio;    \n\
+    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -relFar);    \n\
+	\n\
+    return ray;                      \n\
+}\n\
+\n\
+void get_FrontAndRear_posCC(in vec2 screenPos, in float currFar_rear, in float currFar_front, inout vec3 frontPosCC, inout vec3 rearPosCC)\n\
+{\n\
+    vec2 frontTexCoord;\n\
+    vec2 rearTexCoord;\n\
+    get_FrontAndRear_depthTexCoords(screenPos, frontTexCoord, rearTexCoord);\n\
+\n\
+    // If the linear depth is 1, then, take the camPos as the position, so, pos = (0.0, 0.0, 0.0).***\n\
+    //vec4 depthColor4 = texture2D(simulationBoxDoubleDepthTex, screenPos);\n\
+    //float depthColLength = length(depthColor4);\n\
+\n\
+    // Front posCC.***\n\
+    float frontLinearDepth = getDepth_simulationBox(frontTexCoord);\n\
+    if(frontLinearDepth < 1e-8)\n\
+    {\n\
+        frontPosCC = vec3(0.0);\n\
+    }\n\
+    else\n\
+    {\n\
+        float front_zDist = frontLinearDepth * currFar_front; \n\
+        frontPosCC = getViewRay(screenPos, front_zDist);\n\
+    }\n\
+\n\
+    // Rear posCC.***\n\
+    float rearLinearDepth = getDepth_simulationBox(rearTexCoord);\n\
+    if(rearLinearDepth < 1e-8)\n\
+    {\n\
+        rearPosCC = vec3(0.0);\n\
+    }\n\
+    else\n\
+    {\n\
+        float rear_zDist = rearLinearDepth * currFar_rear; \n\
+        rearPosCC = getViewRay(screenPos, rear_zDist);\n\
+    }\n\
+}\n\
+\n\
+void get_cuttingPlane_posCC(in vec2 screenPos, in float currFar, inout vec3 posCC)\n\
+{\n\
+\n\
+    // posCC.***\n\
+    float frontLinearDepth = getDepth_cuttingPlane(screenPos);\n\
+    if(frontLinearDepth < 1e-8)\n\
+    {\n\
+        posCC = vec3(0.0);\n\
+    }\n\
+    else\n\
+    {\n\
+        float front_zDist = frontLinearDepth * currFar; \n\
+        posCC = getViewRay(screenPos, front_zDist);\n\
+    }\n\
+}\n\
+\n\
+void posWCRelToEye_to_posLC(in vec4 posWC_relToEye, in mat4 local_mat4Inv, in vec3 localPosHIGH, in vec3 localPosLOW, inout vec3 posLC)\n\
+{\n\
+    vec3 highDifferenceSun = -localPosHIGH.xyz + encodedCameraPositionMCHigh;\n\
+	vec3 lowDifferenceSun = posWC_relToEye.xyz -localPosLOW.xyz + encodedCameraPositionMCLow;\n\
+	vec4 pos4Sun = vec4(highDifferenceSun.xyz + lowDifferenceSun.xyz, 1.0);\n\
+	vec4 vPosRelToLight = local_mat4Inv * pos4Sun;\n\
+\n\
+	posLC = vPosRelToLight.xyz / vPosRelToLight.w;\n\
+}\n\
+\n\
+void checkTexCoordRange(inout vec2 texCoord)\n\
+{\n\
+    float error = 0.0;\n\
+    if(texCoord.x < 0.0)\n\
+    {\n\
+        texCoord.x = 0.0 + error;\n\
+    }\n\
+    else if(texCoord.x > 1.0)\n\
+    {\n\
+        texCoord.x = 1.0 - error;\n\
+    }\n\
+\n\
+    if(texCoord.y < 0.0)\n\
+    {\n\
+        texCoord.y = 0.0 + error;\n\
+    }\n\
+    else if(texCoord.y > 1.0)\n\
+    {\n\
+        texCoord.y = 1.0 - error;\n\
+    }\n\
+}\n\
+\n\
+void checkTexCoord3DRange(inout vec3 texCoord)\n\
+{\n\
+    float error = 0.0;\n\
+    if(texCoord.x < 0.0)\n\
+    {\n\
+        texCoord.x = 0.0 + error;\n\
+    }\n\
+    else if(texCoord.x > 1.0)\n\
+    {\n\
+        texCoord.x = 1.0 - error;\n\
+    }\n\
+\n\
+    if(texCoord.y < 0.0)\n\
+    {\n\
+        texCoord.y = 0.0 + error;\n\
+    }\n\
+    else if(texCoord.y > 1.0)\n\
+    {\n\
+        texCoord.y = 1.0 - error;\n\
+    }\n\
+\n\
+    if(texCoord.z < 0.0)\n\
+    {\n\
+        texCoord.z = 0.0 + error;\n\
+    }\n\
+    else if(texCoord.z > 1.0)\n\
+    {\n\
+        texCoord.z = 1.0 - error;\n\
+    }\n\
+}\n\
+\n\
+vec2 subTexCoord_to_texCoord(in vec2 subTexCoord, in int col_mosaic, in int row_mosaic)\n\
+{\n\
+    // given col, row & subTexCoord, this function returns the texCoord into mosaic texture.***\n\
+    // The \"subTexCoord\" is the texCoord of the subTexture[col, row].***\n\
+    // u_mosaicSize =  The mosaic composition (xTexCount X yTexCount X zSlicesCount).***\n\
+    checkTexCoordRange(subTexCoord);\n\
+    float sRange = 1.0 / float(u_mosaicSize[0]);\n\
+    float tRange = 1.0 / float(u_mosaicSize[1]);\n\
+\n\
+    float s = float(col_mosaic) * sRange + subTexCoord.x * sRange;\n\
+    float t = float(row_mosaic) * tRange + subTexCoord.y * tRange;\n\
+\n\
+    // must check if the texCoord_tl is boundary in x & y.***************************************************************************\n\
+    float mosaicTexSize_x = float(u_texSize[0] * u_mosaicSize[0]); // for example : 150 pixels * 3 columns = 450 pixels.***\n\
+    float mosaicTexSize_y = float(u_texSize[1] * u_mosaicSize[1]); // for example : 150 pixels * 3 rows = 450 pixels.***\n\
+\n\
+    float currMosaicStart_x = float(col_mosaic * u_texSize[0]);\n\
+    float currMosaicStart_y = float(row_mosaic * u_texSize[1]);\n\
+    float currMosaicEnd_x = currMosaicStart_x + float(u_texSize[0]);\n\
+    float currMosaicEnd_y = currMosaicStart_y + float(u_texSize[1]);\n\
+\n\
+    float pixel_x = s * mosaicTexSize_x;\n\
+    float pixel_y = t * mosaicTexSize_y;\n\
+\n\
+    if(pixel_x < currMosaicStart_x + 1.0)\n\
+    {\n\
+        pixel_x = currMosaicStart_x + 1.0;\n\
+    }\n\
+    else if(pixel_x > currMosaicEnd_x - 1.0)\n\
+    {\n\
+        pixel_x = currMosaicEnd_x - 1.0;\n\
+    }\n\
+\n\
+    if(pixel_y < currMosaicStart_y + 1.0)\n\
+    {\n\
+        pixel_y = currMosaicStart_y + 1.0;\n\
+    }\n\
+    else if(pixel_y > currMosaicEnd_y - 1.0)\n\
+    {\n\
+        pixel_y = currMosaicEnd_y - 1.0;\n\
+    }\n\
+\n\
+    s = pixel_x / mosaicTexSize_x;\n\
+    t = pixel_y / mosaicTexSize_y;\n\
+\n\
+\n\
+    vec2 resultTexCoord = vec2(s, t);\n\
+\n\
+    return resultTexCoord;\n\
+}\n\
+\n\
+\n\
+\n\
+float getPollution_inMosaicTexture(in vec2 texCoord)\n\
+{\n\
+    checkTexCoordRange(texCoord);\n\
+    vec4 color4;\n\
+    color4 = texture2D(pollutionMosaicTex, texCoord);\n\
+    float decoded = unpackDepth(color4); // 32bit.\n\
+    float pollution = decoded * u_minMaxPollutionValues.y;\n\
+\n\
+    return pollution;\n\
+}\n\
+\n\
+float _getPollution_triLinearInterpolation(in vec2 subTexCoord2d, in int col_mosaic, in int row_mosaic)\n\
+{\n\
+    // This function : given a subTexture2d(real texCoord.xy of a realTex3D), \n\
+    // and the col & row into the mosaic texture, returns a trilinear interpolation of the pressure.***\n\
+\n\
+    //************************************************************************************\n\
+    // u_texSize[3]; // The original texture3D size.***\n\
+    // mosaicSize[3]; // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***\n\
+    //------------------------------------------------------------------------------------\n\
+\n\
+    checkTexCoordRange(subTexCoord2d);\n\
+    vec3 sim_res3d = vec3(u_texSize[0], u_texSize[1], u_texSize[2]);\n\
+    vec2 px = 1.0 / sim_res3d.xy;\n\
+    vec2 vc = (floor(subTexCoord2d * sim_res3d.xy)) * px;\n\
+    vec2 f = fract(subTexCoord2d * sim_res3d.xy);\n\
+    vec2 texCoord_tl = vec2(vc);\n\
+\n\
+    \n\
+    \n\
+\n\
+    vec2 texCoord_tr = vec2(vc + vec2(px.x, 0));\n\
+    vec2 texCoord_bl = vec2(vc + vec2(0, px.y));\n\
+    vec2 texCoord_br = vec2(vc + vec2(px.x, px.y));\n\
+\n\
+    checkTexCoordRange(texCoord_tl);\n\
+    checkTexCoordRange(texCoord_tr);\n\
+    checkTexCoordRange(texCoord_bl);\n\
+    checkTexCoordRange(texCoord_br);\n\
+    vec2 mosaicTexCoord_tl = subTexCoord_to_texCoord(texCoord_tl, col_mosaic, row_mosaic);\n\
+    vec2 mosaicTexCoord_tr = subTexCoord_to_texCoord(texCoord_tr, col_mosaic, row_mosaic);\n\
+    vec2 mosaicTexCoord_bl = subTexCoord_to_texCoord(texCoord_bl, col_mosaic, row_mosaic);\n\
+    vec2 mosaicTexCoord_br = subTexCoord_to_texCoord(texCoord_br, col_mosaic, row_mosaic);\n\
+\n\
+    // vec2 mosaicTexCoord_tl = subTexCoord_to_texCoord(texCoord_tl, col_mosaic, row_mosaic);\n\
+    // vec2 mosaicTexCoord_tr = vec2(mosaicTexCoord_tl + vec2(px.x, 0));\n\
+    // vec2 mosaicTexCoord_bl = vec2(mosaicTexCoord_tl + vec2(0, px.y));\n\
+    // vec2 mosaicTexCoord_br = vec2(mosaicTexCoord_tl + vec2(px.x, px.y));\n\
+\n\
+\n\
+    float ap_tl = getPollution_inMosaicTexture(mosaicTexCoord_tl);\n\
+    float ap_tr = getPollution_inMosaicTexture(mosaicTexCoord_tr);\n\
+    float ap_bl = getPollution_inMosaicTexture(mosaicTexCoord_bl);\n\
+    float ap_br = getPollution_inMosaicTexture(mosaicTexCoord_br);\n\
+\n\
+    float airPressure = mix(mix(ap_tl, ap_tr, f.x), mix(ap_bl, ap_br, f.x), f.y);\n\
+\n\
+    return airPressure;\n\
+}\n\
+\n\
+\n\
+float _getPollution_nearest(in vec2 subTexCoord2d, in int col_mosaic, in int row_mosaic)\n\
+{\n\
+    // This function : given a subTexture2d(real texCoord.xy of a realTex3D), \n\
+    // and the col & row into the mosaic texture, returns a nearest interpolation of the pressure.***\n\
+    checkTexCoordRange(subTexCoord2d);\n\
+    vec2 mosaicTexCoord = subTexCoord_to_texCoord(subTexCoord2d, col_mosaic, row_mosaic);\n\
+    float ap = getPollution_inMosaicTexture(mosaicTexCoord);\n\
+    return ap;\n\
+}\n\
+\n\
+bool getUpDownSlicesIdx(in float altitude, inout int sliceDownIdx, inout int sliceUpIdx, inout float distUp, inout float distDown)\n\
+{\n\
+    // uMinMaxAltitudeSlices[32]; // limited to 32 slices.***\n\
+    // u_texSize[3] =  The original texture3D size.***\n\
+    int currSliceIdx = -1;\n\
+    for(int i=0; i<32; i++)\n\
+    {\n\
+        if(altitude >= uMinMaxAltitudeSlices[i].x && altitude < uMinMaxAltitudeSlices[i].y)\n\
+        {\n\
+            currSliceIdx = i;\n\
+            break;\n\
+        }\n\
+    }\n\
+\n\
+    if(currSliceIdx < 0)\n\
+    {\n\
+        return false;\n\
+    }\n\
+\n\
+    if(currSliceIdx == 0)\n\
+    {\n\
+        sliceDownIdx = currSliceIdx;\n\
+        sliceUpIdx = currSliceIdx;\n\
+    }\n\
+    else\n\
+    {\n\
+        sliceDownIdx = currSliceIdx-1;\n\
+        sliceUpIdx = currSliceIdx;\n\
+    }\n\
+\n\
+    if(sliceUpIdx > u_texSize[2] - 1)\n\
+    {\n\
+        sliceUpIdx = u_texSize[2] - 1;\n\
+    }\n\
+\n\
+    // +------------------------------+ <- sliceUp\n\
+    //                 |\n\
+    //                 |\n\
+    //                 |  distUp\n\
+    //                 |\n\
+    //                 * <- posL.z\n\
+    //                 |\n\
+    //                 |  distDown\n\
+    // +------------------------------+ <- sliceDown\n\
+    float sliceUpAltitude = 0.0;\n\
+    float sliceDownAltitude = 0.0;\n\
+    for(int i=0; i<32; i++)\n\
+    {\n\
+        if(sliceUpIdx == i)\n\
+        {\n\
+            sliceUpAltitude = uMinMaxAltitudeSlices[i].y;\n\
+            sliceDownAltitude = uMinMaxAltitudeSlices[i].x;\n\
+            break;\n\
+        }\n\
+    }\n\
+\n\
+    distUp = abs(sliceUpAltitude - altitude);\n\
+    distDown = abs(altitude - sliceDownAltitude);\n\
+\n\
+    return true;\n\
+}\n\
+\n\
+bool getUpDownSlicesIdx_FAST(in vec3 posLC, inout int sliceDownIdx, inout int sliceUpIdx)\n\
+{\n\
+    // uMinMaxAltitudeSlices[32]; // limited to 32 slices.***\n\
+    // u_texSize[3] =  The original texture3D size.***\n\
+    float altitude = posLC.z;\n\
+    int currSliceIdx = -1;\n\
+    for(int i=0; i<32; i++)\n\
+    {\n\
+        if(altitude >= uMinMaxAltitudeSlices[i].x && altitude < uMinMaxAltitudeSlices[i].y)\n\
+        {\n\
+            currSliceIdx = i;\n\
+            break;\n\
+        }\n\
+    }\n\
+\n\
+    if(currSliceIdx < 0)\n\
+    {\n\
+        return false;\n\
+    }\n\
+\n\
+    if(currSliceIdx == 0)\n\
+    {\n\
+        sliceDownIdx = currSliceIdx;\n\
+        sliceUpIdx = currSliceIdx;\n\
+    }\n\
+    else\n\
+    {\n\
+        sliceDownIdx = currSliceIdx-1;\n\
+        sliceUpIdx = currSliceIdx;\n\
+    }\n\
+\n\
+    if(sliceUpIdx > u_texSize[2] - 1)\n\
+    {\n\
+        sliceUpIdx = u_texSize[2] - 1;\n\
+    }\n\
+\n\
+    return true;\n\
+}\n\
+\n\
+bool get_pollution_fromTexture3d_triLinearInterpolation_FAST(in vec3 texCoord3d, in vec3 posLC, inout float airPressure)\n\
+{\n\
+    // Here is not important the pollution value. Only need know if the pollution value is zero or not.***\n\
+    // this function is called by \"findFirstSamplePosition\".***\n\
+    // tex3d : airPressureMosaicTex\n\
+\n\
+    // 1rst, determine the sliceIdx.***\n\
+    int currSliceIdx_down = -1;\n\
+    int currSliceIdx_up = -1;\n\
+    float distUp = 0.0;\n\
+    float distDown = 0.0;\n\
+\n\
+    if(!getUpDownSlicesIdx_FAST(posLC, currSliceIdx_down, currSliceIdx_up))\n\
+    {\n\
+        return false;\n\
+    }\n\
+\n\
+    float distUpAndDown = distUp + distDown;\n\
+    float distUpRatio = distUp / distUpAndDown;\n\
+    float distDownRatio = distDown / distUpAndDown;\n\
+\n\
+    // Down slice.************************************************************\n\
+    int col_down, row_down;\n\
+    //if(currSliceIdx_down <= u_mosaicSize[0])\n\
+    //{\n\
+        // Our current sliceIdx_down is smaller than the columns count of the mosaic, so:\n\
+        // in this case, the row = 0.***\n\
+    //    row_down = 0;\n\
+    //    col_down = currSliceIdx_down;\n\
+    //}\n\
+    //else\n\
+    {\n\
+        float rowAux = floor(float(currSliceIdx_down) / float(u_mosaicSize[0]));\n\
+        float colAux = float(currSliceIdx_down) - (rowAux * float(u_mosaicSize[0]));\n\
+\n\
+        col_down = int(colAux);\n\
+        row_down = int(rowAux);\n\
+    }\n\
+\n\
+    float airPressure_down = _getPollution_nearest(texCoord3d.xy, col_down, row_down);\n\
+\n\
+    if(airPressure_down > 0.0)\n\
+    {\n\
+        airPressure = airPressure_down;\n\
+        return true;\n\
+    }\n\
+\n\
+    // up slice.************************************************************\n\
+    int col_up, row_up;\n\
+    if(currSliceIdx_up <= u_mosaicSize[0])\n\
+    {\n\
+        // Our current sliceIdx_up is smaller than the columns count of the mosaic, so:\n\
+        // in this case, the row = 0.***\n\
+        row_up = 0;\n\
+        col_up = currSliceIdx_up;\n\
+    }\n\
+    else\n\
+    {\n\
+        float rowAux = floor(float(currSliceIdx_up) / float(u_mosaicSize[0]));\n\
+        float colAux = float(currSliceIdx_up) - (rowAux * float(u_mosaicSize[0]));\n\
+\n\
+        col_up = int(colAux);\n\
+        row_up = int(rowAux);\n\
+    }\n\
+\n\
+    // test.***\n\
+    col_up = col_down + 1;\n\
+    row_up = row_down;\n\
+    if(col_up >= u_mosaicSize[0])\n\
+    {\n\
+        col_up = 0;\n\
+        row_up = row_down + 1;\n\
+    }\n\
+\n\
+    if(row_up >= u_mosaicSize[1])\n\
+    {\n\
+        return false;\n\
+    }\n\
+\n\
+    float airPressure_up = _getPollution_nearest(texCoord3d.xy, col_up, row_up);\n\
+    if(airPressure_up > 0.0)\n\
+    {\n\
+        airPressure = airPressure_up;\n\
+        return true;\n\
+    }\n\
+\n\
+\n\
+    return false;\n\
+}\n\
+\n\
+bool get_pollution_fromTexture3d_triLinearInterpolation(in vec3 texCoord3d, in vec3 posLC, inout float airPressure)\n\
+{\n\
+    // 1rst, determine the sliceIdx.***\n\
+    int currSliceIdx_down = -1;\n\
+    int currSliceIdx_up = -1;\n\
+    float distUp = 0.0;\n\
+    float distDown = 0.0;\n\
+    //float altitude = texCoord3d.z;\n\
+\n\
+    float simulBoxHeight = u_simulBoxMaxPosLC[2] - u_simulBoxMinPosLC[2];\n\
+    float altitude = texCoord3d.z * simulBoxHeight; // altitude = posLC.z.***\n\
+\n\
+    if(!getUpDownSlicesIdx(altitude, currSliceIdx_down, currSliceIdx_up, distUp, distDown))\n\
+    {\n\
+        return false;\n\
+    }\n\
+\n\
+    float distUpAndDown = distUp + distDown;\n\
+    float distUpRatio = distUp / distUpAndDown;\n\
+    float distDownRatio = distDown / distUpAndDown;\n\
+\n\
+    // Down slice.************************************************************\n\
+    int col_down, row_down;\n\
+    //if(currSliceIdx_down <= u_mosaicSize[0])\n\
+    //{\n\
+        // Our current sliceIdx_down is smaller than the columns count of the mosaic, so:\n\
+        // in this case, the row = 0.***\n\
+    //    row_down = 0;\n\
+    //    col_down = currSliceIdx_down;\n\
+    //}\n\
+    //else\n\
+    {\n\
+        float rowAux = floor(float(currSliceIdx_down) / float(u_mosaicSize[0]));\n\
+        float colAux = float(currSliceIdx_down) - (rowAux * float(u_mosaicSize[0]));\n\
+\n\
+        col_down = int(colAux);\n\
+        row_down = int(rowAux);\n\
+    }\n\
+\n\
+    //float airPressure_down = _getPollution_triLinearInterpolation(texCoord3d.xy, col_down, row_down);\n\
+    float airPressure_down = _getPollution_nearest(texCoord3d.xy, col_down, row_down); // test delete.***\n\
+\n\
+    // up slice.************************************************************\n\
+    int col_up, row_up;\n\
+    if(currSliceIdx_up <= u_mosaicSize[0])\n\
+    {\n\
+        // Our current sliceIdx_up is smaller than the columns count of the mosaic, so:\n\
+        // in this case, the row = 0.***\n\
+        row_up = 0;\n\
+        col_up = currSliceIdx_up;\n\
+    }\n\
+    else\n\
+    {\n\
+        float rowAux = floor(float(currSliceIdx_up) / float(u_mosaicSize[0]));\n\
+        float colAux = float(currSliceIdx_up) - (rowAux * float(u_mosaicSize[0]));\n\
+\n\
+        col_up = int(colAux);\n\
+        row_up = int(rowAux);\n\
+    }\n\
+\n\
+    // test.***\n\
+    col_up = col_down + 1;\n\
+    row_up = row_down;\n\
+    if(col_up >= u_mosaicSize[0])\n\
+    {\n\
+        col_up = 0;\n\
+        row_up = row_down + 1;\n\
+    }\n\
+\n\
+    if(row_up >= u_mosaicSize[1])\n\
+    {\n\
+        return false;\n\
+    }\n\
+\n\
+    //float airPressure_up = _getPollution_triLinearInterpolation(texCoord3d.xy, col_up, row_up); // test delete.***\n\
+    float airPressure_up = _getPollution_nearest(texCoord3d.xy, col_up, row_up);\n\
+\n\
+    airPressure = mix(airPressure_down, airPressure_up, distDownRatio);\n\
+\n\
+    return true;\n\
+}\n\
+\n\
+bool get_pollution_fromTexture3d_nearest(in vec3 texCoord3d, inout float airPressure)\n\
+{\n\
+    // tex3d : airPressureMosaicTex\n\
+    // 1rst, check texCoord3d boundary limits.***\n\
+    if(texCoord3d.x < 0.0 || texCoord3d.x > 1.0)\n\
+    {\n\
+        return false;\n\
+    }\n\
+\n\
+    if(texCoord3d.y < 0.0 || texCoord3d.y > 1.0)\n\
+    {\n\
+        return false;\n\
+    }\n\
+\n\
+    if(texCoord3d.z < 0.0 || texCoord3d.z > 1.0)\n\
+    {\n\
+        return false;\n\
+    }\n\
+    // 1rst, determine the sliceIdx.***\n\
+    int slicesCount = u_texSize[2];\n\
+\n\
+    float currSliceIdx_float = texCoord3d.z * float(slicesCount -  1);\n\
+    int currSliceIdx_down = int(floor(currSliceIdx_float));\n\
+    int currSliceIdx_up = currSliceIdx_down + 1;\n\
+    int currSliceIdx = currSliceIdx_down;\n\
+\n\
+    vec3 sim_res3d = vec3(u_texSize[0], u_texSize[1], u_texSize[2]);\n\
+    //vec2 px = 1.0 / sim_res3d.xy;\n\
+    //vec2 vc = (floor(texCoord3d.xy * sim_res3d.xy)) * px;\n\
+    vec3 f = fract(texCoord3d * sim_res3d);\n\
+\n\
+    if(f.z > 0.5)\n\
+    {\n\
+        currSliceIdx = currSliceIdx_up;\n\
+    }\n\
+\n\
+    if(currSliceIdx >= u_texSize[2])\n\
+    {\n\
+        return false;\n\
+    }\n\
+\n\
+    // ************************************************************\n\
+    int col, row;\n\
+    //if(currSliceIdx <= u_mosaicSize[0])\n\
+    //{\n\
+        // Our current sliceIdx_down is smaller than the columns count of the mosaic, so:\n\
+        // in this case, the row = 0.***\n\
+    //    row = 0;\n\
+   //     col = currSliceIdx;\n\
+   /// }\n\
+    //else\n\
+    {\n\
+        float mosaicSize_x = float(u_mosaicSize[0]);\n\
+        float rowAux = floor(float(currSliceIdx) / mosaicSize_x);\n\
+        float colAux = float(currSliceIdx) - (rowAux * mosaicSize_x);\n\
+\n\
+        col = int(colAux);\n\
+        row = int(rowAux);\n\
+    }\n\
+\n\
+    // now, must calculate the mosaicTexCoord.***\n\
+\n\
+    airPressure = _getPollution_nearest(texCoord3d.xy, col, row);\n\
+\n\
+    return true;\n\
+}\n\
+\n\
+vec4 getRainbowColor_byHeight(in float height, in float minHeight_rainbow, in float maxHeight_rainbow, bool hotToCold)\n\
+{\n\
+    \n\
+    float gray = (height - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);\n\
+	if (gray > 1.0){ gray = 1.0; }\n\
+	else if (gray<0.0){ gray = 0.0; }\n\
+\n\
+    float value = gray * 3.99;\n\
+    float h = floor(value);\n\
+    float f = fract(value);\n\
+\n\
+    // test.***\n\
+    if(gray > 0.0000001)\n\
+    {\n\
+        //gray = 0.95;\n\
+    }\n\
+\n\
+    vec4 resultColor = vec4(0.0, 0.0, 0.0, (gray));\n\
+\n\
+    if(hotToCold)\n\
+    {\n\
+        // HOT to COLD.***\n\
+        resultColor.rgb = vec3(1.0, 0.0, 0.0); // init\n\
+        if(h >= 0.0 && h < 1.0)\n\
+        {\n\
+            // mix red & yellow.***\n\
+            vec3 red = vec3(1.0, 0.0, 0.0);\n\
+            vec3 yellow = vec3(1.0, 1.0, 0.0);\n\
+            resultColor.rgb = mix(red, yellow, f);\n\
+        }\n\
+        else if(h >= 1.0 && h < 2.0)\n\
+        {\n\
+            // mix yellow & green.***\n\
+            vec3 green = vec3(0.0, 1.0, 0.0);\n\
+            vec3 yellow = vec3(1.0, 1.0, 0.0);\n\
+            resultColor.rgb = mix(yellow, green, f);\n\
+        }\n\
+        else if(h >= 2.0 && h < 3.0)\n\
+        {\n\
+            // mix green & cyan.***\n\
+            vec3 green = vec3(0.0, 1.0, 0.0);\n\
+            vec3 cyan = vec3(0.0, 1.0, 1.0);\n\
+            resultColor.rgb = mix(green, cyan, f);\n\
+        }\n\
+        else if(h >= 3.0)\n\
+        {\n\
+            // mix cyan & blue.***\n\
+            vec3 blue = vec3(0.0, 0.0, 1.0);\n\
+            vec3 cyan = vec3(0.0, 1.0, 1.0);\n\
+            resultColor.rgb = mix(cyan, blue, f);\n\
+        }\n\
+    }\n\
+    else\n\
+    {\n\
+        // COLD to HOT.***\n\
+        resultColor.rgb = vec3(0.0, 0.0, 1.0); // init\n\
+        if(h >= 0.0 && h < 1.0)\n\
+        {\n\
+            // mix blue & cyan.***\n\
+            vec3 blue = vec3(0.0, 0.0, 1.0);\n\
+            vec3 cyan = vec3(0.0, 1.0, 1.0);\n\
+            resultColor.rgb = mix(blue, cyan, f);\n\
+        }\n\
+        else if(h >= 1.0 && h < 2.0)\n\
+        {\n\
+            // mix cyan & green.***\n\
+            vec3 green = vec3(0.0, 1.0, 0.0);\n\
+            vec3 cyan = vec3(0.0, 1.0, 1.0);\n\
+            resultColor.rgb = mix(cyan, green, f);  \n\
+        }\n\
+        else if(h >= 2.0 && h < 3.0)\n\
+        {\n\
+            // mix green & yellow.***\n\
+            vec3 green = vec3(0.0, 1.0, 0.0);\n\
+            vec3 yellow = vec3(1.0, 1.0, 0.0);\n\
+            resultColor.rgb = mix(green, yellow, f);\n\
+        }\n\
+        else if(h >= 3.0)\n\
+        {\n\
+            // mix yellow & red.***\n\
+            vec3 red = vec3(1.0, 0.0, 0.0);\n\
+            vec3 yellow = vec3(1.0, 1.0, 0.0);\n\
+            resultColor.rgb = mix(yellow, red, f);\n\
+        }\n\
+    }\n\
+\n\
+    return resultColor;\n\
+}\n\
+\n\
+vec4 getColorByLegendColors(float realPollutionValue)\n\
+{\n\
+    vec4 colorAux = vec4(0.3, 0.3, 0.3, 0.1);\n\
+    vec4 colorZero = vec4(0.3, 0.3, 0.3, 0.1);\n\
+\n\
+    // The legendValues are scaled, so must scale the realPollutionValue.***\n\
+    float scaledValue = realPollutionValue * uLegendValuesScale;\n\
+\n\
+    // find legendIdx.***\n\
+    for(int i=0; i<16; i++)\n\
+    {\n\
+        if( i >= uLegendColorsCount)\n\
+        {\n\
+            break;\n\
+        }\n\
+\n\
+        if(i == 0)\n\
+        {\n\
+            if(scaledValue < uLegendValues[i])\n\
+            {\n\
+                float value0 = 0.0;\n\
+                float value1 = uLegendValues[i];\n\
+                float factor = (scaledValue - value0) / (value1 - value0);\n\
+                colorAux = mix(colorZero, uLegendColors[i], factor);\n\
+                //colorAux = vec4(0.3, 0.3, 0.3, 0.0);\n\
+                break;\n\
+            }\n\
+        }\n\
+\n\
+        if(i < uLegendColorsCount - 1)\n\
+        {\n\
+            if(scaledValue >= uLegendValues[i] && scaledValue < uLegendValues[i + 1])\n\
+            {\n\
+                // if(uTextureFilterType == 0)\n\
+                // {\n\
+                //     colorAux = uLegendColors[i];\n\
+                // }\n\
+                // else\n\
+                {\n\
+                    float value0 = uLegendValues[i];\n\
+                    float value1 = uLegendValues[i + 1];\n\
+                    float factor = (scaledValue - value0) / (value1 - value0);\n\
+                    colorAux = mix(uLegendColors[i], uLegendColors[i + 1], factor);\n\
+                }\n\
+                break;\n\
+            }\n\
+        }\n\
+        else if(i == uLegendColorsCount - 1)\n\
+        {\n\
+            if(scaledValue >= uLegendValues[i])\n\
+            {\n\
+                colorAux = uLegendColors[i];\n\
+                break;\n\
+            }\n\
+            else\n\
+            {\n\
+                float value0 = uLegendValues[i];\n\
+                float value1 = uLegendValues[i];\n\
+                float factor = (scaledValue - value0) / (value1 - value0);\n\
+                colorAux = mix(uLegendColors[i], uLegendColors[i], factor);\n\
+            }\n\
+        }\n\
+\n\
+    }\n\
+\n\
+    return colorAux;\n\
+}\n\
+\n\
+\n\
+// https://www.willusher.io/webgl/2019/01/13/volume-rendering-with-webgl\n\
+// The transfer function specifies what color and opacity value should be assigned for a given value sampled from the volume. \n\
+//--------------------------------------------------------------------------------------------------------------------------\n\
+\n\
+// https://developer.nvidia.com/gpugems/gpugems/part-vi-beyond-triangles/chapter-39-volume-rendering-techniques\n\
+//--------------------------------------------------------------------------------------------------------------------------\n\
+\n\
+/*\n\
+// https://martinopilia.com/posts/2018/09/17/volume-raycasting.html\n\
+// Estimate the normal from a finite difference approximation of the gradient\n\
+vec3 normal(vec3 position, float intensity)\n\
+{\n\
+    float d = step_length;\n\
+    float dx = texture(volume, position + vec3(d,0,0)).r - intensity;\n\
+    float dy = texture(volume, position + vec3(0,d,0)).r - intensity;\n\
+    float dz = texture(volume, position + vec3(0,0,d)).r - intensity;\n\
+    return -normalize(NormalMatrix * vec3(dx, dy, dz));\n\
+}*/\n\
+\n\
+bool normalLC(vec3 texCoord3d, in vec3 posLC, inout vec3 result_normal)\n\
+{\n\
+    // Estimate the normal from a finite difference approximation of the gradient\n\
+    vec3 sim_res3d = vec3(u_texSize[0], u_texSize[1], u_texSize[2]);\n\
+    vec3 pix = 1.0 / sim_res3d;\n\
+\n\
+    checkTexCoord3DRange(texCoord3d);\n\
+\n\
+    vec3 vc = texCoord3d;\n\
+\n\
+    // dx.*************************************************\n\
+    float airPressure_dx = 0.0;\n\
+    vec3 velocity_dx;\n\
+    vec3 texCoord3d_dx = vec3(vc + vec3(pix.x, 0.0, 0.0));\n\
+    bool succes_dx =  get_pollution_fromTexture3d_triLinearInterpolation(texCoord3d_dx, posLC, airPressure_dx);\n\
+    if(!succes_dx)return false;\n\
+\n\
+    float airPressure_dx_neg = 0.0;\n\
+    vec3 velocity_dx_neg;\n\
+    vec3 texCoord3d_dx_neg = vec3(vc - vec3(pix.x, 0.0, 0.0));\n\
+    bool succes_dx_neg =  get_pollution_fromTexture3d_triLinearInterpolation(texCoord3d_dx_neg, posLC, airPressure_dx_neg);\n\
+    if(!succes_dx_neg)return false;\n\
+\n\
+    // dy.*************************************************\n\
+    float airPressure_dy = 0.0;\n\
+    vec3 velocity_dy;\n\
+    vec3 texCoord3d_dy = vec3(vc + vec3(0.0, pix.y, 0.0));\n\
+    bool succes_dy =  get_pollution_fromTexture3d_triLinearInterpolation(texCoord3d_dy, posLC, airPressure_dy);\n\
+    if(!succes_dy)return false;\n\
+\n\
+    float airPressure_dy_neg = 0.0;\n\
+    vec3 velocity_dy_neg;\n\
+    vec3 texCoord3d_dy_neg = vec3(vc - vec3(0.0, pix.y, 0.0));\n\
+    bool succes_dy_neg =  get_pollution_fromTexture3d_triLinearInterpolation(texCoord3d_dy_neg, posLC, airPressure_dy_neg);\n\
+    if(!succes_dy_neg)return false;\n\
+\n\
+    // dz.*************************************************\n\
+    float airPressure_dz = 0.0;\n\
+    vec3 velocity_dz;\n\
+    vec3 texCoord3d_dz = vec3(vc + vec3(0.0, 0.0, pix.z));\n\
+    bool succes_dz =  get_pollution_fromTexture3d_triLinearInterpolation(texCoord3d_dz, posLC, airPressure_dz);\n\
+    if(!succes_dz)return false;\n\
+\n\
+    float airPressure_dz_neg = 0.0;\n\
+    vec3 velocity_dz_neg;\n\
+    vec3 texCoord3d_dz_neg = vec3(vc - vec3(0.0, 0.0, pix.z));\n\
+    bool succes_dz_neg =  get_pollution_fromTexture3d_triLinearInterpolation(texCoord3d_dz_neg, posLC, airPressure_dz_neg);\n\
+    if(!succes_dz_neg)return false;\n\
+\n\
+    //result_normal = normalize(vec3(airPressure_dx - pressure, airPressure_dy - pressure, airPressure_dz - pressure));\n\
+    result_normal = normalize(vec3(airPressure_dx - airPressure_dx_neg, airPressure_dy - airPressure_dy_neg, airPressure_dz - airPressure_dz_neg));\n\
+\n\
+    if(abs(result_normal.x) > 0.0 || abs(result_normal.y) > 0.0 || abs(result_normal.z) > 0.0 )\n\
+    {\n\
+        return true;\n\
+    }\n\
+    else return false;\n\
+\n\
+    return true;\n\
+}\n\
+\n\
+vec4 transfer_fnc(in float pressure)\n\
+{\n\
+    // The transfer function specifies what color and opacity value should be assigned for a given value sampled from the volume. \n\
+    //float maxPressureRef = 1.05;\n\
+    //float minPressureRef = u_airEnvirontmentPressure;\n\
+    float maxPressureRef = u_minMaxPollutionValues.y; // test.***\n\
+    float minPressureRef = u_minMaxPollutionValues.x; // test.***\n\
+    bool bHotToCold = false; // we want coldToHot (blue = min to red = max).***\n\
+    vec4 rainbowCol3 = getRainbowColor_byHeight(pressure, minPressureRef, maxPressureRef, bHotToCold);\n\
+\n\
+    return rainbowCol3;\n\
+}\n\
+\n\
+bool isSimulationBoxEdge(vec2 screenPos)\n\
+{\n\
+    // This function is used to render the simulation box edges.***\n\
+    // check the normals.***\n\
+    vec2 frontTexCoord;\n\
+    vec2 rearTexCoord;\n\
+    get_FrontAndRear_depthTexCoords(screenPos, frontTexCoord, rearTexCoord);\n\
+    float pixelSize_x = 1.0 / (u_screenSize.x * 2.0);\n\
+    float pixelSize_y = 1.0 / u_screenSize.y;\n\
+    \n\
+    // check front.***\n\
+    vec4 normal4front = getNormal_simulationBox(frontTexCoord);\n\
+    vec4 normal4front_up = getNormal_simulationBox(vec2(frontTexCoord.x, frontTexCoord.y + pixelSize_y));\n\
+\n\
+    if(dot(normal4front.xyz, normal4front_up.xyz) < 0.95)\n\
+    {\n\
+        return true; // is edge.***\n\
+    }\n\
+\n\
+    vec4 normal4front_left = getNormal_simulationBox(vec2(frontTexCoord.x - pixelSize_x, frontTexCoord.y));    \n\
+    if(dot(normal4front.xyz, normal4front_left.xyz) < 0.95)\n\
+    {\n\
+        return true; // is edge.***\n\
+    }\n\
+\n\
+    vec4 normal4front_down = getNormal_simulationBox(vec2(frontTexCoord.x, frontTexCoord.y - pixelSize_y));    \n\
+    if(dot(normal4front.xyz, normal4front_down.xyz) < 0.95)\n\
+    {\n\
+        return true; // is edge.***\n\
+    }\n\
+\n\
+    vec4 normal4front_rigth = getNormal_simulationBox(vec2(frontTexCoord.x + pixelSize_x, frontTexCoord.y));    \n\
+    if(dot(normal4front.xyz, normal4front_rigth.xyz) < 0.95)\n\
+    {\n\
+        return true; // is edge.***\n\
+    }\n\
+\n\
+    // now, check the rear normals.***\n\
+    vec4 normal4rear = getNormal_simulationBox(rearTexCoord);\n\
+    vec4 normal4rear_up = getNormal_simulationBox(vec2(rearTexCoord.x, rearTexCoord.y + pixelSize_y));\n\
+\n\
+    if(dot(normal4rear.xyz, normal4rear_up.xyz) < 0.95)\n\
+    {\n\
+        return true; // is edge.***\n\
+    }\n\
+\n\
+    vec4 normal4rear_left = getNormal_simulationBox(vec2(rearTexCoord.x - pixelSize_x, rearTexCoord.y));    \n\
+    if(dot(normal4rear.xyz, normal4rear_left.xyz) < 0.95)\n\
+    {\n\
+        return true; // is edge.***\n\
+    }\n\
+\n\
+    vec4 normal4rear_down = getNormal_simulationBox(vec2(rearTexCoord.x, rearTexCoord.y - pixelSize_y));    \n\
+    if(dot(normal4rear.xyz, normal4rear_down.xyz) < 0.95)\n\
+    {\n\
+        return true; // is edge.***\n\
+    }\n\
+\n\
+    vec4 normal4rear_rigth = getNormal_simulationBox(vec2(rearTexCoord.x + pixelSize_x, rearTexCoord.y));    \n\
+    if(dot(normal4rear.xyz, normal4rear_rigth.xyz) < 0.95)\n\
+    {\n\
+        return true; // is edge.***\n\
+    }\n\
+\n\
+    return false;\n\
+}\n\
+\n\
+bool findFirstSamplePosition(in vec3 frontPosLC, in vec3 rearPosLC, in vec3 samplingDirLC, in float increLength, in vec3 simulBoxRange, inout vec3 result_samplePos, inout int iteration)\n\
+{\n\
+    // This function finds the first sample position.***\n\
+    // Here is not important the pollution value. Only need know if the pollution value is zero or not.***\n\
+    float contaminationSample = 0.0;\n\
+    vec3 samplePosLC;\n\
+    vec3 samplePosLC_prev;\n\
+    float minValToConsidereSample = u_minMaxPollutionValues[0]; // original.***\n\
+    //float minValToConsidereSample = (u_minMaxPollutionValues[1] - u_minMaxPollutionValues[0]) * 0.0001;\n\
+    for(int i=0; i<30; i++)\n\
+    {\n\
+        // Note : for each smple, must depth check with the scene depthTexure.***\n\
+        float dist = float(i) * increLength;\n\
+        samplePosLC = frontPosLC + samplingDirLC * dist;\n\
+        iteration = i;\n\
+\n\
+        if(i == 0)\n\
+        {\n\
+            samplePosLC_prev = samplePosLC;\n\
+        }\n\
+\n\
+        contaminationSample = 0.0;\n\
+        vec3 sampleTexCoord3d = vec3((samplePosLC.x - u_simulBoxMinPosLC.x)/simulBoxRange.x, (samplePosLC.y - u_simulBoxMinPosLC.y)/simulBoxRange.y, (samplePosLC.z - u_simulBoxMinPosLC.z)/simulBoxRange.z);\n\
+        checkTexCoord3DRange(sampleTexCoord3d);\n\
+\n\
+        if(get_pollution_fromTexture3d_triLinearInterpolation_FAST(sampleTexCoord3d, samplePosLC, contaminationSample))\n\
+        {\n\
+            if(contaminationSample > minValToConsidereSample)\n\
+            {\n\
+                if(i > 0)\n\
+                {\n\
+                    // check the prev semiPos.***\n\
+                    vec3 samplePosLC_semiPrev = samplePosLC - samplingDirLC * increLength * 0.5;\n\
+                    if(get_pollution_fromTexture3d_triLinearInterpolation_FAST(sampleTexCoord3d, samplePosLC_semiPrev, contaminationSample))\n\
+                    {\n\
+                        if(contaminationSample > minValToConsidereSample)\n\
+                        {\n\
+                            result_samplePos = samplePosLC_prev;\n\
+                            return true;\n\
+                        }\n\
+                        else\n\
+                        {\n\
+                            //result_samplePos = (samplePosLC + samplePosLC_prev) * 0.5;\n\
+                            result_samplePos = samplePosLC_semiPrev;\n\
+                            return true;\n\
+                        }\n\
+                    }\n\
+                }\n\
+\n\
+                //result_samplePos = (samplePosLC + samplePosLC_prev) * 0.5;\n\
+                result_samplePos = samplePosLC_prev;\n\
+                return true;\n\
+            }\n\
+        }\n\
+        //currSamplePosLC += step_vector_LC;\n\
+        samplePosLC_prev = samplePosLC;\n\
+    }\n\
+\n\
+    return false;\n\
+}\n\
+\n\
+int bresenhamLine3D(int x0, int y0, int z0, int x1, int y1, int z1, inout vec3 result[200])\n\
+{\n\
+    // Bresenham 3D line algorithm.***\n\
+    int resultIntersectedsCount = 0;\n\
+    int dx = (x1 - x0);\n\
+    int dy = (y1 - y0);\n\
+    int dz = (z1 - z0);\n\
+    if(dx < 0) dx *= -1;\n\
+    if(dy < 0) dy *= -1;\n\
+    if(dz < 0) dz *= -1;\n\
+    int xs = x0 < x1 ? 1 : -1;\n\
+    int ys = y0 < y1 ? 1 : -1;\n\
+    int zs = z0 < z1 ? 1 : -1;\n\
+    // int err1 = dx - dy;\n\
+    // int err2 = dx - dz;\n\
+    // int e2 = 0;\n\
+    int x = x0;\n\
+    int y = y0;\n\
+    int z = z0;\n\
+\n\
+    // Driving axis is X-axis\n\
+    if (dx >= dy && dx >= dz) {\n\
+        int p1 = 2 * dy - dx;\n\
+        int p2 = 2 * dz - dx;\n\
+        for(int i=0; i<200; i++)\n\
+        {\n\
+            if(x == x1)\n\
+            {\n\
+                resultIntersectedsCount = i;\n\
+                result[i] = vec3(x1, y1, z1);\n\
+                resultIntersectedsCount += 1;\n\
+                break;\n\
+            }\n\
+            //points.push({x: x0, y: y0, z: z0});\n\
+            result[i] = vec3(x, y, z);\n\
+            x += xs;\n\
+            if (p1 >= 0) {\n\
+                y += ys;\n\
+                p1 -= 2 * dx;\n\
+            }\n\
+            if (p2 >= 0) {\n\
+                z += zs;\n\
+                p2 -= 2 * dx;\n\
+            }\n\
+            p1 += 2 * dy;\n\
+            p2 += 2 * dz;\n\
+        }\n\
+    }\n\
+    // Driving axis is Y-axis\n\
+    else if (dy >= dx && dy >= dz) {\n\
+        int p1 = 2 * dx - dy;\n\
+        int p2 = 2 * dz - dy;\n\
+        for(int i=0; i<200; i++)\n\
+        {\n\
+            if(y == y1)\n\
+            {\n\
+                resultIntersectedsCount = i;\n\
+                result[i] = vec3(x1, y1, z1);\n\
+                resultIntersectedsCount += 1;\n\
+                break;\n\
+            }\n\
+            //points.push({x: x0, y: y0, z: z0});\n\
+            result[i] = vec3(x, y, z);\n\
+            y += ys;\n\
+            if (p1 >= 0) {\n\
+                x += xs;\n\
+                p1 -= 2 * dy;\n\
+            }\n\
+            if (p2 >= 0) {\n\
+                z += zs;\n\
+                p2 -= 2 * dy;\n\
+            }\n\
+            p1 += 2 * dx;\n\
+            p2 += 2 * dz;\n\
+        }\n\
+    }\n\
+    // Driving axis is Z-axis\n\
+    else {\n\
+        int p1 = 2 * dy - dz;\n\
+        int p2 = 2 * dx - dz;\n\
+        for(int i=0; i<200; i++)\n\
+        {\n\
+            if(z == z1)\n\
+            {\n\
+                resultIntersectedsCount = i;\n\
+                result[i] = vec3(x1, y1, z1);\n\
+                resultIntersectedsCount += 1;\n\
+\n\
+                break;\n\
+            }\n\
+            //points.push({x: x0, y: y0, z: z0});\n\
+            result[i] = vec3(x, y, z);\n\
+            z += zs;\n\
+            if (p1 >= 0) {\n\
+                y += ys;\n\
+                p1 -= 2 * dz;\n\
+            }\n\
+            if (p2 >= 0) {\n\
+                x += xs;\n\
+                p2 -= 2 * dz;\n\
+            }\n\
+            p1 += 2 * dy;\n\
+            p2 += 2 * dx;\n\
+        }\n\
+    }\n\
+\n\
+    \n\
+\n\
+    // put the last point.***\n\
+\n\
+    //points.push({x: x0, y: y0, z: z0});  // Add the last point\n\
+    // for(int i=0; i<200; i++)\n\
+    // {\n\
+    //     result[i] = vec3(x, y, z);\n\
+    //     if(x == x1 && y == y1 && z == z1)\n\
+    //     {\n\
+    //         resultIntersectedsCount = i;\n\
+    //         break;\n\
+    //     }\n\
+    //     e2 = 2 * err1;\n\
+    //     if(e2 > -dy)\n\
+    //     {\n\
+    //         err1 -= dy;\n\
+    //         x += sx;\n\
+    //     }\n\
+    //     if(e2 < dx)\n\
+    //     {\n\
+    //         err1 += dx;\n\
+    //         y += sy;\n\
+    //     }\n\
+    //     if(e2 > -dz)\n\
+    //     {\n\
+    //         err2 -= dz;\n\
+    //         x += sx;\n\
+    //     }\n\
+    //     if(e2 < dx)\n\
+    //     {\n\
+    //         err2 += dx;\n\
+    //         z += sz;\n\
+    //     }\n\
+    // }\n\
+\n\
+    return resultIntersectedsCount;\n\
+}\n\
+\n\
+void main(){\n\
+\n\
+    // 1rst, read front depth & rear depth and check if exist rear depth.***\n\
+    // If no exist rear depth, then discard.***\n\
+    //vec2 screenPos = vec2(gl_FragCoord.x / u_screenSize.x, gl_FragCoord.y / u_screenSize.y); // \n\
+    vec2 screenPos = v_tex_pos;\n\
+\n\
+    if(isSimulationBoxEdge(screenPos))\n\
+    {\n\
+        vec4 edgeColor = vec4(0.25, 0.5, 0.99, 1.0);\n\
+        gl_FragData[0] = edgeColor;\n\
+\n\
+        #ifdef USE_MULTI_RENDER_TARGET\n\
+            gl_FragData[1] = edgeColor;\n\
+            gl_FragData[2] = edgeColor;\n\
+            gl_FragData[3] = edgeColor;\n\
+        #endif\n\
+        return;\n\
+    }\n\
+\n\
+    // read normal in rear depth. If no exist normal, then, discard.***\n\
+    // calculate the texCoord for rear normal:\n\
+    vec2 frontTexCoord;\n\
+    vec2 rearTexCoord;\n\
+    get_FrontAndRear_depthTexCoords(screenPos, frontTexCoord, rearTexCoord);\n\
+\n\
+    vec4 encodedNormal = texture2D(simulationBoxDoubleNormalTex, frontTexCoord);\n\
+	if(length(encodedNormal.xyz) < 0.1)\n\
+    {\n\
+        vec4 encodedNormal_rear = texture2D(simulationBoxDoubleNormalTex, rearTexCoord);\n\
+        if(length(encodedNormal_rear.xyz) < 0.1)\n\
+        {\n\
+            discard;\n\
+        }\n\
+        //discard;\n\
+    }\n\
+\n\
+    vec4 normal4rear = getNormal_simulationBox(rearTexCoord);\n\
+    vec4 normal4front = getNormal_simulationBox(frontTexCoord);\n\
+	//vec3 normal = normal4front.xyz;\n\
+\n\
+    // 1rst, know the scene depth.***\n\
+    vec4 normal4scene = getNormal(v_tex_pos);\n\
+    int estimatedFrustumIdx = int(floor(normal4scene.w * 100.0));\n\
+	int dataType = -1;// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.\n\
+	int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType); // Note : \"dataType\" no used in this shader.***\n\
+	vec2 nearFar_scene = getNearFar_byFrustumIdx(currFrustumIdx);\n\
+	//float currNear_scene = nearFar_scene.x; // no used in this shader.***\n\
+	float currFar_scene = nearFar_scene.y;\n\
+    float sceneLinearDepth = getDepth(v_tex_pos);\n\
+    float distToCam = sceneLinearDepth * currFar_scene;\n\
+    //vec3 sceneDepthPosCC = getViewRay(v_tex_pos, distToCam - 1.0);\n\
+\n\
+\n\
+    // Now, calculate the positions with the simulation box, front & rear.***\n\
+    // rear.***\n\
+	estimatedFrustumIdx = int(floor(normal4rear.w * 100.0));\n\
+	dataType = -1;// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.\n\
+	currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType); // Note : \"dataType\" no used in this shader.***\n\
+	vec2 nearFar_rear = getNearFar_byFrustumIdx(currFrustumIdx);\n\
+	//float currNear_rear = nearFar_rear.x; // no used in this shader.***\n\
+	float currFar_rear = nearFar_rear.y;\n\
+\n\
+    // front.***\n\
+    estimatedFrustumIdx = int(floor(normal4front.w * 100.0));\n\
+	currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType); // Note : \"dataType\" no used in this shader.***\n\
+	vec2 nearFar_front = getNearFar_byFrustumIdx(currFrustumIdx);\n\
+	//float currNear_front = nearFar_front.x; // no used in this shader.***\n\
+	float currFar_front = nearFar_front.y;\n\
+\n\
+    // Now, calculate the rearPosCC & frontPosCC.***\n\
+    vec3 frontPosCC;\n\
+    vec3 rearPosCC;\n\
+    get_FrontAndRear_posCC(screenPos, currFar_rear, currFar_front, frontPosCC, rearPosCC);\n\
+\n\
+    // Now check cutting plane if exist.***\n\
+    // u_cuttingPlanePosLC\n\
+    // uniform mat4 modelViewMatrixRelToEyeInv;\n\
+    // uniform vec3 encodedCameraPositionMCHigh;\n\
+    // uniform vec3 encodedCameraPositionMCLow;\n\
+    // u_simulBoxTMatInv\n\
+    vec4 camPosRelToSimBox;\n\
+    vec3 cuttingPosCC;\n\
+    vec3 frontPosLCKeep;\n\
+    if(u_cuttingPlaneIdx == 0 || u_cuttingPlaneIdx == 1 || u_cuttingPlaneIdx == 2)\n\
+    {\n\
+        vec4 encodedNormal4cuttingPlane = texture2D(cuttingPlaneNormalTex, v_tex_pos);\n\
+        if(length(encodedNormal4cuttingPlane.xyz) > 0.1)\n\
+        {\n\
+            vec4 normal4cuttingPlane = getNormal_cuttingPlane(v_tex_pos);\n\
+            estimatedFrustumIdx = int(floor(normal4cuttingPlane.w * 100.0));\n\
+            currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType); // Note : \"dataType\" no used in this shader.***\n\
+            vec2 nearFar_cuttingPlane = getNearFar_byFrustumIdx(currFrustumIdx);\n\
+            float currFar_cuttingPlane = nearFar_cuttingPlane.y;\n\
+            \n\
+            get_cuttingPlane_posCC(screenPos, currFar_cuttingPlane, cuttingPosCC);\n\
+\n\
+            // before to change the frontPosCC, must calculate the camPosRelToSimBox.***\n\
+            vec4 frontPosWCRelToEyeKeep = modelViewMatrixRelToEyeInv * vec4(frontPosCC.xyz, 1.0);\n\
+            posWCRelToEye_to_posLC(frontPosWCRelToEyeKeep, u_simulBoxTMatInv, u_simulBoxPosHigh, u_simulBoxPosLow, frontPosLCKeep);\n\
+\n\
+            // now change the frontPosCC.***\n\
+            frontPosCC = cuttingPosCC;\n\
+\n\
+            if(cuttingPosCC.z < rearPosCC.z)\n\
+            {\n\
+                // if cutting plane moves entirely inside of the simulBox, then never enter here.***\n\
+                discard;\n\
+            }\n\
+        }\n\
+\n\
+        // now, calculate camPosRelToSimBox.***\n\
+        vec3 highDiff = encodedCameraPositionMCHigh - u_simulBoxPosHigh;\n\
+        vec3 lowDiff = encodedCameraPositionMCLow - u_simulBoxPosLow;\n\
+        vec3 camPosWC = highDiff + lowDiff;\n\
+        camPosRelToSimBox = u_simulBoxTMatInv * vec4(camPosWC, 1.0);\n\
+    }\n\
+\n\
+    // Now, calculate frontPosWC & rearPosWC.***\n\
+    vec4 frontPosWCRelToEye = modelViewMatrixRelToEyeInv * vec4(frontPosCC.xyz, 1.0);\n\
+    vec4 rearPosWCRelToEye = modelViewMatrixRelToEyeInv * vec4(rearPosCC.xyz, 1.0);\n\
+\n\
+    // Now, calculate frontPosLC & rearPosLC.***\n\
+    vec3 frontPosLC;\n\
+    vec3 rearPosLC;\n\
+    posWCRelToEye_to_posLC(frontPosWCRelToEye, u_simulBoxTMatInv, u_simulBoxPosHigh, u_simulBoxPosLow, frontPosLC);\n\
+    posWCRelToEye_to_posLC(rearPosWCRelToEye, u_simulBoxTMatInv, u_simulBoxPosHigh, u_simulBoxPosLow, rearPosLC);\n\
+\n\
+    if(u_cuttingPlaneIdx == 0) // x-axis\n\
+    {\n\
+        float error = 10.0;\n\
+        if(camPosRelToSimBox.x >= u_cuttingPlanePosLC.x)\n\
+        {\n\
+            if(frontPosLC.x - error > u_cuttingPlanePosLC.x)// || rearPosLC.y > u_cuttingPlanePosLC.y)\n\
+            {\n\
+                discard;\n\
+            }\n\
+        }\n\
+        else\n\
+        {\n\
+            if(frontPosLC.x + error < u_cuttingPlanePosLC.x)// || rearPosLC.y < u_cuttingPlanePosLC.y)\n\
+            {\n\
+                discard;\n\
+            }\n\
+        }\n\
+    }\n\
+    else if(u_cuttingPlaneIdx == 1) // y-axis\n\
+    {\n\
+        float error = 10.0;\n\
+        if(camPosRelToSimBox.y >= u_cuttingPlanePosLC.y)\n\
+        {\n\
+            if(frontPosLC.y - error > u_cuttingPlanePosLC.y)// || rearPosLC.y > u_cuttingPlanePosLC.y)\n\
+            {\n\
+                discard;\n\
+            }\n\
+        }\n\
+        else\n\
+        {\n\
+            if(frontPosLC.y + error < u_cuttingPlanePosLC.y)// || rearPosLC.y < u_cuttingPlanePosLC.y)\n\
+            {\n\
+                discard;\n\
+            }\n\
+        }\n\
+    }\n\
+    else if(u_cuttingPlaneIdx == 2) // z-axis\n\
+    {\n\
+        float error = 10.0;\n\
+        if(camPosRelToSimBox.z >= u_cuttingPlanePosLC.z)\n\
+        {\n\
+            if(frontPosLC.z - error > u_cuttingPlanePosLC.z)// || rearPosLC.y > u_cuttingPlanePosLC.y)\n\
+            {\n\
+                // vec4 colorDiscard = vec4(1.0, 0.3, 0.3, 1.0);\n\
+                // gl_FragData[0] = colorDiscard;\n\
+                // #ifdef USE_MULTI_RENDER_TARGET\n\
+                //     gl_FragData[1] = colorDiscard;\n\
+                //     gl_FragData[2] = colorDiscard;\n\
+                //     gl_FragData[3] = colorDiscard;\n\
+                // #endif\n\
+                // return;\n\
+                discard;\n\
+            }\n\
+        }\n\
+        else\n\
+        {\n\
+            if(frontPosLC.z + error < u_cuttingPlanePosLC.z)// || rearPosLC.y < u_cuttingPlanePosLC.y)\n\
+            {\n\
+                // vec4 colorDiscard = vec4(0.3, 1.0, 0.3, 1.0);\n\
+                // gl_FragData[0] = colorDiscard;\n\
+                // #ifdef USE_MULTI_RENDER_TARGET\n\
+                //     gl_FragData[1] = colorDiscard;\n\
+                //     gl_FragData[2] = colorDiscard;\n\
+                //     gl_FragData[3] = colorDiscard;\n\
+                // #endif\n\
+                // return;\n\
+                discard;\n\
+            }\n\
+        }\n\
+    }\n\
+\n\
+    // Now, with \"frontPosLC\" & \"rearPosLC\", calculate the frontTexCoord3d & rearTexCoord3d.***\n\
+    vec3 simulBoxRange = vec3(u_simulBoxMaxPosLC.x - u_simulBoxMinPosLC.x, u_simulBoxMaxPosLC.y - u_simulBoxMinPosLC.y, u_simulBoxMaxPosLC.z - u_simulBoxMinPosLC.z);\n\
+\n\
+    // apply bresenham algorithm.***\n\
+    vec3 frontPosTexCoord = vec3((frontPosLC.x - u_simulBoxMinPosLC.x)/simulBoxRange.x, (frontPosLC.y - u_simulBoxMinPosLC.y)/simulBoxRange.y, (frontPosLC.z - u_simulBoxMinPosLC.z)/simulBoxRange.z);\n\
+    vec3 rearPosTexCoord = vec3((rearPosLC.x - u_simulBoxMinPosLC.x)/simulBoxRange.x, (rearPosLC.y - u_simulBoxMinPosLC.y)/simulBoxRange.y, (rearPosLC.z - u_simulBoxMinPosLC.z)/simulBoxRange.z);\n\
+    float simulBoxHeight = u_simulBoxMaxPosLC[2] - u_simulBoxMinPosLC[2];\n\
+    int simulBoxHeightInt = int(simulBoxHeight / u_voxelSizeMeters.z);\n\
+    int frontVoxelCoordX = int(frontPosTexCoord.x * float(u_texSize[0]));\n\
+    int frontVoxelCoordY = int(frontPosTexCoord.y * float(u_texSize[1]));\n\
+    int frontVoxelCoordZ = int(frontPosTexCoord.z * float(simulBoxHeightInt));\n\
+    int rearVoxelCoordX = int(rearPosTexCoord.x * float(u_texSize[0]));\n\
+    int rearVoxelCoordY = int(rearPosTexCoord.y * float(u_texSize[1]));\n\
+    int rearVoxelCoordZ = int(rearPosTexCoord.z * float(simulBoxHeightInt));\n\
+    vec3 resultIntersectedVoxels[200];\n\
+    int intersectedsCount = bresenhamLine3D(frontVoxelCoordX, frontVoxelCoordY, frontVoxelCoordZ, rearVoxelCoordX, rearVoxelCoordY, rearVoxelCoordZ, resultIntersectedVoxels);\n\
+\n\
+    float contaminationSamples[200];\n\
+    float contaminationSample = 0.0;\n\
+    int samplesCount = 0;\n\
+    vec4 currColor4;\n\
+    vec4 finalColor4 = vec4(0.0);\n\
+    for(int i=0; i<200; i++)\n\
+    {\n\
+        if(i == intersectedsCount)\n\
+        {\n\
+            break;\n\
+        }\n\
+\n\
+        vec3 voxel = resultIntersectedVoxels[i];\n\
+        float zPixelsCount = simulBoxHeight / u_voxelSizeMeters.z;\n\
+        vec3 texCoord3d = vec3(voxel.x / float(u_texSize[0]), voxel.y / float(u_texSize[1]), voxel.z / zPixelsCount);\n\
+        if(get_pollution_fromTexture3d_triLinearInterpolation(texCoord3d, frontPosTexCoord, contaminationSample))\n\
+        {\n\
+            contaminationSamples[i] = contaminationSample;\n\
+            if(contaminationSample > 0.0)\n\
+            {\n\
+                if(uRenderingColorType == 0)\n\
+                {\n\
+                    currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);\n\
+                }\n\
+                else if(uRenderingColorType == 1)\n\
+                {\n\
+                    // for the moment use rainbow colors.***\n\
+                    currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);\n\
+                }\n\
+                else if(uRenderingColorType == 2)\n\
+                {\n\
+                    currColor4 = getColorByLegendColors(contaminationSample);\n\
+                }\n\
+\n\
+                if(u_useMinMaxValuesToRender == 1)\n\
+                {\n\
+                    float targetValue = u_minMaxPollutionValuesToRender.y;\n\
+                    \n\
+                    //targetValue = u_minMaxPollutionValues.y;\n\
+                    //currColor4.a = contaminationSample / targetValue;\n\
+                    if(currColor4.a > 1.0)\n\
+                    {\n\
+                        currColor4.a = 1.0;\n\
+                    }\n\
+\n\
+                    //currColor4.a *= smoothstep(0.0, targetValue, contaminationSample);\n\
+                    currColor4.a = smoothstep(0.0, targetValue, contaminationSample);\n\
+                }\n\
+\n\
+                // https://www.willusher.io/webgl/2019/01/13/volume-rendering-with-webgl\n\
+                finalColor4.rgb += (1.0 - finalColor4.a) * currColor4.a * currColor4.rgb; \n\
+                finalColor4.a += (1.0 - finalColor4.a) * currColor4.a;\n\
+                // samplesCount2 += 1;\n\
+\n\
+                // contaminationAccum += contaminationSample;\n\
+            }\n\
+\n\
+            // Optimization: break out of the loop when the color is near opaque\n\
+            if (finalColor4.a >= 0.95) {\n\
+                break;\n\
+            }\n\
+        }\n\
+    }\n\
+\n\
+   \n\
+\n\
+    vec4 color4Aux = vec4(finalColor4);\n\
+    \n\
+    gl_FragData[0] = color4Aux;\n\
+\n\
+    #ifdef USE_MULTI_RENDER_TARGET\n\
+        gl_FragData[1] = color4Aux;\n\
+        gl_FragData[2] = color4Aux;\n\
+        gl_FragData[3] = color4Aux;\n\
+    #endif\n\
+\n\
+    \n\
+    // float smplingCount = 0.0;\n\
+    // float segmentLength = distance(rearPosLC, frontPosLC);\n\
+    // vec3 samplingDirLC = normalize(rearPosLC - frontPosLC);\n\
+    // //vec3 samplingDirCC = normalize(rearPosCC - frontPosCC);\n\
+    // float samplingsCount = 30.0;\n\
+    // float increLength = segmentLength / samplingsCount;\n\
+    // if(increLength < u_voxelSizeMeters.x)\n\
+    // {\n\
+    //     //increLength = u_voxelSizeMeters.x;\n\
+    // }\n\
+\n\
+    // vec4 color4Aux = vec4(0.0, 0.0, 0.0, 0.0);\n\
+\n\
+    // vec4 finalColor4 = vec4(0.0);\n\
+    // float contaminationAccum = 0.0;\n\
+    // // u_minMaxPollutionValues\n\
+\n\
+    // vec3 firstPosLC = vec3(frontPosLC);\n\
+    // int iteration = 0;\n\
+    // if(!findFirstSamplePosition(frontPosLC, rearPosLC, samplingDirLC, increLength, simulBoxRange, firstPosLC, iteration))\n\
+    // {\n\
+    //     // vec4 colorDiscard = vec4(0.3, 0.3, 0.3, 1.0);\n\
+    //     // gl_FragData[0] = colorDiscard;\n\
+    //     // #ifdef USE_MULTI_RENDER_TARGET\n\
+    //     //     gl_FragData[1] = colorDiscard;\n\
+    //     //     gl_FragData[2] = colorDiscard;\n\
+    //     //     gl_FragData[3] = colorDiscard;\n\
+    //     // #endif\n\
+        \n\
+    //     return;\n\
+    // }\n\
+    \n\
+    // // recalculate segmentLength & increLength.***\n\
+    // samplingsCount = 30.0;\n\
+    // segmentLength = distance(rearPosLC, firstPosLC);\n\
+    // increLength = segmentLength / samplingsCount;\n\
+\n\
+    // vec4 colorTest = vec4(0.0, 0.0, 0.5, 1.0);\n\
+    // colorTest = vec4(firstPosLC.x /u_voxelSizeMeters.x, firstPosLC.y /u_voxelSizeMeters.y, firstPosLC.z /u_voxelSizeMeters.z , 1.0);\n\
+    \n\
+    // // Sampling far to near.***\n\
+    // bool normalLC_calculated = true;\n\
+\n\
+    // float contaminationSamples[30];\n\
+    // int samplesCount = 0;\n\
+    // for(int i=0; i<30; i++)\n\
+    // {\n\
+    //     // Note : for each smple, must depth check with the scene depthTexure.***\n\
+    //     vec3 samplePosLC = firstPosLC + samplingDirLC * increLength * float(i);\n\
+\n\
+    //     contaminationSample = 0.0;\n\
+    //     vec3 sampleTexCoord3d = vec3((samplePosLC.x - u_simulBoxMinPosLC.x)/simulBoxRange.x, (samplePosLC.y - u_simulBoxMinPosLC.y)/simulBoxRange.y, (samplePosLC.z - u_simulBoxMinPosLC.z)/simulBoxRange.z);\n\
+    //     checkTexCoord3DRange(sampleTexCoord3d);\n\
+\n\
+    //     if(get_pollution_fromTexture3d_triLinearInterpolation(sampleTexCoord3d, samplePosLC, contaminationSample))\n\
+    //     {\n\
+    //         contaminationSamples[i] = contaminationSample;\n\
+    //         samplesCount += 1;\n\
+    //         // vec3 currNormalLC;\n\
+    //         // // if(!normalLC(sampleTexCoord3d, samplePosLC, currNormalLC))\n\
+    //         // // {\n\
+    //         // //    normalLC_calculated = false;\n\
+    //         // //    continue;\n\
+    //         // // }\n\
+\n\
+    //         // //vec4 currColor4 = transfer_fnc(contaminationSample);\n\
+    //         // vec4 currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);\n\
+    //         // //float unitaryContaminationSample = (contaminationSample - u_minMaxPollutionValues.x) / (u_minMaxPollutionValues.y - u_minMaxPollutionValues.x);\n\
+ \n\
+    //         // //if(length(currNormalLC) > 0.0)\n\
+    //         // {\n\
+    //         //     // https://www.willusher.io/webgl/2019/01/13/volume-rendering-with-webgl\n\
+    //         //     finalColor4.rgb += (1.0 - finalColor4.a) * currColor4.a * currColor4.rgb; \n\
+    //         //     finalColor4.a += (1.0 - finalColor4.a) * currColor4.a;\n\
+    //         // }\n\
+\n\
+    //         // smplingCount += 1.0;\n\
+\n\
+    //         // // Optimization: break out of the loop when the color is near opaque\n\
+    //         // if (finalColor4.a >= 0.95) {\n\
+    //         //     break;\n\
+    //         // }\n\
+\n\
+    //         // contaminationAccum += contaminationSample;\n\
+            \n\
+    //     }\n\
+    //     else{\n\
+    //         contaminationSamples[i] = 0.0;\n\
+    //     }\n\
+    // }\n\
+\n\
+    // int samplesCount2 = 0;\n\
+    // vec4 currColor4;\n\
+    // for(int i=0; i<30; i++)\n\
+    // {\n\
+    //     contaminationSample = contaminationSamples[i];\n\
+    //     if(contaminationSample > 0.0)\n\
+    //     {\n\
+    //         if(uRenderingColorType == 0)\n\
+    //         {\n\
+    //             currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);\n\
+    //         }\n\
+    //         else if(uRenderingColorType == 1)\n\
+    //         {\n\
+    //             // for the moment use rainbow colors.***\n\
+    //             currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);\n\
+    //         }\n\
+    //         else if(uRenderingColorType == 2)\n\
+    //         {\n\
+    //             currColor4 = getColorByLegendColors(contaminationSample);\n\
+    //         }\n\
+\n\
+    //         if(u_useMinMaxValuesToRender == 1)\n\
+    //         {\n\
+    //             float targetValue = u_minMaxPollutionValuesToRender.y;\n\
+                \n\
+    //             //targetValue = u_minMaxPollutionValues.y;\n\
+    //             //currColor4.a = contaminationSample / targetValue;\n\
+    //             if(currColor4.a > 1.0)\n\
+    //             {\n\
+    //                 currColor4.a = 1.0;\n\
+    //             }\n\
+\n\
+    //             //currColor4.a *= smoothstep(0.0, targetValue, contaminationSample);\n\
+    //             currColor4.a = smoothstep(0.0, targetValue, contaminationSample);\n\
+    //         }\n\
+\n\
+    //         // https://www.willusher.io/webgl/2019/01/13/volume-rendering-with-webgl\n\
+    //         finalColor4.rgb += (1.0 - finalColor4.a) * currColor4.a * currColor4.rgb; \n\
+    //         finalColor4.a += (1.0 - finalColor4.a) * currColor4.a;\n\
+    //         samplesCount2 += 1;\n\
+\n\
+    //         contaminationAccum += contaminationSample;\n\
+    //     }\n\
+\n\
+    //     // Optimization: break out of the loop when the color is near opaque\n\
+    //     if (finalColor4.a >= 0.95) {\n\
+    //         break;\n\
+    //     }\n\
+\n\
+    //     // if(samplesCount2 >= samplesCount)\n\
+    //     // {\n\
+    //     //     break;\n\
+    //     // }\n\
+    // }\n\
+\n\
+    // // contaminationAccum /= float(samplesCount2);\n\
+    // // finalColor4 = getRainbowColor_byHeight(contaminationAccum, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);\n\
+    // // finalColor4.a *= 10.0;\n\
+\n\
+    // if(smplingCount < 1.0)\n\
+    // {\n\
+    //     //discard;\n\
+    // }\n\
+\n\
+    // if(smplingCount < 1.0)\n\
+    // {\n\
+    //     smplingCount = 1.0;\n\
+    // }\n\
+\n\
+    // color4Aux = finalColor4;\n\
+\n\
+    // if(!normalLC_calculated)\n\
+    // {\n\
+    //     //color4Aux = vec4(1.0, 0.0, 0.0, 1.0);\n\
+    // }\n\
+\n\
+    // gl_FragData[0] = color4Aux;\n\
+\n\
+    // #ifdef USE_MULTI_RENDER_TARGET\n\
+    //     gl_FragData[1] = color4Aux;\n\
+    //     gl_FragData[2] = color4Aux;\n\
+    //     gl_FragData[3] = color4Aux;\n\
+    // #endif\n\
+}\n\
+";
 ShaderSource.chemicalAccidentVolumRenderFS = "//#version 300 es\n\
 \n\
 #ifdef GL_ES\n\
@@ -3709,113 +5540,6 @@ bool get_pollution_fromTexture3d_triLinearInterpolation(in vec3 texCoord3d, in v
     airPressure = mix(airPressure_down, airPressure_up, distDownRatio);\n\
     //airPressure = mix(airPressure_down, airPressure_up, 0.5);\n\
 \n\
-    return true;\n\
-}\n\
-\n\
-bool get_pollution_fromTexture3d_triLinearInterpolation_original(in vec3 texCoord3d, inout float airPressure)\n\
-{\n\
-    // This function is used if all slices of the texture3d has same altitude differences.***\n\
-    //---------------------------------------------------------------------------------------\n\
-    // tex3d : airPressureMosaicTex\n\
-    // 1rst, check texCoord3d boundary limits.***\n\
-    if(texCoord3d.x < 0.0 || texCoord3d.x > 1.0)\n\
-    {\n\
-        return false;\n\
-    }\n\
-\n\
-    if(texCoord3d.y < 0.0 || texCoord3d.y > 1.0)\n\
-    {\n\
-        return false;\n\
-    }\n\
-\n\
-    if(texCoord3d.z < 0.0 || texCoord3d.z > 1.0)\n\
-    {\n\
-        return false;\n\
-    }\n\
-    // 1rst, determine the sliceIdx.***\n\
-    // u_texSize[3]; // The original texture3D size.***\n\
-    int slicesCount = u_texSize[2];\n\
-\n\
-    float currSliceIdx_float = texCoord3d.z * float(slicesCount - 1);\n\
-    int currSliceIdx_down = int(floor(currSliceIdx_float));\n\
-    int currSliceIdx_up = currSliceIdx_down + 1;\n\
-\n\
-    if(currSliceIdx_up >= u_texSize[2])\n\
-    {\n\
-        return false;\n\
-    }\n\
-\n\
-    // now, calculate the mod.***\n\
-    //float remain = currSliceIdx_float -  floor(currSliceIdx_float);\n\
-    float remain = fract(currSliceIdx_float);\n\
-\n\
-    // Now, calculate the \"col\" & \"row\" in the mosaic texture3d.***\n\
-    // u_mosaicSize[3]; // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***\n\
-\n\
-    // Down slice.************************************************************\n\
-    int col_down, row_down;\n\
-    //if(currSliceIdx_down <= u_mosaicSize[0])\n\
-    //{\n\
-        // Our current sliceIdx_down is smaller than the columns count of the mosaic, so:\n\
-        // in this case, the row = 0.***\n\
-    //    row_down = 0;\n\
-    //    col_down = currSliceIdx_down;\n\
-   // }\n\
-    //else\n\
-    {\n\
-        float rowAux = floor(float(currSliceIdx_down) / float(u_mosaicSize[0]));\n\
-        float colAux = float(currSliceIdx_down) - (rowAux * float(u_mosaicSize[0]));\n\
-\n\
-        col_down = int(colAux);\n\
-        row_down = int(rowAux);\n\
-    }\n\
-\n\
-    // now, must calculate the mosaicTexCoord.***\n\
-    vec2 mosaicTexCoord_down = subTexCoord_to_texCoord(texCoord3d.xy, col_down, row_down);\n\
-    \n\
-    vec3 sim_res3d = vec3(u_texSize[0], u_texSize[1], u_texSize[2]);\n\
-    vec2 px = 1.0 / sim_res3d.xy;\n\
-    vec2 vc = (floor(texCoord3d.xy * sim_res3d.xy)) * px;\n\
-    vec3 f = fract(texCoord3d * sim_res3d);\n\
-\n\
-    float airPressure_down = _getPollution_triLinearInterpolation(texCoord3d.xy, col_down, row_down);\n\
-\n\
-    // up slice.************************************************************\n\
-    int col_up, row_up;\n\
-    if(currSliceIdx_up <= u_mosaicSize[0])\n\
-    {\n\
-        // Our current sliceIdx_up is smaller than the columns count of the mosaic, so:\n\
-        // in this case, the row = 0.***\n\
-        row_up = 0;\n\
-        col_up = currSliceIdx_up;\n\
-    }\n\
-    else\n\
-    {\n\
-        float rowAux = floor(float(currSliceIdx_up) / float(u_mosaicSize[0]));\n\
-        float colAux = float(currSliceIdx_up) - (rowAux * float(u_mosaicSize[0]));\n\
-\n\
-        col_up = int(colAux);\n\
-        row_up = int(rowAux);\n\
-    }\n\
-\n\
-    // test.***\n\
-    col_up = col_down + 1;\n\
-    row_up = row_down;\n\
-    if(col_up >= u_mosaicSize[0])\n\
-    {\n\
-        col_up = 0;\n\
-        row_up = row_down + 1;\n\
-    }\n\
-\n\
-    if(row_up >= u_mosaicSize[1])\n\
-    {\n\
-        return false;\n\
-    }\n\
-\n\
-    float airPressure_up = _getPollution_triLinearInterpolation(texCoord3d.xy, col_up, row_up);\n\
-\n\
-    airPressure = mix(airPressure_down, airPressure_up, f.z);\n\
-    //airPressure = airPressure_down; // test delete.***\n\
     return true;\n\
 }\n\
 \n\
