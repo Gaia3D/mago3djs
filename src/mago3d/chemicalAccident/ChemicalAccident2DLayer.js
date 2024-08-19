@@ -37,6 +37,7 @@ var ChemicalAccident2DLayer = function(options)
 	this.renderBorder = 0; // 0= no render border, 1= render border.***
 	this.renderingColorType = 0; // 0= rainbow, 1= monotone, 2= legendColors.***
 	this.interpolationBetweenSlices = 0; // 0= no interpolation, 1= interpolation.***
+	this.textureFlipYAxis = true;
 
 	// legend colors.***
 	this._legendColors4;
@@ -104,6 +105,11 @@ var ChemicalAccident2DLayer = function(options)
 		if (options.interpolationBetweenSlices !== undefined)
 		{
 			this.interpolationBetweenSlices = options.interpolationBetweenSlices;
+		}
+
+		if (options.textureFlipYAxis !== undefined)
+		{
+			this.textureFlipYAxis = options.textureFlipYAxis;
 		}
 	}
 
@@ -1009,6 +1015,16 @@ ChemicalAccident2DLayer.prototype.getTextureFilterType = function ()
 	return this.textureFilterType;
 };
 
+ChemicalAccident2DLayer.prototype.getTextureFlipYAxis = function ()
+{
+	return this.textureFlipYAxis;
+};
+
+ChemicalAccident2DLayer.prototype.setTextureFlipYAxis = function (textureFlipYAxis)
+{
+	this.textureFlipYAxis = textureFlipYAxis;
+};
+
 ChemicalAccident2DLayer.prototype.setRenderingColorType = function (renderingColorType)
 {
 	this.renderingColorType = renderingColorType;
@@ -1108,7 +1124,7 @@ ChemicalAccident2DLayer.prototype.render = function ()
 	
 	currentShader.bindUniformGenerals();
 	gl.uniform1f(currentShader.externalAlpha_loc, 1.0);
-	gl.uniform1i(currentShader.textureFlipYAxis_loc, magoManager.sceneState.textureFlipYAxis);
+	gl.uniform1i(currentShader.textureFlipYAxis_loc, this.getTextureFlipYAxis());
 	gl.uniform3fv(currentShader.scaleLC_loc, [1.0, 1.0, 1.0]); // init local scale.
 	gl.uniform4fv(currentShader.colorMultiplier_loc, [1.0, 1.0, 1.0, 1.0]);
 	gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.

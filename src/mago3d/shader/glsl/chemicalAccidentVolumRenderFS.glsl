@@ -47,6 +47,8 @@ uniform int u_texSize[3]; // The original texture3D size.***
 uniform int u_mosaicSize[3]; // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***
 uniform vec3 u_voxelSizeMeters;
 
+uniform bool textureFlipYAxis;
+
 varying vec2 v_tex_pos;
 
 uniform mat4 modelViewMatrixRelToEye;
@@ -445,6 +447,11 @@ float _getPollution_triLinearInterpolation(in vec2 subTexCoord2d, in int col_mos
     // mosaicSize[3]; // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***
     //------------------------------------------------------------------------------------
 
+    if(textureFlipYAxis)
+    {
+        subTexCoord2d.y = 1.0 - subTexCoord2d.y; // invert the y.***
+    }
+
     checkTexCoordRange(subTexCoord2d);
     vec3 sim_res3d = vec3(u_texSize[0], u_texSize[1], u_texSize[2]);
     vec2 px = 1.0 / sim_res3d.xy;
@@ -489,6 +496,11 @@ float _getPollution_nearest(in vec2 subTexCoord2d, in int col_mosaic, in int row
 {
     // This function : given a subTexture2d(real texCoord.xy of a realTex3D), 
     // and the col & row into the mosaic texture, returns a nearest interpolation of the pressure.***
+    if(textureFlipYAxis)
+    {
+        subTexCoord2d.y = 1.0 - subTexCoord2d.y; // invert the y.***
+    }
+
     checkTexCoordRange(subTexCoord2d);
     vec2 mosaicTexCoord = subTexCoord_to_texCoord(subTexCoord2d, col_mosaic, row_mosaic);
     float ap = getPollution_inMosaicTexture(mosaicTexCoord);

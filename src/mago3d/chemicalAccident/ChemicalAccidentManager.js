@@ -74,6 +74,11 @@ var ChemicalAccidentManager = function (options)
 		{
 			this.renderingColorType = options.renderingColorType; // 0= rainbow, 1= monotone, 2= legendColors.***
 		}
+
+		if (options.textureFlipYAxis !== undefined)
+		{
+			this.textureFlipYAxis = options.textureFlipYAxis;
+		}
 	}
 
 	// test vars.***
@@ -170,6 +175,16 @@ ChemicalAccidentManager.prototype.getChemicalAccidentLayer = function (idx)
 	return this.chemAccidentLayersArray[idx];
 };
 
+ChemicalAccidentManager.prototype.getTextureFlipYAxis = function ()
+{
+	return this.textureFlipYAxis;
+};
+
+ChemicalAccidentManager.prototype.setTextureFlipYAxis = function (textureFlipYAxis)
+{
+	this.textureFlipYAxis = textureFlipYAxis;
+};
+
 ChemicalAccidentManager.prototype.newChemAccidentLayer = function (options)
 {
 	if (!this.chemAccidentLayersArray)
@@ -184,6 +199,7 @@ ChemicalAccidentManager.prototype.newChemAccidentLayer = function (options)
 
 	options.chemicalAccidentManager = this;
 	options.renderingColorType = this.renderingColorType;
+	options.textureFlipYAxis = this.textureFlipYAxis;
 	var chemAccLayer = new ChemicalAccidentLayer(options);
 
 	// set the legendColors.***

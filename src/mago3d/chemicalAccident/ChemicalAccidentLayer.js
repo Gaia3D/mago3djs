@@ -21,6 +21,7 @@ var ChemicalAccidentTimeSlice = function(options)
 	 this._texture3d;
 	 this._mosaicTexture; // note : the mosaicTexture is a Texture3D too.***
 	 this._texture2dAux;	// aux texture.***
+	 
 
 	 // legend colors.***
 	this._legendColors4;
@@ -56,6 +57,8 @@ var ChemicalAccidentTimeSlice = function(options)
 		{
 			this._endUnixTimeMiliseconds = options.endUnixTimeMiliseconds;
 		}
+
+		
 
 		
 	 }
@@ -475,6 +478,7 @@ var ChemicalAccidentLayer = function(options)
 	this.minMaxPollutionValuesToRender = new Float32Array([0.0, 0.0194 * 0.5]);
 
 	this.renderingColorType = 0; // 0= rainbow, 1= monotone, 2= legendColors.***
+	this.textureFlipYAxis = false;
 
 	// cutting planes.
 	this.cuttingPlanesArray = [];
@@ -515,6 +519,11 @@ var ChemicalAccidentLayer = function(options)
 		if (options.renderingColorType !== undefined)
 		{
 			this.renderingColorType = options.renderingColorType; // 0= rainbow, 1= monotone, 2= legendColors.***
+		}
+
+		if (options.textureFlipYAxis !== undefined)
+		{
+			this.textureFlipYAxis = options.textureFlipYAxis;
 		}
 	}
 
@@ -949,6 +958,16 @@ ChemicalAccidentLayer.prototype.getRenderingColorType = function ()
 	return this.renderingColorType;
 };
 
+ChemicalAccidentLayer.prototype.getTextureFlipYAxis = function ()
+{
+	return this.textureFlipYAxis;
+};
+
+ChemicalAccidentLayer.prototype.setTextureFlipYAxis = function (textureFlipYAxis)
+{
+	this.textureFlipYAxis = textureFlipYAxis;
+};
+
 ChemicalAccidentLayer.prototype.setLegendColors = function (legendColorsArray)
 {
 	var legendColorsCount = legendColorsArray.length;
@@ -1339,6 +1358,7 @@ ChemicalAccidentLayer.prototype.render = function ()
 	
 	gl.uniform1iv(shader.u_texSize_loc, [refTex3D.texture3DXSize, refTex3D.texture3DYSize, refTex3D.texture3DZSize]); // The original texture3D size.***
 	gl.uniform1iv(shader.u_mosaicSize_loc, [refTex3D.mosaicXCount, refTex3D.mosaicYCount, refTex3D.finalSlicesCount]); // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***
+	gl.uniform1i(shader.textureFlipYAxis_loc, this.getTextureFlipYAxis());
 	var modelViewMatrixRelToEyeInv = sceneState.getModelViewRelToEyeMatrixInv();
 	gl.uniformMatrix4fv(shader.modelViewMatrixRelToEyeInv_loc, false, modelViewMatrixRelToEyeInv._floatArrays);
 	var minMaxPollutionValues = this.getMinMaxPollutionValues();
