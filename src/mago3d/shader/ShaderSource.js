@@ -4844,7 +4844,7 @@ uniform int uLegendColorsCount;\n\
 uniform float uLegendValuesScale;\n\
 \n\
 uniform int uRenderingColorType;  // 0= rainbow, 1= monotone, 2= legendColors.\n\
-\n\
+uniform int uSamplingsCount;\n\
 \n\
 \n\
 \n\
@@ -6237,7 +6237,18 @@ void main(){\n\
     }\n\
     \n\
     // recalculate segmentLength & increLength.***\n\
-    samplingsCount = 30.0;\n\
+    int samplingsCountInt = uSamplingsCount;\n\
+    \n\
+    if(samplingsCountInt > 200)\n\
+    {\n\
+        samplingsCountInt = 200;\n\
+    }\n\
+    else if(samplingsCountInt < 1)\n\
+    {\n\
+        samplingsCountInt = 1;\n\
+    }\n\
+    \n\
+    samplingsCount = float(samplingsCountInt);\n\
     segmentLength = distance(rearPosLC, firstPosLC);\n\
     increLength = segmentLength / samplingsCount;\n\
 \n\
@@ -6247,10 +6258,15 @@ void main(){\n\
     // Sampling far to near.***\n\
     bool normalLC_calculated = true;\n\
 \n\
-    float contaminationSamples[30];\n\
+    float contaminationSamples[200];\n\
     int samplesCount = 0;\n\
-    for(int i=0; i<30; i++)\n\
+    for(int i=0; i<200; i++)\n\
     {\n\
+        if(i >= samplingsCountInt)\n\
+        {\n\
+            break;\n\
+        }\n\
+\n\
         // Note : for each smple, must depth check with the scene depthTexure.***\n\
         vec3 samplePosLC = firstPosLC + samplingDirLC * increLength * float(i);\n\
 \n\
@@ -6303,8 +6319,13 @@ void main(){\n\
 \n\
     int samplesCount2 = 0;\n\
     vec4 currColor4;\n\
-    for(int i=0; i<30; i++)\n\
+    for(int i=0; i<200; i++)\n\
     {\n\
+        if(i >= samplingsCountInt)\n\
+        {\n\
+            break;\n\
+        }\n\
+\n\
         contaminationSample = contaminationSamples[i];\n\
         if(contaminationSample > 0.0)\n\
         {\n\

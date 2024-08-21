@@ -82,7 +82,7 @@ uniform int uLegendColorsCount;
 uniform float uLegendValuesScale;
 
 uniform int uRenderingColorType;  // 0= rainbow, 1= monotone, 2= legendColors.
-
+uniform int uSamplingsCount;
 
 
 
@@ -1475,7 +1475,18 @@ void main(){
     }
     
     // recalculate segmentLength & increLength.***
-    samplingsCount = 30.0;
+    int samplingsCountInt = uSamplingsCount;
+    
+    if(samplingsCountInt > 200)
+    {
+        samplingsCountInt = 200;
+    }
+    else if(samplingsCountInt < 1)
+    {
+        samplingsCountInt = 1;
+    }
+    
+    samplingsCount = float(samplingsCountInt);
     segmentLength = distance(rearPosLC, firstPosLC);
     increLength = segmentLength / samplingsCount;
 
@@ -1485,10 +1496,15 @@ void main(){
     // Sampling far to near.***
     bool normalLC_calculated = true;
 
-    float contaminationSamples[30];
+    float contaminationSamples[200];
     int samplesCount = 0;
-    for(int i=0; i<30; i++)
+    for(int i=0; i<200; i++)
     {
+        if(i >= samplingsCountInt)
+        {
+            break;
+        }
+
         // Note : for each smple, must depth check with the scene depthTexure.***
         vec3 samplePosLC = firstPosLC + samplingDirLC * increLength * float(i);
 
@@ -1541,8 +1557,13 @@ void main(){
 
     int samplesCount2 = 0;
     vec4 currColor4;
-    for(int i=0; i<30; i++)
+    for(int i=0; i<200; i++)
     {
+        if(i >= samplingsCountInt)
+        {
+            break;
+        }
+
         contaminationSample = contaminationSamples[i];
         if(contaminationSample > 0.0)
         {

@@ -31,6 +31,8 @@ var ChemicalAccidentTimeSlice = function(options)
 
 	 this._startUnixTimeMiliseconds;
 	 this._endUnixTimeMiliseconds;
+
+	 
 	 
 
 	 // uniforms.***
@@ -484,6 +486,8 @@ var ChemicalAccidentLayer = function(options)
 	this.cuttingPlanesArray = [];
 	this.currentActiveCuttingPlaneIdx = -1;
 
+	this._volumetricSamplingsCount = 30;
+
 	if (options)
 	{
 		if (options.mosaicTexMetaDataFileNames)
@@ -524,6 +528,11 @@ var ChemicalAccidentLayer = function(options)
 		if (options.textureFlipYAxis !== undefined)
 		{
 			this.textureFlipYAxis = options.textureFlipYAxis;
+		}
+
+		if (options.volumetricSamplingsCount !== undefined)
+		{
+			this._volumetricSamplingsCount = options.volumetricSamplingsCount;
 		}
 	}
 
@@ -968,6 +977,16 @@ ChemicalAccidentLayer.prototype.setTextureFlipYAxis = function (textureFlipYAxis
 	this.textureFlipYAxis = textureFlipYAxis;
 };
 
+ChemicalAccidentLayer.prototype.setVolumetricSamplingsCount = function (volumetricSamplingsCount)
+{
+	this._volumetricSamplingsCount = volumetricSamplingsCount;
+};
+
+ChemicalAccidentLayer.prototype.getVolumetricSamplingsCount = function ()
+{
+	return this._volumetricSamplingsCount;
+};
+
 ChemicalAccidentLayer.prototype.setLegendColors = function (legendColorsArray)
 {
 	var legendColorsCount = legendColorsArray.length;
@@ -1406,6 +1425,7 @@ ChemicalAccidentLayer.prototype.render = function ()
 	}
 
 	gl.uniform1i(shader.uRenderingColorType_loc, this.renderingColorType); // 0= rainbow, 1= monotone, 2= legendColors.***
+	gl.uniform1i(shader.uSamplingsCount_loc, this._volumetricSamplingsCount);
 
 	var useCuttingPlane = false;
 	if (this.currentActiveCuttingPlaneIdx >= 0 && this.currentActiveCuttingPlaneIdx < this.cuttingPlanesArray.length)

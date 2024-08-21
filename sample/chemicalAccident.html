@@ -697,8 +697,10 @@
 			magoManager.chemicalAccident2dManager._animationState = Mago3D.CODE.processState.STARTED;
 
 			// 1rst layer.************************************************************************************************************************
+			// (20240806) 화학사고 Concentration1minute_intervalAir1
+			// url : "/f4d/chemicalAccident/output_chemAcc2D_fromCsv_victimsCount/JsonIndex2D.json",
 			var options = {
-				url : "/f4d/chemicalAccident/output_chemAcc2D_fromCsv_victimsCount/JsonIndex2D.json",
+				url : "/f4d/chemicalAccident/(20240806) 화학사고 Concentration1minute_intervalAir1/JsonIndex2D.json",
 				renderingColorType : 2,  // 0= rainbow, 1= monotone, 2= legendColors.***
 				renderBorder : true, // true, false.***
 				textureFilterType : 0,  // 0= nearest, 1= linear.***
@@ -849,7 +851,8 @@
 				magoManager : magoManager,
 				url : "/f4d/chemicalAccident/output_chemAcc_20240805/JsonIndex.json",
 				renderingColorType : 0, // 0= rainbow, 1= monotone, 2= legendColors.***
-				textureFlipYAxis : true
+				textureFlipYAxis : true,
+				volumetricSamplingsCount : 10
 			};
 			magoManager.chemicalAccidentManager = new Mago3D.ChemicalAccidentManager(options);
 			magoManager.chemicalAccidentManager._animationState = Mago3D.CODE.processState.STARTED;

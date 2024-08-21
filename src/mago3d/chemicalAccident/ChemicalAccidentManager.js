@@ -35,6 +35,8 @@ var ChemicalAccidentManager = function (options)
 
 	this._isReadyToRender  = false;
 
+	this._volumetricSamplingsCount = 30;
+
 	// aux vars.***
 	this.counterAux = 0;
 
@@ -78,6 +80,11 @@ var ChemicalAccidentManager = function (options)
 		if (options.textureFlipYAxis !== undefined)
 		{
 			this.textureFlipYAxis = options.textureFlipYAxis;
+		}
+
+		if (options.volumetricSamplingsCount !== undefined)
+		{
+			this._volumetricSamplingsCount = options.volumetricSamplingsCount;
 		}
 	}
 
@@ -200,6 +207,7 @@ ChemicalAccidentManager.prototype.newChemAccidentLayer = function (options)
 	options.chemicalAccidentManager = this;
 	options.renderingColorType = this.renderingColorType;
 	options.textureFlipYAxis = this.textureFlipYAxis;
+	options.volumetricSamplingsCount = this._volumetricSamplingsCount;
 	var chemAccLayer = new ChemicalAccidentLayer(options);
 
 	// set the legendColors.***
@@ -674,6 +682,7 @@ ChemicalAccidentManager.prototype.createDefaultShaders = function ()
 	shader.uLegendValuesScale_loc = gl.getUniformLocation(shader.program, "uLegendValuesScale");
 
 	shader.uRenderingColorType_loc = gl.getUniformLocation(shader.program, "uRenderingColorType");
+	shader.uSamplingsCount_loc = gl.getUniformLocation(shader.program, "uSamplingsCount");
 	
 	magoManager.postFxShadersManager.useProgram(shader);
 	gl.uniform1i(shader.simulationBoxDoubleDepthTex_loc, 0);
