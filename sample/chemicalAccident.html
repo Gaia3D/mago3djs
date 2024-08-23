@@ -22,10 +22,13 @@
 	</li>
 	
 	<li onclick="Chemical_Accident_Test();">
-		Chemical Accident Test
+		Load
 	</li>
 	<li onclick="Start();">
-		ReStart animation
+		ReStart
+	</li>
+	<li onclick="playPause();">
+		Play / Pause
 	</li>
 	<li onclick="useCuttingPlaneXY();">
 		Use cutting plane XY
@@ -41,9 +44,6 @@
 	</li>
 	<li onclick="useMinMaxValuesToRender();">
 		Use minMax values to render
-	</li>
-	<li onclick="playPause();">
-		play / pause
 	</li>
 	<li onclick="startItinerary();">
 		start itinerary
@@ -161,8 +161,9 @@
 				serverPolicy.geoserverEnable = false;
 				serverPolicy.geoserverImageproviderEnable = false;
 				serverPolicy.terrainType = 'cesium-default';
-				serverPolicy.initLatitude = 37.6168;
-				serverPolicy.initLongitude = 127.1823;
+				serverPolicy.initLatitude = 36.902156101663145;
+				serverPolicy.initLongitude = 126.68418943890646;
+
 				serverPolicy.initAltitude = 4000;
 
 				
@@ -311,8 +312,8 @@
 		// }
 
 		// Active this code for tile inspector.**************************************************************************************
-		magoInstance.getViewer().extend(Cesium.viewerCesium3DTilesInspectorMixin);
-		const inspectorViewModel = magoInstance.getViewer().cesium3DTilesInspector.viewModel;
+		//magoInstance.getViewer().extend(Cesium.viewerCesium3DTilesInspectorMixin);
+		//const inspectorViewModel = magoInstance.getViewer().cesium3DTilesInspector.viewModel;
 		//inspectorViewModel.pickActive = true;
 		// Active this code for tile inspector.**************************************************************************************
 
@@ -683,6 +684,44 @@
 		}
 	}
 
+	const getLinearLegendColors = (legendValuesScale) => {
+		const minValue = 0;
+		const maxValue = 112000000.0 * legendValuesScale;
+		const numColors = 12;
+		const alpha = 0.5;
+		const legendColors = [];
+
+		const valueRange = maxValue - minValue;
+		const step = valueRange / numColors;
+
+		let legendColor = new Mago3D.ColorLegend(0/255, 0/255, 143/255, 0.1, 0);
+		legendColors.push(legendColor);
+		legendColor = new Mago3D.ColorLegend(0/255, 15/255, 255/255, 0.2, step);
+		legendColors.push(legendColor);
+		legendColor = new Mago3D.ColorLegend(0/255, 95/255, 255/255, 0.3, step * 2);
+		legendColors.push(legendColor);
+		legendColor = new Mago3D.ColorLegend(0/255, 175/255, 255/255, 0.4, step * 3);
+		legendColors.push(legendColor);
+		legendColor = new Mago3D.ColorLegend(0/255, 255/255, 255/255, alpha, step * 4);
+		legendColors.push(legendColor);
+		legendColor = new Mago3D.ColorLegend(79/255, 255/255, 175/255, alpha, step * 5);
+		legendColors.push(legendColor);
+		legendColor = new Mago3D.ColorLegend(159/255, 255/255, 95/255, alpha, step * 6);
+		legendColors.push(legendColor);
+		legendColor = new Mago3D.ColorLegend(239/255, 255/255, 15/255, alpha, step * 7);
+		legendColors.push(legendColor);
+		legendColor = new Mago3D.ColorLegend(255/255, 191/255, 0/255, alpha, step * 8);
+		legendColors.push(legendColor);
+		legendColor = new Mago3D.ColorLegend(255/255, 111/255, 0/255, alpha, step * 9);
+		legendColors.push(legendColor);
+		legendColor = new Mago3D.ColorLegend(255/255, 31/255, 0/255, alpha, step * 10);
+		legendColors.push(legendColor);
+		legendColor = new Mago3D.ColorLegend(207/255, 0/255, 0/255, alpha, step * 11);
+		legendColors.push(legendColor);
+
+		return legendColors;
+	}
+
 	function chemicalAccident2d()
 	{
 		var magoManager = MAGO3D_INSTANCE.getMagoManager();
@@ -708,6 +747,14 @@
 				textureFlipYAxis : true
 			};
 
+
+
+
+
+
+
+
+
 			var chemAccLayer = new Mago3D.ChemicalAccident2DLayer(options);
 			var legendValuesScale = 1;
 			var minValue = 0.0 * legendValuesScale;
@@ -718,7 +765,7 @@
 			var legendValues = getLogDivisions(minValue, maxValue, numColors, accentuationFactor);
 
 			// create legend colors.***
-			var legendColors = [];
+			/*var legendColors = [];
 			var LegendColor = new Mago3D.ColorLegend(0/255, 0/255, 0/255, 0.0, 0);  // 0
 			legendColors.push(LegendColor);
 			LegendColor = new Mago3D.ColorLegend(0/255, 255/255, 0/255, 128/255, 1);  // 5
@@ -732,10 +779,15 @@
 			LegendColor = new Mago3D.ColorLegend(0/255, 255/255, 255/255, 128/255, 10);  // 15
 			legendColors.push(LegendColor);
 			LegendColor = new Mago3D.ColorLegend(255/255, 0/255, 255/255, 128/255, 15);  // 15
-			legendColors.push(LegendColor);
+			legendColors.push(LegendColor);*/
 
-			chemAccLayer.setLegendColors(legendColors);
-			chemAccLayer.setLegendValuesScale(legendValuesScale);
+
+			chemAccLayer.setLegendColors(getLinearLegendColors());
+			//chemAccLayer.setLegendValuesScale(1e10);
+			chemAccLayer.setLegendValuesScale(1e10);
+
+			//chemAccLayer.setLegendColors(legendColors);
+			//chemAccLayer.setLegendValuesScale(legendValuesScale);
 			magoManager.chemicalAccident2dManager.addChemAccidentLayer2D(chemAccLayer);
 
 			// 2nd layer.************************************************************************************************************************
@@ -850,7 +902,7 @@
 			var options = {
 				magoManager : magoManager,
 				url : "/f4d/chemicalAccident/output_chemAcc_20240805/JsonIndex.json",
-				renderingColorType : 0, // 0= rainbow, 1= monotone, 2= legendColors.***
+				renderingColorType : 2, // 0= rainbow, 1= monotone, 2= legendColors.***
 				textureFlipYAxis : true,
 				volumetricSamplingsCount : 10
 			};
@@ -858,11 +910,10 @@
 			magoManager.chemicalAccidentManager._animationState = Mago3D.CODE.processState.STARTED;
 
 			// create legend colors.***
-			var legendValuesScale = 1e10;
-			//var minValue = 1e-17 * legendValuesScale;
-			var minValue = 0.0 * legendValuesScale;
-			//var maxValue = 0.648 * legendValuesScale;
-			var maxValue = 3000.0 * legendValuesScale;
+			var legendValuesScale = 1;
+			//var legendValuesScale = 1e10;
+			var minValue = 0.0;
+			var maxValue = 112000000.0 * legendValuesScale;
 			var numColors = 12;
 			var accentuationFactor = 1.0;
 			var legendValues = getLogDivisions(minValue, maxValue, numColors, accentuationFactor);
@@ -871,30 +922,34 @@
 			var legendColors = [];
 
 			// create legend colors.***
-			var LegendColor = new Mago3D.ColorLegend(0/255, 0/255, 143/255, 0.0, legendValues[0]);  // 0
+			var LegendColor = new Mago3D.ColorLegend(0/255, 0/255, 143/255, 0.2, legendValues[0]);  // 0
 			legendColors.push(LegendColor);
-			LegendColor = new Mago3D.ColorLegend(0/255, 15/255, 255/255, alphaValues[1], legendValues[1]);  // 1
+			LegendColor = new Mago3D.ColorLegend(0/255, 15/255, 255/255, 0.2, legendValues[1]);  // 1
 			legendColors.push(LegendColor);
-			LegendColor = new Mago3D.ColorLegend(0/255, 95/255, 255/255, alphaValues[2], legendValues[2]);  // 2
+			LegendColor = new Mago3D.ColorLegend(0/255, 95/255, 255/255, 0.2, legendValues[2]);  // 2
 			legendColors.push(LegendColor);
-			LegendColor = new Mago3D.ColorLegend(0/255, 175/255, 255/255, alphaValues[3], legendValues[3]);  // 3
+			LegendColor = new Mago3D.ColorLegend(0/255, 175/255, 255/255, 0.2, legendValues[3]);  // 3
 			legendColors.push(LegendColor);
-			LegendColor = new Mago3D.ColorLegend(0/255, 255/255, 255/255, alphaValues[4], legendValues[4]);  // 4
+			LegendColor = new Mago3D.ColorLegend(0/255, 255/255, 255/255, 0.2, legendValues[4]);  // 4
 			legendColors.push(LegendColor);
-			LegendColor = new Mago3D.ColorLegend(79/255, 255/255, 175/255, alphaValues[5], legendValues[5]);  // 5
+			LegendColor = new Mago3D.ColorLegend(79/255, 255/255, 175/255, 0.2, legendValues[5]);  // 5
 			legendColors.push(LegendColor);
-			LegendColor = new Mago3D.ColorLegend(159/255, 255/255, 95/255, alphaValues[6], legendValues[6]);  // 6
+			LegendColor = new Mago3D.ColorLegend(159/255, 255/255, 95/255, 0.2, legendValues[6]);  // 6
 			legendColors.push(LegendColor);
-			LegendColor = new Mago3D.ColorLegend(239/255, 255/255, 15/255, alphaValues[7], legendValues[7]);  // 7
+			LegendColor = new Mago3D.ColorLegend(239/255, 255/255, 15/255, 0.2, legendValues[7]);  // 7
 			legendColors.push(LegendColor);
-			LegendColor = new Mago3D.ColorLegend(255/255, 191/255, 0/255, alphaValues[8], legendValues[8]);  // 8
+			LegendColor = new Mago3D.ColorLegend(255/255, 191/255, 0/255, 0.2, legendValues[8]);  // 8
 			legendColors.push(LegendColor);
-			LegendColor = new Mago3D.ColorLegend(255/255, 111/255, 0/255, alphaValues[9], legendValues[9]);  // 9
+			LegendColor = new Mago3D.ColorLegend(255/255, 111/255, 0/255, 0.2, legendValues[9]);  // 9
 			legendColors.push(LegendColor);
-			LegendColor = new Mago3D.ColorLegend(255/255, 31/255, 0/255, alphaValues[10], legendValues[10]);  // 10
+			LegendColor = new Mago3D.ColorLegend(255/255, 31/255, 0/255, 0.2, legendValues[10]);  // 10
 			legendColors.push(LegendColor);
-			LegendColor = new Mago3D.ColorLegend(207/255, 0/255, 0/255, alphaValues[11], legendValues[11]);  // 11
+			LegendColor = new Mago3D.ColorLegend(207/255, 0/255, 0/255, 0.2, legendValues[11]);  // 11
 			legendColors.push(LegendColor);
+
+
+			//magoManager.chemicalAccidentManager.setLegendColors(getLinearLegendColors(legendValuesScale));
+			//magoManager.chemicalAccidentManager.setLegendValuesScale(legendValuesScale);
 
 			magoManager.chemicalAccidentManager.setLegendColors(legendColors);
 			magoManager.chemicalAccidentManager.setLegendValuesScale(legendValuesScale);
