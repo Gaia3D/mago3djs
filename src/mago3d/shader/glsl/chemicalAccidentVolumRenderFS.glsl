@@ -434,6 +434,9 @@ float getPollution_inMosaicTexture(in vec2 texCoord)
     float decoded = unpackDepth(color4); // 32bit.
     float pollution = decoded * u_minMaxPollutionValues.y;
 
+    // The ratio of the total MinMax value to the timeslice MinMax value
+    float minMaxRatio = u_minMaxPollutionValuesToRender.y / u_minMaxPollutionValues.y;
+    pollution = pollution * minMaxRatio;
     return pollution;
 }
 
@@ -1239,6 +1242,31 @@ bool findFirstSamplePosition(in vec3 frontPosLC, in vec3 rearPosLC, in vec3 samp
     return false;
 }
 
+// 2024-08-23 znkim
+vec4 getColorTest(in float value) {
+    float temp = value;
+    if (temp > 1000000.0) {
+        return vec4(0.2, 0.0, 0.0, 0.2); // dark red
+    } else if (temp > 100000.0) {
+        return vec4(0.0, 0.2, 0.0, 0.2); // dark green
+    } else if (temp > 10000.0) {
+        return vec4(0.0, 0.0, 0.2, 0.2); // dark blue
+    } else if (temp > 100.0) {
+        return vec4(1.0, 0.0, 0.0, 0.1); // red
+    } else if (temp > 1.0) {
+        return vec4(1.0, 1.0, 0.0, 0.1); // yellow
+    } else if (temp > 0.0) {
+        return vec4(0.0, 1.0, 0.0, 0.1); // green
+    } else if (temp == 0.0) {
+        return vec4(0.0, 0.0, 1.0, 0.1); // blue
+    } else if (temp < 0.0) {
+        return vec4(0.0, 1.0, 1.0, 0.1); // cyan
+    } else {
+        return vec4(0.0, 0.0, 0.0, 0.1); // black
+    }
+}
+
+
 void main(){
 
     // 1rst, read front depth & rear depth and check if exist rear depth.***
@@ -1579,6 +1607,11 @@ void main(){
             else if(uRenderingColorType == 2)
             {
                 currColor4 = getColorByLegendColors(contaminationSample);
+            }
+            else if(uRenderingColorType == 3)
+            {
+                // 4debug
+                currColor4 = getColorTest(contaminationSample);
             }
 
             if(u_useMinMaxValuesToRender == 1)

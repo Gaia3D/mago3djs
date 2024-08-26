@@ -1365,6 +1365,9 @@ ChemicalAccidentLayer.prototype.render = function ()
 	
 	var testTimeSlice = this._timeSlicesArray[this.testCurrIdx];
 	var refTex3D = testTimeSlice._mosaicTexture; // a reference texture3D, to take parameters for the shader.***
+	var minMaxTimeSlicePollutionValues = testTimeSlice.getMinMaxPollutionValues();
+	//console.log("minMaxTimeSlicePollutionValues = " + minMaxTimeSlicePollutionValues[0] + ", " + minMaxTimeSlicePollutionValues[1]);
+	this.minMaxPollutionValuesToRender = minMaxTimeSlicePollutionValues;
 
 	// bind uniforms.***
 	shader.bindUniformGenerals();
@@ -1574,30 +1577,32 @@ ChemicalAccidentLayer.prototype.getContaminationValue = function (posWC, currUni
 
 ChemicalAccidentLayer.prototype.getMinMaxPollutionValues = function ()
 {
-	if (this.minMaxPollutionValues === undefined)
+	/*if (this.minMaxPollutionValues === undefined)
 	{
-		this.minMaxPollutionValues = new Float32Array(2); 
 
-		var timeSliceCount = this._timeSlicesArray.length;
-		for (var i=0; i<timeSliceCount; i++)
+	}	*/
+
+	this.minMaxPollutionValues = new Float32Array(2);
+
+	var timeSliceCount = this._timeSlicesArray.length;
+	for (var i=0; i<timeSliceCount; i++)
+	{
+		var timeSlice = this._timeSlicesArray[i];
+		var minMaxValues = timeSlice.getMinMaxPollutionValues();
+		if (i === 0)
 		{
-			var timeSlice = this._timeSlicesArray[i];
-			var minMaxValues = timeSlice.getMinMaxPollutionValues();
-			if (i === 0)
-			{
-				this.minMaxPollutionValues[0] = minMaxValues[0];
-				this.minMaxPollutionValues[1] = minMaxValues[1];
-			}
-			else
-			{
-				if (minMaxValues[0] < this.minMaxPollutionValues[0])
-				{ this.minMaxPollutionValues[0] = minMaxValues[0]; }
-	
-				if (minMaxValues[1] > this.minMaxPollutionValues[1])
-				{ this.minMaxPollutionValues[1] = minMaxValues[1]; }
-			}
+			this.minMaxPollutionValues[0] = minMaxValues[0];
+			this.minMaxPollutionValues[1] = minMaxValues[1];
 		}
-	}	
+		else
+		{
+			if (minMaxValues[0] < this.minMaxPollutionValues[0])
+			{ this.minMaxPollutionValues[0] = minMaxValues[0]; }
+
+			if (minMaxValues[1] > this.minMaxPollutionValues[1])
+			{ this.minMaxPollutionValues[1] = minMaxValues[1]; }
+		}
+	}
 	
 	return this.minMaxPollutionValues;
 };

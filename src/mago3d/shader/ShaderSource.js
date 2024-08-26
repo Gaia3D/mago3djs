@@ -5196,6 +5196,9 @@ float getPollution_inMosaicTexture(in vec2 texCoord)\n\
     float decoded = unpackDepth(color4); // 32bit.\n\
     float pollution = decoded * u_minMaxPollutionValues.y;\n\
 \n\
+    // The ratio of the total MinMax value to the timeslice MinMax value\n\
+    float minMaxRatio = u_minMaxPollutionValuesToRender.y / u_minMaxPollutionValues.y;\n\
+    pollution = pollution * minMaxRatio;\n\
     return pollution;\n\
 }\n\
 \n\
@@ -6001,6 +6004,31 @@ bool findFirstSamplePosition(in vec3 frontPosLC, in vec3 rearPosLC, in vec3 samp
     return false;\n\
 }\n\
 \n\
+// 2024-08-23 znkim\n\
+vec4 getColorTest(in float value) {\n\
+    float temp = value;\n\
+    if (temp > 1000000.0) {\n\
+        return vec4(0.2, 0.0, 0.0, 0.2); // dark red\n\
+    } else if (temp > 100000.0) {\n\
+        return vec4(0.0, 0.2, 0.0, 0.2); // dark green\n\
+    } else if (temp > 10000.0) {\n\
+        return vec4(0.0, 0.0, 0.2, 0.2); // dark blue\n\
+    } else if (temp > 100.0) {\n\
+        return vec4(1.0, 0.0, 0.0, 0.1); // red\n\
+    } else if (temp > 1.0) {\n\
+        return vec4(1.0, 1.0, 0.0, 0.1); // yellow\n\
+    } else if (temp > 0.0) {\n\
+        return vec4(0.0, 1.0, 0.0, 0.1); // green\n\
+    } else if (temp == 0.0) {\n\
+        return vec4(0.0, 0.0, 1.0, 0.1); // blue\n\
+    } else if (temp < 0.0) {\n\
+        return vec4(0.0, 1.0, 1.0, 0.1); // cyan\n\
+    } else {\n\
+        return vec4(0.0, 0.0, 0.0, 0.1); // black\n\
+    }\n\
+}\n\
+\n\
+\n\
 void main(){\n\
 \n\
     // 1rst, read front depth & rear depth and check if exist rear depth.***\n\
@@ -6341,6 +6369,11 @@ void main(){\n\
             else if(uRenderingColorType == 2)\n\
             {\n\
                 currColor4 = getColorByLegendColors(contaminationSample);\n\
+            }\n\
+            else if(uRenderingColorType == 3)\n\
+            {\n\
+                // 4debug\n\
+                currColor4 = getColorTest(contaminationSample);\n\
             }\n\
 \n\
             if(u_useMinMaxValuesToRender == 1)\n\
