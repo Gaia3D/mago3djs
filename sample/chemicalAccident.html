@@ -213,8 +213,8 @@
 				// // Active this code for tile inspector.**************************************************************************************
 				
 				
-				//MAGO3D_INSTANCE.getViewer().scene.globe.translucency.enabled = true;
-				//MAGO3D_INSTANCE.getViewer().scene.globe.translucency.frontFaceAlphaByDistance = new Cesium.NearFarScalar(300.0, 0.0, 3000.0, 1.0);
+				MAGO3D_INSTANCE.getViewer().scene.globe.translucency.enabled = true;
+				MAGO3D_INSTANCE.getViewer().scene.globe.translucency.frontFaceAlphaByDistance = new Cesium.NearFarScalar(300.0, 0.3, 3000.0, 1.0);
 				// for Cesium v1.3.2.******************************************************************************
 				// var urlTest = "../f4d/3dtiles/fbx_HayashiSan/tileset.json";
 				// try{
@@ -232,6 +232,11 @@
 				// MAGO3D_INSTANCE.getViewer().scene.primitives.add(new Cesium.Cesium3DTileset({
 				// 	url : urlTest
 				// }));
+
+				var urlTest = "../f4d/3dtiles/water_pipelinesShp_India/tileset.json";
+				MAGO3D_INSTANCE.getViewer().scene.primitives.add(new Cesium.Cesium3DTileset({
+					url : urlTest
+				}));
 				//-------------------------------------------------------------------------------------------------
 				function addAdditionalLayerOption(name, imageryProvider, alpha, show) {
 					var layer = MAGO3D_INSTANCE.getViewer().scene.imageryLayers.addImageryProvider(imageryProvider);
@@ -852,7 +857,7 @@
 				url : "/f4d/chemicalAccident/output_chemAcc_20240805/JsonIndex.json",
 				renderingColorType : 0, // 0= rainbow, 1= monotone, 2= legendColors.***
 				textureFlipYAxis : true,
-				volumetricSamplingsCount : 10
+				volumetricSamplingsCount : 40
 			};
 			magoManager.chemicalAccidentManager = new Mago3D.ChemicalAccidentManager(options);
 			magoManager.chemicalAccidentManager._animationState = Mago3D.CODE.processState.STARTED;
