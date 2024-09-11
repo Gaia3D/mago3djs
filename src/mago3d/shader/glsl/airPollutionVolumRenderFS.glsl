@@ -67,6 +67,12 @@ uniform vec3 u_simulBoxPosLow;
 uniform vec3 u_simulBoxMinPosLC;
 uniform vec3 u_simulBoxMaxPosLC;
 
+// Legend colors.***
+uniform vec4 uLegendColors[16];
+uniform float uLegendValues[16];
+uniform int uLegendColorsCount;
+uniform float uLegendValuesScale;
+
 uniform int uRenderingColorType; // 0= rainbow, 1= monotone, 2= legendColors.
 
 
@@ -1277,6 +1283,74 @@ bool findFirstSamplePosition(in vec3 frontPosLC, in vec3 rearPosLC, in vec3 samp
     return false;
 }
 
+vec4 getColorByLegendColors(float realPollutionValue)
+{
+    vec4 colorAux = vec4(0.3, 0.3, 0.3, 0.1);
+    vec4 colorZero = vec4(0.3, 0.3, 0.3, 0.1);
+
+    // The legendValues are scaled, so must scale the realPollutionValue.***
+    float scaledValue = realPollutionValue * uLegendValuesScale;
+
+    // find legendIdx.***
+    for(int i=0; i<16; i++)
+    {
+        if( i >= uLegendColorsCount)
+        {
+            break;
+        }
+
+        if(i == 0)
+        {
+            if(scaledValue < uLegendValues[i])
+            {
+                float value0 = 0.0;
+                float value1 = uLegendValues[i];
+                float factor = (scaledValue - value0) / (value1 - value0);
+                colorAux = mix(colorZero, uLegendColors[i], factor);
+                //colorAux = vec4(0.3, 0.3, 0.3, 0.0);
+                break;
+            }
+        }
+
+        if(i < uLegendColorsCount - 1)
+        {
+            if(scaledValue >= uLegendValues[i] && scaledValue < uLegendValues[i + 1])
+            {
+                // if(uTextureFilterType == 0)
+                // {
+                //     colorAux = uLegendColors[i];
+                // }
+                // else
+                {
+                    float value0 = uLegendValues[i];
+                    float value1 = uLegendValues[i + 1];
+                    float factor = (scaledValue - value0) / (value1 - value0);
+                    colorAux = mix(uLegendColors[i], uLegendColors[i + 1], factor);
+                }
+                break;
+            }
+        }
+        else if(i == uLegendColorsCount - 1)
+        {
+            if(scaledValue >= uLegendValues[i])
+            {
+                colorAux = uLegendColors[i];
+                break;
+            }
+            else
+            {
+                float value0 = uLegendValues[i];
+                float value1 = uLegendValues[i];
+                float factor = (scaledValue - value0) / (value1 - value0);
+                colorAux = mix(uLegendColors[i], uLegendColors[i], factor);
+            }
+        }
+
+    }
+
+    return colorAux;
+}
+
 void main(){
 
     // 1rst, read front depth & rear depth and check if exist rear depth.***
@@ -1398,16 +1472,6 @@ void main(){
     int iteration = 0;
     if(!findFirstSamplePosition(frontPosLC, rearPosLC, samplingDirLC, increLength, simulBoxRange, firstPosLC, iteration))
     {
-        
-        // vec4 colorDiscard = vec4(0.3, 0.3, 0.3, 1.0);
-        // gl_FragData[0] = colorDiscard;
-
-        // #ifdef USE_MULTI_RENDER_TARGET
-        //     gl_FragData[1] = colorDiscard;
-        //     gl_FragData[2] = colorDiscard;
-        //     gl_FragData[3] = colorDiscard;
-        // #endif
-        
         return;
     }
     
@@ -1420,114 +1484,7 @@ void main(){
     vec4 colorTest = vec4(0.0, 0.0, 0.5, 1.0);
     colorTest = vec4(firstPosLC.x /u_voxelSizeMeters.x, firstPosLC.y /u_voxelSizeMeters.y, firstPosLC.z /u_voxelSizeMeters.z , 1.0);
 
-    // if(iteration == 0)
-    // {
-    //     colorTest = vec4(1.0, 0.0, 0.0, 1.0);
-    //     gl_FragData[0] = colorTest;
-
-    //     #ifdef USE_MULTI_RENDER_TARGET
-    //         gl_FragData[1] = colorTest;
-    //         gl_FragData[2] = colorTest;
-    //         gl_FragData[3] = colorTest;
-    //     #endif
-    //     return;
-    // }
-    // else if(iteration == 1)
-    // {
-    //     colorTest = vec4(0.0, 1.0, 0.0, 1.0);
-    //     gl_FragData[0] = colorTest;
-
-    //     #ifdef USE_MULTI_RENDER_TARGET
-    //         gl_FragData[1] = colorTest;
-    //         gl_FragData[2] = colorTest;
-    //         gl_FragData[3] = colorTest;
-    //     #endif
-    //     return;
-    // }
-    // else if(iteration == 2)
-    // {
-    //     colorTest = vec4(0.0, 0.0, 1.0, 1.0);
-    //     gl_FragData[0] = colorTest;
-
-    //     #ifdef USE_MULTI_RENDER_TARGET
-    //         gl_FragData[1] = colorTest;
-    //         gl_FragData[2] = colorTest;
-    //         gl_FragData[3] = colorTest;
-    //     #endif
-    //     return;
-    // }
-    // else if(iteration == 3)
-    // {
-    //     colorTest = vec4(1.0, 1.0, 0.0, 1.0);
-    //     gl_FragData[0] = colorTest;
-
-    //     #ifdef USE_MULTI_RENDER_TARGET
-    //         gl_FragData[1] = colorTest;
-    //         gl_FragData[2] = colorTest;
-    //         gl_FragData[3] = colorTest;
-    //     #endif
-    //     return;
-    // }
-    // else if(iteration == 4)
-    // {
-    //     colorTest = vec4(1.0, 0.0, 1.0, 1.0);
-    //     gl_FragData[0] = colorTest;
-
-    //     #ifdef USE_MULTI_RENDER_TARGET
-    //         gl_FragData[1] = colorTest;
-    //         gl_FragData[2] = colorTest;
-    //         gl_FragData[3] = colorTest;
-    //     #endif
-    //     return;
-    // }
-    // else if(iteration == 5)
-    // {
-    //     colorTest = vec4(0.0, 1.0, 1.0, 1.0);
-    //     gl_FragData[0] = colorTest;
-
-    //     #ifdef USE_MULTI_RENDER_TARGET
-    //         gl_FragData[1] = colorTest;
-    //         gl_FragData[2] = colorTest;
-    //         gl_FragData[3] = colorTest;
-    //     #endif
-    //     return;
-    // }
-    // else if(iteration == 6)
-    // {
-    //     colorTest = vec4(0.5, 0.0, 0.0, 1.0);
-    //     gl_FragData[0] = colorTest;
-
-    //     #ifdef USE_MULTI_RENDER_TARGET
-    //         gl_FragData[1] = colorTest;
-    //         gl_FragData[2] = colorTest;
-    //         gl_FragData[3] = colorTest;
-    //     #endif
-    //     return;
-    // }
-    // else if(iteration == 7)
-    // {
-    //     colorTest = vec4(0.0, 0.5, 0.0, 1.0);
-    //     gl_FragData[0] = colorTest;
-
-    //     #ifdef USE_MULTI_RENDER_TARGET
-    //         gl_FragData[1] = colorTest;
-    //         gl_FragData[2] = colorTest;
-    //         gl_FragData[3] = colorTest;
-    //     #endif
-    //     return;
-    // }
-    // else if(iteration == 8)
-    // {
-    //     colorTest = vec4(0.0, 0.0, 0.5, 1.0);
-    //     gl_FragData[0] = colorTest;
-
-    //     #ifdef USE_MULTI_RENDER_TARGET
-    //         gl_FragData[1] = colorTest;
-    //         gl_FragData[2] = colorTest;
-    //         gl_FragData[3] = colorTest;
-    //     #endif
-    //     return;
-    // }
+    
     
     // Sampling far to near.***
     bool normalLC_calculated = true;
@@ -1557,30 +1514,25 @@ void main(){
             //}
 
             vec4 currColor4 = transfer_fnc(contaminationSample);
-            currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);
-            //vec3 normalizedVelocityLC = normalize(velocityLC);
-            //vec4 velocityWC = u_simulBoxTMat * vec4(velocityLC, 1.0);
-            //vec4 velocityDirCC = modelViewMatrixRelToEye * vec4(velocityWC.xyz, 1.0);
-
-            // Now, calculate alpha by normalCC.***
-            /*
-            vec4 currNormalWC = u_simulBoxTMat * vec4(currNormalLC, 1.0);
-            vec4 currNormalCC = modelViewMatrixRelToEye * vec4(currNormalWC.xyz, 1.0);
-            vec3 normalCC = normalize(currNormalCC.xyz);
-            float dotProd = dot(camRay, normalCC);
-
-            // Now, accumulate the color.***
-            if(dotProd < 0.0)
+            //currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);
+             if(uRenderingColorType == 0)
             {
-                currColor4.rgb *= abs(dotProd);
+                currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);
             }
-            */
-            
-
-            //vec4 vecAux = abs(vec4(currColor4.rgb, 1.0));
-            //currColor4.r = sampleTexCoord3d.x;
-            //currColor4.g = sampleTexCoord3d.y;
-            //currColor4.b = sampleTexCoord3d.z;
+            else if(uRenderingColorType == 1)
+            {
+                // for the moment use rainbow colors.***
+                currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);
+            }
+            else if(uRenderingColorType == 2)
+            {
+                currColor4 = getColorByLegendColors(contaminationSample);
+            }
+            else if(uRenderingColorType == 3)
+            {
+                // 4debug
+                //currColor4 = getColorTest(contaminationSample);
+            }
  
             //if(length(currNormalLC) > 0.0)
             {

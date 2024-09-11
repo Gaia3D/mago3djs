@@ -69,6 +69,12 @@ uniform vec3 u_simulBoxPosLow;\n\
 uniform vec3 u_simulBoxMinPosLC;\n\
 uniform vec3 u_simulBoxMaxPosLC;\n\
 \n\
+// Legend colors.***\n\
+uniform vec4 uLegendColors[16];\n\
+uniform float uLegendValues[16];\n\
+uniform int uLegendColorsCount;\n\
+uniform float uLegendValuesScale;\n\
+\n\
 uniform int uRenderingColorType; // 0= rainbow, 1= monotone, 2= legendColors.\n\
 \n\
 \n\
@@ -1279,6 +1285,74 @@ bool findFirstSamplePosition(in vec3 frontPosLC, in vec3 rearPosLC, in vec3 samp
     return false;\n\
 }\n\
 \n\
+vec4 getColorByLegendColors(float realPollutionValue)\n\
+{\n\
+    vec4 colorAux = vec4(0.3, 0.3, 0.3, 0.1);\n\
+    vec4 colorZero = vec4(0.3, 0.3, 0.3, 0.1);\n\
+\n\
+    // The legendValues are scaled, so must scale the realPollutionValue.***\n\
+    float scaledValue = realPollutionValue * uLegendValuesScale;\n\
+\n\
+    // find legendIdx.***\n\
+    for(int i=0; i<16; i++)\n\
+    {\n\
+        if( i >= uLegendColorsCount)\n\
+        {\n\
+            break;\n\
+        }\n\
+\n\
+        if(i == 0)\n\
+        {\n\
+            if(scaledValue < uLegendValues[i])\n\
+            {\n\
+                float value0 = 0.0;\n\
+                float value1 = uLegendValues[i];\n\
+                float factor = (scaledValue - value0) / (value1 - value0);\n\
+                colorAux = mix(colorZero, uLegendColors[i], factor);\n\
+                //colorAux = vec4(0.3, 0.3, 0.3, 0.0);\n\
+                break;\n\
+            }\n\
+        }\n\
+\n\
+        if(i < uLegendColorsCount - 1)\n\
+        {\n\
+            if(scaledValue >= uLegendValues[i] && scaledValue < uLegendValues[i + 1])\n\
+            {\n\
+                // if(uTextureFilterType == 0)\n\
+                // {\n\
+                //     colorAux = uLegendColors[i];\n\
+                // }\n\
+                // else\n\
+                {\n\
+                    float value0 = uLegendValues[i];\n\
+                    float value1 = uLegendValues[i + 1];\n\
+                    float factor = (scaledValue - value0) / (value1 - value0);\n\
+                    colorAux = mix(uLegendColors[i], uLegendColors[i + 1], factor);\n\
+                }\n\
+                break;\n\
+            }\n\
+        }\n\
+        else if(i == uLegendColorsCount - 1)\n\
+        {\n\
+            if(scaledValue >= uLegendValues[i])\n\
+            {\n\
+                colorAux = uLegendColors[i];\n\
+                break;\n\
+            }\n\
+            else\n\
+            {\n\
+                float value0 = uLegendValues[i];\n\
+                float value1 = uLegendValues[i];\n\
+                float factor = (scaledValue - value0) / (value1 - value0);\n\
+                colorAux = mix(uLegendColors[i], uLegendColors[i], factor);\n\
+            }\n\
+        }\n\
+\n\
+    }\n\
+\n\
+    return colorAux;\n\
+}\n\
+\n\
 void main(){\n\
 \n\
     // 1rst, read front depth & rear depth and check if exist rear depth.***\n\
@@ -1400,16 +1474,6 @@ void main(){\n\
     int iteration = 0;\n\
     if(!findFirstSamplePosition(frontPosLC, rearPosLC, samplingDirLC, increLength, simulBoxRange, firstPosLC, iteration))\n\
     {\n\
-        \n\
-        // vec4 colorDiscard = vec4(0.3, 0.3, 0.3, 1.0);\n\
-        // gl_FragData[0] = colorDiscard;\n\
-\n\
-        // #ifdef USE_MULTI_RENDER_TARGET\n\
-        //     gl_FragData[1] = colorDiscard;\n\
-        //     gl_FragData[2] = colorDiscard;\n\
-        //     gl_FragData[3] = colorDiscard;\n\
-        // #endif\n\
-        \n\
         return;\n\
     }\n\
     \n\
@@ -1422,114 +1486,7 @@ void main(){\n\
     vec4 colorTest = vec4(0.0, 0.0, 0.5, 1.0);\n\
     colorTest = vec4(firstPosLC.x /u_voxelSizeMeters.x, firstPosLC.y /u_voxelSizeMeters.y, firstPosLC.z /u_voxelSizeMeters.z , 1.0);\n\
 \n\
-    // if(iteration == 0)\n\
-    // {\n\
-    //     colorTest = vec4(1.0, 0.0, 0.0, 1.0);\n\
-    //     gl_FragData[0] = colorTest;\n\
-\n\
-    //     #ifdef USE_MULTI_RENDER_TARGET\n\
-    //         gl_FragData[1] = colorTest;\n\
-    //         gl_FragData[2] = colorTest;\n\
-    //         gl_FragData[3] = colorTest;\n\
-    //     #endif\n\
-    //     return;\n\
-    // }\n\
-    // else if(iteration == 1)\n\
-    // {\n\
-    //     colorTest = vec4(0.0, 1.0, 0.0, 1.0);\n\
-    //     gl_FragData[0] = colorTest;\n\
-\n\
-    //     #ifdef USE_MULTI_RENDER_TARGET\n\
-    //         gl_FragData[1] = colorTest;\n\
-    //         gl_FragData[2] = colorTest;\n\
-    //         gl_FragData[3] = colorTest;\n\
-    //     #endif\n\
-    //     return;\n\
-    // }\n\
-    // else if(iteration == 2)\n\
-    // {\n\
-    //     colorTest = vec4(0.0, 0.0, 1.0, 1.0);\n\
-    //     gl_FragData[0] = colorTest;\n\
-\n\
-    //     #ifdef USE_MULTI_RENDER_TARGET\n\
-    //         gl_FragData[1] = colorTest;\n\
-    //         gl_FragData[2] = colorTest;\n\
-    //         gl_FragData[3] = colorTest;\n\
-    //     #endif\n\
-    //     return;\n\
-    // }\n\
-    // else if(iteration == 3)\n\
-    // {\n\
-    //     colorTest = vec4(1.0, 1.0, 0.0, 1.0);\n\
-    //     gl_FragData[0] = colorTest;\n\
-\n\
-    //     #ifdef USE_MULTI_RENDER_TARGET\n\
-    //         gl_FragData[1] = colorTest;\n\
-    //         gl_FragData[2] = colorTest;\n\
-    //         gl_FragData[3] = colorTest;\n\
-    //     #endif\n\
-    //     return;\n\
-    // }\n\
-    // else if(iteration == 4)\n\
-    // {\n\
-    //     colorTest = vec4(1.0, 0.0, 1.0, 1.0);\n\
-    //     gl_FragData[0] = colorTest;\n\
-\n\
-    //     #ifdef USE_MULTI_RENDER_TARGET\n\
-    //         gl_FragData[1] = colorTest;\n\
-    //         gl_FragData[2] = colorTest;\n\
-    //         gl_FragData[3] = colorTest;\n\
-    //     #endif\n\
-    //     return;\n\
-    // }\n\
-    // else if(iteration == 5)\n\
-    // {\n\
-    //     colorTest = vec4(0.0, 1.0, 1.0, 1.0);\n\
-    //     gl_FragData[0] = colorTest;\n\
-\n\
-    //     #ifdef USE_MULTI_RENDER_TARGET\n\
-    //         gl_FragData[1] = colorTest;\n\
-    //         gl_FragData[2] = colorTest;\n\
-    //         gl_FragData[3] = colorTest;\n\
-    //     #endif\n\
-    //     return;\n\
-    // }\n\
-    // else if(iteration == 6)\n\
-    // {\n\
-    //     colorTest = vec4(0.5, 0.0, 0.0, 1.0);\n\
-    //     gl_FragData[0] = colorTest;\n\
-\n\
-    //     #ifdef USE_MULTI_RENDER_TARGET\n\
-    //         gl_FragData[1] = colorTest;\n\
-    //         gl_FragData[2] = colorTest;\n\
-    //         gl_FragData[3] = colorTest;\n\
-    //     #endif\n\
-    //     return;\n\
-    // }\n\
-    // else if(iteration == 7)\n\
-    // {\n\
-    //     colorTest = vec4(0.0, 0.5, 0.0, 1.0);\n\
-    //     gl_FragData[0] = colorTest;\n\
-\n\
-    //     #ifdef USE_MULTI_RENDER_TARGET\n\
-    //         gl_FragData[1] = colorTest;\n\
-    //         gl_FragData[2] = colorTest;\n\
-    //         gl_FragData[3] = colorTest;\n\
-    //     #endif\n\
-    //     return;\n\
-    // }\n\
-    // else if(iteration == 8)\n\
-    // {\n\
-    //     colorTest = vec4(0.0, 0.0, 0.5, 1.0);\n\
-    //     gl_FragData[0] = colorTest;\n\
-\n\
-    //     #ifdef USE_MULTI_RENDER_TARGET\n\
-    //         gl_FragData[1] = colorTest;\n\
-    //         gl_FragData[2] = colorTest;\n\
-    //         gl_FragData[3] = colorTest;\n\
-    //     #endif\n\
-    //     return;\n\
-    // }\n\
+    \n\
     \n\
     // Sampling far to near.***\n\
     bool normalLC_calculated = true;\n\
@@ -1559,30 +1516,25 @@ void main(){\n\
             //}\n\
 \n\
             vec4 currColor4 = transfer_fnc(contaminationSample);\n\
-            currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);\n\
-            //vec3 normalizedVelocityLC = normalize(velocityLC);\n\
-            //vec4 velocityWC = u_simulBoxTMat * vec4(velocityLC, 1.0);\n\
-            //vec4 velocityDirCC = modelViewMatrixRelToEye * vec4(velocityWC.xyz, 1.0);\n\
-\n\
-            // Now, calculate alpha by normalCC.***\n\
-            /*\n\
-            vec4 currNormalWC = u_simulBoxTMat * vec4(currNormalLC, 1.0);\n\
-            vec4 currNormalCC = modelViewMatrixRelToEye * vec4(currNormalWC.xyz, 1.0);\n\
-            vec3 normalCC = normalize(currNormalCC.xyz);\n\
-            float dotProd = dot(camRay, normalCC);\n\
-\n\
-            // Now, accumulate the color.***\n\
-            if(dotProd < 0.0)\n\
+            //currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);\n\
+             if(uRenderingColorType == 0)\n\
             {\n\
-                currColor4.rgb *= abs(dotProd);\n\
+                currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);\n\
             }\n\
-            */\n\
-            \n\
-\n\
-            //vec4 vecAux = abs(vec4(currColor4.rgb, 1.0));\n\
-            //currColor4.r = sampleTexCoord3d.x;\n\
-            //currColor4.g = sampleTexCoord3d.y;\n\
-            //currColor4.b = sampleTexCoord3d.z;\n\
+            else if(uRenderingColorType == 1)\n\
+            {\n\
+                // for the moment use rainbow colors.***\n\
+                currColor4 = getRainbowColor_byHeight(contaminationSample, u_minMaxPollutionValues.x, u_minMaxPollutionValues.y * 0.3, false);\n\
+            }\n\
+            else if(uRenderingColorType == 2)\n\
+            {\n\
+                currColor4 = getColorByLegendColors(contaminationSample);\n\
+            }\n\
+            else if(uRenderingColorType == 3)\n\
+            {\n\
+                // 4debug\n\
+                //currColor4 = getColorTest(contaminationSample);\n\
+            }\n\
  \n\
             //if(length(currNormalLC) > 0.0)\n\
             {\n\
@@ -2649,6 +2601,7 @@ vec4 getColorByLegendColors(float realPollutionValue)\n\
                 float value1 = uLegendValues[i];\n\
                 float factor = (scaledValue - value0) / (value1 - value0);\n\
                 colorAux = mix(colorZero, uLegendColors[i], factor);\n\
+                colorAux = vec4(1.0, 1.0, 0.0, 1.0);\n\
                 break;\n\
             }\n\
         }\n\
@@ -2684,6 +2637,7 @@ vec4 getColorByLegendColors(float realPollutionValue)\n\
                 float value1 = uLegendValues[i];\n\
                 float factor = (scaledValue - value0) / (value1 - value0);\n\
                 colorAux = mix(uLegendColors[i], uLegendColors[i], factor);\n\
+                \n\
             }\n\
         }\n\
 \n\
@@ -2787,6 +2741,25 @@ void main()\n\
         if(colorAux.a == 0.0)\n\
         {\n\
             discard;\n\
+            //colorAux = vec4(1.0, 0.0, 1.0, 1.0);\n\
+        }\n\
+\n\
+        // if(realPollutionValue < 1e-2)\n\
+        // {\n\
+        //     colorAux = vec4(0.0, 0.0, 0.0, 1.0);\n\
+        // }\n\
+        // if(realPollutionValue < 1e-5)\n\
+        // {\n\
+        //     colorAux = vec4(0.0, 1.0, 0.0, 1.0);\n\
+        // }\n\
+        // if(realPollutionValue < 1e-20)\n\
+        // {\n\
+        //     colorAux = vec4(0.0, 0.0, 1.0, 1.0);\n\
+        // }\n\
+\n\
+        if(realPollutionValue == 0.0)\n\
+        {\n\
+            colorAux = vec4(1.0, 0.0, 0.0, 0.0);\n\
         }\n\
 \n\
         finalColor = colorAux;\n\
@@ -5194,11 +5167,13 @@ float getPollution_inMosaicTexture(in vec2 texCoord)\n\
     vec4 color4;\n\
     color4 = texture2D(pollutionMosaicTex, texCoord);\n\
     float decoded = unpackDepth(color4); // 32bit.\n\
-    float pollution = decoded * u_minMaxPollutionValues.y;\n\
+    // float pollution = decoded * u_minMaxPollutionValues.y;\n\
 \n\
-    // The ratio of the total MinMax value to the timeslice MinMax value\n\
-    float minMaxRatio = u_minMaxPollutionValuesToRender.y / u_minMaxPollutionValues.y;\n\
-    pollution = pollution * minMaxRatio;\n\
+    // // The ratio of the total MinMax value to the timeslice MinMax value\n\
+    // float minMaxRatio = u_minMaxPollutionValuesToRender.y / u_minMaxPollutionValues.y;\n\
+    // pollution = pollution * minMaxRatio;\n\
+\n\
+    float pollution = decoded * u_minMaxPollutionValuesToRender.y;\n\
     return pollution;\n\
 }\n\
 \n\

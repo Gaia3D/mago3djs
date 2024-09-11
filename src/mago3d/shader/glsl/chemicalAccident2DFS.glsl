@@ -293,6 +293,7 @@ vec4 getColorByLegendColors(float realPollutionValue)
                 float value1 = uLegendValues[i];
                 float factor = (scaledValue - value0) / (value1 - value0);
                 colorAux = mix(colorZero, uLegendColors[i], factor);
+                colorAux = vec4(1.0, 1.0, 0.0, 1.0);
                 break;
             }
         }
@@ -328,6 +329,7 @@ vec4 getColorByLegendColors(float realPollutionValue)
                 float value1 = uLegendValues[i];
                 float factor = (scaledValue - value0) / (value1 - value0);
                 colorAux = mix(uLegendColors[i], uLegendColors[i], factor);
+                
             }
         }
 
@@ -431,6 +433,25 @@ void main()
         if(colorAux.a == 0.0)
         {
             discard;
+            //colorAux = vec4(1.0, 0.0, 1.0, 1.0);
+        }
+
+        // if(realPollutionValue < 1e-2)
+        // {
+        //     colorAux = vec4(0.0, 0.0, 0.0, 1.0);
+        // }
+        // if(realPollutionValue < 1e-5)
+        // {
+        //     colorAux = vec4(0.0, 1.0, 0.0, 1.0);
+        // }
+        // if(realPollutionValue < 1e-20)
+        // {
+        //     colorAux = vec4(0.0, 0.0, 1.0, 1.0);
+        // }
+
+        if(realPollutionValue == 0.0)
+        {
+            colorAux = vec4(1.0, 0.0, 0.0, 0.0);
         }
 
         finalColor = colorAux;

@@ -137,7 +137,7 @@
 			dataType: "json",
 			success: function(serverPolicy){
 				var cesiumViewerOption = {};
-				cesiumViewerOption.infoBox = false;
+				cesiumViewerOption.infoBox = true;
 				cesiumViewerOption.navigationHelpButton = false;
 				cesiumViewerOption.selectionIndicator = false;
 				cesiumViewerOption.homeButton = false;
@@ -194,9 +194,9 @@
 				// const terrain = new Cesium.Terrain(terrainProvider);
 				
 
-				// serverPolicy.initLatitude = 0.0;
-				// serverPolicy.initLongitude = 0.0;
-				// serverPolicy.initAltitude = 100;
+				// serverPolicy.initLatitude = 18.621694;
+				// serverPolicy.initLongitude = 73.856223;
+				// serverPolicy.initAltitude = 30;
 
 				MAGO3D_INSTANCE = new Mago3D.Mago3d(renderDivId, serverPolicy, {loadend : loadend}, cesiumViewerOption);
 
@@ -214,30 +214,10 @@
 				// // Active this code for tile inspector.**************************************************************************************
 				
 				
-				MAGO3D_INSTANCE.getViewer().scene.globe.translucency.enabled = true;
-				MAGO3D_INSTANCE.getViewer().scene.globe.translucency.frontFaceAlphaByDistance = new Cesium.NearFarScalar(300.0, 0.3, 3000.0, 1.0);
-				// for Cesium v1.3.2.******************************************************************************
-				// var urlTest = "../f4d/3dtiles/fbx_HayashiSan/tileset.json";
-				// try{
-				// MAGO3D_INSTANCE.getViewer().scene.primitives.add(Cesium.Cesium3DTileset.fromUrl(urlTest));
-				// } catch (error) {
-				// console.log(`Error loading tileset: ${error}`);
-				// }
+				// MAGO3D_INSTANCE.getViewer().scene.globe.translucency.enabled = true;
+				// MAGO3D_INSTANCE.getViewer().scene.globe.translucency.frontFaceAlphaByDistance = new Cesium.NearFarScalar(300.0, 0.3, 3000.0, 1.0);
 
-				// urlTest = "../f4d/3dtiles/sejeong_citygml/tileset.json";
-				// MAGO3D_INSTANCE.getViewer().scene.primitives.add(new Cesium.Cesium3DTileset({
-				// 	url : urlTest
-				// }));
-
-				// urlTest = "../f4d/3dtiles/SejongBuildings_3ds/tileset.json";
-				// MAGO3D_INSTANCE.getViewer().scene.primitives.add(new Cesium.Cesium3DTileset({
-				// 	url : urlTest
-				// }));
-
-				var urlTest = "../f4d/3dtiles/water_pipelinesShp_India/tileset.json";
-				MAGO3D_INSTANCE.getViewer().scene.primitives.add(new Cesium.Cesium3DTileset({
-					url : urlTest
-				}));
+				
 				//-------------------------------------------------------------------------------------------------
 				function addAdditionalLayerOption(name, imageryProvider, alpha, show) {
 					var layer = MAGO3D_INSTANCE.getViewer().scene.imageryLayers.addImageryProvider(imageryProvider);
@@ -309,12 +289,68 @@
 		// console.log(`Error loading tileset: ${error}`);
 		// }
 
-		// var urlTest = "../f4d/3dtiles/GoyangChangRung/tree/tileset.json";
-		// try{
-		// 	magoInstance.getViewer().scene.primitives.add(await Cesium.Cesium3DTileset.fromUrl(urlTest));
-		// } catch (error) {
-		// console.log(`Error loading tileset: ${error}`);
-		// }
+		
+
+		//var urlTest = "../f4d/3dtiles/water_pipelinesShp_India/tileset.json";
+		//var urlTest = "../f4d/3dtiles/selected_pipes.shp/tileset.json";
+		var urlTest = "../f4d/3dtiles/selected_water_line.shp/tileset.json";
+		try{
+			var tileset = await Cesium.Cesium3DTileset.fromUrl(urlTest);	
+		
+			magoInstance.getViewer().scene.primitives.add(tileset);
+
+			// var hpr = new Cesium.HeadingPitchRange(0.0, -90.0, 0.0);
+			// // free camera
+			// magoInstance.getViewer().zoomTo(tileset, hpr);
+			// console.info(tileset);
+
+			tileset.tileLoad.addEventListener(function (tile) {  
+				const content = tile.content;
+
+				let featuresLength = content.featuresLength;
+				for(let j=0; j<featuresLength; j++){
+					let feature = content.getFeature(j);
+					if(feature instanceof Cesium.Cesium3DTileFeature){
+						let propertyNames = feature.getPropertyIds();
+						for(let i=0; i<propertyNames.length; i++){
+							let propertyName = propertyNames[i];
+							let propertyValue = feature.getProperty(propertyName);
+							console.log(propertyName + " : " + propertyValue);
+						}
+					}
+				}
+
+				// for (let i = 0; i < content.innerContents.length; i++) {  
+				// 	const innerContent = content.innerContents[i];  
+				// 	const groupMetadata = innerContent.group?.metadata;  
+				// 	if (Cesium.defined(groupMetadata)) {  
+				// 		const diameter = groupMetadata.getProperty("pipe_depth");  
+				// 		if (Cesium.defined(diameter)) {  
+				// 			console.log('el diámetro existe')  
+				// 		} 
+				// 		else{
+				// 			console.log('el diámetro no existe')  
+				// 		} 
+				// 	} 
+				// 	else{
+				// 		console.log('el grupo no existe')
+				// 	} 
+				// }  
+			});
+
+		} catch (error) {
+		console.log(`Error loading tileset: ${error}`);
+		}
+
+		var urlTest = "../f4d/3dtiles/tree/tileset.json";
+		try{
+			var tileset = await Cesium.Cesium3DTileset.fromUrl(urlTest);	
+			magoInstance.getViewer().scene.primitives.add(tileset);
+		} catch (error) {
+		console.log(`Error loading tileset: ${error}`);
+		}
+
+		
 
 		// Active this code for tile inspector.**************************************************************************************
 		//magoInstance.getViewer().extend(Cesium.viewerCesium3DTilesInspectorMixin);
@@ -390,14 +426,14 @@
 				highPrecision : false
 			};
 			
-			var posWC = Mago3D.ManagerUtils.screenCoordToWorldCoordUseDepthCheck(screenX, screenY, magoManager, options);
-			var geoCoord = Mago3D.ManagerUtils.pointToGeographicCoord(posWC, undefined);
-			geoCoord.altitude += 4.0; //
-			geoCoord.makeDefaultGeoLocationData();
+			// var posWC = Mago3D.ManagerUtils.screenCoordToWorldCoordUseDepthCheck(screenX, screenY, magoManager, options);
+			// var geoCoord = Mago3D.ManagerUtils.pointToGeographicCoord(posWC, undefined);
+			// geoCoord.altitude += 4.0; //
+			// geoCoord.makeDefaultGeoLocationData();
 
-			// check if mago is or not in selection & move mode.***
-			var geoCoordsList = magoManager.modeler.getGeographicCoordsList();
-			geoCoordsList.addGeoCoord(geoCoord);
+			// // check if mago is or not in selection & move mode.***
+			// var geoCoordsList = magoManager.modeler.getGeographicCoordsList();
+			// geoCoordsList.addGeoCoord(geoCoord);
 			
 			var hola = 0;
 
@@ -478,11 +514,11 @@
 		}
 
 		var options = {
-				timeScale : 2000,
-				year : 2024,
-				month : 2, // 0 to 11
-				day : 6,
-				hour : 11,
+				timeScale : 200000,
+				year : 2020,
+				month : 8, // 0 to 11
+				day : 18,
+				hour : 24,
 				minute : 0,
 				second : 0
 			};
@@ -726,6 +762,7 @@
 
 		return legendColors;
 	}
+	
 
 	function chemicalAccident2d()
 	{
@@ -741,10 +778,10 @@
 			magoManager.chemicalAccident2dManager._animationState = Mago3D.CODE.processState.STARTED;
 
 			// 1rst layer.************************************************************************************************************************
-			// (20240806) 화학사고 Concentration1minute_intervalAir1
+			// output_chemAcc2D_20240806_Air1
 			// url : "/f4d/chemicalAccident/output_chemAcc2D_fromCsv_victimsCount/JsonIndex2D.json",
 			var options = {
-				url : "/f4d/chemicalAccident/(20240806) 화학사고 Concentration1minute_intervalAir1/JsonIndex2D.json",
+				url : "/f4d/chemicalAccident/output_chemAcc2D_20240806_Air1/JsonIndex2D.json",
 				renderingColorType : 2,  // 0= rainbow, 1= monotone, 2= legendColors.***
 				renderBorder : true, // true, false.***
 				textureFilterType : 0,  // 0= nearest, 1= linear.***
@@ -762,34 +799,59 @@
 
 			var chemAccLayer = new Mago3D.ChemicalAccident2DLayer(options);
 			var legendValuesScale = 1;
-			var minValue = 0.0 * legendValuesScale;
-			//var maxValue = 0.648 * legendValuesScale;
-			var maxValue = 3 * legendValuesScale;
-			var numColors = 7;
-			var accentuationFactor = 1.0;
-			var legendValues = getLogDivisions(minValue, maxValue, numColors, accentuationFactor);
+			// var minValue = 0.0 * legendValuesScale;
+			// //var maxValue = 0.648 * legendValuesScale;
+			// var maxValue = 3 * legendValuesScale;
+			// var numColors = 7;
+			// var accentuationFactor = 1.0;
+			// var legendValues = getLogDivisions(minValue, maxValue, numColors, accentuationFactor);
 
-			// create legend colors.***
-			/*var legendColors = [];
-			var LegendColor = new Mago3D.ColorLegend(0/255, 0/255, 0/255, 0.0, 0);  // 0
+			const minValue = 0;
+			//const maxValue = 1620000.0 * legendValuesScale;
+			const maxValue = 112000000.0 * legendValuesScale;
+			//const maxValue = 200000000.0 * legendValuesScale;
+			const numColors = 12;
+			const accentuationFactor = 5.0;
+			const legendValues = getLogDivisions(minValue, maxValue, numColors, accentuationFactor);
+
+			const legendColors = [];
+			let alphaColor = 0.5;
+
+			let LegendColor = new Mago3D.ColorLegend(255/255, 255/255, 255/255, 0.0, legendValues[0]);
 			legendColors.push(LegendColor);
-			LegendColor = new Mago3D.ColorLegend(0/255, 255/255, 0/255, 128/255, 1);  // 5
-			legendColors.push(LegendColor);
-			LegendColor = new Mago3D.ColorLegend(255/255, 255/255, 0/255, 128/255, 3);  // 10
-			legendColors.push(LegendColor);
-			LegendColor = new Mago3D.ColorLegend(255/255, 0/255, 0/255, 128/255, 6);  // 15
-			legendColors.push(LegendColor);
-			LegendColor = new Mago3D.ColorLegend(0/255, 0/255, 255/255, 128/255, 9);  // 15
-			legendColors.push(LegendColor);
-			LegendColor = new Mago3D.ColorLegend(0/255, 255/255, 255/255, 128/255, 10);  // 15
-			legendColors.push(LegendColor);
-			LegendColor = new Mago3D.ColorLegend(255/255, 0/255, 255/255, 128/255, 15);  // 15
+			/*LegendColor = new Mago3D.ColorLegend(0/255, 0/255, 143/255, alphaColor * 0.5, 1e-38);  // 0
 			legendColors.push(LegendColor);*/
+			/*LegendColor = new Mago3D.ColorLegend(0/255, 0/255, 143/255, 0.0, legendValues[0]);  // 0
+			legendColors.push(LegendColor);*/
+			LegendColor = new Mago3D.ColorLegend(0/255, 15/255, 255/255, alphaColor * 0.6, legendValues[1]);  // 1
+			legendColors.push(LegendColor);
+			LegendColor = new Mago3D.ColorLegend(0/255, 95/255, 255/255, alphaColor * 0.7, legendValues[2]);  // 2
+			legendColors.push(LegendColor);
+			LegendColor = new Mago3D.ColorLegend(0/255, 175/255, 255/255, alphaColor * 0.8, legendValues[3]);  // 3
+			legendColors.push(LegendColor);
+			LegendColor = new Mago3D.ColorLegend(0/255, 255/255, 255/255, alphaColor * 0.9, legendValues[4]);  // 4
+			legendColors.push(LegendColor);
+			LegendColor = new Mago3D.ColorLegend(79/255, 255/255, 175/255, alphaColor, legendValues[5]);  // 5
+			legendColors.push(LegendColor);
+			LegendColor = new Mago3D.ColorLegend(159/255, 255/255, 95/255, alphaColor, legendValues[6]);  // 6
+			legendColors.push(LegendColor);
+			LegendColor = new Mago3D.ColorLegend(239/255, 255/255, 15/255, alphaColor, legendValues[7]);  // 7
+			legendColors.push(LegendColor);
+			LegendColor = new Mago3D.ColorLegend(255/255, 191/255, 0/255, alphaColor, legendValues[8]);  // 8
+			legendColors.push(LegendColor);
+			LegendColor = new Mago3D.ColorLegend(255/255, 111/255, 0/255, alphaColor, legendValues[9]);  // 9
+			legendColors.push(LegendColor);
+			LegendColor = new Mago3D.ColorLegend(255/255, 31/255, 0/255, alphaColor, legendValues[10]);  // 10
+			legendColors.push(LegendColor);
+			LegendColor = new Mago3D.ColorLegend(207/255, 0/255, 0/255, alphaColor, legendValues[11]);  // 11
+			legendColors.push(LegendColor);
+			LegendColor = new Mago3D.ColorLegend(0/255, 0/255, 0/255, alphaColor, legendValues[12]);  // 11
+			legendColors.push(LegendColor);
 
 
-			chemAccLayer.setLegendColors(getLinearLegendColors());
+			chemAccLayer.setLegendColors(legendColors);
 			//chemAccLayer.setLegendValuesScale(1e10);
-			chemAccLayer.setLegendValuesScale(1e10);
+			chemAccLayer.setLegendValuesScale(legendValuesScale);
 
 			//chemAccLayer.setLegendColors(legendColors);
 			//chemAccLayer.setLegendValuesScale(legendValuesScale);
@@ -902,11 +964,12 @@
 		// create chemicalAccidentManager, if no exist.***
 		// output_chemicalAccident
 		// output_chemAcc_20240805
+		var url = "/f4d/airPollution_NewVersion/B_PM10/index.json";
 		if(!magoManager.chemicalAccidentManager)
 		{
 			var options = {
 				magoManager : magoManager,
-				url : "/f4d/chemicalAccident/output_chemAcc_20240805/JsonIndex.json",
+				url : url,
 				renderingColorType : 2, // 0= rainbow, 1= monotone, 2= legendColors.***
 				textureFlipYAxis : true,
 				volumetricSamplingsCount : 40
@@ -918,7 +981,7 @@
 			var legendValuesScale = 1;
 			//var legendValuesScale = 1e10;
 			var minValue = 0.0;
-			var maxValue = 112000000.0 * legendValuesScale;
+			var maxValue = 178 * legendValuesScale;
 			var numColors = 12;
 			var accentuationFactor = 1.0;
 			var legendValues = getLogDivisions(minValue, maxValue, numColors, accentuationFactor);
@@ -960,11 +1023,11 @@
 			magoManager.chemicalAccidentManager.setLegendValuesScale(legendValuesScale);
 
 			var options = {
-				timeScale : 2000,
-				year : 2024,
-				month : 2, // 0 to 11
-				day : 6,
-				hour : 11,
+				timeScale : 200000,
+				year : 2020,
+				month : 8, // 0 to 11
+				day : 18,
+				hour : 24,
 				minute : 0,
 				second : 0
 			};

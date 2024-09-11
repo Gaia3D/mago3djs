@@ -24,6 +24,10 @@ var AirPollutionManager = function (options)
 	this._totalAnimTime;
 	this._increTime;
 
+	this._legendColors4 = undefined;
+	this._legendValues = undefined;
+	this._legendValuesScale = 1.0;
+
 	if (options)
 	{
 		if (options.magoManager)
@@ -31,14 +35,13 @@ var AirPollutionManager = function (options)
 			this.magoManager = options.magoManager;
 		}
 
-		if (options.geoJsonIndexFilePath)
+		if (options.url)
 		{
-			this._geoJsonIndexFilePath = options.geoJsonIndexFilePath;
-		}
+			this._geoJsonIndexFilePath = options.url;
 
-		if (options.geoJsonIndexFileFolderPath)
-		{
-			this._geoJsonIndexFileFolderPath = options.geoJsonIndexFileFolderPath;
+			// calculate the folderPath from this._geoJsonIndexFilePath.***
+			var lastSlashIndex = this._geoJsonIndexFilePath.lastIndexOf("/");
+			this._geoJsonIndexFileFolderPath = this._geoJsonIndexFilePath.substring(0, lastSlashIndex);
 		}
 
 		if (options.animationSpeed !== undefined)
@@ -56,6 +59,12 @@ var AirPollutionManager = function (options)
 
 AirPollutionManager.prototype.init = function ()
 {
+	if (this._geoJsonIndexFilePath !== undefined)
+	{
+		this.load_airPollutionIndexFile(this._geoJsonIndexFilePath);
+	}
+	this.test_started = false; // delete this var after test.***
+
 	this.test_started = false;
 };
 
@@ -154,6 +163,13 @@ AirPollutionManager.prototype.createDefaultShaders = function ()
 	shader.u_simulBoxMinPosLC_loc = gl.getUniformLocation(shader.program, "u_simulBoxMinPosLC");
 	shader.u_simulBoxMaxPosLC_loc = gl.getUniformLocation(shader.program, "u_simulBoxMaxPosLC");
 	shader.uMinMaxAltitudeSlices_loc = gl.getUniformLocation(shader.program, "uMinMaxAltitudeSlices");
+
+	shader.uLegendColors_loc = gl.getUniformLocation(shader.program, "uLegendColors");
+	shader.uLegendValues_loc = gl.getUniformLocation(shader.program, "uLegendValues");
+	shader.uLegendColorsCount_loc = gl.getUniformLocation(shader.program, "uLegendColorsCount");
+	shader.uLegendValuesScale_loc = gl.getUniformLocation(shader.program, "uLegendValuesScale");
+
+	shader.uRenderingColorType_loc = gl.getUniformLocation(shader.program, "uRenderingColorType");
 	
 	magoManager.postFxShadersManager.useProgram(shader);
 	gl.uniform1i(shader.simulationBoxDoubleDepthTex_loc, 0);
@@ -165,6 +181,40 @@ AirPollutionManager.prototype.createDefaultShaders = function ()
 	//gl.uniform1i(shader.maxPressureMosaicTex_loc, 6);
 
 	magoManager.postFxShadersManager.useProgram(null);
+};
+
+AirPollutionManager.prototype.setLegendColors = function (legendColorsArray)
+{
+	var legendColorsCount = legendColorsArray.length;
+	if (legendColorsCount === 0)
+	{
+		return false;
+	}
+
+	this._legendColors4 = new Float32Array(legendColorsCount * 4);
+	this._legendValues = new Float32Array(legendColorsCount);
+
+	for (var i=0; i<legendColorsCount; i++)
+	{
+		var color = legendColorsArray[i];
+		this._legendColors4[i*4] = color.red;
+		this._legendColors4[i*4+1] = color.green;
+		this._legendColors4[i*4+2] = color.blue;
+		this._legendColors4[i*4+3] = color.alpha;
+		this._legendValues[i] = color.value;
+	}
+
+	this._legendColorsCount = legendColorsCount;
+};
+
+AirPollutionManager.prototype.setLegendValuesScale = function (legendValuesScale)
+{
+	this._legendValuesScale = legendValuesScale;
+};
+
+AirPollutionManager.prototype.getLegendValuesScale = function ()
+{
+	return this._legendValuesScale;
 };
 
 AirPollutionManager.prototype.load_airPollutionIndexFile = function (geoJsonIndexFilePath)

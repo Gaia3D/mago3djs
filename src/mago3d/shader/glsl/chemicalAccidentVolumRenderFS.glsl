@@ -432,11 +432,13 @@ float getPollution_inMosaicTexture(in vec2 texCoord)
     vec4 color4;
     color4 = texture2D(pollutionMosaicTex, texCoord);
     float decoded = unpackDepth(color4); // 32bit.
-    float pollution = decoded * u_minMaxPollutionValues.y;
+    // float pollution = decoded * u_minMaxPollutionValues.y;
 
-    // The ratio of the total MinMax value to the timeslice MinMax value
-    float minMaxRatio = u_minMaxPollutionValuesToRender.y / u_minMaxPollutionValues.y;
-    pollution = pollution * minMaxRatio;
+    // // The ratio of the total MinMax value to the timeslice MinMax value
+    // float minMaxRatio = u_minMaxPollutionValuesToRender.y / u_minMaxPollutionValues.y;
+    // pollution = pollution * minMaxRatio;
+
+    float pollution = decoded * u_minMaxPollutionValuesToRender.y;
     return pollution;
 }
 

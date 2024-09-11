@@ -1095,6 +1095,8 @@ ChemicalAccident2DLayer.prototype.render = function ()
 		texIdxCurr = 0;
 	}
 
+	texIdxCurr = 1399;
+
 	
 	// Now, do render.***
 	//var chemicalAccidentManager = this.chemicalAccident2DManager;
@@ -1138,7 +1140,8 @@ ChemicalAccident2DLayer.prototype.render = function ()
 	var texHeight = texSize[1];
 	gl.uniform1iv(currentShader.uTextureSize_loc, [texSize[0], texSize[1]]);
 
-	var minMaxValues = this._getMinMaxQuantizedValues();
+	//var minMaxValues = this._getMinMaxQuantizedValues(); // old.***
+	var minMaxValues = this._timeSlicesArray[texIdxCurr].getQuantizedMinMaxValues();
 	gl.uniform2fv(currentShader.uMinMaxValues_loc, [minMaxValues[0], minMaxValues[1]]);
 	gl.uniform2fv(currentShader.uMinMaxValuesToRender_loc, [minMaxValues[0], minMaxValues[1]*0.0000001]);
 	

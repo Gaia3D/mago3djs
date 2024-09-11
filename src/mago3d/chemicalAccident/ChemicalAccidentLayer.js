@@ -1640,6 +1640,14 @@ ChemicalAccidentLayer.prototype._prepareLayer = function ()
 		{
 			timeIncrementMilisecond = timeInterval * 60 * 1000;
 		}
+		else if (timeIntervalUnits === "hour" || timeIntervalUnits === "hours")
+		{
+			timeIncrementMilisecond = timeInterval * 60 * 60 * 1000;
+		}
+		else if (timeIntervalUnits === "day" || timeIntervalUnits === "days")
+		{
+			timeIncrementMilisecond = timeInterval * 60 * 60 * 24 * 1000;
+		}
 
 		var date = new Date(year, month, day, hour, minute, second, millisecond);
 		var startUnixTimeMiliseconds = date.getTime();

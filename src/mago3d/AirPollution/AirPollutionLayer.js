@@ -25,6 +25,7 @@ var AirPollutionTimeSlice = function(options)
 
 	 this._startUnixTimeMiliseconds;
 	 this._endUnixTimeMiliseconds;
+	 this.renderingColorType = 0; // 0= rainbow, 1= monotone, 2= legendColors.***
 
 	 if (options !== undefined)
 	 {
@@ -546,7 +547,7 @@ AirPollutionLayer.prototype.render = function ()
 	gl.viewport(0, 0, fbo.width[0], fbo.height[0]);
 
 	var screenQuad = airPollutionManager.getQuadBuffer();
-	var shader = magoManager.postFxShadersManager.getShader("volumetricAirPollution"); // (waterQuadVertVS, chemicalAccidentVolumRenderFS)
+	var shader = magoManager.postFxShadersManager.getShader("volumetricAirPollution"); // (waterQuadVertVS, airPollutionVolumRenderFS)
 	magoManager.postFxShadersManager.useProgram(shader);
 
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, fbo.colorBuffersArray[0], 0);
@@ -635,6 +636,8 @@ AirPollutionLayer.prototype.render = function ()
 
 	// uMinMaxAltitudeSlices is a vec2 array.***
 	gl.uniform2fv(shader.uMinMaxAltitudeSlices_loc, testTimeSlice.uMinMaxAltitudeSlices);
+
+	gl.uniform1i(shader.uRenderingColorType_loc, this.renderingColorType); // 0= rainbow, 1= monotone, 2= legendColors.***
 
 	// Test rendering only 1 slice.******************************************************
 	//var testTimeSlice = this._timeSlicesArray[8];
