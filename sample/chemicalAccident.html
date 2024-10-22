@@ -170,8 +170,8 @@
 
 
 				//serverPolicy.terrainType = 'cesium-customer'; //serverPolicy.terrainType = 'cesium-default';
-				serverPolicy.terrainType = 'cesium-default';
-				//serverPolicy.terrainValue = 'http://192.168.10.11:8887/tilesets/sejong/';
+				//serverPolicy.terrainType = 'cesium-default';
+				serverPolicy.terrainValue = 'http://192.168.10.11:8887/tilesets/sejong/';
 				//serverPolicy.terrainValue = 'http://192.168.10.182:9998/tilesets/terrain/';
 				//serverPolicy.terrainValue = 'https://mago3d.net/tilesets/terrain/';
 
@@ -185,23 +185,26 @@
 				//var terrainUrl = '../f4d/terrainSejong20240704/';
 				//var terrainUrl = '../f4d/terrainKorea_miniSeoul/';
 				//var terrainUrl = '../f4d/terrainAsia_L11/';
-				var terrainUrl = '../f4d/terrain_seoul_1/';
+				//var terrainUrl = '../f4d/Terrain_BangKok20240919/';
+				var terrainUrl = '../f4d/Terrain_buildings_pinchos/';
 
 				//const url = "/terrain-sample/seoul-12bilinear/";
-				// const terrainProvider = Cesium.CesiumTerrainProvider.fromUrl(terrainUrl, {
-				// 	requestVertexNormals: true,
-				// })
-				// const terrain = new Cesium.Terrain(terrainProvider);
+				const terrainProvider = Cesium.CesiumTerrainProvider.fromUrl(terrainUrl, {
+					requestVertexNormals: true,
+				})
+				const terrain = new Cesium.Terrain(terrainProvider);
 				
+				// lon = 127.2270213
+				// lat = 36.464432
 
-				// serverPolicy.initLatitude = 18.621694;
-				// serverPolicy.initLongitude = 73.856223;
-				// serverPolicy.initAltitude = 30;
+				serverPolicy.initLongitude = 2.21324093 * 180.0 / Math.PI;
+				serverPolicy.initLatitude = 0.58449859 * 180.0 / Math.PI;
+				serverPolicy.initAltitude = 1000;
 
 				MAGO3D_INSTANCE = new Mago3D.Mago3d(renderDivId, serverPolicy, {loadend : loadend}, cesiumViewerOption);
 
-				//MAGO3D_INSTANCE.getViewer().scene.setTerrain(terrain);
-				MAGO3D_INSTANCE.getViewer().scene.globe.enableLighting = true;
+				MAGO3D_INSTANCE.getViewer().scene.setTerrain(terrain);
+				//MAGO3D_INSTANCE.getViewer().scene.globe.enableLighting = true;
 				//MAGO3D_INSTANCE.getViewer().scene.globe._surface._tileProvider._debug.wireframe = true;
 
 				// https://searchcode.com/codesearch/view/93566826/
@@ -240,109 +243,82 @@
 		magoInstance.getViewer().scene.globe.depthTestAgainstTerrain = true;
 		magoInstance.setBaseUrl(dataInfo.baseUrl);
 
-		//var urlTest = "../f4d/3dtiles/(20240712)상지대 콜라다 데이터_6buildings/tileset.json";
+		//var urlTest = "../f4d/3dtiles/(20240712)상지대 콜라다 데이터/tileset.json";
+		var urlTest = "../f4d/3dtiles/(20240712)상지대 콜라다 데이터_1building/tileset.json";
+		//var urlTest = "../f4d/3dtiles/(20240712)상지대 콜라다 데이터_1building_NoReduced/tileset.json";
 		//var urlTest = "../f4d/3dtiles/(20240712)상지대 콜라다 데이터_2buildings/tileset.json";
 		//var urlTest = "../f4d/3dtiles/splittedTile/tileset.json";
 		//var urlTest = "../f4d/3dtiles/Data_HanamKyosan/건물/tileset.json";
 		//var urlTest = "../f4d/3dtiles/ComplicatedModels10/tileset.json";
 		//var urlTest = "../f4d/3dtiles/fbx_HayashiSan/tileset.json";
 		// var urlTest = "../f4d/3dtiles/GoyangChangRung/signal/tileset.json";
-		var urlTest = "../f4d/3dtiles/RailWay/tileset.json";
+		// var urlTest = "../f4d/3dtiles/RailWay/tileset.json";
+		// try{
+		// 	magoInstance.getViewer().scene.primitives.add(await Cesium.Cesium3DTileset.fromUrl(urlTest));
+		// } catch (error) {
+		// console.log(`Error loading tileset: ${error}`);
+		// }
+
+
+		//var urlTest = "../f4d/3dtiles/RailWay/tileset.json";
+		//var urlTest = "../f4d/3dtiles/Yeongdeok_Lespia_Building/tileset.json";
+		//var urlTest = "../f4d/3dtiles/RealisticMesh_Thailand/tileset.json";
+		//var urlTest = "../f4d/3dtiles/Data_1building/tileset.json";
+		//var urlTest = "../f4d/3dtiles/Data_2buildings/tileset.json";
+		var urlTest = "../f4d/3dtiles/Data_4buildings/tileset.json";
 		try{
-			magoInstance.getViewer().scene.primitives.add(await Cesium.Cesium3DTileset.fromUrl(urlTest));
+			var tileSet = await Cesium.Cesium3DTileset.fromUrl(urlTest, {
+				debugColorizeTiles : true,
+				debugShowBoundingVolume : true
+			});
+			magoInstance.getViewer().scene.primitives.add(tileSet);
+			//tileset.debugColorizeTiles = true;
+			//tileset.debugShowBoundingVolume = true;
+
+
+			// let hpr = new Cesium.HeadingPitchRange(0.0, -90.0, 0.0);
+			// viewer.zoomTo(tileSet, hpr);
 		} catch (error) {
 		console.log(`Error loading tileset: ${error}`);
 		}
-
-		// var urlTest = "../f4d/3dtiles/GoyangChangRung/sign/tileset.json";
-		// try{
-		// 	magoInstance.getViewer().scene.primitives.add(await Cesium.Cesium3DTileset.fromUrl(urlTest));
-		// } catch (error) {
-		// console.log(`Error loading tileset: ${error}`);
-		// }
-
-		// var urlTest = "../f4d/3dtiles/GoyangChangRung/lamp/tileset.json";
-		// try{
-		// 	magoInstance.getViewer().scene.primitives.add(await Cesium.Cesium3DTileset.fromUrl(urlTest));
-		// } catch (error) {
-		// console.log(`Error loading tileset: ${error}`);
-		// }
-
-		// var urlTest = "../f4d/3dtiles/GoyangChangRung/fence/tileset.json";
-		// try{
-		// 	magoInstance.getViewer().scene.primitives.add(await Cesium.Cesium3DTileset.fromUrl(urlTest));
-		// } catch (error) {
-		// console.log(`Error loading tileset: ${error}`);
-		// }
-
-		// var urlTest = "../f4d/3dtiles/GoyangChangRung/busstop/tileset.json";
-		// try{
-		// 	magoInstance.getViewer().scene.primitives.add(await Cesium.Cesium3DTileset.fromUrl(urlTest));
-		// } catch (error) {
-		// console.log(`Error loading tileset: ${error}`);
-		// }
-
-		// var urlTest = "../f4d/3dtiles/GoyangChangRung/building/tileset.json";
-		// try{
-		// 	magoInstance.getViewer().scene.primitives.add(await Cesium.Cesium3DTileset.fromUrl(urlTest));
-		// } catch (error) {
-		// console.log(`Error loading tileset: ${error}`);
-		// }
 
 		
 
 		//var urlTest = "../f4d/3dtiles/water_pipelinesShp_India/tileset.json";
 		//var urlTest = "../f4d/3dtiles/selected_pipes.shp/tileset.json";
-		var urlTest = "../f4d/3dtiles/selected_water_line.shp/tileset.json";
-		try{
-			var tileset = await Cesium.Cesium3DTileset.fromUrl(urlTest);	
+		// var urlTest = "../f4d/3dtiles/selected_water_line.shp/tileset.json";
+		// try{
+		// 	var tileset = await Cesium.Cesium3DTileset.fromUrl(urlTest);	
 		
-			magoInstance.getViewer().scene.primitives.add(tileset);
+		// 	magoInstance.getViewer().scene.primitives.add(tileset);
 
-			// var hpr = new Cesium.HeadingPitchRange(0.0, -90.0, 0.0);
-			// // free camera
-			// magoInstance.getViewer().zoomTo(tileset, hpr);
-			// console.info(tileset);
+		// 	// var hpr = new Cesium.HeadingPitchRange(0.0, -90.0, 0.0);
+		// 	// // free camera
+		// 	// magoInstance.getViewer().zoomTo(tileset, hpr);
+		// 	// console.info(tileset);
 
-			tileset.tileLoad.addEventListener(function (tile) {  
-				const content = tile.content;
+		// 	tileset.tileLoad.addEventListener(function (tile) {  
+		// 		const content = tile.content;
 
-				let featuresLength = content.featuresLength;
-				for(let j=0; j<featuresLength; j++){
-					let feature = content.getFeature(j);
-					if(feature instanceof Cesium.Cesium3DTileFeature){
-						let propertyNames = feature.getPropertyIds();
-						for(let i=0; i<propertyNames.length; i++){
-							let propertyName = propertyNames[i];
-							let propertyValue = feature.getProperty(propertyName);
-							console.log(propertyName + " : " + propertyValue);
-						}
-					}
-				}
+		// 		let featuresLength = content.featuresLength;
+		// 		for(let j=0; j<featuresLength; j++){
+		// 			let feature = content.getFeature(j);
+		// 			if(feature instanceof Cesium.Cesium3DTileFeature){
+		// 				let propertyNames = feature.getPropertyIds();
+		// 				for(let i=0; i<propertyNames.length; i++){
+		// 					let propertyName = propertyNames[i];
+		// 					let propertyValue = feature.getProperty(propertyName);
+		// 					console.log(propertyName + " : " + propertyValue);
+		// 				}
+		// 			}
+		// 		}
+		// 	});
 
-				// for (let i = 0; i < content.innerContents.length; i++) {  
-				// 	const innerContent = content.innerContents[i];  
-				// 	const groupMetadata = innerContent.group?.metadata;  
-				// 	if (Cesium.defined(groupMetadata)) {  
-				// 		const diameter = groupMetadata.getProperty("pipe_depth");  
-				// 		if (Cesium.defined(diameter)) {  
-				// 			console.log('el diámetro existe')  
-				// 		} 
-				// 		else{
-				// 			console.log('el diámetro no existe')  
-				// 		} 
-				// 	} 
-				// 	else{
-				// 		console.log('el grupo no existe')
-				// 	} 
-				// }  
-			});
+		// } catch (error) {
+		// console.log(`Error loading tileset: ${error}`);
+		// }
 
-		} catch (error) {
-		console.log(`Error loading tileset: ${error}`);
-		}
-
-		var urlTest = "../f4d/3dtiles/tree/tileset.json";
+		var urlTest = "../f4d/3dtiles/incheonSemaphore_shp/tileset.json";
 		try{
 			var tileset = await Cesium.Cesium3DTileset.fromUrl(urlTest);	
 			magoInstance.getViewer().scene.primitives.add(tileset);
@@ -964,13 +940,31 @@
 		// create chemicalAccidentManager, if no exist.***
 		// output_chemicalAccident
 		// output_chemAcc_20240805
-		var url = "/f4d/airPollution_NewVersion/B_PM10/index.json";
+		//var url = "/f4d/airPollution_NewVersion/B_PM10/index.json"; // maxVal = 178
+		//var url = "/f4d/airPollution_NewVersion/B_NO2/index.json"; // maxVal = 1.322
+		//var url = "/f4d/airPollution_NewVersion/B_PM25/index.json"; // maxVal = 18.57645
+		// var url = "/f4d/airPollution_NewVersion/O_NO2/index.json"; // maxVal = 13
+		// var url = "/f4d/airPollution_NewVersion/O_PM10/index.json"; // maxVal = 221
+		// var url = "/f4d/airPollution_NewVersion/O_PM25/index.json"; // maxVal = 22.8
+		// var url = "/f4d/airPollution_NewVersion/OD_H2S/index.json"; // maxVal = 5.4
+		// var url = "/f4d/airPollution_NewVersion/OD_NH3/index.json"; // maxVal = 103.36281
+		// var url = "/f4d/airPollution_NewVersion/OD_OU/index.json"; // maxVal = 42.35
+		//---------------------------------------------------------------------------------------
+		//var url = "/f4d/airPollution_20241008/B_NO2/index.json"; // maxVal = 1.32266
+		// var url = "/f4d/airPollution_20241008/B_PM10/index.json"; // maxVal = 177.51537
+		//var url = "/f4d/airPollution_20241008/B_PM25/index.json"; // maxVal = 18.57645
+		// var url = "/f4d/airPollution_20241008/O_NO2/index.json"; // maxVal = 13.09991,// 
+		// var url = "/f4d/airPollution_20241008/O_PM10/index.json"; // maxVal = 221.05804,
+		// var url = "/f4d/airPollution_20241008/O_PM25/index.json"; // maxVal = 22.87845,
+		// var url = "/f4d/airPollution_20241008/OD_H2S/index.json"; // maxVal = 5.41222
+		var url = "/f4d/airPollution_20241008/OD_NH3/index.json"; // maxVal = 103.36281,
+		// var url = "/f4d/airPollution_20241008/OD_OU/index.json"; // maxVal = 42.35048,
 		if(!magoManager.chemicalAccidentManager)
 		{
 			var options = {
 				magoManager : magoManager,
 				url : url,
-				renderingColorType : 2, // 0= rainbow, 1= monotone, 2= legendColors.***
+				renderingColorType : 0, // 0= rainbow, 1= monotone, 2= legendColors.***
 				textureFlipYAxis : true,
 				volumetricSamplingsCount : 40
 			};
@@ -981,7 +975,7 @@
 			var legendValuesScale = 1;
 			//var legendValuesScale = 1e10;
 			var minValue = 0.0;
-			var maxValue = 178 * legendValuesScale;
+			var maxValue = 10 * legendValuesScale;
 			var numColors = 12;
 			var accentuationFactor = 1.0;
 			var legendValues = getLogDivisions(minValue, maxValue, numColors, accentuationFactor);
@@ -990,29 +984,29 @@
 			var legendColors = [];
 
 			// create legend colors.***
-			var LegendColor = new Mago3D.ColorLegend(0/255, 0/255, 143/255, 0.2, legendValues[0]);  // 0
+			var LegendColor = new Mago3D.ColorLegend(0/255, 0/255, 143/255, 0.001, legendValues[0]);  // 0
 			legendColors.push(LegendColor);
-			LegendColor = new Mago3D.ColorLegend(0/255, 15/255, 255/255, 0.2, legendValues[1]);  // 1
+			LegendColor = new Mago3D.ColorLegend(0/255, 15/255, 255/255, 0.005, legendValues[1]);  // 1
 			legendColors.push(LegendColor);
-			LegendColor = new Mago3D.ColorLegend(0/255, 95/255, 255/255, 0.2, legendValues[2]);  // 2
+			LegendColor = new Mago3D.ColorLegend(0/255, 95/255, 255/255, 0.05, legendValues[2]);  // 2
 			legendColors.push(LegendColor);
-			LegendColor = new Mago3D.ColorLegend(0/255, 175/255, 255/255, 0.2, legendValues[3]);  // 3
+			LegendColor = new Mago3D.ColorLegend(0/255, 175/255, 255/255, 0.1, legendValues[3]);  // 3
 			legendColors.push(LegendColor);
 			LegendColor = new Mago3D.ColorLegend(0/255, 255/255, 255/255, 0.2, legendValues[4]);  // 4
 			legendColors.push(LegendColor);
-			LegendColor = new Mago3D.ColorLegend(79/255, 255/255, 175/255, 0.2, legendValues[5]);  // 5
+			LegendColor = new Mago3D.ColorLegend(79/255, 255/255, 175/255, 0.3, legendValues[5]);  // 5
 			legendColors.push(LegendColor);
-			LegendColor = new Mago3D.ColorLegend(159/255, 255/255, 95/255, 0.2, legendValues[6]);  // 6
+			LegendColor = new Mago3D.ColorLegend(159/255, 255/255, 95/255, 0.4, legendValues[6]);  // 6
 			legendColors.push(LegendColor);
-			LegendColor = new Mago3D.ColorLegend(239/255, 255/255, 15/255, 0.2, legendValues[7]);  // 7
+			LegendColor = new Mago3D.ColorLegend(239/255, 255/255, 15/255, 0.5, legendValues[7]);  // 7
 			legendColors.push(LegendColor);
-			LegendColor = new Mago3D.ColorLegend(255/255, 191/255, 0/255, 0.2, legendValues[8]);  // 8
+			LegendColor = new Mago3D.ColorLegend(255/255, 191/255, 0/255, 0.6, legendValues[8]);  // 8
 			legendColors.push(LegendColor);
-			LegendColor = new Mago3D.ColorLegend(255/255, 111/255, 0/255, 0.2, legendValues[9]);  // 9
+			LegendColor = new Mago3D.ColorLegend(255/255, 111/255, 0/255, 0.7, legendValues[9]);  // 9
 			legendColors.push(LegendColor);
-			LegendColor = new Mago3D.ColorLegend(255/255, 31/255, 0/255, 0.2, legendValues[10]);  // 10
+			LegendColor = new Mago3D.ColorLegend(255/255, 31/255, 0/255, 0.88, legendValues[10]);  // 10
 			legendColors.push(LegendColor);
-			LegendColor = new Mago3D.ColorLegend(207/255, 0/255, 0/255, 0.2, legendValues[11]);  // 11
+			LegendColor = new Mago3D.ColorLegend(207/255, 0/255, 0/255, 0.9, legendValues[11]);  // 11
 			legendColors.push(LegendColor);
 
 

@@ -5389,6 +5389,7 @@ bool get_pollution_fromTexture3d_triLinearInterpolation_FAST(in vec3 texCoord3d,
     }\n\
 \n\
     float airPressure_down = _getPollution_nearest(texCoord3d.xy, col_down, row_down);\n\
+   // float airPressure_down = _getPollution_triLinearInterpolation(texCoord3d.xy, col_down, row_down);\n\
 \n\
     if(airPressure_down > 0.0)\n\
     {\n\

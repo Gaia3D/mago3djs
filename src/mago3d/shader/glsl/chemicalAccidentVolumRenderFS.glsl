@@ -653,7 +653,8 @@ bool get_pollution_fromTexture3d_triLinearInterpolation_FAST(in vec3 texCoord3d,
         row_down = int(rowAux);
     }
 
-    float airPressure_down = _getPollution_nearest(texCoord3d.xy, col_down, row_down);
+    //float airPressure_down = _getPollution_nearest(texCoord3d.xy, col_down, row_down); // bad solution. no use!
+    float airPressure_down = _getPollution_triLinearInterpolation(texCoord3d.xy, col_down, row_down);
 
     if(airPressure_down > 0.0)
     {
@@ -693,7 +694,7 @@ bool get_pollution_fromTexture3d_triLinearInterpolation_FAST(in vec3 texCoord3d,
         return false;
     }
 
-    float airPressure_up = _getPollution_nearest(texCoord3d.xy, col_up, row_up);
+    float airPressure_up = _getPollution_triLinearInterpolation(texCoord3d.xy, col_up, row_up);
     if(airPressure_up > 0.0)
     {
         airPressure = airPressure_up;
